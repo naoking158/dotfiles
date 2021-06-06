@@ -1877,9 +1877,6 @@
 
   (setq jethro/org-agenda-directory (file-truename "~/org/gtd/"))
   (setq org-agenda-files (directory-files-recursively org-directory "\\.org$"))
-        ;; '((directory-files-recursively jethro/org-agenda-directory "\\.org$")
-
-        ;;   )
 
   (setq org-capture-templates
         `(("i" "inbox" entry (file ,(concat jethro/org-agenda-directory "inbox.org"))
@@ -1994,7 +1991,6 @@
   (add-hook 'org-clock-in-hook 'jethro/set-todo-state-next 'append))
 
 (leaf org-agenda
-  :when window-system
   :require t
   :preface
   (defun jethro/switch-to-agenda ()
@@ -2211,7 +2207,6 @@
   )
 
 (leaf org-ql
-  :when window-system
   :doc "Org Query Language, search command, and agenda-like view"
   :req "emacs-26.1" "dash-2.13" "dash-functional-1.2.0" "f-0.17.2" "map-2.1" "org-9.0" "org-super-agenda-1.2" "ov-1.0.6" "peg-1.0" "s-1.12.0" "transient-0.1" "ts-0.2.-1"
   :tag "agenda" "org" "outlines" "hypermedia" "emacs>=26.1"
@@ -2220,7 +2215,6 @@
   :ensure t
   :after map org org-super-agenda peg ts)
 (leaf org-super-agenda
-  :when window-system
   :doc "Supercharge your agenda"
   :req "emacs-26.1" "s-1.10.0" "dash-2.13" "org-9.0" "ht-2.2" "ts-0.2"
   :tag "agenda" "org" "outlines" "hypermedia" "emacs>=26.1"
@@ -2229,7 +2223,6 @@
   :ensure t
   :after org ts)
 (leaf org-analyzer
-  :when window-system
   :doc "org-analyzer is a tool that extracts time tracking data from org files."
   :tag "calendar"
   :url "https://github.com/rksm/clj-org-analyzer"
@@ -2244,7 +2237,6 @@
   :after org)
 
 (leaf org-ref
-  :when window-system
   :doc "citations, cross-references and bibliographies in org-mode"
   :req "dash-2.11.0" "htmlize-1.51" "helm-1.5.5" "helm-bibtex-2.0.0" "ivy-0.8.0" "hydra-0.13.2" "key-chord-0" "s-1.10.0" "f-0.18.0" "pdf-tools-0.7"
   :tag "label" "ref" "cite" "org-mode"
@@ -2335,8 +2327,8 @@
         (add-to-list 'org-latex-classes
                      '("research-note"
                        "\\documentclass[openany]{report}\n
-\\input{/Users/naoki/drive/github.com/org/braindump/org/preferences/header.tex}\n
-\\input{/Users/naoki/drive/github.com/org/braindump/org/preferences/preamble_research_note.tex}\n
+\\input{../preferences/header.tex}\n
+\\input{..//preferences/preamble_research_note.tex}\n
 \\usepackage[whole]{bxcjkjatype}
 %% \\usepackage{amsmath,amsthm,amssymb}
 %% \\usepackage{mynotestyle}
@@ -2355,7 +2347,7 @@
                      '("article"
                         "\\RequirePackage{plautopatch}\n
 \\documentclass[a4p,uplatex,dvipdfmx]{article}\n
-\\input{/Users/naoki/drive/github.com/org/braindump/org/preferences/header.tex}"
+\\input{../preferences/header.tex}"
                         ("\\section{%s}" . "\\section*{%s}")
                         ("\\subsection{%s}" . "\\subsection*{%s}")
                         ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
@@ -2365,7 +2357,7 @@
                        '("jsarticle"
                         "\\RequirePackage{plautopatch}\n
 \\documentclass[a4p,uplatex,dvipdfmx]{jsarticle}\n
-\\input{/Users/naoki/drive/github.com/org/braindump/org/preferences/header.tex}
+\\input{../preferences/header.tex}
 [NO-DEFAULT-PACKAGES]
 [PACKAGES]
 [EXTRA]"
@@ -2443,7 +2435,6 @@
       :advice (:around org-export-dispatch c/org-export-dispatch))))
 
 (leaf org-roam
-  :when window-system
   :doc "Roam Research replica with Org-mode"
   :req "emacs-26.1" "dash-2.13" "f-0.17.2" "s-1.12.0" "org-9.3" "emacsql-3.0.0" "emacsql-sqlite3-1.0.2"
   :tag "convenience" "roam" "org-mode" "emacs>=26.1"
@@ -2800,43 +2791,45 @@
   ((company-mode-hook . set-yas-as-company-backend))
   )
 
-(leaf font-setting
-  :when window-system
+(leaf *font
   :config
-  ;; フォントセットを作る
-  ;; (leaf font-setting
-  ;;   :disabled nil
-  ;;   :when window-system
-  ;;   :config
-  ;;                                 ;(set-face-attribute 'default nil :family "Source Code Pro" :height 100)
-  ;;   (set-face-attribute 'default nil :family "Consolas" :height 100)
-  ;;                                 ;(set-fontset-font nil '(#x0000 . #x0080) (font-spec :family "Consolas" :size 14))
-  ;;                                 ;(set-fontset-font nil 'japanese-jisx0208 (font-spec :family "Ricty Diminished Discord" :size 11))
-  ;;   (set-fontset-font nil 'japanese-jisx0208 (font-spec :family "Yu Gothic UI" :size 12))
-  ;;   (add-to-list 'face-font-rescale-alist '(".*Yu Gothic UI*" . 0.95)))
+  (leaf *font-setting
+    :when window-system
+    :config
+    ;; フォントセットを作る
+    ;; (leaf font-setting
+    ;;   :disabled nil
+    ;;   :when window-system
+    ;;   :config
+    ;;                                 ;(set-face-attribute 'default nil :family "Source Code Pro" :height 100)
+    ;;   (set-face-attribute 'default nil :family "Consolas" :height 100)
+    ;;                                 ;(set-fontset-font nil '(#x0000 . #x0080) (font-spec :family "Consolas" :size 14))
+    ;;                                 ;(set-fontset-font nil 'japanese-jisx0208 (font-spec :family "Ricty Diminished Discord" :size 11))
+    ;;   (set-fontset-font nil 'japanese-jisx0208 (font-spec :family "Yu Gothic UI" :size 12))
+    ;;   (add-to-list 'face-font-rescale-alist '(".*Yu Gothic UI*" . 0.95)))
 
-  (let* ((fontset-name "myfonts") ; フォントセットの名前
-          (size 14) ; ASCIIフォントのサイズ [9/10/12/14/15/17/19/20/...]
-          (asciifont "JetBrains Mono") ; ASCIIフォント
-          (jpfont "Noto Serif CJK JP") ; 日本語フォント
-          (font (format "%s-%d:weight=normal:slant=normal" asciifont size))
-          (fontspec (font-spec :family asciifont))
-          (jp-fontspec (font-spec :family jpfont))
-          (fsn (create-fontset-from-ascii-font font nil fontset-name)))
-    (set-fontset-font fsn 'japanese-jisx0213.2004-1 jp-fontspec)
-    (set-fontset-font fsn 'japanese-jisx0213-2 jp-fontspec)
-    (set-fontset-font fsn 'katakana-jisx0201 jp-fontspec) ; 半角カナ
-    (set-fontset-font fsn '(#x0080 . #x024F) fontspec)    ; 分音符付きラテン
-    (set-fontset-font fsn '(#x0370 . #x03FF) fontspec)    ; ギリシャ文字
-    ;; )  ;; commented 2021/05/29
+    (let* ((fontset-name "myfonts") ; フォントセットの名前
+            (size 14) ; ASCIIフォントのサイズ [9/10/12/14/15/17/19/20/...]
+            (asciifont "JetBrains Mono") ; ASCIIフォント
+            (jpfont "Noto Serif CJK JP") ; 日本語フォント
+            (font (format "%s-%d:weight=normal:slant=normal" asciifont size))
+            (fontspec (font-spec :family asciifont))
+            (jp-fontspec (font-spec :family jpfont))
+            (fsn (create-fontset-from-ascii-font font nil fontset-name)))
+      (set-fontset-font fsn 'japanese-jisx0213.2004-1 jp-fontspec)
+      (set-fontset-font fsn 'japanese-jisx0213-2 jp-fontspec)
+      (set-fontset-font fsn 'katakana-jisx0201 jp-fontspec) ; 半角カナ
+      (set-fontset-font fsn '(#x0080 . #x024F) fontspec)    ; 分音符付きラテン
+      (set-fontset-font fsn '(#x0370 . #x03FF) fontspec)    ; ギリシャ文字
+      ;; )  ;; commented 2021/05/29
 
-    ;; デフォルトのフレームパラメータでフォントセットを指定
-    (add-to-list 'default-frame-alist '(font . "fontset-myfonts"))
-    )  ;; add 2021/05/29
+      ;; デフォルトのフレームパラメータでフォントセットを指定
+      (add-to-list 'default-frame-alist '(font . "fontset-myfonts"))
+      )  ;; add 2021/05/29
 
-  ;; デフォルトフェイスにフォントセットを設定
-  ;; # これは起動時に default-frame-alist に従ったフレームが作成されない現象への対処
-  (set-face-font 'default "fontset-myfonts")
+    ;; デフォルトフェイスにフォントセットを設定
+    ;; # これは起動時に default-frame-alist に従ったフレームが作成されない現象への対処
+    (set-face-font 'default "fontset-myfonts"))
 
   ;; Ligatureの設定 (対応フォント限定: Fira Code や JetBrains Mono)
   (let ((alist '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
@@ -2868,13 +2861,8 @@
     (dolist (char-regexp alist)
       (set-char-table-range composition-function-table (car char-regexp)
         `([,(cdr char-regexp) 0 font-shape-gstring]))))
-
-  ;; ;; フォントサイズの比を設定
-  ;; (dolist (elt '(
-  ;;                ("*Hiragino Sans*" . 0.7)
-  ;;                ))
-  ;;   (add-to-list 'face-font-rescale-alist elt))
   )
+
 
 (provide 'init)
 
