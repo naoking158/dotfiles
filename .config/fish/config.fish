@@ -535,7 +535,7 @@ end
 # function e
 #     command emacsclient $argv
 # end
-alias em='emacsclient -t -a""'
+alias e='emacsclient ""'
 alias ee='open ~/drive/github.com/build-emacs-for-macos/builds/Emacs.app'
 alias ekill='emacsclient -e "(kill-emacs)"'
 
