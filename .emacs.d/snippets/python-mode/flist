@@ -1,0 +1,6 @@
+# key: flist
+# name: flist
+# --
+def ${1:f}_list(num_list: list) -> int:
+    return reduce($1, num_list)
+$0
