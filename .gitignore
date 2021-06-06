@@ -4,11 +4,13 @@
 !/README.md
 
 !/Brewfile
-!/.config/
 !/.mackup*
 !/.mackup/
 !/.ssh/
 !/.tmux.conf
+
+!/.config/
+/.config/fish/fish_variables
 
 !/Library/
 /Library/*
