@@ -1,0 +1,6 @@
+[submodule ".emacs.d/el-get/nano-emacs"]
+	path = .emacs.d/el-get/nano-emacs
+	url = https://github.com/rougier/nano-emacs.git
+[submodule ".emacs.d/el-get/flymake-posframe"]
+	path = .emacs.d/el-get/flymake-posframe
+	url = https://github.com/Ladicle/flymake-posframe.git
