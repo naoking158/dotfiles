@@ -488,8 +488,10 @@ function replace --argument-names 'before' 'after'
     find . -name "*$before*" | xargs rename -s $before $after
 end
 
-function ssh
-    command ~/bin/ssh-change-profile.sh $argv
+if test (uname -s) = "Darwin"
+    function ssh
+        command ~/bin/ssh-change-profile.sh $argv
+    end
 end
 
 function _sirius
