@@ -45,7 +45,7 @@ set -xg LANG en_US.UTF-8
 
 if test (uname -s) = "Darwin"
    # libgccjit
-   set -xg LIBRARY_PATH /usr/local/opt/libgccjit/lib/gcc/11 $LIBRARY_PATH
+   # set -xg LIBRARY_PATH /usr/local/opt/libgccjit/lib/gcc/11 $LIBRARY_PATH
 
     # Homebrew
     set -xg HOMEBREW_EDITOR "/usr/local/bin/emacs -q -nw"
@@ -537,7 +537,7 @@ end
 # function e
 #     command emacsclient $argv
 # end
-alias e='emacsclient ""'
+alias e='emacsclient'
 alias ee='open ~/drive/github.com/build-emacs-for-macos/builds/Emacs.app'
 alias ekill='emacsclient -e "(kill-emacs)"'
 
@@ -580,8 +580,8 @@ if test (uname -s) = "Darwin"
     # !! Contents within this block are managed by 'conda init' !!
     eval /Users/naoki/miniconda/condabin/conda "shell.fish" "hook" $argv | source
     # <<< conda initialize <<<set -g fish_user_paths "/usr/local/opt/texinfo/bin" $fish_user_paths
-    set -g fish_user_paths "/usr/local/opt/icu4c/bin" $fish_user_paths
-    set -g fish_user_paths "/usr/local/opt/icu4c/sbin" $fish_user_pathsset -g fish_user_paths "/usr/local/opt/ruby/bin" $fish_user_paths
+    # set -g fish_user_paths "/usr/local/opt/icu4c/bin" $fish_user_paths
+    # set -g fish_user_paths "/usr/local/opt/icu4c/sbin" $fish_user_pathsset -g fish_user_paths "/usr/local/opt/ruby/bin" $fish_user_paths
 
     set -gx LDFLAGS "-L/usr/local/opt/ruby/lib" $LDFLAGS
     set -gx CPPFLAGS "-I/usr/local/opt/ruby/include" $CPPFLAGS
