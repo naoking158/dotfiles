@@ -469,16 +469,10 @@
   :tag "location" "window"
   :url "https://github.com/abo-abo/ace-window"
   :ensure t
-  :bind ("C-t" . ace-window)
+  :bind* ("C-t" . ace-window)
   :custom ((aw-keys . '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
   :custom-face
   ((aw-leading-char-face . '((t (:height 4.0 :foreground "#f1fa8c")))))
-  :config
-  (add-hook 'dired-mode-hook
-    (lambda nil
-      (define-key dired-mode-map
-        (kbd "C-t")
-        'ace-window)))
   )
 
 (leaf auctex
@@ -1618,15 +1612,22 @@
   :emacs>= 25.1
   :ensure t
   :bind (("C-c m" . magit-status))
-  :config
-  (set-default 'magit-stage-all-confirm nil)
-  (set-default 'magit-unstage-all-confirm nil)
-  (remove-hook 'magit-mode-hook 'turn-on-magit-gitflow)
-  ;; Restores "normal" behavior in branch view (when hitting RET)
-  (setq magit-visit-ref-behavior '(create-branch checkout-any focus-on-ref))
-  (setq git-commit-finish-query-functions nil)
-  (setq magit-visit-ref-create 1)
-  (setq magit-revision-show-gravatars nil)
+  :custom ((magit-bury-buffer-function quote magit-mode-quit-window)
+            (magit-buffer-name-format . "%x%M%v: %t%x")
+            (magit-refresh-verbose . t)
+            (magit-commit-ask-to-stage quote stage)
+            (magit-clone-set-remote\.pushDefault . t)
+            (magit-clone-default-directory . "~/drive/github.com/")
+            (magit-remote-add-set-remote\.pushDefault quote ask))
+  ;; :config
+  ;; (set-default 'magit-stage-all-confirm nil)
+  ;; (set-default 'magit-unstage-all-confirm nil)
+  ;; (remove-hook 'magit-mode-hook 'turn-on-magit-gitflow)
+  ;; ;; Restores "normal" behavior in branch view (when hitting RET)
+  ;; (setq magit-visit-ref-behavior '(create-branch checkout-any focus-on-ref))
+  ;; (setq git-commit-finish-query-functions nil)
+  ;; (setq magit-visit-ref-create 1)
+  ;; (setq magit-revision-show-gravatars nil)
   )
 
 (leaf window-numbering
