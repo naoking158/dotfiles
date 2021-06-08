@@ -291,6 +291,14 @@
           (doom-modeline-def-modeline 'main
             '(bar window-number matches buffer-info remote-host buffer-position parrot selection-info)
             '(misc-info persp-name lsp github debug minor-modes input-method major-mode process vcs checker)))
+        (doom-modeline-def-segment tab-bar-name
+          "The current tab name. Requires `tab-bar-mode` to be enabled."
+          (if (< 1 (length (tab-bar-tabs)))
+            (let ((name (cdr (assoc 'name (tab-bar--current-tab)))))
+              (propertize (format " %s " name)
+                'face (if (doom-modeline--active)
+                        'doom-modeline-buffer-major-mode
+                        'mode-line-inactive)))))
         )
 
       (leaf hide-mode-line
@@ -582,6 +590,14 @@
 
   :global-minor-mode global-company-mode
   :config
+  (leaf company-org-block
+    :ensure t
+    :custom
+    (company-org-block-edit-style . 'auto) ;; 'auto, 'prompt, or 'inline
+    :hook ((org-mode-hook . (lambda ()
+                              (setq-local company-backends '(company-org-block))
+                              (company-mode +1)))))
+
   (leaf company-yasnippet
     :doc "company-mode completion backend for Yasnippet"
     :tag "out-of-MELPA"
@@ -802,19 +818,10 @@
 (leaf tab-bar
   :doc "frame-local tabs with named persistent window configurations"
   :tag "builtin"
-  :bind (("s-t" . tab-bar-new-tab)
-          ("s-d" . tab-bar-close-tab)
-          ("s-[" . tab-bar-switch-to-prev-tab)
-          ("s-]" . tab-bar-switch-to-next-tab)
-          ("s-u" . tab-bar-undo-close-tab)
-          ("s-R" . tab-bar-rename-tab)
-          ("s-z" . tab-bar-history-back)
-          ("s-Z" . tab-bar-history-forward))
-  :custom ((tab-bar-show . 1)
-            (tab-bar-new-button-show . nil)
-            (tab-bar-close-button-show . nil)
-            (tab-bar-history-buttons-show . nil))
-  :global-minor-mode (tab-bar-mode tab-bar-history-mode))
+  :bind (("C-<tab>" . tab-bar-switch-to-next-tab))
+  :config
+  (tab-bar-mode)
+  (tab-bar-new-tab))
 
 (leaf ein
     :doc "Emacs IPython Notebook"
