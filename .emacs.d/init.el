@@ -123,6 +123,7 @@
               ("M-ESC g" . c/garbage-collect))
       :custom '((fill-column . 85)
                  (tab-width . 4)
+                 (tool-bar-mode . nil)
                  (user-full-name . "Naoki Sakamoto")
                  (user-mail-address . "naoki@bbo.cs.tsukuba.ac.jp")
                  (user-login-name . "naoking158")
@@ -144,7 +145,7 @@
                  (ring-bell-function quote ignore)
                  (text-quoting-style quote straight)
                  (truncate-lines . t)
-                 (menu-bar-mode . t)
+                 (menu-bar-mode . nil)
                  (tool-bar-mode)
                  (scroll-bar-mode)
                  (fringe-mode . 10)
@@ -237,19 +238,6 @@
                   )
         )
 
-      (leaf nano-faces
-        :disabled t
-        :tag "out-of-MELPA"
-        :load-path "~/.emacs.d/el-get/nano-emacs"
-        :require t nano-theme nano-theme-dark nano-modeline nano-bindings
-        :config
-        (nano-faces)
-        (nano-theme)
-        (let ((inhibit-message t))
-          (message "Welcome to GNU Emacs / N Λ N O edition")
-          (message (format "Initialization time: %s" (emacs-init-time))))
-        )
-
       (leaf doom-themes
         :doc "an opinionated pack of modern color-themes"
         :req "emacs-25.1" "cl-lib-0.5"
@@ -260,8 +248,6 @@
         :custom
         ((doom-themes-enable-italic . t)
           (doom-themes-enable-bold . t))
-        :custom-face
-        (doom-modeline-bar . '((t (:background "#6272a4"))))
         :config
         ;; (load-theme 'doom-one t)
         (load-theme 'doom-nord t)
@@ -281,8 +267,10 @@
             (doom-modeline-icon . t)
             (doom-modeline-major-mode-icon . nil)
             (doom-modeline-minor-modes . nil))
-          :custom-face
-          ((mode-line . '((t (:background "dark slate gray" :foreground "white")))))
+          ;; :custom-face
+          ;; (
+          ;;  ;; (doom-modeline-bar . '((t (:background "#6272a4"))))
+          ;;  (mode-line . '((t (:background "dark slate gray" :foreground "white")))))
           :hook (after-init-hook . doom-modeline-mode)
           :defun (doom-modeline-def-modeline)
           :config
@@ -290,15 +278,8 @@
           (column-number-mode 1)
           (doom-modeline-def-modeline 'main
             '(bar window-number matches buffer-info remote-host buffer-position parrot selection-info)
-            '(misc-info persp-name lsp github debug minor-modes input-method major-mode process vcs checker)))
-        (doom-modeline-def-segment tab-bar-name
-          "The current tab name. Requires `tab-bar-mode` to be enabled."
-          (if (< 1 (length (tab-bar-tabs)))
-            (let ((name (cdr (assoc 'name (tab-bar--current-tab)))))
-              (propertize (format " %s " name)
-                'face (if (doom-modeline--active)
-                        'doom-modeline-buffer-major-mode
-                        'mode-line-inactive)))))
+            '(misc-info persp-name lsp github debug minor-modes input-method major-mode process vcs checker))
+          )
         )
 
       (leaf hide-mode-line
