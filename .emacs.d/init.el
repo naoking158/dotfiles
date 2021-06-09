@@ -887,6 +887,28 @@
   :config
   (gcmh-mode 1))
 
+(leaf git-gutter
+  :doc "Port of Sublime Text plugin GitGutter"
+  :req "emacs-24.3"
+  :tag "emacs>=24.3"
+  :added "2021-06-10"
+  :url "https://github.com/emacsorphanage/git-gutter"
+  :emacs>= 24.3
+  :ensure t
+  :bind (("C-x g" . git-gutter)
+          ("C-x p" . git-gutter:previous-hunk)
+          ("C-x n" . git-gutter:next-hunk)
+          ("C-x t" . git-gutter:toggle))
+  :custom
+  ((git-gutter:modified-sign . "~")
+    (git-gutter:added-sign . "+")
+    (git-gutter:deleted-sign . "-"))
+  :custom-face
+  ((git-gutter:modified . '((t (:background "#f1fa8c"))))
+  (git-gutter:added . '((t (:background "#50fa7b"))))
+  (git-gutter:deleted . '((t (:background "#ff79c6")))))
+  )
+
 (leaf global-visual-line-mode
   :defun (global-visual-line-mode . t)
   :config
