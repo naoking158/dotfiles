@@ -806,6 +806,13 @@
     :ensure t
     :custom ((ein:output-area-inlined-images . t)))
 
+(leaf fish-mode
+  :doc "Major mode for fish shell scripts"
+  :req "emacs-24"
+  :tag "shell" "fish" "emacs>=24"
+  :emacs>= 24
+  :ensure t)
+
 (leaf flymake
   :doc "A universal on-the-fly syntax checker"
   :tag "builtin"

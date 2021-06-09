@@ -23,7 +23,9 @@ function fish_prompt
   set -l green (set_color green)
   set -l normal (set_color normal)
 
-  set -l cwd $blue(pwd | sed "s:^$HOME:~:")
+  # set -l cwd $blue(pwd | sed "s:^$HOME:~:")
+  set -l myname '[' $yellow(string replace '.local' '' (hostname)) $normal']'
+  set -l cwd $myname $blue(pwd | sed "s:^$HOME:~:")
 
   # Output the prompt, left to right
 
