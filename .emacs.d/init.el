@@ -840,7 +840,7 @@
     :ensure t
     :after flymake
     :defvar (flymake-diagnostic-at-point-error-prefix)
-    :custom ((flymake-diagnostic-at-point-timer-delay . 0.1)
+    :custom ((flymake-diagnostic-at-point-timer-delay . 1)
               (flymake-diagnostic-at-point-error-prefix . " ► ")
               (flymake-diagnostic-at-point-display-diagnostic-function quote flymake-diagnostic-at-point-display-popup))
     :hook ((flymake-mode-hook . flymake-diagnostic-at-point-mode))
