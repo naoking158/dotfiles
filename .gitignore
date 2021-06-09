@@ -7,7 +7,9 @@
 !/.mackup*
 !/.mackup/
 !/.ssh/
-!/.tmux.conf
+
+!/.tmux/
+!/.tmux*
 
 !/.config/
 /.config/fish/fish_variables
