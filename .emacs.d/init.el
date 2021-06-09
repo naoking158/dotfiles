@@ -723,7 +723,7 @@
   :emacs>= 24.1
   :ensure t
   :bind (("C-c a w" . avy-goto-word-1)
-         ("C-c a c" . avy-goto-char-2)))
+          ("C-c a c" . avy-goto-char-2)))
 
 (leaf beacon
   :doc "Highlight the cursor whenever the window scrolls"
@@ -732,7 +732,9 @@
   :url "https://github.com/Malabarba/beacon"
   :ensure t
   :custom
-  ((beacon-color . "yellow"))
+  ((beacon-color . "cyan")
+    ;; (beacon-color . "yellow")
+    )
   :config
   (beacon-mode 1))
 
@@ -1506,7 +1508,6 @@
              (lsp-print-performance . nil)
              ;; general
              (lsp-idle-delay . 0.5)
-             ;; (lsp-pyls-plugins-flake8-enabled . t)
              (lsp-document-sync-method . 2)
              (lsp-response-timeout . 5)
              (lsp-prefer-flymake . t)
@@ -1514,8 +1515,6 @@
              (lsp-enable-completion-at-point . nil)
              (lsp-enable-indentation . nil)
              (lsp-restart . 'ignore)
-             ;; (lsp-pyls-plugins-flake8-ignore . (E203 E226 E302 E41 E501 E503))
-             ;; (lsp-pyls-plugins-flake8-max-line-length . 93)
              )
   :hook (;; (prog-mode-hook . lsp-deferred)
           (lsp-mode-hook . lsp-enable-which-key-integration)
@@ -1538,7 +1537,6 @@
     :ensure t
     :config
     (add-hook 'TeX-mode-hook 'lsp)
-    ;; (add-hook 'LaTeX-mode-hook 'lsp)
     )
 
   (leaf lsp-ui
@@ -1593,11 +1591,6 @@
       ("C-c d"   . ladicle/toggle-lsp-ui-doc)))
     :hook
     (lsp-mode-hook . lsp-ui-mode)
-    :config
-    ;; (defun disable-flycheck-mode ()
-    ;;   (interactive)
-    ;;   (flycheck-mode -1))
-    ;; (add-hook 'prog-mode-hook 'disable-flycheck-mode)
     )
 
   (leaf lsp-ivy
@@ -1629,15 +1622,6 @@
             (magit-clone-set-remote\.pushDefault . t)
             (magit-clone-default-directory . "~/drive/github.com/")
             (magit-remote-add-set-remote\.pushDefault quote ask))
-  ;; :config
-  ;; (set-default 'magit-stage-all-confirm nil)
-  ;; (set-default 'magit-unstage-all-confirm nil)
-  ;; (remove-hook 'magit-mode-hook 'turn-on-magit-gitflow)
-  ;; ;; Restores "normal" behavior in branch view (when hitting RET)
-  ;; (setq magit-visit-ref-behavior '(create-branch checkout-any focus-on-ref))
-  ;; (setq git-commit-finish-query-functions nil)
-  ;; (setq magit-visit-ref-create 1)
-  ;; (setq magit-revision-show-gravatars nil)
   )
 
 (leaf window-numbering
@@ -2734,19 +2718,9 @@
   :tag "wp" "convenience" "emulations"
   :url "http://www.emacswiki.org/emacs/download/volatile-highlights.el"
   :ensure t
-  :hook
-  ((after-init-hook . volatile-highlights-mode))
+  :hook ((after-init-hook . volatile-highlights-mode))
   :custom-face
   ((vhl/default-face . '((nil (:foreground "#FF3333" :background "#FFCDCD"))))))
-
-;; (leaf ob-ipython
-;;   :doc "org-babel functions for IPython evaluation"
-;;   :req "s-1.9.0" "dash-2.10.0" "dash-functional-1.2.0" "f-0.17.2" "emacs-24"
-;;   :tag "reproducible research" "literate programming" "emacs>=24"
-;;   :added "2021-01-05"
-;;   :url "http://www.gregsexton.org"
-;;   :emacs>= 24
-;;   :ensure t)
 
 (leaf wgrep
   :doc "Writable grep buffer and apply the changes to files"
