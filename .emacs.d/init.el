@@ -1163,7 +1163,7 @@
                        candidates))))
 
     (setf (alist-get 'counsel-M-x ivy-sort-matches-functions-alist)
-          #'ivy--sort-by-len)
+      #'ivy--sort-by-len)
 
     ;; ;; Disable counsel-find-file
     ;; ;; https://emacs.stackexchange.com/questions/45929/disable-ivy-for-find-file
