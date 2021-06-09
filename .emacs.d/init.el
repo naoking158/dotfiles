@@ -552,7 +552,7 @@
           ("C-n" . company-select-next)
           ("C-p" . company-select-previous)))
   :custom ((company-tooltip-limit . 15)
-           (company-idle-delay . 0.2)
+           (company-idle-delay . 0)
            (company-dabbrev-downcase . 0)
            (company-minimum-prefix-length . 2)
            (company-transformers quote
