@@ -2130,19 +2130,10 @@
   ;; (setq org-journal-file-header 'org-journal-file-header-func)
   )
 
-(leaf org-download
-  :when window-system
-  :doc "Image drag-and-drop for Org-mode."
-  :req "emacs-24.3" "async-1.2"
-  :tag "download" "screenshots" "images" "multimedia" "emacs>=24.3"
-  :url "https://github.com/abo-abo/org-download"
-  :emacs>= 24.3
-  :ensure t
-  :custom
-  ((org-download-image-dir . "imgs"))
-  :config
-  (with-eval-after-load "org"
-    (defun org-insert-clipboard-image ()
+(leaf org-insert-clipboard-image*
+  :after org
+  :preface
+  (defun org-insert-clipboard-image ()
       "Generate png file from a clipboard image and insert a link to current buffer."
       (interactive)
       (let* ((filename
@@ -2156,11 +2147,9 @@
         (if (file-exists-p filename)
           (insert (concat "[[file:" filename "]]")))
         (org-display-inline-images)))
-
-    (global-set-key (kbd "C-M-y") 'org-insert-clipboard-image))
-
+  :bind (("C-M-y" . org-insert-clipboard-image))
+  :config
   (defcustom org-limit-image-size '(0.8 . 0.4) "Maximum image size") ;; integer or float or (width-int-or-float . height-int-or-float)
-
   (defun org-limit-image-size--get-limit-size (width-p)
     (let ((limit-size (if (numberp org-limit-image-size)
                         org-limit-image-size
@@ -2210,6 +2199,21 @@
     (advice-remove #'org-display-inline-images #'org-limit-image-size--org-display-inline-images))
 
   (add-hook 'org-mode-hook 'org-limit-image-size-activate)
+  )
+
+
+(leaf org-download
+  :disabled t
+  :when window-system
+  :doc "Image drag-and-drop for Org-mode."
+  :req "emacs-24.3" "async-1.2"
+  :tag "download" "screenshots" "images" "multimedia" "emacs>=24.3"
+  :url "https://github.com/abo-abo/org-download"
+  :emacs>= 24.3
+  :ensure t
+  :hook (org-mode-hook . org-download-enable)
+  :custom
+  ((org-download-image-dir . "imgs"))
   )
 
 (leaf org-ql
