@@ -941,10 +941,10 @@
   ((highlight-indent-guides-auto-enabled . t)
     (highlight-indent-guides-responsive . t)
     (highlight-indent-guides-method . 'character)) ; column
-  :config
-  (set-face-background 'highlight-indent-guides-odd-face "darkgray")
-  (set-face-background 'highlight-indent-guides-even-face "dimgray")
-  (set-face-foreground 'highlight-indent-guides-character-face "dimgray")
+  ;; :config
+  ;; (set-face-background 'highlight-indent-guides-odd-face "darkgray")
+  ;; (set-face-background 'highlight-indent-guides-even-face "dimgray")
+  ;; (set-face-foreground 'highlight-indent-guides-character-face "dimgray")
   )
 
 (leaf indent-region-custom
