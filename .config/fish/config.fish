@@ -50,9 +50,6 @@ if test (uname -s) = "Darwin"
     # Homebrew
     set -xg HOMEBREW_EDITOR "/usr/local/bin/emacs -q -nw"
 
-    # ghq root
-    set -xg GHQ_ROOT "$HOME/drive"
-
     set PATH /Library/Tex/texbin $PATH
     set PATH /usr/local/bin $PATH
     set PATH /usr/local/texlive/2020basic/bin/x86_64-darwin $PATH
