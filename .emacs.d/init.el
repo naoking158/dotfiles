@@ -799,7 +799,7 @@
   :bind (("s-]" . tab-bar-switch-to-next-tab)
           ("s-[" . tab-bar-switch-to-prev-tab)
           ("s-d" . tab-bar-close-tab)
-          ("S-s-r" . tab-bar-rename))
+          ("s-R" . tab-bar-rename-tab))
   :config
   (tab-bar-mode)
   (tab-bar-new-tab))
@@ -2458,7 +2458,6 @@
          ("C-c n c" . org-roam-capture))
   :init
   (setq org-roam-directory (file-truename "~/org/braindump/org/")
-        ;; org-roam-db-location "~/.doom.d/org-roam.db"
         org-roam-db-location (concat org-roam-directory "org-roam.db")
         org-roam-db-gc-threshold most-positive-fixnum
         org-roam-graph-exclude-matcher "private"
