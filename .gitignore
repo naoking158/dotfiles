@@ -1,4 +1,5 @@
 /*
+/.**
 
 !/.git*
 !/README.md
@@ -16,9 +17,12 @@
 !/Library/
 /Library/*
 !/Library/Workflows/
+!/Library/Workflows/**
 
 !/.emacs.d/
 /.emacs.d/*
 !/.emacs.d/init.el
 !/.emacs.d/el-get/
+!/.emacs.d/el-get/**
 !/.emacs.d/snippets/
+!/.emacs.d/snippets/**
