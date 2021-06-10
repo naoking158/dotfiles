@@ -796,7 +796,10 @@
 (leaf tab-bar
   :doc "frame-local tabs with named persistent window configurations"
   :tag "builtin"
-  :bind (("C-<tab>" . tab-bar-switch-to-next-tab))
+  :bind (("s-]" . tab-bar-switch-to-next-tab)
+          ("s-[" . tab-bar-switch-to-prev-tab)
+          ("s-d" . tab-bar-close-tab)
+          ("S-s-r" . tab-bar-rename))
   :config
   (tab-bar-mode)
   (tab-bar-new-tab))
