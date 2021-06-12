@@ -1009,8 +1009,7 @@
   ;; (set-face-foreground 'highlight-indent-guides-character-face "dimgray")
   )
 
-(leaf indent-region-custom
-  :defun (indent-region-custom)
+(leaf *indent-region-custom
   :preface
   (defun indent-region-custom(numSpaces)
     (progn
@@ -1033,8 +1032,7 @@
         (setq deactivate-mark nil) ; restore the selected region
         )))
   :config
-  (leaf untab-region
-    :defun (untab-region . nil)
+  (leaf *untab-region
     :bind (("M-[" . untab-region))
     :preface
     (defun untab-region nil
@@ -1042,8 +1040,7 @@
       (indent-region-custom -4))
     )
 
-  (leaf tab-region
-    :defun (tab-region . nil)
+  (leaf *tab-region
     :bind (("M-]" . tab-region))
     :preface
     (defun tab-region nil
@@ -1186,7 +1183,7 @@
            ("M-x" . counsel-M-x)
            ("M-y" . counsel-yank-pop)
            ("C-M-z" . counsel-fzf)
-           ("C-M-r" . counsel-recentf)
+           ("C-M-r" . counsel-buffer-or-recentf)
            ("C-x C-b" . counsel-ibuffer)
            ("C-M-f" . counsel-rg)
            ("C-x C-f" . counsel-find-file)
@@ -2192,7 +2189,7 @@
   ;; (setq org-journal-file-header 'org-journal-file-header-func)
   )
 
-(leaf org-insert-clipboard-image*
+(leaf *org-insert-clipboard-image
   :after org
   :preface
   (defun org-insert-clipboard-image ()
