@@ -793,6 +793,68 @@
   :blackout t
   :custom ((eldoc-idle-delay . 0.3)))
 
+(leaf *font
+  :when window-system
+  :hook (after-init-hook . font-setting)
+  :preface
+  (defun font-setting ()
+    ;; フォントセットを作る
+    (let* ((fontset-name "myfonts") ; フォントセットの名前
+            (size 14) ; ASCIIフォントのサイズ [9/10/12/14/15/17/19/20/...]
+            (asciifont "JetBrains Mono") ; ASCIIフォント
+            (jpfont "Noto Serif CJK JP") ; 日本語フォント
+            (font (format "%s-%d:weight=normal:slant=normal" asciifont size))
+            (fontspec (font-spec :family asciifont))
+            (jp-fontspec (font-spec :family jpfont))
+            (fsn (create-fontset-from-ascii-font font nil fontset-name)))
+      (set-fontset-font fsn 'japanese-jisx0213.2004-1 jp-fontspec)
+      (set-fontset-font fsn 'japanese-jisx0213-2 jp-fontspec)
+      (set-fontset-font fsn 'katakana-jisx0201 jp-fontspec) ; 半角カナ
+      (set-fontset-font fsn '(#x0080 . #x024F) fontspec)    ; 分音符付きラテン
+      (set-fontset-font fsn '(#x0370 . #x03FF) fontspec)    ; ギリシャ文字
+      ;; )  ;; commented 2021/05/29
+
+      ;; デフォルトのフレームパラメータでフォントセットを指定
+      (add-to-list 'default-frame-alist '(font . "fontset-myfonts"))
+      )  ;; add 2021/05/29
+
+    ;; デフォルトフェイスにフォントセットを設定
+    ;; # これは起動時に default-frame-alist に従ったフレームが作成されない現象への対処
+    (set-face-font 'default "fontset-myfonts")
+
+    ;; Ligatureの設定 (対応フォント限定: Fira Code や JetBrains Mono)
+    (let ((alist '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
+                    (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
+                    (36 . ".\\(?:>\\)")
+                    (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
+                    (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
+                    (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
+                    (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
+                    (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
+                    (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
+                    (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
+                    (48 . ".\\(?:x[a-zA-Z]\\)")
+                    (58 . ".\\(?:::\\|[:=]\\)")
+                    (59 . ".\\(?:;;\\|;\\)")
+                    (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
+                    (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
+                    (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
+                    (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
+                    (91 . ".\\(?:]\\)")
+                    (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
+                    (94 . ".\\(?:=\\)")
+                    (119 . ".\\(?:ww\\)")
+                    (123 . ".\\(?:-\\)")
+                    (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
+                    (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)")
+                    )
+            ))
+      (dolist (char-regexp alist)
+        (set-char-table-range composition-function-table (car char-regexp)
+          `([,(cdr char-regexp) 0 font-shape-gstring]))))
+    )
+  )
+
 (leaf tab-bar
   :doc "frame-local tabs with named persistent window configurations"
   :tag "builtin"
