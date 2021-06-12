@@ -2759,23 +2759,15 @@
   :ensure t
   :bind (("M-=" . transient-dwim-dispatch)))
 
-(leaf undo-tree
-  :doc "Treat undo history as a tree"
-  :tag "tree" "history" "redo" "undo" "files" "convenience"
-  :url "http://www.dr-qubit.org/emacs.php"
+(leaf undo-fu
+  :doc "Undo helper with redo"
+  :req "emacs-24.3"
+  :tag "emacs>=24.3"
+  :url "https://gitlab.com/ideasman42/emacs-undo-fu"
+  :emacs>= 24.3
   :ensure t
-  :bind ("M-/" . undo-tree-redo)
-  :custom
-  ((undo-limit . 80000)
-   (undo-strong-limit . 120000)
-   (undo-outer-limit . 360000)
-   (undo-tree-limit . 80000)
-   (undo-tree-strong-limit . 120000)
-   (undo-tree-outer-limit . 360000))
-  :config
-  (defadvice undo-tree-make-history-save-file-name
-      (after undo-tree activate)
-    (setq ad-return-value (concat ad-return-value ".zip")))
+  :bind* (("C-/" . undo-fu-only-undo)
+          ("C-M-/" . undo-fu-only-redo))
   )
 
 (leaf volatile-highlights
