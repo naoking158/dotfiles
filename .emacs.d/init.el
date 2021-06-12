@@ -1488,33 +1488,6 @@
   (defvar-local jump-back!--marker-ring nil)
   (run-with-idle-timer 1 t 'jump-back!--ring-update))
 
-(leaf jupyter
-  :disabled t
-  ;; :when (executable-find "jupyter")
-  :doc "Jupyter"
-  :req "emacs-26" "zmq-0.10.3" "cl-lib-0.5" "simple-httpd-1.5.0" "websocket-1.9"
-  :tag "emacs>=26"
-  :url "https://github.com/dzop/emacs-jupyter"
-  :emacs>= 26
-  :ensure t
-  :config
-  (leaf ob-jupyter
-    :after ox
-    :require t ob-python jupyter
-    :commands (org-babel-jupyter-override-src-block)
-    :custom ((org-babel-default-header-args:jupyter-julia quote
-                                                          ((:async . "yes")
-                                                           (:session . "jl")
-                                                           (:kernel . "julia-1.0")
-                                                           (:cache . "yes")))
-             (org-babel-default-header-args:jupyter-python quote
-                                                           ((:async . "yes")
-                                                            (:session . "py")
-                                                            (:kernel . "python3")
-                                                            (:cache . "yes"))))
-    :config
-    (org-babel-jupyter-override-src-block "python")))
-
 (leaf key-chord
   :doc "map pairs of simultaneously pressed keys to commands"
   :req "emacs-24"
@@ -1733,12 +1706,11 @@
   :bind (("C-a" . mwim-beginning-of-code-or-line)
          ("C-e" . mwim-end-of-code-or-line)))
 
-(leaf my-window-resizer
-  :defun (my-window-resizer . nil)
-  :defvar (last-command-char
-           current-height
-           current-width
-           window-obj)
+(leaf *my-window-resizer
+  ;; :defvar (last-command-char
+  ;;          current-height
+  ;;          current-width
+  ;;          window-obj)
   :doc "Control window size and position."
   :bind (("C-x r" . my-window-resizer))
   :preface
@@ -1812,7 +1784,7 @@
     (org-babel-load-languages . '((emacs-lisp . t)
                                    (python . t)
                                    (latex . t)
-                                   ;; (ipython . t)
+                                   (shell . t)
                                    ))
     (org-confirm-babel-evaluate . nil)
     (org-catch-invisible-edits . 'show)
@@ -1878,10 +1850,6 @@
     '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
     )
 
-  ;; ;; fix color handling in org-preview-latex-fragment
-  ;; (let ((dvipng--plist (alist-get 'dvipng org-preview-latex-process-alist)))
-  ;;   (plist-put dvipng--plist :use-xcolor t)
-  ;;   (plist-put dvipng--plist :image-converter '("dvipng -D %D -T tight -o %O %f")))
   (setq org-format-latex-options
     '(:foreground default
        :background default
@@ -2651,7 +2619,6 @@
     :emacs>= 26.1
     :ensure t
     :require t
-    :defvar lsp-pyright-venv-path
     :init
     (defun lsp-pyright-setup-when-conda ()
       (setq-local lsp-pyright-venv-path python-shell-virtualenv-root)
@@ -2839,78 +2806,6 @@
     )
   :hook
   ((company-mode-hook . set-yas-as-company-backend))
-  )
-
-(leaf *font
-  :config
-  (leaf *font-setting
-    :when window-system
-    :config
-    ;; フォントセットを作る
-    ;; (leaf font-setting
-    ;;   :disabled nil
-    ;;   :when window-system
-    ;;   :config
-    ;;                                 ;(set-face-attribute 'default nil :family "Source Code Pro" :height 100)
-    ;;   (set-face-attribute 'default nil :family "Consolas" :height 100)
-    ;;                                 ;(set-fontset-font nil '(#x0000 . #x0080) (font-spec :family "Consolas" :size 14))
-    ;;                                 ;(set-fontset-font nil 'japanese-jisx0208 (font-spec :family "Ricty Diminished Discord" :size 11))
-    ;;   (set-fontset-font nil 'japanese-jisx0208 (font-spec :family "Yu Gothic UI" :size 12))
-    ;;   (add-to-list 'face-font-rescale-alist '(".*Yu Gothic UI*" . 0.95)))
-
-    (let* ((fontset-name "myfonts") ; フォントセットの名前
-            (size 14) ; ASCIIフォントのサイズ [9/10/12/14/15/17/19/20/...]
-            (asciifont "JetBrains Mono") ; ASCIIフォント
-            (jpfont "Noto Serif CJK JP") ; 日本語フォント
-            (font (format "%s-%d:weight=normal:slant=normal" asciifont size))
-            (fontspec (font-spec :family asciifont))
-            (jp-fontspec (font-spec :family jpfont))
-            (fsn (create-fontset-from-ascii-font font nil fontset-name)))
-      (set-fontset-font fsn 'japanese-jisx0213.2004-1 jp-fontspec)
-      (set-fontset-font fsn 'japanese-jisx0213-2 jp-fontspec)
-      (set-fontset-font fsn 'katakana-jisx0201 jp-fontspec) ; 半角カナ
-      (set-fontset-font fsn '(#x0080 . #x024F) fontspec)    ; 分音符付きラテン
-      (set-fontset-font fsn '(#x0370 . #x03FF) fontspec)    ; ギリシャ文字
-      ;; )  ;; commented 2021/05/29
-
-      ;; デフォルトのフレームパラメータでフォントセットを指定
-      (add-to-list 'default-frame-alist '(font . "fontset-myfonts"))
-      )  ;; add 2021/05/29
-
-    ;; デフォルトフェイスにフォントセットを設定
-    ;; # これは起動時に default-frame-alist に従ったフレームが作成されない現象への対処
-    (set-face-font 'default "fontset-myfonts"))
-
-  ;; Ligatureの設定 (対応フォント限定: Fira Code や JetBrains Mono)
-  (let ((alist '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
-                  (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
-                  (36 . ".\\(?:>\\)")
-                  (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
-                  (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
-                  (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
-                  (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
-                  (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
-                  (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
-                  (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
-                  (48 . ".\\(?:x[a-zA-Z]\\)")
-                  (58 . ".\\(?:::\\|[:=]\\)")
-                  (59 . ".\\(?:;;\\|;\\)")
-                  (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
-                  (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
-                  (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
-                  (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
-                  (91 . ".\\(?:]\\)")
-                  (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
-                  (94 . ".\\(?:=\\)")
-                  (119 . ".\\(?:ww\\)")
-                  (123 . ".\\(?:-\\)")
-                  (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
-                  (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)")
-                  )
-          ))
-    (dolist (char-regexp alist)
-      (set-char-table-range composition-function-table (car char-regexp)
-        `([,(cdr char-regexp) 0 font-shape-gstring]))))
   )
 
 
