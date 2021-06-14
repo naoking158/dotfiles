@@ -474,7 +474,7 @@
    (reftex-plug-into-AUCTeX . t)
    (reftex-insert-label-flags . '("s" "sfte"))
    (reftex-label-alist . '((nil ?e nil "\\eqref{%s}" nil nil)))
-   (reftex-default-bibliography . '("~/org/preferences/ref.bib"))
+   (reftex-default-bibliography . '("~/org/braindump/org/preferences/ref.bib"))
    (reftex-bibliography-commands . '("bibliography" "nobibliography" "addbibresource"))
    (fill-column . 86)
    )
