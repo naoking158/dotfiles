@@ -553,7 +553,7 @@
           ("C-n" . company-select-next)
           ("C-p" . company-select-previous)))
   :custom ((company-tooltip-limit . 15)
-           (company-idle-delay . 0)
+           (company-idle-delay . 0.2)
            (company-dabbrev-downcase . 0)
            (company-minimum-prefix-length . 2)
            (company-transformers quote
@@ -2618,7 +2618,6 @@
     :url "https://github.com/emacs-lsp/lsp-pyright"
     :emacs>= 26.1
     :ensure t
-    :require t
     :init
     (defun lsp-pyright-setup-when-conda ()
       (setq-local lsp-pyright-venv-path python-shell-virtualenv-root)
