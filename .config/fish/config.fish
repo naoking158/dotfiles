@@ -44,9 +44,6 @@ set -xg LANG en_US.UTF-8
 
 
 if test (uname -s) = "Darwin"
-   # libgccjit
-   # set -xg LIBRARY_PATH /usr/local/opt/libgccjit/lib/gcc/11 $LIBRARY_PATH
-
     # Homebrew
     set -xg HOMEBREW_EDITOR "/usr/local/bin/emacs -q -nw"
 
@@ -132,16 +129,14 @@ end
 
 function sshexit
     set hostport $argv[1]
-    set running (ps aux | grep "mdlssh-socket" | grep $hostport -c)
 
     if ps aux | grep "mdlssh-socket" | grep $hostport -c
         ssh -S mdlssh-socket -O exit $MDL
-	    echo "All SSH tunnels closed"
+	      echo "All SSH tunnels closed"
     else
-    	echo "No running tunnels"
+    	  echo "No running tunnels"
     end
 end
-
 
 function rsyncto
     argparse -n mycmdname o/only= e/exclude= -- $argv
@@ -574,12 +569,7 @@ end
 
 if test (uname -s) = "Darwin"
     # >>> conda initialize >>>
-    # !! Contents within this block are managed by 'conda init' !!
     eval /Users/naoki/miniconda/condabin/conda "shell.fish" "hook" $argv | source
-    # <<< conda initialize <<<set -g fish_user_paths "/usr/local/opt/texinfo/bin" $fish_user_paths
-    # set -g fish_user_paths "/usr/local/opt/icu4c/bin" $fish_user_paths
-    # set -g fish_user_paths "/usr/local/opt/icu4c/sbin" $fish_user_pathsset -g fish_user_paths "/usr/local/opt/ruby/bin" $fish_user_paths
-
     set -gx LDFLAGS "-L/usr/local/opt/ruby/lib" $LDFLAGS
     set -gx CPPFLAGS "-I/usr/local/opt/ruby/include" $CPPFLAGS
     set -gx PKG_CONFIG_PATH "/usr/local/opt/ruby/lib/pkgconfig" $PKG_CONFIG_PATH
