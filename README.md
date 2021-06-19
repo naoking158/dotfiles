@@ -61,7 +61,7 @@ $ make init
 
 To run `make init` immediately after running the [installation command](#oneliner):
 ```sh
-$ bash -c "$(curl -fsSL raw.githubusercontent.com/naoking158/dotfiles/main/etc/install)" -s init
+bash -c "$(curl -fsSL raw.githubusercontent.com/naoking158/dotfiles/main/etc/install)" -s init
 ```
     
 ## Components
