@@ -202,223 +202,6 @@ function mdlrsyncfrom
     sshexit 10022
 end
 
-
-function send_and_install_anaconda_on
-    if count $argv > /dev/null
-	if [ $argv = --help ]
-	    printf "
-	    Description:
-	    Send Anaconda*.sh and license*.txt to server.
-	    Next, install Anaconda*.sh, update all and install accelerate.
-
-	    If older version of anaconda (e.g., anaconda2) is already exists on server,
-	    install is skipped.
-
-	    Usage:
-	    send_and_install_anaconda_on <server name>
-
-	    Examples:
-	    # You are in local (e.g., /home/user/)
-	    > ls
-	    #  Anaconda*.sh  license*.txt
-	    > send_and_install_anaconda_on debian1 debian2 sun sirius
-
-	    Option:
-	    --help    Print this help and exit.
-	    "
-	else
-	    set -l anaconda_with_wildcard Anaconda*.sh
-	    if test -e $anaconda_with_wildcard
-		set anaconda (ls $anaconda_with_wildcard)
-		for hostname in $argv
-		    fish -c "_install_anaconda_on_server $hostname $anaconda"
-		end
-	    else
-		echo "Anaconda~.sh is not exist here."
-	    end
-	end
-    else
-	echo "You must input server name."
-	echo "If you want know how to use this function, type `send_and_install_anaconda_on --help`."
-    end
-end
-
-
-function _install_anaconda_on_server
-    set hostname $argv[1]
-    set anaconda $argv[2]
-    set answers '\nyes\n\nyes\nno\n'
-    set -l license_with_wildcard license*.txt
-    if test -e $license_with_wildcard
-        set -l license (ls $license_with_wildcard)
-        ssh $USER@$hostname.local "
-        if [ ! -d '.continuum' ]; then
-        mkdir .continuum;
-        fi;
-        exit"
-        rsyncto $hostname '\./\.continuum' $license
-        echo \n'Done send '$license' for '$hostname'.'\n
-    else
-	    echo \n'Pass "mkdir .continuum" and "send license", because license.txt not exists.'\n
-    end
-
-    rsyncto $hostname "\./" $anaconda
-    echo \n'Done send '$anaconda' for '$hostname'.'\n
-    nohup ssh $USER@$hostname.local "
-    if [ ! -d anaconda* ]; then
-    printf '$answers' | bash '$anaconda';
-    rm $anaconda;
-    source .bashrc;
-    echo -e '\nDone install anaconda on $hostname.\n';
-else
-    echo -e '\nanaconda already installed. Installing anaconda is skipped.\n';
-    fi;
-    echo -e 'Next step -> `conda update` and `install accelerate`.\n';
-    yes | conda update --all;
-    yes | conda install accelerate;
-    echo -e '\nComplete install and update anaconda on $hostname.\n';
-    exit" > 'progress_of_install_anaconda.out' &
-end
-
-
-
-function clone_alab_repositories_on
-    if count $argv > /dev/null
-	if [ $argv = --help ]
-	    printf "
-	    Description:
-	    Clone repositories on server.
-	    If Optimization/IterativeAlgorithmCore in clone repositories,
-	    then execute the following, `pip --no-cache-dir install -I -e .`.
-
-	    Usage:
-	    clone_alab_repositories_on <server name>
-
-	    Examples:
-	    # You are in local
-	    > clone_alab_repositories_on debian1 debian2 sun sirius
-
-	    Option:
-	    --help    Print this help and exit.
-	    "
-	else
-	    echo \n"/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/"
-	    echo " +++  Set repositories will be cloned.  +++"
-	    echo "/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/"
-	    echo "These repositories will be cloned:"
-	    echo "akimotolab/Optimization, akimotolab/IterativeAlgorithmCore"\n
-
-	    read -p '
-	    echo "  - Press ENTER to confirm the repository"
-	    echo "  - Or specify differents repositories below"
-	    echo "    (e.g., akimotolab/trunk akimotolab/ServerAdmin)"\n
-	    echo "Clone repositories: "
-	    ' -l input_repositories
-	    if [ $input_repositories = '' ]
-		set repositories 'akimotolab/Optimization' 'akimotolab/IterativeAlgorithmCore'
-		echo $repositories
-	    else
-		set repositories $input_repositories
-	    end
-
-	    echo \n"/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/"
-	    echo "+ Set location where the repository will be cloned. +"
-	    echo "/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/"
-	    echo "The repository will now be cloned into this location:"
-	    echo "(remote server)~/repositories/"\n
-
-	    read -p '
-	    echo "  - Press ENTER to confirm the location"
-	    echo "  - Or specify differents location below"
-	    echo "    (e.g., ~/github/akimotolab/)"\n
-	    echo "Clone into: "
-	    ' -l input_location
-	    if [ $input_location = '' ]
-		set clone_location '~/repositories/'
-		echo $clone_location
-	    else
-		set clone_location $input_location
-	    end
-
-	    read -p 'echo \n"github username: "' -l username
-	    read -p 'echo "github passward: "' --silent pw
-
-	    for hostname in $argv
-		nohup ssh $USER@$hostname.local "pip install quadprog" &
-		for repository in $repositories
-		    fish -c "_clone_repository $hostname $clone_location $repository $username $pw"
-		end
-		echo \n"Done send job for $hostname."\n
-	    end
-	    # remove password
-	    set -e $pw
-	end
-    else
-	echo "You must input server name."
-	echo "If you want know how to use this function, type `clone_alab_repositories_on --help`."
-
-    end
-
-end
-
-
-function _clone_repository --argument-names 'hostname' 'location' 'repository' 'user' 'pw'
-    set -l repository_dir_names (string split / $repository)
-    set repository_dir_name $repository_dir_names[-1]
-    nohup ssh $USER@$hostname.local "
-    if [ ! -d $location ];
-    then
-    mkdir -p $location;
-    fi;
-    cd $location;
-
-    if [ ! -d $repository_dir_name ];
-    then
-    git clone 'https://$user:$pw@github.com/$repository.git';
-
-    if [ '$repository_dir_name' == 'Optimization' ] || [ '$repository_dir_name' == 'IterativeAlgorithmCore' ];
-    then
-    cd $repository_dir_name;
-    pip --no-cache-dir install -I -e .;
-    fi;
-else
-    echo -e '\n$repository_dir_name is already exists.\n';
-    fi;
-    echo -e '\nComplete clone $repository_dir_name on $hostname.\n';
-    exit
-    " > 'progress_of_clone.out' &
-end
-
-################################################################
-
-function fish_on_server
-    read -p 'echo "USERNAME: "' user
-    read -p 'echo "PASSWORD: "' --silent pw
-    for hostname in $argv
-	fish -c "_install_fish $hostname $user $pw"
-	echo \n"send $hostname."\n
-    end
-end
-
-
-function _install_fish --argument-names 'hostname' 'user' 'pw'
-    nohup command sshpass -p "$pw" ssh -o StrictHostKeyChecking=no $user@$hostname.local "
-    echo 'deb http://download.opensuse.org/repositories/shells:/fish:/release:/2/Debian_8.0/ /' > fish.list;
-    echo -e '$pw\n' | sudo -S mv 'fish.list' '/etc/apt/sources.list.d/';
-    sudo wget http://download.opensuse.org/repositories/shells:fish:release:2/Debian_8.0/Release.key;
-    sudo apt-key add - < Release.key;
-    echo -e '$pw\n' | sudo -S -;
-    yes | sudo -S apt-get update;
-    echo -e '$pw\n' | sudo -S -;
-    yes | sudo -S apt-get upgrade;
-    echo -e '$pw\n' | sudo -S -;
-    yes | sudo -S apt-get install fish;
-    echo -e '\n Done install fish on $hostname.\n';
-    exit
-    " > 'fish_on_server.out' &
-end
-
-
 function backup_homedir
     set basedir /Volumes/NSSD/backup
 
@@ -486,56 +269,22 @@ if test (uname -s) = "Darwin"
     end
 end
 
-function _sirius
-    ssh _sirius
-end
+alias _sirius='ssh _sirius'
+alias _kingkong='ssh kingkong'
+alias __kingkong=' ssh _kingkong'
+alias _mdl='ssh _mdl'
+alias _gorilla1='ssh gorilla1'
+alias _gorilla2='ssh gorilla2'
+alias _gorilla3='ssh gorilla3'
+alias _zeus=' zeus'
+alias _koike='ssh _koike'
+alias _tanabe='ssh _tanabe'
 
-function _kingkong
-    ssh kingkong
-end
-
-function __kingkong
-     ssh _kingkong
-end
-
-function _mdl
-    ssh _mdl
-end
-
-function _gorilla1
-    ssh gorilla1
-end
-
-function _gorilla2
-    ssh gorilla2
-end
-
-function _gorilla3
-    ssh gorilla3
-end
-
-function _zeus
-	ssh zeus
-end
-
-function _koike
-    ssh _koike
-end
-
-function _tanabe
-    ssh _tanabe
-end
-
-# function e
-#     command emacsclient $argv
-# end
 alias e='emacsclient'
 alias ee='open ~/drive/github.com/build-emacs-for-macos/builds/Emacs.app'
 alias ekill='emacsclient -e "(kill-emacs)"'
 
-function black
-    echo -ne "\033]1337;SetProfile=Default\a"
-end
+alias black='echo -ne "\033]1337;SetProfile=Default\a"'
 
 function tar_xz
     tar cvJf $argv.tar.xz $argv
