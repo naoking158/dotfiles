@@ -12,7 +12,6 @@
 !/Brewfile
 !/.mackup*
 !/.mackup/
-!/.ssh/
 
 !/.tmux*
 

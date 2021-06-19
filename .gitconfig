@@ -7,3 +7,5 @@
 
 [ghq]
     root = ~/drive/github.com/
+[init]
+	defaultBranch = main
