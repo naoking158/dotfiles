@@ -179,13 +179,9 @@ dotfiles_logo='
   | (_| | (_) | |_| | | | |  __/\__ \
    \__,_|\___/ \__|_| |_|_|\___||___/
   *** WHAT IS INSIDE? ***
-  1. Download https://github.com/b4b4r07/dotfiles.git
+  1. Download https://github.com/naoking158/dotfiles.git
   2. Symlinking dot files to your home directory
-  3. Execute all sh files within `etc/init/` (optional)
-  See the README for documentation.
-  https://github.com/b4b4r07/dotfiles
-  Copyright (c) 2014 "BABAROT" aka @b4b4r07
-  Licensed under the MIT license.
+  3. Execute all sh files within `etc/scripts/` (optional)
 '
 
 dotfiles_download() {
@@ -259,9 +255,6 @@ dotfiles_initialize() {
             :
         else
             if [ -f Makefile ]; then
-                #DOTPATH="$(dotpath)"
-                #export DOTPATH
-                #bash "$DOTPATH"/etc/init/init.sh
                 make init
             else
                 log_fail "Makefile: not found"
@@ -285,7 +278,7 @@ dotfiles_install() {
     # ==> deploying
     dotfiles_deploy &&
 
-    # 3. Execute all sh files within etc/init/
+    # 3. Execute all sh files within etc/scripts/
     # ==> initializing
     dotfiles_initialize "$@"
 }
