@@ -1,6 +1,11 @@
 /*
 /.**
 
+
+!/etc/
+!/bin/
+
+## dotfiles
 !/.git*
 !/README.md
 
