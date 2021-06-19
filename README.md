@@ -30,7 +30,7 @@ Run the installation command below in your terminal.
 
 	It is almost the same as the command below except for executing through a Web site directly.
   ```sh
-		$ make install
+  $ make install
   ```
 
 	It is not necessary to perform `make install` at all if this repository was installed by the [installation command](#oneliner).
@@ -47,7 +47,7 @@ When the [installation command](#oneliner) format is not `curl -L URL | sh` but 
 
 To update later on, just run this command.
 ```sh
-  $ make update
+$ make update
 ```
 
 In addition, there are several git submodules included in this configuration. On a new installation these submodules need to be initialized and updated.
@@ -56,12 +56,12 @@ In addition, there are several git submodules included in this configuration. On
 
 All configuration files for setup is stored within the `etc/init/` directory. By running this command, you can interactively setup all preferences.
 ```sh
-  $ make init
+$ make init
 ```
 
 To run `make init` immediately after running the [installation command](#oneliner):
 ```sh
-  $ bash -c "$(curl -fsSL raw.githubusercontent.com/naoking158/dotfiles/main/etc/install)" -s init
+$ bash -c "$(curl -fsSL raw.githubusercontent.com/naoking158/dotfiles/main/etc/install)" -s init
 ```
     
 ## Components
@@ -70,5 +70,6 @@ To run `make init` immediately after running the [installation command](#oneline
 - **etc/init/**: Configuration file storage to be executed initially for setup.
 
 ## Inspiration
-<https://github.com/b4b4r07/dotfiles>
-[最強の dotfiles 駆動開発と GitHub で管理する運用方法](https://qiita.com/b4b4r07/items/b70178e021bef12cd4a2#fnref2)
+
+- <https://github.com/b4b4r07/dotfiles>
+- [最強の dotfiles 駆動開発と GitHub で管理する運用方法](https://qiita.com/b4b4r07/items/b70178e021bef12cd4a2#fnref2)
