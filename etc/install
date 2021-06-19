@@ -247,7 +247,7 @@ dotfiles_deploy() {
 }
 
 dotfiles_initialize() {
-    if [ "$0" = "init" ]; then
+    if [ "$1" = "init" ]; then
         e_newline
         e_header "Initializing dotfiles..."
 

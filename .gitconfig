@@ -6,6 +6,6 @@
     email = naoki@bbo.cs.tsukuba.ac.jp
 
 [ghq]
-    root = ~/drive/github.com/
+    root = ~/src/
 [init]
 	defaultBranch = main

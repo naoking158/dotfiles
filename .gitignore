@@ -5,10 +5,10 @@
 !/etc/
 !/bin/
 
-## dotfiles
 !/.git*
 !/README.md
 
+## dotfiles
 !/.Brewfile
 
 !/.tmux*
