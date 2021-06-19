@@ -226,9 +226,9 @@ dotfiles_download() {
     e_newline && e_done "Download"
 }
 
-dotfiles_deploy() {
+dotfiles_install() {
     e_newline
-    e_header "Deploying dotfiles..."
+    e_header "Instaling dotfiles..."
 
     if [ ! -d $DOTPATH ]; then
         log_fail "$DOTPATH: not found"
@@ -240,10 +240,10 @@ dotfiles_deploy() {
     if is_debug; then
         :
     else
-        make deploy
+        make install
     fi &&
 
-        e_newline && e_done "Deploy"
+        e_newline && e_done "Install"
 }
 
 dotfiles_initialize() {
@@ -274,9 +274,9 @@ dotfiles_install() {
     # Priority: git > curl > wget
     dotfiles_download &&
 
-    # 2. Deploy dotfiles to your home directory
-    # ==> deploying
-    dotfiles_deploy &&
+    # 2. Install dotfiles to your home directory
+    # ==> Instaling
+    dotfiles_instal &&
 
     # 3. Execute all sh files within etc/init/
     # ==> initializing
