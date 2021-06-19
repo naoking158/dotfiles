@@ -181,7 +181,7 @@ dotfiles_logo='
   *** WHAT IS INSIDE? ***
   1. Download https://github.com/naoking158/dotfiles.git
   2. Symlinking dot files to your home directory
-  3. Execute all sh files within `etc/scripts/` (optional)
+  3. Execute all sh files within `etc/init/` (optional)
 '
 
 dotfiles_download() {
@@ -278,13 +278,19 @@ dotfiles_install() {
     # ==> deploying
     dotfiles_deploy &&
 
-    # 3. Execute all sh files within etc/scripts/
+    # 3. Execute all sh files within etc/init/
     # ==> initializing
     dotfiles_initialize "$@"
 }
 
 mytest() {
-    echo "in test" $1
+  if [ "$1" = "init" ]; then
+    e_newline
+    e_header "Initializing dotfiles..."
+    echo "in test initializer..."
+  else
+    echo "otherwise"
+  fi
 }
 
 
