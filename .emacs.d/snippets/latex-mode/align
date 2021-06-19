@@ -1,0 +1,6 @@
+# key: ali
+# name: ali
+# --
+\begin{align${1:*}}
+$0
+\end{align$1}

@@ -1,7 +1,6 @@
 /*
 /.**
 
-
 !/etc/
 !/bin/
 
@@ -28,3 +27,5 @@
 !/.emacs.d/el-get/**
 !/.emacs.d/snippets/
 !/.emacs.d/snippets/**
+
+/**/.DS_Store
