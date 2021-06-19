@@ -9,9 +9,7 @@
 !/.git*
 !/README.md
 
-!/Brewfile
-!/.mackup*
-!/.mackup/
+!/.Brewfile
 
 !/.tmux*
 
