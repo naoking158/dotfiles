@@ -61,7 +61,7 @@ All configuration files for setup is stored within the `etc/init/` directory. By
 
 To run `make init` immediately after running the [installation command](#oneliner):
 
-    -c "$(curl -fsSL raw.githubusercontent.com/naoking158/dotfiles/main/etc/install)" -s init 
+    bash -c "$(curl -fsSL raw.githubusercontent.com/naoking158/dotfiles/main/etc/install)" -s init 
 
     
 ## Components
