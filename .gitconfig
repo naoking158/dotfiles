@@ -6,6 +6,6 @@
     email = naoki@bbo.cs.tsukuba.ac.jp
 
 [ghq]
-    root = ~/src/
+    root = ~/src
 [init]
 	defaultBranch = main

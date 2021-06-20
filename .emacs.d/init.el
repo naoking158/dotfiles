@@ -1656,7 +1656,7 @@
             (magit-refresh-verbose . t)
             (magit-commit-ask-to-stage quote stage)
             (magit-clone-set-remote\.pushDefault . t)
-            (magit-clone-default-directory . "~/src/")
+            (magit-clone-default-directory . "~/src/github.com/")
             (magit-remote-add-set-remote\.pushDefault quote ask))
   )
 
