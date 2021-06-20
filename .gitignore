@@ -16,10 +16,9 @@
 !/.config/
 /.config/fish/fish_variables
 
-!/Library/
-/Library/*
-!/Library/Workflows/
-!/Library/Workflows/**
+!/.ssh/
+/.ssh/*
+!/.ssh/config
 
 !/.emacs.d/
 /.emacs.d/*
