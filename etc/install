@@ -182,6 +182,12 @@ dotfiles_logo='
   1. Download https://github.com/naoking158/dotfiles.git
   2. Symlinking dot files to your home directory
   3. Execute all sh files within `etc/init/` (optional)
+
+  See the README for documentation.
+  https://github.com/b4b4r07/dotfiles
+
+  Copyright (c) 2021 Naoki Sakamoto
+  Licensed under the MIT license.
 '
 
 dotfiles_download() {
