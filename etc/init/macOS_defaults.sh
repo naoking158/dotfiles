@@ -12,7 +12,7 @@ if [ "$(uname)" = "Darwin" ]; then
   sudo softwareupdate --schedule off
 
   printf "Finder - Show hidden files"
-  defaults write com.apple.finder AppleShowAllFiles -bool YES
+  defaults write com.apple.finder AppleShowAllFiles -bool true
 
   printf "Finder - Show all extensions"
   defaults write -g AppleShowAllExtensions -bool true
@@ -30,8 +30,8 @@ if [ "$(uname)" = "Darwin" ]; then
   defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
 
   printf "Increase key repeat rate\n"
-  defaults write -g InitialKeyRepeat -int 10
-  defaults write -g KeyRepeat -int 1
+  defaults write -g InitialKeyRepeat -int 11
+  defaults write -g KeyRepeat -float 1.5
 
   killall Finder
 
