@@ -1,6 +1,6 @@
 DOTPATH    := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-CANDIDATES := $(wildcard .??*) bin
-EXCLUSIONS := .DS_Store .git .gitmodules .travis.yml
+CANDIDATES := $(wildcard .??*)
+EXCLUSIONS := .DS_Store .git .gitmodules .travis.yml .ssh
 DOTFILES   := $(filter-out $(EXCLUSIONS), $(CANDIDATES))
 
 .DEFAULT_GOAL := help
@@ -18,19 +18,23 @@ deploy: ## Create symlink to home directory
 
 init: ## Initialize
 	@echo ''
+	@echo 'etc/init/*.sh will be conducted.'
+	@make .confirm_prompt
+	@echo ''
 	@echo '==> Start to initialize.'
 	@echo ''
 	@$(foreach val, $(wildcard ./etc/init/*.sh), bash $(val);)
 
 clean: ## Remove the dot files and this repo
-	@echo 'Remove dot files in your home directory...'
+	@echo 'Remove dot files in your home directory.'
+	@echo ''
+	@make .confirm_prompt
+	@echo ''
 	@-$(foreach val, $(DOTFILES), rm -vrf $(HOME)/$(val);)
 	-rm -rf $(DOTPATH)
 
 update:
 	git pull origin main
 
-help: ## Self-documented Makefile
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
-		| sort \
-		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'DOTFILES_EXCLUDES:= .DS_Store .git .gitmodules
+.confirm_prompt:
+	@read -p "Are you sure? [y/N] " yn && [ $${yn:-N} = y ]
