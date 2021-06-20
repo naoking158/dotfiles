@@ -73,3 +73,7 @@ bash -c "$(curl -fsSL raw.githubusercontent.com/naoking158/dotfiles/main/etc/ins
 
 - <https://github.com/b4b4r07/dotfiles>
 - [最強の dotfiles 駆動開発と GitHub で管理する運用方法](https://qiita.com/b4b4r07/items/b70178e021bef12cd4a2#fnref2)
+
+## License
+
+[MIT](LICENSE)
