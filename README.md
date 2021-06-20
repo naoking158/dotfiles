@@ -29,11 +29,11 @@ Run the installation command below in your terminal.
 - :warning: NOTE
 
 	It is almost the same as the command below except for executing through a Web site directly.
+	```console
+	$ make deploy
+	```
 
-      $ make install
-
-
-	It is not necessary to perform `make install` at all if this repository was installed by the [installation command](#oneliner).
+	It is not necessary to perform `make deploy` at all if this repository was installed by the [installation command](#oneliner).
 
 **what's inside?**
 
@@ -46,23 +46,23 @@ When the [installation command](#oneliner) format is not `curl -L URL | sh` but 
 ## Updating
 
 To update later on, just run this command.
-
-    $ make update
-
+```console
+make update
+```
 
 In addition, there are several git submodules included in this configuration. On a new installation these submodules need to be initialized and updated.
 
 ## Setup
 
 All configuration files for setup is stored within the `etc/init/` directory. By running this command, you can interactively setup all preferences.
-
-    $ make init
-
+```console
+make init
+```
 
 To run `make init` immediately after running the [installation command](#oneliner):
-
-    bash -c "$(curl -fsSL raw.githubusercontent.com/naoking158/dotfiles/main/etc/install)" -s init 
-
+```console
+bash -c "$(curl -fsSL raw.githubusercontent.com/naoking158/dotfiles/main/etc/install)" -s init 
+```
     
 ## Components
 
@@ -73,3 +73,7 @@ To run `make init` immediately after running the [installation command](#oneline
 
 - <https://github.com/b4b4r07/dotfiles>
 - [最強の dotfiles 駆動開発と GitHub で管理する運用方法](https://qiita.com/b4b4r07/items/b70178e021bef12cd4a2#fnref2)
+
+## License
+
+[MIT](LICENSE)
