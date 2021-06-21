@@ -271,7 +271,7 @@ end
 
 alias _sirius='ssh sirius'
 alias _kingkong='ssh kingkong'
-alias __kingkong=' ssh _kingkong'
+alias __kingkong='ssh _kingkong'
 alias _mdl='ssh _mdl'
 alias _gorilla1='ssh gorilla1'
 alias _gorilla2='ssh gorilla2'
