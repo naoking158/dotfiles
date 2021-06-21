@@ -317,11 +317,14 @@ function ja_latex
 end
 
 if test (uname -s) = "Darwin"
-    # >>> conda initialize >>>
-    eval /Users/naoki/miniconda/condabin/conda "shell.fish" "hook" $argv | source
+    if test -e $HOME/miniconda
+        eval /Users/naoki/miniconda/condabin/conda "shell.fish" "hook" $argv | source
+    end
     set -gx LDFLAGS "-L/usr/local/opt/ruby/lib" $LDFLAGS
     set -gx CPPFLAGS "-I/usr/local/opt/ruby/include" $CPPFLAGS
     set -gx PKG_CONFIG_PATH "/usr/local/opt/ruby/lib/pkgconfig" $PKG_CONFIG_PATH
 else
-    eval ~/miniconda3/condabin/conda "shell.fish" "hook" $argv | source
+    if test -e $HOME/miniconda3
+        eval $HOME/miniconda3/condabin/conda "shell.fish" "hook" $argv | source
+    end
 end
