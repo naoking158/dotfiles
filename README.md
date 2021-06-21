@@ -11,7 +11,8 @@ My primary OS is macOS (10.15.x) and some of these configurations are tuned to w
 ## Features
 
 - **macOS** Catallina
-- **Tmux** 3.1c
+- **[fish](https://github.com/fish-shell/fish-shell)** 3.2.2
+- **[Tmux](https://github.com/tmux/tmux/wiki)** 3.1c
 - **Emacs** 28.0.05
 - **[iTerm2.app](https://iterm2.com)**
 
@@ -30,7 +31,7 @@ Run the installation command below in your terminal.
 
 	It is almost the same as the command below except for executing through a Web site directly.
 	```console
-	$ make deploy
+	make deploy
 	```
 
 	It is not necessary to perform `make deploy` at all if this repository was installed by the [installation command](#oneliner).
@@ -53,6 +54,8 @@ make update
 In addition, there are several git submodules included in this configuration. On a new installation these submodules need to be initialized and updated.
 
 ## Setup
+
+> :warning: Initialization of [homebrew](https://brew.sh) and [fisher](https://github.com/jorgebucaran/fisher) does not complete properly. This will be resolved in the future when [homebrew.sh](etc/init/homebrew.sh) and [fisher.sh](etc/init/fisher.sh) have the ability to set the path automatically.
 
 All configuration files for setup is stored within the `etc/init/` directory. By running this command, you can interactively setup all preferences.
 ```console
