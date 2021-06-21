@@ -53,7 +53,7 @@ if test (uname -s) = "Darwin"
     set PATH $HOME/.local/bin $PATH
     set PATH /opt/local/bin $PATH
 
-    set PYTHONPATH ~/drive/github.com/akimotolab/NaokiSakamoto/source/script $PYTHONPATH
+    # set PYTHONPATH ~/src/github.com/akimotolab/NaokiSakamoto/source/script $PYTHONPATH
     set -x USE_DAAL4PY_SKLEARN YES
 
     # Node.js
@@ -263,11 +263,11 @@ function replace --argument-names 'before' 'after'
     find . -name "*$before*" | xargs rename -s $before $after
 end
 
-if test (uname -s) = "Darwin"
-    function ssh
-        command ~/bin/ssh-change-profile.sh $argv
-    end
-end
+# if test (uname -s) = "Darwin"
+#     function ssh
+#         command ~/bin/ssh-change-profile.sh $argv
+#     end
+# end
 
 alias _sirius='ssh _sirius'
 alias _kingkong='ssh kingkong'
@@ -284,7 +284,7 @@ alias e='emacsclient'
 alias ee='open ~/src/emacs28/builds/Emacs.app'
 alias ekill='emacsclient -e "(kill-emacs)"'
 
-alias black='echo -ne "\033]1337;SetProfile=Default\a"'
+# alias black='echo -ne "\033]1337;SetProfile=Default\a"'
 
 function tar_xz
     tar cvJf $argv.tar.xz $argv
