@@ -269,16 +269,16 @@ end
 #     end
 # end
 
-alias _sirius='ssh _sirius'
+alias _sirius='ssh sirius'
 alias _kingkong='ssh kingkong'
 alias __kingkong=' ssh _kingkong'
 alias _mdl='ssh _mdl'
 alias _gorilla1='ssh gorilla1'
 alias _gorilla2='ssh gorilla2'
 alias _gorilla3='ssh gorilla3'
-alias _zeus=' zeus'
-alias _koike='ssh _koike'
-alias _tanabe='ssh _tanabe'
+alias _zeus='ssh zeus'
+alias _koike='ssh koike'
+alias _tanabe='ssh tanabe'
 
 alias e='emacsclient'
 alias ee='open ~/src/emacs28/builds/Emacs.app'
