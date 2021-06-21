@@ -3,8 +3,6 @@ CANDIDATES := $(wildcard .??*)
 EXCLUSIONS := .DS_Store .git .gitmodules .travis.yml .ssh
 DOTFILES   := $(filter-out $(EXCLUSIONS), $(CANDIDATES))
 
-.DEFAULT_GOAL := help
-
 all:
 
 list: ## Show dot files in this repo
@@ -14,7 +12,25 @@ deploy: ## Create symlink to home directory
 	@echo ''
 	@echo '==> Start to deploy dotfiles to home directory.'
 	@echo ''
-	@$(foreach val, $(DOTFILES), ln -sfnv $(abspath $(val)) $(HOME)/$(val);)
+	@test -d "$(HOME)/tmp_naoking_dotfiles/" || mkdir $(HOME)/tmp_naoking_dotfiles
+	@$(foreach val, $(DOTFILES), make create-symlink-safely ARG=$(val);)
+	@rm -r $(HOME)/tmp_naoking_dotfiles
+	@echo 'All done, except for `.ssh`.'
+
+create-symlink-safely:
+ifneq ("$(wildcard $(HOME)/$(ARG))","")
+	@echo "\nBackup: from $(HOME)/$(ARG) to $(HOME)/bak_dotfiles/"
+	@echo "Create Symlink:"
+	@test -d "$(HOME)/bak_dotfiles/" || mkdir $(HOME)/bak_dotfiles \
+		&& cp -r $(HOME)/$(ARG) $(HOME)/bak_dotfiles/
+	@mv $(HOME)/$(ARG) $(HOME)/tmp_naoking_dotfiles/$(ARG)
+	@rsync -a ./$(ARG) $(HOME)/tmp_naoking_dotfiles/
+	@ln -sfnv $(abspath $(ARG)) $(HOME)/$(ARG)
+	@rsync -a $(HOME)/tmp_naoking_dotfiles/$(ARG) ./
+else
+	@echo "Create Symlink:"
+	@ln -sfnv $(abspath $(ARG)) $(HOME)/$(ARG)
+endif
 
 init: ## Initialize
 	@echo ''
@@ -25,13 +41,12 @@ init: ## Initialize
 	@echo ''
 	@$(foreach val, $(wildcard ./etc/init/*.sh), bash $(val);)
 
-clean: ## Remove the dot files and this repo
-	@echo 'Remove dot files in your home directory.'
+clean: ## Remove the dot files
+	@echo 'Remove the dot files in your home directory.'
 	@echo ''
 	@make .confirm_prompt
 	@echo ''
 	@-$(foreach val, $(DOTFILES), rm -vrf $(HOME)/$(val);)
-	-rm -rf $(DOTPATH)
 
 update:
 	git pull origin main
