@@ -36,11 +36,12 @@ Run the installation command below in your terminal.
 
 	It is not necessary to perform `make deploy` at all if this repository was installed by the [installation command](#oneliner).
 
-**what's inside?**
+**What's inside?**
 
 1. Downloads this repository
-2. Deploy (i.e. *copy* or *create symlink*) dot files to your home directory; `make deploy`
-3. Run all programs for setup in `./etc/init/` directory; `make init` (**Optional**: when running the [installation command](#oneliner) specify `-s init` as an argument)
+2. Deploy (i.e., *copy* or *create symlink*) dot files to your home directory; `make deploy`
+> If dot files exist, they are copied to `$HOME/bak_dotfiles/` directory and this repository's dot files are merged to original one.
+3. **Optional**: Run all programs for setup in `./etc/init/` directory; `make init`, when running the [installation command](#oneliner) specify `-s init` as an argument
 
 When the [installation command](#oneliner) format is not `curl -L URL | sh` but `sh -c "$(curl -L URL)"`, shell will be restart automatically. If this is not the case, it is necessary to restart your shell manually.
 
