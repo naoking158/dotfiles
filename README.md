@@ -81,6 +81,22 @@ bash -c "$(curl -fsSL raw.githubusercontent.com/naoking158/dotfiles/main/etc/ins
 - <https://github.com/b4b4r07/dotfiles>
 - [最強の dotfiles 駆動開発と GitHub で管理する運用方法](https://qiita.com/b4b4r07/items/b70178e021bef12cd4a2#fnref2)
 
+## 📸 Screen shots
+
+### terminal appearance (fish + tmux + tmux-powerline)
+- Simple
+- Show hostname, workspace
+![ 2021-06-22 at 16 10 35](https://user-images.githubusercontent.com/29372455/122880004-7951c080-d374-11eb-90a1-6d97cfe6a9c2.png)
+
+
+### Emacs
+#### GUI
+![ 2021-06-22 at 16 00 28](https://user-images.githubusercontent.com/29372455/122879165-8f12b600-d373-11eb-9a8e-3b7a1a004477.png)
+
+#### CLI
+![ 2021-06-22 at 15 55 39](https://user-images.githubusercontent.com/29372455/122879197-99cd4b00-d373-11eb-9eaa-e92e79fb76fb.png)
+
+
 ## License
 
 [MIT](LICENSE)
