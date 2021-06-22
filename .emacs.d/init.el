@@ -1776,7 +1776,6 @@
     (org-enforce-todo-dependencies . t)
     (org-log-done . t)
     (org-return-follows-link . t)
-    (org-image-actual-width)
     (org-highlight-latex-and-related quote
       (latex script entities))
     (org-src-window-setup . 'current-window)
@@ -2175,37 +2174,42 @@
           (insert (concat "[[file:" filename "]]")))
         (org-display-inline-images)))
   :bind (("C-M-y" . org-insert-clipboard-image))
-  :config
-  (defcustom org-limit-image-size '(0.8 . 0.4) "Maximum image size") ;; integer or float or (width-int-or-float . height-int-or-float)
+  )
+
+(leaf *org-image-size-adjuster
+  :hook (org-mode-hook . org-limit-image-size-activate)
+  :preface
+  (defcustom org-limit-image-size '(0.8 . 0.25) "Maximum image size") ;; integer or float or (width-int-or-float . height-int-or-float)
+
   (defun org-limit-image-size--get-limit-size (width-p)
     (let ((limit-size (if (numberp org-limit-image-size)
-                        org-limit-image-size
+                          org-limit-image-size
                         (if width-p (car org-limit-image-size)
                           (cdr org-limit-image-size)))))
       (if (floatp limit-size)
-        (ceiling (* limit-size (if width-p (frame-text-width) (frame-text-height))))
+          (ceiling (* limit-size (if width-p (frame-text-width) (frame-text-height))))
         limit-size)))
 
   (defvar org-limit-image-size--in-org-display-inline-images nil)
 
   (defun org-limit-image-size--create-image
-    (old-func file-or-data &optional type data-p &rest props)
+      (old-func file-or-data &optional type data-p &rest props)
 
     (if (and org-limit-image-size--in-org-display-inline-images
-          org-limit-image-size
-          (null type)
-          ;;(image-type-available-p 'imagemagick) ;;Emacs27 support scaling by default?
-          (null (plist-get props :width)))
-      ;; limit to maximum size
-      (apply
-        old-func
-        file-or-data
-        (if (image-type-available-p 'imagemagick) 'imagemagick)
-        data-p
-        (plist-put
+             org-limit-image-size
+             (null type)
+             ;;(image-type-available-p 'imagemagick) ;;Emacs27 support scaling by default?
+             (null (plist-get props :width)))
+        ;; limit to maximum size
+        (apply
+         old-func
+         file-or-data
+         (if (image-type-available-p 'imagemagick) 'imagemagick)
+         data-p
+         (plist-put
           (plist-put
-            (org-plist-delete props :width) ;;remove (:width nil)
-            :max-width (org-limit-image-size--get-limit-size t))
+           (org-plist-delete props :width) ;;remove (:width nil)
+           :max-width (org-limit-image-size--get-limit-size t))
           :max-height (org-limit-image-size--get-limit-size nil)))
 
       ;; default
@@ -2224,8 +2228,6 @@
     (interactive)
     (advice-remove #'create-image #'org-limit-image-size--create-image)
     (advice-remove #'org-display-inline-images #'org-limit-image-size--org-display-inline-images))
-
-  (add-hook 'org-mode-hook 'org-limit-image-size-activate)
   )
 
 
