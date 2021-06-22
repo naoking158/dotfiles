@@ -2122,40 +2122,6 @@
                                               (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline))))))))
   )
 
-
-(leaf org-journal
-  :disabled t
-  :doc "a simple org-mode based journaling mode"
-  :req "emacs-25.1" "org-9.1"
-  :tag "emacs>=25.1"
-  :url "http://github.com/bastibe/org-journal"
-  :emacs>= 25.1
-  :ensure t
-  :after org
-  ;; :init
-  ;;  ;; Change default prefix key; needs to be set before loading org-journal
-  :bind (("C-c j n" . org-journal-new-entry)
-          ("C-c j s" . org-journal-search))
-  :custom ((org-journal-dir . jethro/org-agenda-directory)
-             (org-journal-date-format . "%Y-%m-%d, %A")
-             (org-journal-file-format . "daily.org")
-             (org-journal-enable-agenda-integration . t)
-             ;; org-journal-dir (concat org-directory "journal/")
-             ;; org-journal-file-format "%Y%m%d.org"
-             )
-  ;;
-  ;; (defun org-journal-file-header-func (time)
-  ;;   "Custom function to create journal header."
-  ;;   (concat
-  ;;     (pcase org-journal-file-type
-  ;;       (`daily "#+TITLE: Daily Journal\n#+STARTUP: showeverything")
-  ;;       (`weekly "#+TITLE: Weekly Journal\n#+STARTUP: folded")
-  ;;       (`monthly "#+TITLE: Monthly Journal\n#+STARTUP: folded")
-  ;;       (`yearly "#+TITLE: Yearly Journal\n#+STARTUP: folded"))))
-
-  ;; (setq org-journal-file-header 'org-journal-file-header-func)
-  )
-
 (leaf *org-insert-clipboard-image
   :after org
   :preface
