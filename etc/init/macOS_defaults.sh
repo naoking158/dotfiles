@@ -30,8 +30,8 @@ if [ "$(uname)" = "Darwin" ]; then
   defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
 
   printf "Increase key repeat rate\n"
-  defaults write -g InitialKeyRepeat -int 11
-  defaults write -g KeyRepeat -float 1.5
+  defaults write -g InitialKeyRepeat -int 12
+  defaults write -g KeyRepeat -float 1.2
 
   killall Finder
 
