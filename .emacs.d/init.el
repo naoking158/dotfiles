@@ -2598,9 +2598,6 @@
                                 (require 'lsp-pyright)
                                 (lsp)
                                 ))
-    :custom
-    (lsp-pyright-disable-organize-imports . t)
-    (lsp-pyright-disable-language-services . t)
     )
 
   (defadvice python-shell-completion-at-point (around fix-company-bug activate)
