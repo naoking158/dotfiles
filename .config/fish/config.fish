@@ -43,6 +43,10 @@ set -xg LC_ALL en_US.UTF-8
 set -xg LANG en_US.UTF-8
 
 
+if test -e $HOME/src/github.com/naoking158/research
+    set PYTHONPATH $HOME/src/github.com/naoking158/research $PYTHONPATH
+end
+
 if test (uname -s) = "Darwin"
     # Homebrew
     set -xg HOMEBREW_EDITOR "/usr/local/bin/emacs -q -nw"
@@ -52,8 +56,7 @@ if test (uname -s) = "Darwin"
     set PATH /usr/local/texlive/2020basic/bin/x86_64-darwin $PATH
     set PATH $HOME/.local/bin $PATH
     set PATH /opt/local/bin $PATH
-
-    # set PYTHONPATH ~/src/github.com/akimotolab/NaokiSakamoto/source/script $PYTHONPATH
+    
     set -x USE_DAAL4PY_SKLEARN YES
 
     # Node.js
@@ -318,7 +321,7 @@ end
 
 if test (uname -s) = "Darwin"
     if test -e $HOME/miniconda
-        eval /Users/naoki/miniconda/condabin/conda "shell.fish" "hook" $argv | source
+        eval $HOME/miniconda/condabin/conda "shell.fish" "hook" $argv | source
     end
     set -gx LDFLAGS "-L/usr/local/opt/ruby/lib" $LDFLAGS
     set -gx CPPFLAGS "-I/usr/local/opt/ruby/include" $CPPFLAGS
