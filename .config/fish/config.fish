@@ -43,8 +43,8 @@ set -xg LC_ALL en_US.UTF-8
 set -xg LANG en_US.UTF-8
 
 
-if test -e $HOME/src/github.com/naoking158/research
-    set PYTHONPATH $HOME/src/github.com/naoking158/research $PYTHONPATH
+if test -e $HOME/src/github.com/naoking158
+    set -xg PYTHONPATH $HOME/src/github.com/naoking158 $PYTHONPATH
 end
 
 if test (uname -s) = "Darwin"
