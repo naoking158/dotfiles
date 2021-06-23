@@ -16,7 +16,7 @@ deploy: ## Create symlink to home directory
 	@echo ''
 	@$(foreach val, $(DOTFILES), make create-symlink-safely ARG=$(val);)
 	@echo ''
-	@echo 'All done, except for `.ssh`.'
+	@echo 'All done, except for `.ssh/config`.'
 ifneq ("$(wildcard $(HOME)/bak_dotfiles)","")
 	@echo ''
 	@echo 'Original dotfiles have been moved to $(HOME)/bak_dotfiles/.'
