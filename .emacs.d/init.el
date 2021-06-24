@@ -695,7 +695,6 @@
 
   (leaf company-tabnine
     :ensure t
-    :require t
     :config
     (add-to-list 'company-backends #'company-tabnine)
     ;; workaround for company-transformers
