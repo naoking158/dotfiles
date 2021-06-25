@@ -2536,47 +2536,39 @@
   :ensure t
   :custom
   ((python-indent-guess-indent-offset . t)
-    (python-indent-guess-indent-offset-verbose . nil))
+   (python-indent-guess-indent-offset-verbose . nil))
   :config
-  (leaf pythonic
-    :doc "Utility functions for writing pythonic emacs package."
-    :req "emacs-25.1" "s-1.9" "f-0.17.2"
-    :tag "emacs>=25.1"
-    :url "https://github.com/proofit404/pythonic"
-    :emacs>= 25.1
+  (leaf conda
+    :doc "Work with your conda environments"
+    :req "emacs-24.4" "pythonic-0.1.0" "dash-2.13.0" "s-1.11.0" "f-0.18.2"
+    :tag "conda" "environment" "python" "emacs>=24.4"
+    :added "2021-04-10"
+    :url "http://github.com/necaris/conda.el"
+    :after lsp-pyright
+    :emacs>= 24.4
     :ensure t
+    :require t
     :config
-    (leaf conda
-      :doc "Work with your conda environments"
-      :req "emacs-24.4" "pythonic-0.1.0" "dash-2.13.0" "s-1.11.0" "f-0.18.2"
-      :tag "conda" "environment" "python" "emacs>=24.4"
-      :added "2021-04-10"
-      :url "http://github.com/necaris/conda.el"
-      :after lsp-pyright
-      :emacs>= 24.4
-      :ensure t
-      :require t
-      :config
-      (cond
-        (window-system
-          (custom-set-variables
-            '(conda-anaconda-home (expand-file-name "~/miniconda/"))
-            '(conda-env-home-directory (expand-file-name "~/miniconda/"))))
-        (t
-          (custom-set-variables
-            '(conda-anaconda-home (expand-file-name "~/miniconda3/"))
-            '(conda-env-home-directory (expand-file-name "~/miniconda3/"))))
-        )
-      (conda-env-initialize-interactive-shells)
-      (conda-env-initialize-eshell)
-      ;; these hooks can't go in the :hook section since lsp-restart-workspace
-      ;; is not available if lsp isn't active
-      ;; (add-hook 'conda-postactivate-hook (lambda () (lsp-restart-workspace)))
-      ;; (add-hook 'conda-postdeactivate-hook (lambda () (lsp-restart-workspace)))
-      (add-hook 'conda-postactivate-hook (lambda () (lsp-pyright-setup-when-conda)))
-      (add-hook 'conda-postdeactivate-hook (lambda () (lsp-pyright-setup-when-conda)))
-      )
+    (cond
+     (window-system
+      (custom-set-variables
+       '(conda-anaconda-home (expand-file-name "~/miniconda/"))
+       '(conda-env-home-directory (expand-file-name "~/miniconda/"))))
+     (t
+      (custom-set-variables
+       '(conda-anaconda-home (expand-file-name "~/miniconda3/"))
+       '(conda-env-home-directory (expand-file-name "~/miniconda3/"))))
+     )
+    (conda-env-initialize-interactive-shells)
+    (conda-env-initialize-eshell)
+    ;; these hooks can't go in the :hook section since lsp-restart-workspace
+    ;; is not available if lsp isn't active
+    ;; (add-hook 'conda-postactivate-hook (lambda () (lsp-restart-workspace)))
+    ;; (add-hook 'conda-postdeactivate-hook (lambda () (lsp-restart-workspace)))
+    (add-hook 'conda-postactivate-hook (lambda () (lsp-pyright-setup-when-conda)))
+    (add-hook 'conda-postdeactivate-hook (lambda () (lsp-pyright-setup-when-conda)))
     )
+
 
   (leaf lsp-pyright
     :doc "Python LSP client using Pyright"
