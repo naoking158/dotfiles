@@ -92,14 +92,28 @@ end
 ################################################################
 # Functions
 ################################################################
-alias gomi='trash -i -r'
+function rm
+    argparse -n mycmdname f/force -- $argv
+    or return
 
-# cd -> ls
-functions --copy cd standard_cd
-
-function cd
-    standard_cd $argv; and ls
+    if set -lq _flag_f
+        /bin/rm -rf $argv
+    else
+        if ! test -e $HOME/.myTrash
+            mkdir $HOME/.myTrash
+        end
+        mv -i $argv $HOME/.myTrash/
+        echo "They are moved to $HOME/.myTrash"
+    end
 end
+
+
+# # cd -> ls
+# functions --copy cd standard_cd
+
+# function cd
+#     standard_cd $argv; and ls
+# end
 
 function du
     command /usr/bin/du -shc * | sort -h
