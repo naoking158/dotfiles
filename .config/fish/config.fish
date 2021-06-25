@@ -156,18 +156,21 @@ function sshexit
 end
 
 function rsyncto
-    argparse -n mycmdname o/only= e/exclude= -- $argv
+    argparse -n mycmdname -x 'i,e' \
+        'i/include=+' 'e/exclude=+' -- $argv
     or return
 
-    if set -lq _flag_o
-        set include $_flag_o
+    if set -lq _flag_i
+        set myopts '--exclude=*'
+        for key in $_flag_i
+            set myopts '--include='$key $myopts
+        end
+    else if set -lq _flag_e
+        for key in $_flag_e
+            set myopts '--exclude='$key $myopts
+        end
     else
-        set include '*'
-    end
-    if set -lq _flag_e
-        set exclude $_flag_e
-    else
-        set exclude '*'
+        set myopts ''
     end
 
     set host (hostname_of $argv[1])
@@ -175,22 +178,24 @@ function rsyncto
     set localpath $argv[2..-2]
     set remotepath (string replace $HOME \~ $argv[-1])
 
-    rsync -avz --copy-unsafe-links -e "ssh -p $port" $localpath $USER@$host:$remotepath --include="*/" --include="$include" --exclude="$exclude"
+    rsync -avz --copy-unsafe-links -e "ssh -p $port" $localpath $USER@$host:$remotepath --include="*/" $myopts
 end
 
 function rsyncfrom
     argparse -n mycmdname o/only= e/exclude= -- $argv
     or return
 
-    if set -lq _flag_o
-        set include $_flag_o
+    if set -lq _flag_i
+        set myopts '--exclude=*'
+        for key in $_flag_i
+            set myopts '--include='$key $myopts
+        end
+    else if set -lq _flag_e
+        for key in $_flag_e
+            set myopts '--exclude='$key $myopts
+        end
     else
-        set include '*'
-    end
-    if set -lq _flag_e
-        set exclude $_flag_e
-    else
-        set exclude '*'
+        set myopts ''
     end
 
     set host (hostname_of $argv[1])
@@ -198,7 +203,7 @@ function rsyncfrom
     set remotepath (string replace $HOME \~ $argv[2])
     set localpath $argv[3]
 
-    rsync -avz --copy-unsafe-links -e "ssh -p $port" $USER@$host:$remotepath $localpath --include="*/" --include="$include" --exclude="$exclude"
+    rsync -avz --copy-unsafe-links -e "ssh -p $port" $USER@$host:$remotepath $localpath --include="*/" $myopts
 end
 
 function mdlrsyncto
