@@ -261,7 +261,7 @@
           :url "https://github.com/seagle0128/doom-modeline"
           :emacs>= 25.1
           :ensure t
-          :require t all-the-icons shrink-path
+          :require all-the-icons shrink-path
           :custom
           ((doom-modeline-buffer-file-name-style . 'truncate-from-project)
             (doom-modeline-icon . t)
@@ -537,7 +537,6 @@
   :url "http://company-mode.github.io/"
   :emacs>= 24.3
   :ensure t
-  :require t
   :blackout t
   :leaf-defer nil
   :bind (;; ("<tab>" . company-indent-or-complete-common)
@@ -1523,7 +1522,7 @@
   :url "https://github.com/MaskRay/ccls/wiki/lsp-mode#find-definitionsreferences"
   :emacs>= 25.1
   :ensure t
-  :require t tramp
+  :require t
   :custom `((lsp-keymap-prefix . "s-l")
              (gc-cons-threshold \,
                (* 3 1024 1024 1024)
@@ -1551,8 +1550,7 @@
              (lsp-enable-indentation . nil)
              (lsp-restart . 'ignore)
              )
-  :hook (;; (prog-mode-hook . lsp-deferred)
-          (lsp-mode-hook . lsp-enable-which-key-integration)
+  :hook ((lsp-mode-hook . lsp-enable-which-key-integration)
           (lsp-managed-mode-hook . lsp-modeline-diagnostics-mode))
   :config
   (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\AtCoder\\'")
@@ -1621,7 +1619,6 @@
       ("C-c C-r" . lsp-ui-peek-find-references)
       ("C-c C-j" . lsp-ui-peek-find-definitions)
       ("C-c i"   . lsp-ui-peek-find-implementation)
-      ("C-c m"   . lsp-ui-imenu)
       ("C-c s"   . lsp-ui-sideline-mode)
       ("C-c d"   . ladicle/toggle-lsp-ui-doc)))
     :hook
@@ -2510,6 +2507,7 @@
     :ensure t
     :after org-roam bibtex-completion))
 
+
 (leaf paren
   :hook
   (after-init-hook . show-paren-mode)
@@ -2528,6 +2526,7 @@
   :url "https://github.com/tumashu/posframe"
   :emacs>= 26
   :ensure t)
+
 
 (leaf python-mode
   :doc "Python major mode"
