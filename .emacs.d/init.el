@@ -2773,6 +2773,110 @@
   ((company-mode-hook . set-yas-as-company-backend))
   )
 
+(leaf affe
+  :ensure t
+  :bind (("C-M-f" . affe-grep)
+         ("C-M-z" . affe-find))
+  :custom
+  ;; Orderlessを利用する
+  ((affe-highlight-function function orderless-highlight-matches)
+   (affe-regexp-function function orderless-pattern-compiler))
+  :config
+  (consult-customize affe-grep :preview-key (kbd "M-.")))
+
+(leaf embark
+  :ensure t
+  :bind (("C-s-a" . embark-act))
+  :config
+  (leaf embark-consult
+    :ensure t
+    :require t
+    :after consult
+    :hook ((embark-collect-mode-hook . consult-preview-at-point-mode))
+    ;; :config
+    ;; (bind-key "C-c C-e" 'embark-export minibuffer-local-map)
+    ))
+
+(leaf consult
+  ;; consult-line ... swiper の代替
+  ;; consult-isearch ... isearch中にconsultインタフェースでクエリを再入力し、isearch再実行
+  ;; consult-multi-occur ... multi-occurの代替
+  ;; consult-focus-line ... クエリにヒットする部分のみを抽出して「表示」する（他が隠れる, narrowing）。
+  ;; その後、C-uつきで呼び出すと、隠れていた部分が表示される（もとに戻る, widen）
+  ;; consult-recent-file ... 最近開いたファイルを選択
+  :ensure t
+  :commands consult-customize
+  :custom ((consult-preview-key . 'any))
+  :bind (([remap switch-to-buuuffer] . consult-buffer) ; C-x b
+         ([remap yank-pop] . consult-yank-pop)         ; M-y
+         ([remap goto-line] . consult-goto-line)       ; M-g g
+         ("C-s" . my-consult-line)
+         ("C-M-r" . consult-recent-file)
+         ("C-c o" . consult-outline)
+         ("C-x C-o" . consult-file-externally)
+         ("C-S-s" . consult-imenu))
+  :config
+  (leaf consult-ghq :ensure t)
+  
+  ;; C-uを付けるとカーソル位置の文字列を使うmy-consult-lineコマンドを定義する
+  (defun my-consult-line (&optional at-point)
+    "Consult-line uses things-at-point if set C-u prefix."
+    (interactive "P")
+    (if at-point
+        (consult-line (thing-at-point 'symbol))
+      (consult-line)))
+  )
+
+(leaf orderless
+  :ensure t
+  :require t
+  :custom ((completion-styles . '(orderless)))
+  :config
+  (defun just-one-face (fn &rest args)
+    (let ((orderless-match-faces [completions-common-part]))
+      (apply fn args)))
+
+  (advice-add 'company-capf--candidates :around #'just-one-face))
+
+(leaf selectrum
+  :ensure t
+  :custom ((selectrum-max-window-height . 20))
+  :config
+  (selectrum-mode +1)
+  ;; to make sorting and filtering more intelligent
+  (leaf selectrum-prescient
+    :ensure t
+    :config
+    (selectrum-prescient-mode +1))
+  (leaf prescient
+    :ensure t
+    :custom (prescient-aggressive-file-save . t)
+    :config
+    (prescient-persist-mode 1)
+    ))
+
+(leaf marginalia
+  :ensure t
+  :global-minor-mode t)
+
+(leaf vertico
+  :ensure t
+  :custom ((vertico-count . 20))
+  :global-minor-mode t savehist-mode)
+  ;; :hook ((after-init-hook . (vertico-mode
+  ;;                            savehist-mode)))
+  ;; :config
+  ;; (leaf smex
+  ;;   :doc "M-x interface with Ido-style fuzzy matching."
+  ;;   :req "emacs-24"
+  ;;   :tag "usability" "convenience" "emacs>=24"
+  ;;   :url "http://github.com/nonsequitur/smex/"
+  ;;   :emacs>= 24
+  ;;   :ensure t
+  ;;   :custom ((smex-history-length . 35)
+  ;;            (smex-completion-method . 'ivy))
+  ;;   )
+
 
 (provide 'init)
 
