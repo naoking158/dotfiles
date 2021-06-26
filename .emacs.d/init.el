@@ -530,6 +530,17 @@
   :custom (auto-revert-interval . 0.1)
   )
 
+(leaf auto-rsync
+  :disabled t
+  :load-path "~/.emacs.d/el-get/auto-rsync"
+  :require t
+  :setq ((auto-rsync-dir-alist quote
+                               ((/Users/dizzy/workspace/causal_explanation/ . mdl-kinoko1:/home/dizzy/workspace/causal_explanation)
+                                (/Users/dizzy/workspace/causal_explanation/ . mdl-kinoko2:/home/dizzy/workspace/causal_explanation))
+                               ))
+  :config
+  (auto-rsync-mode t))
+
 (leaf company
   :doc "Modular text completion framework"
   :req "emacs-24.3"
@@ -1430,7 +1441,7 @@
      '(recentf-exclude
        '(".recentf" "bookmarks" "org-recent-headings.dat" "^/tmp\\.*"
          "^/private\\.*" "/TAGS$")))
-;; "^/var/folders\\.*"
+    ;; "^/var/folders\\.*"
 
     ;; 余分なメッセージを削除しておきましょう
     (defmacro with-suppressed-message (&rest body)
