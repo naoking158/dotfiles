@@ -48,9 +48,7 @@
 
     (leaf leaf
       :config
-      (leaf leaf-convert
-        :ensure t
-        )
+      (leaf leaf-convert :ensure t)
       (leaf leaf-tree
         :ensure t
         :custom ((imenu-list-size . 30)
@@ -138,10 +136,7 @@
                  (history-delete-duplicates . t)
                  (scroll-preserve-screen-position . t)
                  (scroll-conservatively . 100)
-                 (mouse-wheel-scroll-amount quote
-                   (1
-                     ((control)
-                       . 5)))
+                 (mouse-wheel-scroll-amount quote (1 ((control). 5)))
                  (ring-bell-function quote ignore)
                  (text-quoting-style quote straight)
                  (truncate-lines . t)
@@ -155,9 +150,18 @@
                  (show-paren-mode . 1)
                  (confirm-kill-emacs . 'y-or-n-p)
                  (recentf-auto-cleanup . 'never)
-                 (save-place-mode . 1)
-                 )
+                 (save-place-mode . 1))
       :config
+      (leaf *recentf
+        :custom ((recentf-exclude quote
+                                 (".recentf" "bookmarks" "org-recent-headings.dat" "^/tmp\\.*"
+                                  "^/private\\.*" "/TAGS$"))
+                 (recentf-save-file . "~/.emacs.d/.recentf")
+                 (recentf-max-saved-items . 300)             ;; recentf に保存するファイルの数
+                 (recentf-exclude . '(".recentf"))           ;; .recentf自体は含まない
+                 (recentf-auto-cleanup . 'never)             ;; 保存する内容を整理
+                 ))
+      
       (let ((gls "/usr/local/bin/gls"))
         (if (file-exists-p gls) (setq insert-directory-program gls)))
 
@@ -174,9 +178,7 @@
             (let ((global-hl-line-mode t))
               (global-hl-line-highlight))))
         (setq global-hl-line-timer
-              (run-with-idle-timer 0.03 t 'global-hl-line-timer-function))
-        )
-
+              (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
 
       (defalias 'yes-or-no-p 'y-or-n-p)
       (keyboard-translate 8 127)
@@ -234,8 +236,7 @@
                   (mac-right-command-modifier quote super)
                   (initial-frame-alist . '((width . 110)
                                             (height . 65)))
-                  (line-spacing . 4)
-                  )
+                  (line-spacing . 4))
         )
 
       (leaf doom-themes
@@ -267,10 +268,6 @@
             (doom-modeline-icon . t)
             (doom-modeline-major-mode-icon . nil)
             (doom-modeline-minor-modes . nil))
-          ;; :custom-face
-          ;; (
-          ;;  ;; (doom-modeline-bar . '((t (:background "#6272a4"))))
-          ;;  (mode-line . '((t (:background "dark slate gray" :foreground "white")))))
           :hook (after-init-hook . doom-modeline-mode)
           :defun (doom-modeline-def-modeline)
           :config
@@ -278,8 +275,7 @@
           (column-number-mode 1)
           (doom-modeline-def-modeline 'main
             '(bar workspace-name window-number matches buffer-info remote-host buffer-position parrot selection-info)
-            '(misc-info persp-name lsp github debug minor-modes input-method major-mode process vcs checker)
-            )
+            '(misc-info persp-name lsp github debug minor-modes input-method major-mode process vcs checker))
           )
         )
 
@@ -305,53 +301,9 @@
                   (ns-use-proxy-icon . nil)
                   (frame-title-format . nil)
                   (default-frame-alist quote
-                    (
-                      (inhibit-double-buffering . t)
+                    ((inhibit-double-buffering . t)
                       (ns-transparent-titlebar . t)
-                      (ns-appearance . dark)
-                      ))
-                  )
-        )
-      )
-
-    (leaf solarized-theme
-      :disabled t
-      :doc "The Solarized color theme"
-      :req "emacs-24.1" "dash-2.16"
-      :tag "solarized" "themes" "convenience" "emacs>=24.1"
-      :url "http://github.com/bbatsov/solarized-emacs"
-      :emacs>= 24.1
-      :leaf-defer nil
-      :ensure t
-      :commands (solarized-create-theme-file-with-palette solarized-color-blend)
-      :custom ((solarized-use-less-bold . t)
-                (solarized-scale-org-headlines)
-                (solarized-distinct-fringe-background . t))
-      :config
-      (defun c/reload-theme nil
-        (interactive)
-        (eval-buffer)
-        (load-theme 'solarized-wombat-dark t))
-
-      (solarized-create-theme-file-with-palette 'dark 'solarized-wombat-dark
-        '("#2a2a29" "#f6f3e8" "#e5c06d" "#ddaa6f" "#ffb4ac" "#e5786d" "#834c98" "#a4b5e6" "#7ec98f" "#8ac6f2")
-        '((custom-theme-set-faces theme-name
-            `(default
-               ((,class
-                  (:foreground ,base3 :background ,base03))))
-            `(vertical-border
-               ((,class
-                  (:foreground ,base03))))
-            `(mode-line
-               ((,class
-                  (:foreground ,base2 :background ,base02))))
-            `(mode-line-inactive
-               ((,class
-                  (:foreground ,base0 :background ,base03))))
-            `(font-lock-builtin-face
-               ((,class
-                  (:foreground ,magenta)))))))
-      (load-theme 'solarized-wombat-dark t))
+                      (ns-appearance . dark))))))
 
     (leaf which-key
       :diminish which-key-mode
@@ -374,17 +326,6 @@
                       "→")
                     (("<\\([[:alnum:]-]+\\)>")
                       "\\1"))))
-      :global-minor-mode t)
-
-    (leaf which-key-posframe
-      :disabled t
-      :doc "Using posframe to show which-key"
-      :req "emacs-26.0" "posframe-0.4.3" "which-key-3.3.2"
-      :tag "tooltip" "bindings" "convenience" "emacs>=26.0"
-      :url "https://github.com/yanghaoxie/which-key-posframe"
-      :emacs>= 26.0
-      :ensure t
-      :after posframe which-key
       :global-minor-mode t)
 
     (leaf dashboard
@@ -441,8 +382,7 @@
               (if file-name
                 (neotree-find file-name)))))))
     :bind
-    (("M-t" . neotree-projectile-toggle))
-    )
+    (("M-t" . neotree-projectile-toggle)))
   )
 
 (leaf ace-window
@@ -526,7 +466,6 @@
   :doc "revert buffers when files on disk change"
   :tag "builtin"
   :ensure t
-  :require t
   :custom (auto-revert-interval . 0.1)
   )
 
@@ -1069,6 +1008,7 @@
   :setq-default (ispell-program-name . "aspell"))
 
 (leaf ivy
+  :disabled t
   :doc "Incremental Vertical completYon"
   :req "emacs-24.5"
   :tag "matching" "emacs>=24.5"
@@ -1172,6 +1112,7 @@
              (smex-completion-method . 'ivy)))
 
   (leaf counsel
+    :disabled t
     :diminish
     :doc "Various completion functions using Ivy"
     :req "emacs-24.5" "swiper-0.13.0"
@@ -1206,7 +1147,6 @@
               (counsel-describe-variable-function . 'helpful-variable)
               )
     :global-minor-mode t
-    ;; :commands with-ivy-window
     :config
     (leaf counsel-tramp
       :doc "Tramp ivy interface for ssh, docker, vagrant"
@@ -1466,7 +1406,6 @@
   :ensure t)
 
 (leaf jump-back!
-  :defun (jump-back! . nil)
   :require ring edmacro
   :preface
   (defun jump-back!--ring-update nil
@@ -1510,18 +1449,15 @@
   :config
   ;; (key-chord-mode 1)
   (key-chord-define-global "gl" 'goto-line)
-  (key-chord-define-global "fk" 'counsel-recentf)
-  (key-chord-define-global "fj" 'counsel-M-x)
+  (key-chord-define-global "fk" 'consult-recentf)
   (key-chord-define-global "x0" '"\C-x0")
   (key-chord-define-global "x1" '"\C-x1")
   (key-chord-define-global "x2" '"\C-x2")
   (key-chord-define-global "x3" '"\C-x3")
   (key-chord-define-global "x5" '"\C-x52")
-  (key-chord-define-global "gr" 'counsel-ag)
+  (key-chord-define-global "gr" 'consult-ripgrep)
   (key-chord-define-global "rl" 'rotate-layout)
   (key-chord-define-global "rw" 'rotate-window)
-  ;; (key-chord-define-global "dj" 'dumb-jump-go)
-  ;; (key-chord-define-global "db" 'dumb-jump-back)
   (key-chord-define-global "jb" 'jump-back!))
 
 (leaf lsp-mode
@@ -2773,6 +2709,95 @@
   ((company-mode-hook . set-yas-as-company-backend))
   )
 
+(leaf affe
+  :ensure t
+  :bind (("C-M-f" . affe-grep)
+         ("C-M-z" . affe-find))
+  :custom
+  ;; Orderlessを利用する
+  ((affe-highlight-function function orderless-highlight-matches)
+   (affe-regexp-function function orderless-pattern-compiler))
+  :config
+  (consult-customize affe-grep :preview-key (kbd "M-.")))
+
+(leaf embark
+  :ensure t
+  :bind (("C-s-a" . embark-act))
+  :config
+  (leaf embark-consult
+    :ensure t
+    :require t
+    :after consult
+    :hook ((embark-collect-mode-hook . consult-preview-at-point-mode))
+    :bind (("C-c C-e" . embark-export))
+    ))
+
+(leaf consult
+  ;; consult-line ... swiper の代替
+  ;; consult-isearch ... isearch中にconsultインタフェースでクエリを再入力し、isearch再実行
+  ;; consult-multi-occur ... multi-occurの代替
+  ;; consult-focus-line ... クエリにヒットする部分のみを抽出して「表示」する（他が隠れる, narrowing）。
+  ;; その後、C-uつきで呼び出すと、隠れていた部分が表示される（もとに戻る, widen）
+  ;; consult-recent-file ... 最近開いたファイルを選択
+  :ensure t
+  :commands consult-customize
+  :custom ((consult-preview-key . 'any))
+  :bind (([remap switch-to-buuuffer] . consult-buffer) ; C-x b
+         ([remap yank-pop] . consult-yank-pop)         ; M-y
+         ([remap goto-line] . consult-goto-line)       ; M-g g
+         ("C-s" . my-consult-line)
+         ("C-M-r" . consult-recent-file)
+         ("C-c o" . consult-outline)
+         ("C-x C-o" . consult-file-externally)
+         ("C-S-s" . consult-imenu))
+  :config
+  (leaf consult-ghq :ensure t)
+  
+  ;; C-uを付けるとカーソル位置の文字列を使うmy-consult-lineコマンドを定義する
+  (defun my-consult-line (&optional at-point)
+    "Consult-line uses things-at-point if set C-u prefix."
+    (interactive "P")
+    (if at-point
+        (consult-line (thing-at-point 'symbol))
+      (consult-line)))
+  )
+
+(leaf orderless
+  :ensure t
+  :require t
+  :custom ((completion-styles . '(orderless)))
+  :config
+  (defun just-one-face (fn &rest args)
+    (let ((orderless-match-faces [completions-common-part]))
+      (apply fn args)))
+
+  (advice-add 'company-capf--candidates :around #'just-one-face))
+
+(leaf selectrum
+  :ensure t
+  :custom ((selectrum-max-window-height . 20))
+  :config
+  (selectrum-mode +1)
+  ;; to make sorting and filtering more intelligent
+  (leaf selectrum-prescient
+    :ensure t
+    :config
+    (selectrum-prescient-mode +1))
+  (leaf prescient
+    :ensure t
+    :custom (prescient-aggressive-file-save . t)
+    :config
+    (prescient-persist-mode 1)
+    ))
+
+(leaf marginalia
+  :ensure t
+  :global-minor-mode t)
+
+(leaf vertico
+  :ensure t
+  :custom ((vertico-count . 20))
+  :global-minor-mode t savehist-mode)
 
 (provide 'init)
 
