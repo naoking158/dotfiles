@@ -1449,18 +1449,15 @@
   :config
   ;; (key-chord-mode 1)
   (key-chord-define-global "gl" 'goto-line)
-  (key-chord-define-global "fk" 'counsel-recentf)
-  (key-chord-define-global "fj" 'counsel-M-x)
+  (key-chord-define-global "fk" 'consult-recentf)
   (key-chord-define-global "x0" '"\C-x0")
   (key-chord-define-global "x1" '"\C-x1")
   (key-chord-define-global "x2" '"\C-x2")
   (key-chord-define-global "x3" '"\C-x3")
   (key-chord-define-global "x5" '"\C-x52")
-  (key-chord-define-global "gr" 'counsel-ag)
+  (key-chord-define-global "gr" 'consult-ripgrep)
   (key-chord-define-global "rl" 'rotate-layout)
   (key-chord-define-global "rw" 'rotate-window)
-  ;; (key-chord-define-global "dj" 'dumb-jump-go)
-  ;; (key-chord-define-global "db" 'dumb-jump-back)
   (key-chord-define-global "jb" 'jump-back!))
 
 (leaf lsp-mode
@@ -2732,8 +2729,7 @@
     :require t
     :after consult
     :hook ((embark-collect-mode-hook . consult-preview-at-point-mode))
-    ;; :config
-    ;; (bind-key "C-c C-e" 'embark-export minibuffer-local-map)
+    :bind (("C-c C-e" . embark-export))
     ))
 
 (leaf consult
@@ -2802,20 +2798,6 @@
   :ensure t
   :custom ((vertico-count . 20))
   :global-minor-mode t savehist-mode)
-  ;; :hook ((after-init-hook . (vertico-mode
-  ;;                            savehist-mode)))
-  ;; :config
-  ;; (leaf smex
-  ;;   :doc "M-x interface with Ido-style fuzzy matching."
-  ;;   :req "emacs-24"
-  ;;   :tag "usability" "convenience" "emacs>=24"
-  ;;   :url "http://github.com/nonsequitur/smex/"
-  ;;   :emacs>= 24
-  ;;   :ensure t
-  ;;   :custom ((smex-history-length . 35)
-  ;;            (smex-completion-method . 'ivy))
-  ;;   )
-
 
 (provide 'init)
 
