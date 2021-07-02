@@ -60,6 +60,11 @@ if [ "$(uname)" = "Darwin" ]; then
   printf "Disable animation when launch app from dock\n"
   defaults write com.apple.dock launchanim -bool false
 
+  printf "Disable shadow of screencapture\n"
+  defaults write com.apple.screencapture disable-shadow -bool TRUE
+  defaults write com.apple.screencapture type JPG
+  killall SystemUIServer
+
   printf "Restart mac for applying modifications."
 
 fi
