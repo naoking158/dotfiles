@@ -1573,6 +1573,7 @@
     )
 
   (leaf lsp-ivy
+    :disabled t
     :doc "LSP ivy integration"
     :req "emacs-25.1" "dash-2.14.1" "lsp-mode-6.2.1" "ivy-0.13.0"
     :tag "debug" "languages" "emacs>=25.1"
@@ -2752,6 +2753,10 @@
          ("C-S-s" . consult-imenu))
   :config
   (leaf consult-ghq :ensure t)
+  (leaf consult-lsp
+    :ensure t
+    :bind ((lsp-mode-map
+            ([remap xref-find-apropos] . consult-lsp-symbols))))
   
   ;; C-uを付けるとカーソル位置の文字列を使うmy-consult-lineコマンドを定義する
   (defun my-consult-line (&optional at-point)
