@@ -497,7 +497,7 @@
           ("C-n" . company-select-next)
           ("C-p" . company-select-previous)
           ;; ("<tab>" . company-complete-selection)
-)
+          )
          (company-search-map
           ("C-n" . company-select-next)
           ("C-p" . company-select-previous)))
@@ -510,9 +510,7 @@
            (company-require-match . 'never)
            (completion-ignore-case . nil)
            (company-math-allow-latex-symbols-in-faces . t)
-           (company-math-allow-unicode-symbols-in-faces . (quote (tex-math font-latex-math-face)))
-           )
-
+           (company-math-allow-unicode-symbols-in-faces . (quote (tex-math font-latex-math-face))))
   :global-minor-mode global-company-mode
   :config
   (leaf company-org-block
@@ -1469,7 +1467,6 @@
   :url "https://github.com/MaskRay/ccls/wiki/lsp-mode#find-definitionsreferences"
   :emacs>= 25.1
   :ensure t
-  :require t
   :custom `((lsp-keymap-prefix . "s-l")
              (gc-cons-threshold \,
                (* 3 1024 1024 1024)
@@ -1495,8 +1492,7 @@
              (lsp-prefer-capf . t)
              (lsp-enable-completion-at-point . nil)
              (lsp-enable-indentation . nil)
-             (lsp-restart . 'ignore)
-             )
+             (lsp-restart . 'ignore))
   :hook ((lsp-mode-hook . lsp-enable-which-key-integration)
           (lsp-managed-mode-hook . lsp-modeline-diagnostics-mode))
   :config
@@ -1601,8 +1597,7 @@
             (magit-commit-ask-to-stage quote stage)
             (magit-clone-set-remote\.pushDefault . t)
             (magit-clone-default-directory . "~/src/github.com/")
-            (magit-remote-add-set-remote\.pushDefault quote ask))
-  )
+            (magit-remote-add-set-remote\.pushDefault quote ask)))
 
 (leaf window-numbering
   :when window-system
@@ -1638,9 +1633,7 @@
          ("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
          ("C-c C-<" . mc/mark-all-like-this)
-         ("C-M-SPC" . mc/mark-all-dwim-or-mark-sexp)
-         )
-  )
+         ("C-M-SPC" . mc/mark-all-dwim-or-mark-sexp)))
 
 (leaf mwim
   :doc "Switch between the beginning/end of line or code"
@@ -1782,16 +1775,14 @@
     '(org-agenda-done ((t (:foreground "gray" :weight book))))
     '(org-scheduled-today ((t (:foreground "orange" :weight book))))
     '(org-agenda-date ((t (:foreground "forest green" :height 1.1))))
-    '(org-agenda-date-today ((t (:foreground "#98be65" :height 1.1))))
-    )
+    '(org-agenda-date-today ((t (:foreground "#98be65" :height 1.1)))))
 
   (custom-set-faces
     '(org-level-1 ((t (:inherit outline-1 :height 1.5))))
     '(org-level-2 ((t (:inherit outline-2 :height 1.3))))
     '(org-level-3 ((t (:inherit outline-3 :height 1.2))))
     '(org-level-4 ((t (:inherit outline-4 :height 1.1))))
-    '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
-    )
+    '(org-level-5 ((t (:inherit outline-5 :height 1.0)))))
 
   (setq org-format-latex-options
     '(:foreground default
@@ -1800,8 +1791,7 @@
        :html-foreground "Black"
        :html-background "Transparent"
        :html-scale 1.0
-       :matchers ("begin" "$1" "$" "$$" "\\(" "\\["))
-    )
+       :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
 
   (when (fboundp 'mac-toggle-input-method)
     (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii))
@@ -1842,8 +1832,7 @@
 
     (defun timed-notification (time msg)
       (interactive "sNotification when (e.g: 2 minutes, 60 seconds, 3 days): \nsMessage: ")
-      (run-at-time time nil (lambda (msg) (terminal-notifier-notify "Emacs" msg)) msg))
-    )
+      (run-at-time time nil (lambda (msg) (terminal-notifier-notify "Emacs" msg)) msg)))
 
 
   (defun jethro/org-archive-done-tasks ()
@@ -2083,8 +2072,7 @@
         (if (file-exists-p filename)
           (insert (concat "[[file:" filename "]]")))
         (org-display-inline-images)))
-  :bind (("C-M-y" . org-insert-clipboard-image))
-  )
+  :bind (("C-M-y" . org-insert-clipboard-image)))
 
 (leaf *org-image-size-adjuster
   :hook (org-mode-hook . org-limit-image-size-activate)
@@ -2137,9 +2125,7 @@
   (defun org-limit-image-size-deactivate ()
     (interactive)
     (advice-remove #'create-image #'org-limit-image-size--create-image)
-    (advice-remove #'org-display-inline-images #'org-limit-image-size--org-display-inline-images))
-  )
-
+    (advice-remove #'org-display-inline-images #'org-limit-image-size--org-display-inline-images)))
 
 (leaf org-download
   :disabled t
@@ -2152,8 +2138,7 @@
   :ensure t
   :hook (org-mode-hook . org-download-enable)
   :custom
-  ((org-download-image-dir . "imgs"))
-  )
+  ((org-download-image-dir . "imgs")))
 
 (leaf org-ql
   :doc "Org Query Language, search command, and agenda-like view"
@@ -2198,8 +2183,7 @@
   :url "https://github.com/integral-dw/org-bullets"
   :ensure t
   :custom ((org-bullets-bullet-list . '("" "" "" "" "" "" "" "" "" "")))
-  :hook (org-mode-hook . org-bullets-mode)
-  )
+  :hook (org-mode-hook . org-bullets-mode))
 
 (leaf org-contrib
   :doc "Outline-based notes management and organizer"
@@ -2475,7 +2459,6 @@
   :emacs>= 26
   :ensure t)
 
-
 (leaf python-mode
   :doc "Python major mode"
   :tag "oop" "python" "processes" "languages"
@@ -2513,9 +2496,7 @@
     ;; (add-hook 'conda-postactivate-hook (lambda () (lsp-restart-workspace)))
     ;; (add-hook 'conda-postdeactivate-hook (lambda () (lsp-restart-workspace)))
     (add-hook 'conda-postactivate-hook (lambda () (lsp-pyright-setup-when-conda)))
-    (add-hook 'conda-postdeactivate-hook (lambda () (lsp-pyright-setup-when-conda)))
-    )
-
+    (add-hook 'conda-postdeactivate-hook (lambda () (lsp-pyright-setup-when-conda))))
 
   (leaf lsp-pyright
     :doc "Python LSP client using Pyright"
@@ -2534,16 +2515,13 @@
                                   python-indent 4
                                   tab-width 4)
                                 (require 'lsp-pyright)
-                                (lsp)
-                                ))
-    )
+                                (lsp))))
 
   (defadvice python-shell-completion-at-point (around fix-company-bug activate)
     "python-shell-completion-at-point breaks when point is before the prompt"
     (when (or (not comint-last-prompt)
               (>= (point) (cdr comint-last-prompt)))
-      ad-do-it))
-  )
+      ad-do-it)))
 
 (leaf rainbow-delimiters
   :doc "Highlight brackets according to their depth"
@@ -2586,9 +2564,7 @@
   (unless (server-running-p)
     (server-start)
     (defun iconify-emacs-when-server-is-done ()
-      (unless server-clients (iconify-frame)))
-    )
-  )
+      (unless server-clients (iconify-frame)))))
 
 (leaf super-save
   :diminish
@@ -2636,8 +2612,7 @@
   :emacs>= 24.3
   :ensure t
   :bind* (("C-/" . undo-fu-only-undo)
-          ("C-M-/" . undo-fu-only-redo))
-  )
+          ("C-M-/" . undo-fu-only-redo)))
 
 (leaf volatile-highlights
   :diminish
@@ -2707,8 +2682,7 @@
     (setq company-backends (mapc #'company-mode/backend-with-yas company-backends))
     )
   :hook
-  ((company-mode-hook . set-yas-as-company-backend))
-  )
+  ((company-mode-hook . set-yas-as-company-backend)))
 
 (leaf affe
   :ensure t
@@ -2764,8 +2738,7 @@
     (interactive "P")
     (if at-point
         (consult-line (thing-at-point 'symbol))
-      (consult-line)))
-  )
+      (consult-line))))
 
 (leaf orderless
   :ensure t
@@ -2792,8 +2765,7 @@
     :ensure t
     :custom (prescient-aggressive-file-save . t)
     :config
-    (prescient-persist-mode 1)
-    ))
+    (prescient-persist-mode 1)))
 
 (leaf marginalia
   :ensure t
