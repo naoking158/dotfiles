@@ -513,12 +513,19 @@
            (company-math-allow-unicode-symbols-in-faces . (quote (tex-math font-latex-math-face))))
   :global-minor-mode global-company-mode
   :config
+  (add-to-list 'company-backends #'company-capf)
+
   (leaf company-org-block
     :ensure t
     :custom
     (company-org-block-edit-style . 'auto) ;; 'auto, 'prompt, or 'inline
     :hook ((org-mode-hook . (lambda ()
-                              (setq-local company-backends '(company-org-block))
+                              (setq-local company-backends
+                                          '(company-org-block
+                                            company-tabnine
+                                            company-semantic
+                                            company-capf
+                                            company-dabbrev))
                               (company-mode +1)))))
 
   (leaf company-yasnippet
@@ -1703,6 +1710,11 @@
   :doc "Export Framework for Org Mode"
   :tag "builtin"
   :ensure org-plus-contrib
+  :preface
+  (defun my-org-mode-hook ()
+    (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
+  :hook (org-mode-hook . my-org-mode-hook)
+  ;; (add-hook 'org-mode-hook #'my-org-mode-hook)
   :custom
   ((org-directory . "~/org/")
     (org-ellipsis . " ▼ ")
@@ -2424,9 +2436,6 @@
 #+title: ${title}
 - source :: ${ref}"
            :unnarrowed t)))
-  ;; (add-to-list 'company-backends 'org-mode)
-  (add-to-list 'company-backends '(company-capf))
-  ;; (set-company-backend! 'org-mode '(company-capf))
 
   (org-roam-mode)
 
