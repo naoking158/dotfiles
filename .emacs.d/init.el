@@ -2299,8 +2299,8 @@
                         ("\\paragraph{%s}" . "\\paragraph*{%s}")
                         ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
         (add-to-list 'org-latex-classes
-                       '("jsarticle"
-                        "\\RequirePackage{plautopatch}\n
+                     '("jsarticle"
+"\\RequirePackage{plautopatch}\n
 \\documentclass[a4p,uplatex,dvipdfmx]{jsarticle}\n
 \\input{../preferences/header.tex}
 [NO-DEFAULT-PACKAGES]
@@ -2312,7 +2312,7 @@
                         ("\\paragraph{%s}" . "\\paragraph*{%s}")
                         ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
-        (setq org-latex-pdf-process (list (my-latexmk-command TeX-engine "-pvc" "%f" "%o")))
+        (setq org-latex-pdf-process (list (my-latexmk-command TeX-engine "-pv" "%f" "%o")))
         )))
 
   (leaf *org-patch
