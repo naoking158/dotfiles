@@ -170,7 +170,7 @@ function rsyncto
             set myopts '--exclude='$key $myopts
         end
     else
-        set myopts ''
+        set myopts '--include=*'
     end
 
     set host (hostname_of $argv[1])
@@ -195,7 +195,7 @@ function rsyncfrom
             set myopts '--exclude='$key $myopts
         end
     else
-        set myopts ''
+        set myopts '--include=*'
     end
 
     set host (hostname_of $argv[1])
