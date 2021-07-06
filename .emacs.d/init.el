@@ -265,9 +265,9 @@
           :require all-the-icons shrink-path
           :custom
           ((doom-modeline-buffer-file-name-style . 'truncate-from-project)
-            (doom-modeline-icon . t)
-            (doom-modeline-major-mode-icon . nil)
-            (doom-modeline-minor-modes . nil))
+           (doom-modeline-icon . t)
+           (doom-modeline-major-mode-icon . nil)
+           (doom-modeline-minor-modes . nil))
           :hook (after-init-hook . doom-modeline-mode)
           :defun (doom-modeline-def-modeline)
           :config
@@ -275,9 +275,7 @@
           (column-number-mode 1)
           (doom-modeline-def-modeline 'main
             '(bar workspace-name window-number matches buffer-info remote-host buffer-position parrot selection-info)
-            '(misc-info persp-name lsp github debug minor-modes input-method major-mode process vcs checker))
-          )
-        )
+            '(misc-info persp-name lsp github debug minor-modes input-method major-mode process vcs checker))))
 
       (leaf hide-mode-line
         :doc "minor mode that hides/masks your modeline"
@@ -502,7 +500,7 @@
           ("C-n" . company-select-next)
           ("C-p" . company-select-previous)))
   :custom ((company-tooltip-limit . 15)
-           (company-idle-delay . 0.2)
+           (company-idle-delay . 0.1)
            (company-dabbrev-downcase . 0)
            (company-minimum-prefix-length . 2)
            (company-transformers quote
@@ -1537,7 +1535,8 @@
              (lsp-ui-doc-max-width . 150)
              (lsp-ui-doc-max-height . 30)
              (lsp-ui-doc-use-childframe . t)
-             (lsp-ui-doc-use-webkit . t)
+             (lsp-ui-doc-use-webkit . nil)
+             (lsp-ui-doc-show-with-mouse . nil)
              ;; lsp-ui-flycheck
              (lsp-ui-flycheck-enable . nil)
              ;; lsp-ui-sideline
@@ -2713,7 +2712,8 @@
     :require t
     :after consult
     :hook ((embark-collect-mode-hook . consult-preview-at-point-mode))
-    :bind (("C-c C-e" . embark-export))
+    :bind (minibuffer-local-map
+           ("C-c C-e" . embark-export))
     ))
 
 (leaf consult
