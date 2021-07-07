@@ -2706,15 +2706,7 @@
 (leaf embark
   :ensure t
   :bind (("C-s-a" . embark-act))
-  :config
-  (leaf embark-consult
-    :ensure t
-    :require t
-    :after consult
-    :hook ((embark-collect-mode-hook . consult-preview-at-point-mode))
-    :bind (minibuffer-local-map
-           ("C-c C-e" . embark-export))
-    ))
+  :config)
 
 (leaf consult
   ;; consult-line ... swiper の代替
@@ -2724,9 +2716,11 @@
   ;; その後、C-uつきで呼び出すと、隠れていた部分が表示される（もとに戻る, widen）
   ;; consult-recent-file ... 最近開いたファイルを選択
   :ensure t
+  :after embark
   :commands consult-customize
-  :custom ((consult-preview-key . 'any))
-  :bind (([remap switch-to-buuuffer] . consult-buffer) ; C-x b
+  ;; :custom ((consult-preview-key . '(list (kbd "<C-M-n>") (kbd "<C-M-p>"))))
+           ;; (consult-preview-key . 'any))
+  :bind (([remap switch-to-buffer] . consult-buffer) ; C-x b
          ([remap yank-pop] . consult-yank-pop)         ; M-y
          ([remap goto-line] . consult-goto-line)       ; M-g g
          ("C-s" . my-consult-line)
@@ -2735,11 +2729,32 @@
          ("C-x C-o" . consult-file-externally)
          ("C-S-s" . consult-imenu))
   :config
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key (kbd "M-."))
+  ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-theme
+   :preview-key '(:debounce 0.2 any)
+   consult-ripgrep consult-git-grep consult-grep
+   consult-bookmark consult-recent-file consult-xref
+   consult--source-file consult--source-project-file consult--source-bookmark
+   :preview-key (kbd "C-S-p"))
+  
   (leaf consult-ghq :ensure t)
   (leaf consult-lsp
     :ensure t
     :bind ((lsp-mode-map
             ([remap xref-find-apropos] . consult-lsp-symbols))))
+  (leaf embark-consult
+    :ensure t
+    :after consult
+    :hook ((embark-collect-mode-hook . consult-preview-at-point-mode))
+    :bind (minibuffer-local-map
+           ("C-c C-e" . embark-export)))
   
   ;; C-uを付けるとカーソル位置の文字列を使うmy-consult-lineコマンドを定義する
   (defun my-consult-line (&optional at-point)
