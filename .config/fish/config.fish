@@ -56,8 +56,6 @@ if test (uname -s) = "Darwin"
     set PATH /usr/local/texlive/2020basic/bin/x86_64-darwin $PATH
     set PATH $HOME/.local/bin $PATH
     set PATH /opt/local/bin $PATH
-    
-    set -x USE_DAAL4PY_SKLEARN YES
 
     # Node.js
     set PATH $HOME/.nodebrew/current/bin $PATH
@@ -72,20 +70,20 @@ if test (uname -s) = "Darwin"
 
     set -g fish_user_paths "/usr/local/sbin" $fish_user_paths
 
-    # For compilers to find openblas you may need to set:
-    set -gx LDFLAGS "-L/usr/local/opt/openblas/lib"
-    set -gx CPPFLAGS "-I/usr/local/opt/openblas/include"
+    # # For compilers to find openblas you may need to set:
+    # set -gx LDFLAGS "-L/usr/local/opt/openblas/lib"
+    # set -gx CPPFLAGS "-I/usr/local/opt/openblas/include"
 
-    # For pkg-config to find openblas you may need to set:
-    set -gx PKG_CONFIG_PATH "/usr/local/opt/openblas/lib/pkgconfig" $PKG_CONFIG_PATH
+    # # For pkg-config to find openblas you may need to set:
+    # set -gx PKG_CONFIG_PATH "/usr/local/opt/openblas/lib/pkgconfig" $PKG_CONFIG_PATH
 
-    set -gx LDFLAGS "-L/usr/local/opt/libxml2/lib" $LDFLAGS
-    set -gx CPPFLAGS "-I/usr/local/opt/libxml2/include" $CPPFLAGS
-    set -gx PKG_CONFIG_PATH "/usr/local/opt/libxml2/lib/pkgconfig" $PKG_CONFIG_PATH
+    # set -gx LDFLAGS "-L/usr/local/opt/libxml2/lib" $LDFLAGS
+    # set -gx CPPFLAGS "-I/usr/local/opt/libxml2/include" $CPPFLAGS
+    # set -gx PKG_CONFIG_PATH "/usr/local/opt/libxml2/lib/pkgconfig" $PKG_CONFIG_PATH
 
-    set -gx LDFLAGS "-L/usr/local/opt/imagemagick@6/lib"
-    set -gx CPPFLAGS "-I/usr/local/opt/imagemagick@6/include"
-    set -gx PKG_CONFIG_PATH "/usr/local/opt/imagemagick@6/lib/pkgconfig"
+    # set -gx LDFLAGS "-L/usr/local/opt/imagemagick@6/lib"
+    # set -gx CPPFLAGS "-I/usr/local/opt/imagemagick@6/include"
+    # set -gx PKG_CONFIG_PATH "/usr/local/opt/imagemagick@6/lib/pkgconfig"
 end
 
 
