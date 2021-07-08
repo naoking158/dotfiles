@@ -2705,8 +2705,8 @@
 
 (leaf embark
   :ensure t
-  :bind (("C-s-a" . embark-act))
-  :config)
+  :require t
+  :bind (("C-s-a" . embark-act)))
 
 (leaf consult
   ;; consult-line ... swiper の代替
@@ -2728,6 +2728,14 @@
          ("C-c o" . consult-outline)
          ("C-x C-o" . consult-file-externally)
          ("C-S-s" . consult-imenu))
+  :preface
+  ;; C-uを付けるとカーソル位置の文字列を使うmy-consult-lineコマンドを定義する
+  (defun my-consult-line (&optional at-point)
+    "Consult-line uses things-at-point if set C-u prefix."
+    (interactive "P")
+    (if at-point
+        (consult-line (thing-at-point 'symbol))
+      (consult-line)))
   :config
   ;; Optionally configure preview. The default value
   ;; is 'any, such that any key triggers the preview.
@@ -2738,7 +2746,7 @@
   ;; :preview-key on a per-command basis using the `consult-customize' macro.
   (consult-customize
    consult-theme
-   :preview-key '(:debounce 0.2 any)
+   :preview-key '(:debounce 0.4 any)
    consult-ripgrep consult-git-grep consult-grep
    consult-bookmark consult-recent-file consult-xref
    consult--source-file consult--source-project-file consult--source-bookmark
@@ -2751,18 +2759,9 @@
             ([remap xref-find-apropos] . consult-lsp-symbols))))
   (leaf embark-consult
     :ensure t
-    :after consult
     :hook ((embark-collect-mode-hook . consult-preview-at-point-mode))
     :bind (minibuffer-local-map
-           ("C-c C-e" . embark-export)))
-  
-  ;; C-uを付けるとカーソル位置の文字列を使うmy-consult-lineコマンドを定義する
-  (defun my-consult-line (&optional at-point)
-    "Consult-line uses things-at-point if set C-u prefix."
-    (interactive "P")
-    (if at-point
-        (consult-line (thing-at-point 'symbol))
-      (consult-line))))
+           ("C-c C-e" . embark-export))))
 
 (leaf orderless
   :ensure t
@@ -2783,13 +2782,11 @@
   ;; to make sorting and filtering more intelligent
   (leaf selectrum-prescient
     :ensure t
-    :config
-    (selectrum-prescient-mode +1))
+    :config (selectrum-prescient-mode +1))
   (leaf prescient
     :ensure t
     :custom (prescient-aggressive-file-save . t)
-    :config
-    (prescient-persist-mode 1)))
+    :config (prescient-persist-mode 1)))
 
 (leaf marginalia
   :ensure t
