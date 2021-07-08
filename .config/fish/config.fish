@@ -47,6 +47,15 @@ if test -e $HOME/src/github.com/naoking158
     set -xg PYTHONPATH $HOME/src/github.com/naoking158 $PYTHONPATH
 end
 
+if test -e $HOME/.dir_colors
+    alias ls='gls --color=auto'
+    if test (uname -s) = "Darwin"
+        eval (gdircolors -c ~/.dir_colors)
+    else
+        eval (dircolors -c ~/.dir_colors)
+    end
+end
+
 if test (uname -s) = "Darwin"
     # Homebrew
     set -xg HOMEBREW_EDITOR "/usr/local/bin/emacs -q -nw"
