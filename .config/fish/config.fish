@@ -46,9 +46,6 @@ set -xg LANG en_US.UTF-8
 if test -e $HOME/src/github.com/naoking158
     set -xg PYTHONPATH $HOME/src/github.com/naoking158 $PYTHONPATH
 end
-if test -e $HOME/src/github.com/IDSIA
-    set -xg PYTHONPATH $HOME/src/github.com/IDSIA $PYTHONPATH
-end
 
 
 if test -e $HOME/.dir_colors
