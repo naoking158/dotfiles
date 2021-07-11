@@ -251,7 +251,8 @@
           (doom-themes-enable-bold . t))
         :config
         ;; (load-theme 'doom-one t)
-        (load-theme 'doom-nord t)
+        ;; (load-theme 'doom-nord t)
+        (load-theme 'doom-badger t)
         (doom-themes-neotree-config)
         (doom-themes-org-config)
 
@@ -1789,11 +1790,11 @@
     '(org-agenda-date-today ((t (:foreground "#98be65" :height 1.1)))))
 
   (custom-set-faces
-    '(org-level-1 ((t (:inherit outline-1 :height 1.5))))
-    '(org-level-2 ((t (:inherit outline-2 :height 1.3))))
-    '(org-level-3 ((t (:inherit outline-3 :height 1.2))))
-    '(org-level-4 ((t (:inherit outline-4 :height 1.1))))
-    '(org-level-5 ((t (:inherit outline-5 :height 1.0)))))
+    '(org-level-1 ((t (:inherit outline-1 :height 1.7 :underline t :weight bold))))
+    '(org-level-2 ((t (:inherit outline-2 :height 1.4 :underline t :weight bold))))
+    '(org-level-3 ((t (:inherit outline-3 :height 1.3 :underline t :weight bold))))
+    '(org-level-4 ((t (:inherit outline-4 :height 1.2 :weight bold))))
+    '(org-level-5 ((t (:inherit outline-5 :height 1.0 :weight bold)))))
 
   (setq org-format-latex-options
     '(:foreground default
