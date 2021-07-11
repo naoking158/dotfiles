@@ -41,12 +41,15 @@ set -xg MDL ssh-user@$HOST
 #To solve a locate problem happens in ipython notebook
 set -xg LC_ALL en_US.UTF-8
 set -xg LANG en_US.UTF-8
+set -xg MYREPO $HOME/src/github.com/naoking158
 
 
-if test -e $HOME/src/github.com/naoking158
-    set -xg PYTHONPATH $HOME/src/github.com/naoking158 $PYTHONPATH
+if test -e $MYREPO
+    set -xg PYTHONPATH $MYREPO $PYTHONPATH
 end
-
+if test -e $MYREPO/research/neptune_api_token
+    set -xg NEPTUNE_API_TOKEN (cat $MYREPO/research/neptune_api_token)
+end
 
 if test -e $HOME/.dir_colors
     alias ls='gls --color=auto'
