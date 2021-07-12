@@ -252,7 +252,8 @@
         :config
         ;; (load-theme 'doom-one t)
         ;; (load-theme 'doom-nord t)
-        (load-theme 'doom-badger t)
+        ;; (load-theme 'doom-badger t)
+        (load-theme 'doom-material t)
         (doom-themes-neotree-config)
         (doom-themes-org-config)
 
