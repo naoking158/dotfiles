@@ -707,6 +707,7 @@
   :ensure t)
 
 (leaf dumb-jump
+  :disabled t
   :doc "Jump to definition for 40+ languages without configuration"
   :req "emacs-24.3" "s-1.11.0" "dash-2.9.0" "popup-0.5.3"
   :tag "programming" "emacs>=24.3"
@@ -2696,14 +2697,16 @@
 
 (leaf affe
   :ensure t
-  :bind (("C-M-f" . affe-grep)
-         ("C-M-z" . affe-find))
+  :after orderless
+  ;; :bind (("C-M-f" . affe-grep)
+  ;;        ("C-M-z" . affe-find))
   :custom
   ;; Orderlessを利用する
   ((affe-highlight-function function orderless-highlight-matches)
    (affe-regexp-function function orderless-pattern-compiler))
   :config
   (consult-customize affe-grep :preview-key (kbd "M-.")))
+
 
 (leaf embark
   :ensure t
@@ -2754,7 +2757,10 @@
    consult--source-file consult--source-project-file consult--source-bookmark
    :preview-key (kbd "C-S-p"))
   
-  (leaf consult-ghq :ensure t)
+  (leaf consult-ghq
+    :ensure t
+    :bind (("C-M-f" . consult-ghq-find)
+           ("C-M-g" . consult-ghq-grep)))
   (leaf consult-lsp
     :ensure t
     :bind ((lsp-mode-map
