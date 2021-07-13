@@ -527,6 +527,7 @@ Thumbs.db
 
 # experiments output
 *.log
+*.logdata
 *.dat
 
 # neptune
