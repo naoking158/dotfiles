@@ -382,6 +382,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.pth
+*.npy
+epoch_*
 
 # C extensions
 *.so
@@ -522,6 +524,24 @@ Thumbs.db
 
 # profiling data
 .prof
+
+# experiments output
+*.log
+*.dat
+
+# neptune
+.neptune
+
+# Compressed files
+*.tar.gz
+*.tar
+*.gz
+*.zip
+*.gzip
+
+# specified data
+**/data/CIFAR10/cifar-10-batches-py/*
+**/data/MNIST/raw/*
 
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,latex,python,emacs
