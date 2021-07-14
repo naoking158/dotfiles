@@ -1485,9 +1485,9 @@
              (read-process-output-max \,
                (* 1 1024 1024)
                )  ;; 1MB
-             (lsp-diagnostics-modeline-scope . :project)
+             ;; (lsp-diagnostics-modeline-scope . :project)
              ;; debug
-             (lsp-auto-guess-root . t)
+             ;; (lsp-auto-guess-root . t)
              (lsp-print-io . nil)
              (lsp-log-io . nil)
              (lsp-trace . nil)
