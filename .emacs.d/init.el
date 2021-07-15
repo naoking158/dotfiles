@@ -345,6 +345,7 @@
       (dashboard-setup-startup-hook)))
 
   (leaf projectile
+    :disabled t
     :doc "Manage and navigate projects in Emacs easily"
     :req "emacs-25.1" "pkg-info-0.4"
     :tag "convenience" "project" "emacs>=25.1"
@@ -843,6 +844,7 @@
           ("C-c C-p" . flymake-goto-prev-error))
   :config
   (leaf flymake-posframe
+    :disabled t
     :when window-system
     :hook (flymake-mode-hook . flymake-posframe-mode)
     :tag "out-of-MELPA"
