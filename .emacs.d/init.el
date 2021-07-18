@@ -334,45 +334,43 @@
       (dashboard-setup-startup-hook)))
 
   (leaf projectile
-    :disabled t
     :doc "Manage and navigate projects in Emacs easily"
     :req "emacs-25.1" "pkg-info-0.4"
     :tag "convenience" "project" "emacs>=25.1"
     :url "https://github.com/bbatsov/projectile"
     :emacs>= 25.1
     :ensure t
+    :global-minor-mode t
     :config
+    (custom-set-variables
+     '(projectile-enable-caching t))
     (leaf neotree
       :doc "A tree plugin like NerdTree for Vim"
       :req "cl-lib-0.5"
       :url "https://github.com/jaypei/emacs-neotree"
       :ensure t
-      :custom
-      ((neo-theme . 'nerd2))
-      :defun
-      (neotree-show neotree-hide neotree-dir neotree-find projectile-project-root)
-      :defvar (neo-smart-open)
+      :custom ((neo-theme . 'nerd2))
+      :bind (("M-t" . neotree-projectile-toggle))
+      ;; :defvar (neo-smart-open)
       :preface
       (defun neotree-projectile-toggle ()
         (interactive)
         (let ((project-dir
-                (ignore-errors
+               (ignore-errors
          ;;; Pick one: projectile or find-file-in-project
-                  (projectile-project-root)
-                  ))
-               (file-name (buffer-file-name))
-               (neo-smart-open t))
+                 (projectile-project-root)
+                 ))
+              (file-name (buffer-file-name))
+              (neo-smart-open t))
           (if (and (fboundp 'neo-global--window-exists-p)
-                (neo-global--window-exists-p))
-            (neotree-hide)
+                   (neo-global--window-exists-p))
+              (neotree-hide)
             (progn
               (neotree-show)
               (if project-dir
-                (neotree-dir project-dir))
+                  (neotree-dir project-dir))
               (if file-name
-                (neotree-find file-name)))))))
-    :bind
-    (("M-t" . neotree-projectile-toggle)))
+                  (neotree-find file-name))))))))
   )
 
 (leaf ace-window
