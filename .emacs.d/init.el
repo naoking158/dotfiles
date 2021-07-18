@@ -226,8 +226,7 @@
                   (mac-right-command-modifier quote super)
                   (initial-frame-alist . '((width . 110)
                                             (height . 65)))
-                  (line-spacing . 4))
-        )
+                  (line-spacing . 4)))
 
       (leaf doom-themes
         :doc "an opinionated pack of modern color-themes"
@@ -696,21 +695,6 @@
   :url "https://github.com/myrjola/diminish.el"
   :emacs>= 24.3
   :ensure t)
-
-(leaf dumb-jump
-  :disabled t
-  :doc "Jump to definition for 40+ languages without configuration"
-  :req "emacs-24.3" "s-1.11.0" "dash-2.9.0" "popup-0.5.3"
-  :tag "programming" "emacs>=24.3"
-  :url "https://github.com/jacktasia/dumb-jump"
-  :emacs>= 24.3
-  :ensure t
-  :custom ((dumb-jump-selector 'ivy)
-           (dumb-jump-use-visible-window))
-  :bind
-  (("s-." . dumb-jump-go)
-   ("s-," . dumb-jump-back))
-  :global-minor-mode t)
 
 (leaf duplicate-thing
   :doc "Duplicate current line & selection"
@@ -2699,6 +2683,7 @@
     )
   :hook
   ((company-mode-hook . set-yas-as-company-backend)))
+
 
 (leaf affe
   :ensure t
