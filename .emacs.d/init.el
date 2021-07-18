@@ -151,17 +151,7 @@
                  (confirm-kill-emacs . 'y-or-n-p)
                  (recentf-auto-cleanup . 'never)
                  (save-place-mode . 1))
-      :config
-      (leaf *recentf
-        :custom ((recentf-exclude quote
-                                 (".recentf" "bookmarks" "org-recent-headings.dat" "^/tmp\\.*"
-                                  "^/private\\.*" "/TAGS$"))
-                 (recentf-save-file . "~/.emacs.d/.recentf")
-                 (recentf-max-saved-items . 300)             ;; recentf に保存するファイルの数
-                 (recentf-exclude . '(".recentf"))           ;; .recentf自体は含まない
-                 (recentf-auto-cleanup . 'never)             ;; 保存する内容を整理
-                 ))
-      
+      :config      
       (let ((gls "/usr/local/bin/gls"))
         (if (file-exists-p gls) (setq insert-directory-program gls)))
 
@@ -2560,6 +2550,19 @@
            (rainbow-r-colors-major-mode-list quote
                                              (ess-mode)))
   :hook (lisp-interaction-mode-hook emacs-lisp-mode-hook web-mode-hook))
+
+(leaf recentf
+  :custom ((recentf-exclude quote
+                            (".recentf" "bookmarks" "org-recent-headings.dat" "^/tmp\\.*"
+                             "^/private\\.*" "/TAGS$"))
+           (recentf-save-file . "~/.emacs.d/.recentf")
+           (recentf-max-saved-items . 300)             ;; recentf に保存するファイルの数
+           ;; (recentf-exclude . '(".recentf"))
+           ;; .recentf自体は含まない
+           (recentf-auto-cleanup . 'never)             ;; 保存する内容を整理
+           )
+  :config
+  (recentf-mode 1))
 
 (leaf rotate
   :doc "Rotate the layout of emacs"
