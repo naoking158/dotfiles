@@ -2199,17 +2199,60 @@
       :url "https://ox-hugo.scripter.co"
       :emacs>= 24.4
       :ensure t
-      :after org org-roam
+      :after org
+      :require t
+      :defun (org-set-property)
+      :custom ((org-hugo-front-matter-format . "yaml")
+               (org-hugo-link-desc-insert-type . t))
       :config
-      (defun jethro/conditional-hugo-enable ()
-        (save-excursion
-          (if (cdr (assoc "SETUPFILE" (org-roam--extract-global-props '("SETUPFILE"))))
-              (org-hugo-auto-export-mode +1)
-            (org-hugo-auto-export-mode -1))))
-      (add-hook 'org-mode-hook #'jethro/conditional-hugo-enable))
+      (defun c/ox-hugo-add-lastmod nil
+        "Add `lastmod' property with the current time."
+        (interactive)
+        (org-set-property "EXPORT_HUGO_LASTMOD"
+                          (format-time-string "[%Y-%m-%d %a %H:%M]")))
 
+      (leaf *ox-hugo-capture
+        :require org-capture
+        :defvar (org-capture-templates)
+        :config
+        (add-to-list 'org-capture-templates
+                     '("b" "Create new blog post" entry
+                       (file+headline "~/src/github.com/naoking158/blog-src/org/naoki.org" "blog")
+                       "** TODO %?
+:PROPERTIES:
+:EXPORT_FILE_NAME: %(apply #'format \"%s-%s-%s\"
+        (format-time-string \"%Y\")
+        (let ((sha1 (sha1 (shell-command-to-string \"head -c 1k /dev/urandom\"))))
+          (cl-loop for (a b c d) on (cdr (split-string sha1 \"\")) by #'cddddr repeat 2 collect (concat a b c d))))
+:EXPORT_HUGO_TAGS:
+:EXPORT_HUGO_LASTMOD:
+:END:
+*** tl;dr
+-
+-
+-
+*** 背景
+
+*** まとめ
+
+*** 参考
+-
+")
+                     'append)
+        (add-to-list 'org-capture-templates
+                     '("p" "Create new package post" entry
+                       (file+headline "~/src/github.com/naoking158/blog-src/org/naoki.org" "emacs")
+                       "** TODO %?
+:PROPERTIES:
+:EXPORT_FILE_NAME:
+:EXPORT_HUGO_TAGS: emacs
+:EXPORT_HUGO_LASTMOD:
+:END:
+")
+                     'append))
+      )
+    
     (leaf ox-latex
-      :disabled nil
       :doc "LaTeX Back-End for Org Export Engine"
       :tag "out-of-MELPA" "wp" "calendar" "hypermedia" "outlines"
       :preface
