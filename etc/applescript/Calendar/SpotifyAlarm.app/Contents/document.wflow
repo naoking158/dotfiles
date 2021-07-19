@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>AMApplicationBuild</key>
-	<string>492</string>
+	<string>509</string>
 	<key>AMApplicationVersion</key>
 	<string>2.10</string>
 	<key>AMDocumentVersion</key>
@@ -59,7 +59,7 @@
 					<key>muteOutput</key>
 					<false/>
 					<key>outputSetting</key>
-					<real>35.190236581920907</real>
+					<real>45.356077820760206</real>
 				</dict>
 				<key>BundleIdentifier</key>
 				<string>com.apple.Automator.SetComputerVolume</string>
@@ -150,12 +150,10 @@
 						<string>3</string>
 					</dict>
 				</dict>
-				<key>conversionLabel</key>
-				<integer>0</integer>
 				<key>isViewVisible</key>
 				<true/>
 				<key>location</key>
-				<string>417.000000:259.000000</string>
+				<string>409.500000:315.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Set Computer Volume.action/Contents/Resources/Base.lproj/main.nib</string>
 			</dict>
@@ -172,19 +170,19 @@
 					<key>Optional</key>
 					<true/>
 					<key>Types</key>
-					<array>
-						<string>com.apple.applescript.object</string>
-					</array>
+					<array/>
 				</dict>
 				<key>AMActionVersion</key>
 				<string>1.0.2</string>
 				<key>AMApplication</key>
 				<array>
-					<string>Automator</string>
+					<string>Music</string>
 				</array>
 				<key>AMParameterProperties</key>
 				<dict>
-					<key>source</key>
+					<key>syncSetting</key>
+					<dict/>
+					<key>volumeSetting</key>
 					<dict/>
 				</dict>
 				<key>AMProvides</key>
@@ -192,21 +190,34 @@
 					<key>Container</key>
 					<string>List</string>
 					<key>Types</key>
-					<array>
-						<string>com.apple.applescript.object</string>
-					</array>
+					<array/>
 				</dict>
+				<key>AMRequiredResources</key>
+				<array>
+					<dict>
+						<key>Display Name</key>
+						<string>Music</string>
+						<key>Resource</key>
+						<string>com.apple.Music</string>
+						<key>Type</key>
+						<string>application</string>
+						<key>Version</key>
+						<string>1.0</string>
+					</dict>
+				</array>
 				<key>ActionBundlePath</key>
-				<string>/System/Library/Automator/Run AppleScript.action</string>
+				<string>/System/Library/Automator/Set iTunes Volume.action</string>
 				<key>ActionName</key>
-				<string>Run AppleScript</string>
+				<string>Set Music Volume</string>
 				<key>ActionParameters</key>
 				<dict>
-					<key>source</key>
-					<string>tell application "Spotify"	launch	delay 10	set shuffling to true	set scriptTrack to "spotify:user:5np0ln4tabrb1prs4vjhn7l4c:playlist:6QwNmvlB6dbsy9GVuO9VsC"	play track scriptTrackend tell</string>
+					<key>syncSetting</key>
+					<integer>0</integer>
+					<key>volumeSetting</key>
+					<real>49.355201198630141</real>
 				</dict>
 				<key>BundleIdentifier</key>
-				<string>com.apple.Automator.RunScript</string>
+				<string>com.apple.Automator.SetiTunesVolume</string>
 				<key>CFBundleVersion</key>
 				<string>1.0.2</string>
 				<key>CanShowSelectedItemsWhenRun</key>
@@ -215,37 +226,168 @@
 				<true/>
 				<key>Category</key>
 				<array>
-					<string>AMCategoryUtilities</string>
+					<string>AMCategoryMusic</string>
 				</array>
 				<key>Class Name</key>
-				<string>RunScriptAction</string>
+				<string>AMSetiTunesVolumeAction</string>
 				<key>InputUUID</key>
-				<string>C40B8743-7252-41BD-802F-F6DB7C4E8074</string>
+				<string>FE6AA50B-F8EE-4104-8999-572A99F95588</string>
 				<key>Keywords</key>
 				<array>
-					<string>Run</string>
+					<string>Set</string>
+					<string>Volume</string>
+					<string>Music</string>
 				</array>
 				<key>OutputUUID</key>
-				<string>8C769FEA-3911-41C3-8BDD-85AAD5F579FA</string>
+				<string>0A364387-16BE-4C41-83EA-8AE16833F67C</string>
 				<key>UUID</key>
-				<string>23FBDEA4-953D-4E97-BD4A-886274BC597F</string>
+				<string>5D4519EF-5264-4E18-91A8-B159AF3BB645</string>
 				<key>UnlocalizedApplications</key>
 				<array>
-					<string>Automator</string>
+					<string>Music</string>
 				</array>
 				<key>arguments</key>
 				<dict>
 					<key>0</key>
 					<dict>
 						<key>default value</key>
-						<string>on run {input, parameters}
-	
-	(* Your script goes here *)
-	
-	return input
-end run</string>
+						<integer>0</integer>
 						<key>name</key>
-						<string>source</string>
+						<string>syncSetting</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>0</string>
+					</dict>
+					<key>1</key>
+					<dict>
+						<key>default value</key>
+						<integer>50</integer>
+						<key>name</key>
+						<string>volumeSetting</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>1</string>
+					</dict>
+				</dict>
+				<key>conversionLabel</key>
+				<integer>0</integer>
+				<key>isViewVisible</key>
+				<integer>1</integer>
+				<key>location</key>
+				<string>409.500000:463.000000</string>
+				<key>nibPath</key>
+				<string>/System/Library/Automator/Set iTunes Volume.action/Contents/Resources/Base.lproj/main.nib</string>
+			</dict>
+			<key>isViewVisible</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>action</key>
+			<dict>
+				<key>AMAccepts</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Optional</key>
+					<true/>
+					<key>Types</key>
+					<array>
+						<string>com.apple.itunes.item-object</string>
+					</array>
+				</dict>
+				<key>AMActionVersion</key>
+				<string>1.1.1</string>
+				<key>AMApplication</key>
+				<array>
+					<string>Music</string>
+				</array>
+				<key>AMParameterProperties</key>
+				<dict>
+					<key>items</key>
+					<dict/>
+				</dict>
+				<key>AMProvides</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Types</key>
+					<array>
+						<string>com.apple.itunes.item-object</string>
+					</array>
+				</dict>
+				<key>AMRequiredResources</key>
+				<array>
+					<dict>
+						<key>Display Name</key>
+						<string>Music</string>
+						<key>Resource</key>
+						<string>com.apple.Music</string>
+						<key>Type</key>
+						<string>application</string>
+						<key>Version</key>
+						<string>1.0</string>
+					</dict>
+				</array>
+				<key>ActionBundlePath</key>
+				<string>/System/Library/Automator/Get Specified iTunes Items.action</string>
+				<key>ActionName</key>
+				<string>Get Specified Music Items</string>
+				<key>ActionParameters</key>
+				<dict>
+					<key>items</key>
+					<array>
+						<dict>
+							<key>Track ID</key>
+							<string>B3AE9A35DC8C2051</string>
+							<key>kind</key>
+							<string>playlist</string>
+							<key>name</key>
+							<string>Chill</string>
+							<key>parent</key>
+							<string>Library</string>
+						</dict>
+					</array>
+				</dict>
+				<key>BundleIdentifier</key>
+				<string>com.apple.Automator.GetSpecifiediTunesItems</string>
+				<key>CFBundleVersion</key>
+				<string>1.1.1</string>
+				<key>CanShowSelectedItemsWhenRun</key>
+				<false/>
+				<key>CanShowWhenRun</key>
+				<true/>
+				<key>Category</key>
+				<array>
+					<string>AMCategoryMusic</string>
+				</array>
+				<key>Class Name</key>
+				<string>AMGetiTunesItemsAction</string>
+				<key>InputUUID</key>
+				<string>0CBDE1AD-A7C7-4208-A4BF-AB9DC27DAF7C</string>
+				<key>Keywords</key>
+				<array/>
+				<key>OutputUUID</key>
+				<string>9153B8C9-47B5-4D90-A3FA-CCB5A782DB45</string>
+				<key>UUID</key>
+				<string>ED80DE74-E384-4D71-A1CC-45CCB72AF185</string>
+				<key>UnlocalizedApplications</key>
+				<array>
+					<string>Music</string>
+				</array>
+				<key>arguments</key>
+				<dict>
+					<key>0</key>
+					<dict>
+						<key>default value</key>
+						<array/>
+						<key>name</key>
+						<string>items</string>
 						<key>required</key>
 						<string>0</string>
 						<key>type</key>
@@ -257,24 +399,173 @@ end run</string>
 				<key>conversionLabel</key>
 				<integer>0</integer>
 				<key>isViewVisible</key>
-				<true/>
+				<integer>1</integer>
 				<key>location</key>
-				<string>417.000000:504.000000</string>
+				<string>409.500000:700.000000</string>
 				<key>nibPath</key>
-				<string>/System/Library/Automator/Run AppleScript.action/Contents/Resources/Base.lproj/main.nib</string>
+				<string>/System/Library/Automator/Get Specified iTunes Items.action/Contents/Resources/Base.lproj/main.nib</string>
 			</dict>
 			<key>isViewVisible</key>
-			<true/>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>action</key>
+			<dict>
+				<key>AMAccepts</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Optional</key>
+					<false/>
+					<key>Types</key>
+					<array>
+						<string>com.apple.itunes.playlist-object</string>
+					</array>
+				</dict>
+				<key>AMActionVersion</key>
+				<string>1.1.1</string>
+				<key>AMApplication</key>
+				<array>
+					<string>Music</string>
+				</array>
+				<key>AMParameterProperties</key>
+				<dict>
+					<key>repeat</key>
+					<dict/>
+					<key>shuffle</key>
+					<dict/>
+				</dict>
+				<key>AMProvides</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Types</key>
+					<array>
+						<string>com.apple.itunes.playlist-object</string>
+					</array>
+				</dict>
+				<key>AMRequiredResources</key>
+				<array>
+					<dict>
+						<key>Display Name</key>
+						<string>Music</string>
+						<key>Resource</key>
+						<string>com.apple.Music</string>
+						<key>Type</key>
+						<string>application</string>
+						<key>Version</key>
+						<string>1.0</string>
+					</dict>
+				</array>
+				<key>ActionBundlePath</key>
+				<string>/System/Library/Automator/Play iTunes Playlist.action</string>
+				<key>ActionName</key>
+				<string>Play Music Playlist</string>
+				<key>ActionParameters</key>
+				<dict>
+					<key>repeat</key>
+					<false/>
+					<key>shuffle</key>
+					<true/>
+				</dict>
+				<key>BundleIdentifier</key>
+				<string>com.apple.Automator.PlayiTunesPlaylist</string>
+				<key>CFBundleVersion</key>
+				<string>1.1.1</string>
+				<key>CanShowSelectedItemsWhenRun</key>
+				<true/>
+				<key>CanShowWhenRun</key>
+				<true/>
+				<key>Category</key>
+				<array>
+					<string>AMCategoryMusic</string>
+				</array>
+				<key>Class Name</key>
+				<string>AMPlayiTunesPlaylistAction</string>
+				<key>InputUUID</key>
+				<string>B1D31DFE-12D2-4900-8DBA-5DA764AD0191</string>
+				<key>Keywords</key>
+				<array>
+					<string>Play</string>
+					<string>Playlist</string>
+					<string>Music</string>
+					<string>Repeat</string>
+					<string>Shuffle</string>
+				</array>
+				<key>OutputUUID</key>
+				<string>9DB4F29F-AD35-4438-860F-77363AD5CC56</string>
+				<key>ShowWhenRun</key>
+				<false/>
+				<key>UUID</key>
+				<string>27FF56EE-9F77-488C-B5BE-1E3B8A4E9018</string>
+				<key>UnlocalizedApplications</key>
+				<array>
+					<string>Music</string>
+				</array>
+				<key>arguments</key>
+				<dict>
+					<key>0</key>
+					<dict>
+						<key>default value</key>
+						<false/>
+						<key>name</key>
+						<string>shuffle</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>0</string>
+					</dict>
+					<key>1</key>
+					<dict>
+						<key>default value</key>
+						<false/>
+						<key>name</key>
+						<string>repeat</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>1</string>
+					</dict>
+				</dict>
+				<key>conversionLabel</key>
+				<integer>0</integer>
+				<key>isViewVisible</key>
+				<integer>1</integer>
+				<key>location</key>
+				<string>409.500000:855.000000</string>
+				<key>nibPath</key>
+				<string>/System/Library/Automator/Play iTunes Playlist.action/Contents/Resources/Base.lproj/main.nib</string>
+			</dict>
+			<key>isViewVisible</key>
+			<integer>1</integer>
 		</dict>
 	</array>
 	<key>connectors</key>
 	<dict>
-		<key>A9B6DD90-C2E1-4507-8141-DB5CD6D6ED6A</key>
+		<key>60C64EFB-B139-4DF6-9C28-9CE427C3D8BF</key>
+		<dict>
+			<key>from</key>
+			<string>5D4519EF-5264-4E18-91A8-B159AF3BB645 - 5D4519EF-5264-4E18-91A8-B159AF3BB645</string>
+			<key>to</key>
+			<string>ED80DE74-E384-4D71-A1CC-45CCB72AF185 - ED80DE74-E384-4D71-A1CC-45CCB72AF185</string>
+		</dict>
+		<key>94D9E2D0-CD55-4B99-9F0E-0459CDE7639C</key>
+		<dict>
+			<key>from</key>
+			<string>ED80DE74-E384-4D71-A1CC-45CCB72AF185 - ED80DE74-E384-4D71-A1CC-45CCB72AF185</string>
+			<key>to</key>
+			<string>27FF56EE-9F77-488C-B5BE-1E3B8A4E9018 - 27FF56EE-9F77-488C-B5BE-1E3B8A4E9018</string>
+		</dict>
+		<key>CC106D31-C0EA-4FB7-8A1E-4EB73DCB8E86</key>
 		<dict>
 			<key>from</key>
 			<string>423B7A19-12AA-4803-8D81-4F3E47272DD7 - 423B7A19-12AA-4803-8D81-4F3E47272DD7</string>
 			<key>to</key>
-			<string>23FBDEA4-953D-4E97-BD4A-886274BC597F - 23FBDEA4-953D-4E97-BD4A-886274BC597F</string>
+			<string>5D4519EF-5264-4E18-91A8-B159AF3BB645 - 5D4519EF-5264-4E18-91A8-B159AF3BB645</string>
 		</dict>
 	</dict>
 	<key>workflowMetaData</key>
