@@ -402,7 +402,7 @@
    (reftex-plug-into-AUCTeX . t)
    (reftex-insert-label-flags . '("s" "sfte"))
    (reftex-label-alist . '((nil ?e nil "\\eqref{%s}" nil nil)))
-   (reftex-default-bibliography . '("~/org/braindump/org/preferences/ref.bib"))
+   (reftex-default-bibliography . '("~/org/braindump/preferences/ref.bib"))
    (reftex-bibliography-commands . '("bibliography" "nobibliography" "addbibresource"))
    (fill-column . 86)
    )
@@ -2029,13 +2029,13 @@
                                        (todo "NEXT"
                                              ((org-agenda-overriding-header "In Progress")
                                                (org-agenda-files '(,(concat jethro/org-agenda-directory "projects.org")
-                                                                    ,(concat org-directory "braindump/org/concepts/research.org")
+                                                                    ,(concat org-directory "braindump/concepts/research.org")
                                                                     ,(concat jethro/org-agenda-directory "daily.org")))))
                                        (todo "TODO"
                                              ((org-agenda-overriding-header "Active Projects")
                                               (org-agenda-skip-function #'jethro/skip-projects)
                                               (org-agenda-files '(,(concat jethro/org-agenda-directory "projects.org")
-                                                                    ,(concat org-directory "braindump/org/concepts/research.org")
+                                                                    ,(concat org-directory "braindump/concepts/research.org")
                                                                     ,(concat jethro/org-agenda-directory "daily.org")))))
                                        (todo "TODO"
                                              ((org-agenda-overriding-header "One-off Tasks")
@@ -2398,75 +2398,53 @@
 
       :advice (:around org-export-dispatch c/org-export-dispatch))))
 
+
+;; :custom `((custom-file \,
+;;                              (locate-user-emacs-file "custom.el"))))
+
 (leaf org-roam
   :doc "Roam Research replica with Org-mode"
-  :req "emacs-26.1" "dash-2.13" "f-0.17.2" "s-1.12.0" "org-9.3" "emacsql-3.0.0" "emacsql-sqlite3-1.0.2"
-  :tag "convenience" "roam" "org-mode" "emacs>=26.1"
   :url "https://github.com/org-roam/org-roam"
   :emacs>= 26.1
+  :after org
   :ensure t
-  :require t company
-  :global-minor-mode org-roam-mode
-  :commands (org-roam-insert org-roam-find-file org-roam-switch-to-buffer org-roam)
-  :bind ( ("C-c n l" . org-roam)
-         ("C-c n i" . org-roam-insert)
-         ("C-c n b" . org-roam-switch-to-buffer)
-         ("C-c n f" . org-roam-find-file)
-         ("C-c n g" . org-roam-show-graph)
-         ("C-c n c" . org-roam-capture))
-  :init
-  (setq org-roam-directory (file-truename "~/org/braindump/org/")
-        org-roam-db-location (concat org-roam-directory "org-roam.db")
-        org-roam-db-gc-threshold most-positive-fixnum
-        org-roam-graph-exclude-matcher "private"
-        org-roam-tag-sources '(prop last-directory)
-        org-id-link-to-org-use-id t)
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n g" . org-roam-graph)
+         ("C-c n i" . org-roam-node-insert)
+         ("C-c n c" . org-roam-capture)
+         ;; Dailies
+         ("C-c n j" . org-roam-dailies-capture-today))
+  :custom
+  `((org-roam-directory . ,(file-truename "~/org/braindump/"))
+    (org-roam-v2-ack . t))
   :config
-  (setq org-roam-capture-templates
-      '(("l" "lit" plain (function org-roam--capture-get-point)
-         "%?"
-           :file-name "lit/${slug}"
-           :head "#+setupfile:../preferences/hugo_setup.org
-#+hugo_slug: ${slug}
-#+title: ${title}\n"
-           :unnarrowed t)
-          ("c" "concept" plain (function org-roam--capture-get-point)
-           "%?"
-           :file-name "concepts/${slug}"
-           :head "#+setupfile:../preferences/hugo_setup.org
-#+hugo_slug: ${slug}
-#+title: ${title}\n"
-           :unnarrowed t)
-          ("p" "private" plain (function org-roam-capture--get-point)
-           "%?"
-           :file-name "private/${slug}"
-           :head "#+setupfile:../preferences/hugo_setup.org
-#+hugo_slug: ${slug}
-#+title: ${title}\n"
-           :unnarrowed t)))
-  (setq org-roam-capture-ref-templates
-        '(("r" "ref" plain (function org-roam-capture--get-point)
-           "%?"
-           :file-name "lit/${slug}"
-           :head "#+setupfile:../preferences/hugo_setup.org
-#+roam_key: ${ref}
-#+hugo_slug: ${slug}
-#+roam_tags: website
-#+title: ${title}
-- source :: ${ref}"
-           :unnarrowed t)))
+  (org-roam-setup)
+  (custom-set-variables
+   '(org-roam-db-location (concat org-roam-directory "org-roam.db")))
+  ;; for org-roam-buffer-toggle
+  ;; Recommendation in the official manual
+  (add-to-list 'display-buffer-alist
+               '("\\*org-roam\\*"
+                 (display-buffer-in-direction)
+                 (direction . right)
+                 (window-width . 0.33)
+                 (window-height . fit-window-to-buffer)))
 
-  (org-roam-mode)
-
-  (leaf org-roam-bibtex
-    :doc "Org Roam meets BibTeX"
-    :req "emacs-27.1" "org-roam-1.2.2" "bibtex-completion-2.0.0"
-    :tag "wp" "outlines" "hypermedia" "bib" "emacs>=27.1"
-    :url "https://github.com/org-roam/org-roam-bibtex"
-    :emacs>= 27.1
-    :ensure t
-    :after org-roam bibtex-completion))
-
+  (custom-set-variables
+   '(org-roam-capture-templates
+     '(("l" "lit" plain "%?"
+        :if-new (file+head "lit/${slug}.org"
+                           "#+title: ${title}\n")
+        :unnarrowed t)
+       ("c" "concept" plain "%?"
+        :if-new (file+head "concept/${slug}.org"
+                           "#+title: ${title}\n")
+        :unnarrowed t)
+       ("p" "private" plain "%?"
+        :if-new (file+head "private/${slug}.org"
+                           "#+title: ${title}\n")
+        :unnarrowed t)))))
 
 (leaf paren
   :hook
