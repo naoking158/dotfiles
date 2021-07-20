@@ -2742,7 +2742,18 @@
 (leaf embark
   :ensure t
   :require t
-  :bind (("C-s-a" . embark-act)))
+  :bind (("C-s-a" . embark-act)
+         ("C-;" . embark-dwim)
+         ("C-s-b" . embark-bindings))
+  :init
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
+  :config
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
 
 (leaf consult
   ;; consult-line ... swiper の代替
