@@ -177,12 +177,6 @@
          (put fn 'disabled nil))
        (list 'upcase-region 'downcase-region 'narrow-to-region 'narrow-to-page 'narrow-to-defun 'list-timers)))
 
-    (leaf bookmark
-      :doc "set bookmarks, maybe annotate them, jump to them later"
-      :tag "builtin"
-      :bind (("C-c b d" . counsel-bookmarked-directory)
-             ("C-c b j" . bookmark-jump)))
-
     (leaf exec-path-from-shell
       :doc "Get environment variables such as $PATH from the shell"
       :tag "environment" "unix"
@@ -2752,7 +2746,8 @@
          ("C-M-r" . consult-recent-file)
          ("C-c o" . consult-outline)
          ("C-x C-o" . consult-file-externally)
-         ("C-S-s" . consult-imenu))
+         ("C-S-s" . consult-imenu)
+         ("C-c b j" . consult-bookmark))
   :preface
   ;; C-uを付けるとカーソル位置の文字列を使うmy-consult-lineコマンドを定義する
   (defun my-consult-line (&optional at-point)
