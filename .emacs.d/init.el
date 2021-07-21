@@ -2015,13 +2015,27 @@
          ("C-c n c" . org-roam-capture)
          ;; Dailies
          ("C-c n j" . org-roam-dailies-capture-today))
-  :custom
-  `((org-roam-directory . ,(file-truename "~/org/braindump/"))
-    (org-roam-v2-ack . t))
+  :require t  ;; Required for variables to be initialized correctly
+  :custom `((org-roam-directory . ,(file-truename "~/org/braindump/"))            
+            (org-roam-v2-ack . t)
+            (org-roam-capture-templates quote
+                                        (("l" "lit" plain "%?"
+                                          :if-new (file+head "lit/${slug}.org"
+                                                             "#+title: ${title}\n")
+                                          :unnarrowed t)
+                                         ("c" "concept" plain "%?"
+                                          :if-new (file+head "concept/${slug}.org"
+                                                             "#+title: ${title}\n")
+                                          :unnarrowed t)
+                                         ("p" "private" plain "%?"
+                                          :if-new (file+head "private/${slug}.org"
+                                                             "#+title: ${title}\n")
+                                          :unnarrowed t))))
   :config
-  (org-roam-setup)
-  (custom-set-variables
-   '(org-roam-db-location (concat org-roam-directory "org-roam.db")))
+  (leaf org-roam-db
+    :require t
+    :custom `(org-roam-db-location . ,(concat org-roam-directory "org-roam.db")))
+  
   ;; for org-roam-buffer-toggle
   ;; Recommendation in the official manual
   (add-to-list 'display-buffer-alist
@@ -2029,22 +2043,7 @@
                  (display-buffer-in-direction)
                  (direction . right)
                  (window-width . 0.33)
-                 (window-height . fit-window-to-buffer)))
-
-  (custom-set-variables
-   '(org-roam-capture-templates
-     '(("l" "lit" plain "%?"
-        :if-new (file+head "lit/${slug}.org"
-                           "#+title: ${title}\n")
-        :unnarrowed t)
-       ("c" "concept" plain "%?"
-        :if-new (file+head "concept/${slug}.org"
-                           "#+title: ${title}\n")
-        :unnarrowed t)
-       ("p" "private" plain "%?"
-        :if-new (file+head "private/${slug}.org"
-                           "#+title: ${title}\n")
-        :unnarrowed t)))))
+                 (window-height . fit-window-to-buffer))))
 
 (leaf paren
   :hook
