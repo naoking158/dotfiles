@@ -1026,12 +1026,11 @@
   :tag "input" "chord" "keyboard" "emacs>=24"
   :emacs>= 24
   :ensure t
-  :global-minor-mode t
+  :global-minor-mode key-chord-mode
   :custom
   ((key-chord-one-keys-delay . 0.02)
    (key-chord-two-keys-delay . 0.03))
   :config
-  ;; (key-chord-mode 1)
   (key-chord-define-global "gl" 'goto-line)
   (key-chord-define-global "fk" 'consult-recentf)
   (key-chord-define-global "x0" '"\C-x0")
@@ -2002,16 +2001,13 @@
 
       :advice (:around org-export-dispatch c/org-export-dispatch))))
 
-
-;; :custom `((custom-file \,
-;;                              (locate-user-emacs-file "custom.el"))))
-
 (leaf org-roam
   :doc "Roam Research replica with Org-mode"
   :url "https://github.com/org-roam/org-roam"
   :emacs>= 26.1
   :after org
   :ensure t
+  :hook (after-init-hook . org-roam-setup)
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
          ("C-c n g" . org-roam-graph)
