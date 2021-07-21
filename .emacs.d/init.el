@@ -392,14 +392,7 @@
    (TeX-source-correlate-method . 'synctex)
    (TeX-source-correlate-start-server . t)
    (TeX-PDF-mode . t)
-   ;; RefTeX
-   (reftex-plug-into-AUCTeX . t)
-   (reftex-insert-label-flags . '("s" "sfte"))
-   (reftex-label-alist . '((nil ?e nil "\\eqref{%s}" nil nil)))
-   (reftex-default-bibliography . '("~/org/braindump/preferences/ref.bib"))
-   (reftex-bibliography-commands . '("bibliography" "nobibliography" "addbibresource"))
-   (fill-column . 86)
-   )
+   (fill-column . 86))
   :defvar (TeX-command-list)
   :config
   (leaf latex-extra
@@ -1767,7 +1760,24 @@
   :tag "label" "ref" "cite" "org-mode"
   :url "https://github.com/jkitchin/org-ref"
   :ensure t
-  :after helm helm-bibtex ivy hydra key-chord pdf-tools)
+  :after org-roam
+  :bind (("C-c c" . org-ref-insert-cite-link))
+  :custom `(;; RefTeX
+           (reftex-plug-into-AUCTeX . t)
+           (reftex-insert-label-flags quote ("s" "sfte"))
+           (reftex-label-alist quote ((nil ?e nil "\\eqref{%s}" nil nil)))
+           (reftex-default-bibliography . '(,(concat org-roam-directory
+                                                   "preferences/ref.bib")))
+           (reftex-bibliography-commands quote
+                                         ("bibliography"
+                                          "nobibliography"
+                                          "addbibresource"))
+           ;; org-ref
+           (org-ref-bibliography-notes . ,(concat org-roam-directory
+                                                  "lit/notes.org"))
+           (org-ref-default-bibliography . '(,(concat org-roam-directory
+                                                    "preferences/ref.bib")))
+           (org-ref-pdf-directory . ,(concat org-roam-directory "lit/"))))
 
 (leaf org-bullets
   :doc "Show bullets in org-mode as UTF-8 characters"
