@@ -2016,7 +2016,7 @@
          ;; Dailies
          ("C-c n j" . org-roam-dailies-capture-today))
   :require t  ;; Required for variables to be initialized correctly
-  :custom `((org-roam-directory . ,(file-truename "~/org/braindump/"))            
+  :custom `((org-roam-directory . ,(file-truename "~/org/braindump/"))
             (org-roam-v2-ack . t)
             (org-roam-capture-templates quote
                                         (("l" "lit" plain "%?"
@@ -2311,10 +2311,10 @@
   :custom
   ;; Orderlessを利用する
   ((affe-highlight-function function orderless-highlight-matches)
-   (affe-regexp-function function orderless-pattern-compiler))
+   (affe-regexp-function function orderless-pattern-compiler)
+   (affe-find-command . "fd --color=never --full-path"))
   :config
   (consult-customize affe-grep :preview-key (kbd "M-.")))
-
 
 (leaf embark
   :ensure t
@@ -2379,8 +2379,8 @@
   
   (leaf consult-ghq
     :ensure t
-    :bind (("C-M-f" . consult-ghq-find)
-           ("C-M-g" . consult-ghq-grep)))
+    :bind (("C-s-f" . consult-ghq-find)
+           ("C-s-g" . consult-ghq-grep)))
   (leaf consult-lsp
     :ensure t
     :bind ((lsp-mode-map
