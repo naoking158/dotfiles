@@ -1392,6 +1392,10 @@
     (mac-toggle-input-method nil)
     (run-hooks 'my:ime-off-hook))
 
+  (leaf org-fragtog
+    :ensure t
+    :hook (org-mode-hook . org-fragtog-mode))
+  
   (leaf *terminal-notifier
     :when window-system
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
