@@ -94,6 +94,12 @@
 
   (leaf *initialize-emacs
     :config
+    (leaf native-compile-conf
+      :emacs>= 28.0
+      :config
+      (setq package-native-compile t)
+      (native-compile-async "~/.emacs.d/el-get/" 'recursively))
+    
     (leaf cus-edit
       :doc "tools for customizing Emacs and Lisp packages"
       :tag "builtin" "faces" "help"
@@ -118,7 +124,7 @@
         (shell-command "open ."))
 
       :bind (("M-ESC ESC" . c/redraw-frame)
-              ("M-ESC g" . c/garbage-collect))
+             ("M-ESC g" . c/garbage-collect))
       :custom '((fill-column . 85)
                 (tab-width . 4)
                 (tool-bar-mode . nil)
@@ -150,12 +156,9 @@
                                              (assq 'name
                                                    (tab-bar--current-tab-find))))
                                      " - "
-                                     buffer-file-name "%f"
-                                     (dired-directory dired-directory "%b")))
-                ;; (frame-title-format quote
-                ;;                     ((:eval (cdr (assq 'name (tab-bar--current-tab-find))))
-                ;;                      " - "
-                ;;                      (:eval (if (buffer-file-name) " %f" "%b"))))
+                                     (:eval (if (buffer-file-name) "%f"
+                                              (if dired-directory dired-directory
+                                                "%b")))))
                 (blink-cursor-mode . t)
                 (show-paren-mode . 1)
                 (confirm-kill-emacs . 'y-or-n-p)
@@ -218,23 +221,25 @@
         :doc "`left' meens same value setting its left key"
         :when window-system
         :bind (("M-o" . finder-current-dir-open)
-                ("s-w" . kill-buffer)
-                ("s-q" . save-buffers-kill-emacs)
-                ("s-v" . yank)
-                ("s-c" . copy-region-as-kill))
+               ("s-w" . kill-buffer)
+               ("s-q" . save-buffers-kill-emacs)
+               ("s-v" . yank)
+               ("s-c" . copy-region-as-kill))
         :custom ((mac-control-modifier quote control)
-                  (mac-option-modifier quote meta)
-                  (mac-command-modifier quote super)
-                  (mac-right-control-modifier quote control)
-                  (mac-right-option-modifier quote meta)
-                  (mac-right-command-modifier quote super)
-                  (initial-frame-alist . '((width . 110)
-                                            (height . 65)))
-                  (line-spacing . 4)))
+                 (mac-option-modifier quote meta)
+                 (mac-command-modifier quote super)
+                 (mac-right-control-modifier quote control)
+                 (mac-right-option-modifier quote meta)
+                 (mac-right-command-modifier quote super)
+                 (initial-frame-alist . '((width . 110)
+                                          (height . 65)))
+                 (line-spacing . 4)))
 
       (leaf nano
         :load-path "~/.emacs.d/el-get/nano-emacs/"
-        :require nano-base-colors nano-colors nano-faces nano-theme nano-theme-dark nano-modeline
+        :require
+        (nano-base-colors nano-colors nano-faces nano-theme nano-theme-dark nano-modeline nano-help)
+        :custom (nano-font-family-monospaced . "JetBrains Mono")
         :config
         (nano-faces)
         (nano-theme))
@@ -337,12 +342,14 @@
       :url "https://github.com/emacs-dashboard/emacs-dashboard"
       :emacs>= 25.3
       :ensure t
+      :require dashboard-widgets
+      :leaf-defer nil
       :custom ((dashboard-items quote
-                 ((agenda . 10)
-                   (recents . 15)
-                   (projects . 5)
-                   (bookmarks . 5))))
-      :defun (dashboard-setup-startup-hook)
+                                ((agenda . 10)
+                                 (recents . 15)
+                                 (projects . 5)
+                                 (bookmarks . 5)))
+               (dashboard-startup-banner . "~/.emacs.d/banner/ascii-gorilla.txt"))
       :config
       (dashboard-setup-startup-hook)))
 
@@ -2274,6 +2281,20 @@
   :hook ((after-init-hook . volatile-highlights-mode))
   :custom-face
   ((vhl/default-face . '((nil (:foreground "#FF3333" :background "#FFCDCD"))))))
+
+(leaf web-mode
+  :ensure t
+  :custom ((web-mode-markup-indent-offset . 2)
+           (web-mode-css-indent-offset . 2)
+           (web-mode-code-indent-offset . 2))
+  :config
+  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode)))
 
 (leaf wgrep
   :doc "Writable grep buffer and apply the changes to files"
