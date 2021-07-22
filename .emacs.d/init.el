@@ -247,15 +247,16 @@
           :url "https://github.com/seagle0128/doom-modeline"
           :emacs>= 25.1
           :ensure t
-          :require all-the-icons shrink-path
-          :custom
-          ((doom-modeline-buffer-file-name-style . 'truncate-from-project)
-           (doom-modeline-icon . t)
-           (doom-modeline-major-mode-icon . nil)
-           (doom-modeline-minor-modes . nil))
           :hook (after-init-hook . doom-modeline-mode)
-          :defun (doom-modeline-def-modeline)
+          :custom ((doom-modeline-buffer-file-name-style . 'truncate-from-project)
+                   (doom-modeline-project-detection . 'project)
+                   (doom-modeline-icon . t)
+                   (doom-modeline-major-mode-icon . nil)
+                   (doom-modeline-minor-modes . nil)
+                   (doom-modeline-hud . t)
+                   (doom-modeline-env-version . t))
           :config
+          (setq inhibit-compacting-font-caches t)
           (line-number-mode 1)
           (column-number-mode 1)
           (doom-modeline-def-modeline 'main
@@ -1286,7 +1287,6 @@
   (defun my-org-mode-hook ()
     (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
   :hook (org-mode-hook . my-org-mode-hook)
-  ;; (add-hook 'org-mode-hook #'my-org-mode-hook)
   :custom
   ((org-directory . "~/org/")
     (org-ellipsis . " ▼ ")
