@@ -340,12 +340,14 @@
       :url "https://github.com/emacs-dashboard/emacs-dashboard"
       :emacs>= 25.3
       :ensure t
+      :require dashboard-widgets
+      :leaf-defer nil
       :custom ((dashboard-items quote
-                 ((agenda . 10)
-                   (recents . 15)
-                   (projects . 5)
-                   (bookmarks . 5))))
-      :defun (dashboard-setup-startup-hook)
+                                ((agenda . 10)
+                                 (recents . 15)
+                                 (projects . 5)
+                                 (bookmarks . 5)))
+               (dashboard-startup-banner . "~/.emacs.d/banner/ascii-gorilla.txt"))
       :config
       (dashboard-setup-startup-hook)))
 
