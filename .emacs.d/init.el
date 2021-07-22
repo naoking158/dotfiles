@@ -237,8 +237,7 @@
         :require nano-base-colors nano-colors nano-faces nano-theme nano-theme-dark nano-modeline
         :config
         (nano-faces)
-        (nano-theme)
-        )
+        (nano-theme))
       
       (leaf doom-themes
         :disabled t
