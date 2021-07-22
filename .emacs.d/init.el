@@ -234,7 +234,7 @@
 
       (leaf nano
         :load-path "~/.emacs.d/el-get/nano-emacs/"
-        :require nano-faces nano-theme nano-theme-dark nano-modeline
+        :require nano-base-colors nano-colors nano-faces nano-theme nano-theme-dark nano-modeline
         :config
         (nano-faces)
         (nano-theme)
