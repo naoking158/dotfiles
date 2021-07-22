@@ -1766,18 +1766,18 @@
            (reftex-plug-into-AUCTeX . t)
            (reftex-insert-label-flags quote ("s" "sfte"))
            (reftex-label-alist quote ((nil ?e nil "\\eqref{%s}" nil nil)))
-           (reftex-default-bibliography . '(,(concat org-roam-directory
-                                                   "preferences/ref.bib")))
+           (reftex-default-bibliography . '(,(concat org-directory
+                                                     "braindump/preferences/ref.bib")))
            (reftex-bibliography-commands quote
                                          ("bibliography"
                                           "nobibliography"
                                           "addbibresource"))
            ;; org-ref
-           (org-ref-bibliography-notes . ,(concat org-roam-directory
-                                                  "lit/notes.org"))
-           (org-ref-default-bibliography . '(,(concat org-roam-directory
-                                                    "preferences/ref.bib")))
-           (org-ref-pdf-directory . ,(concat org-roam-directory "lit/"))))
+           (org-ref-bibliography-notes . ,(concat org-directory
+                                                  "braindump/lit/notes.org"))
+           (org-ref-default-bibliography . '(,(concat org-directory
+                                                    "braindump/preferences/ref.bib")))
+           (org-ref-pdf-directory . ,(concat org-directory "braindump/lit/"))))
 
 (leaf org-bullets
   :doc "Show bullets in org-mode as UTF-8 characters"
