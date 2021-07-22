@@ -120,37 +120,47 @@
       :bind (("M-ESC ESC" . c/redraw-frame)
               ("M-ESC g" . c/garbage-collect))
       :custom '((fill-column . 85)
-                 (tab-width . 4)
-                 (tool-bar-mode . nil)
-                 (user-full-name . "Naoki Sakamoto")
-                 (user-mail-address . "naoki@bbo.cs.tsukuba.ac.jp")
-                 (user-login-name . "naoking158")
-                 (create-lockfiles)
-                 (use-dialog-box)
-                 (use-file-dialog)
-                 (debug-on-error . nil)
-                 (init-file-debug . t)
-                 (frame-resize-pixelwise . t)
-                 (enable-recursive-minibuffers . t)
-                 (history-length . 1000)
-                 (history-delete-duplicates . t)
-                 (scroll-preserve-screen-position . t)
-                 (scroll-conservatively . 100)
-                 (mouse-wheel-scroll-amount quote (1 ((control). 5)))
-                 (ring-bell-function quote ignore)
-                 (text-quoting-style quote straight)
-                 (truncate-lines . t)
-                 (menu-bar-mode . nil)
-                 (tool-bar-mode)
-                 (scroll-bar-mode)
-                 (fringe-mode . 10)
-                 (indent-tabs-mode)
-                 (frame-title-format . "%f")
-                 (blink-cursor-mode . nil)
-                 (show-paren-mode . 1)
-                 (confirm-kill-emacs . 'y-or-n-p)
-                 (recentf-auto-cleanup . 'never)
-                 (save-place-mode . 1))
+                (tab-width . 4)
+                (tool-bar-mode . nil)
+                (user-full-name . "Naoki Sakamoto")
+                (user-mail-address . "naoki@bbo.cs.tsukuba.ac.jp")
+                (user-login-name . "naoking158")
+                (create-lockfiles)
+                (use-dialog-box)
+                (use-file-dialog)
+                (debug-on-error . nil)
+                (init-file-debug . t)
+                (frame-resize-pixelwise . t)
+                (enable-recursive-minibuffers . t)
+                (history-length . 1000)
+                (history-delete-duplicates . t)
+                (scroll-preserve-screen-position . t)
+                (scroll-conservatively . 100)
+                (mouse-wheel-scroll-amount quote (1 ((control). 5)))
+                (ring-bell-function quote ignore)
+                (text-quoting-style quote straight)
+                (truncate-lines . t)
+                (menu-bar-mode . nil)
+                (tool-bar-mode)
+                (scroll-bar-mode)
+                (fringe-mode . 10)
+                (indent-tabs-mode)
+                (frame-title-format quote
+                                    ((:eval (cdr
+                                             (assq 'name
+                                                   (tab-bar--current-tab-find))))
+                                     " - "
+                                     buffer-file-name "%f"
+                                     (dired-directory dired-directory "%b")))
+                ;; (frame-title-format quote
+                ;;                     ((:eval (cdr (assq 'name (tab-bar--current-tab-find))))
+                ;;                      " - "
+                ;;                      (:eval (if (buffer-file-name) " %f" "%b"))))
+                (blink-cursor-mode . t)
+                (show-paren-mode . 1)
+                (confirm-kill-emacs . 'y-or-n-p)
+                (recentf-auto-cleanup . 'never)
+                (save-place-mode . 1))
       :config      
       (let ((gls "/usr/local/bin/gls"))
         (if (file-exists-p gls) (setq insert-directory-program gls)))
@@ -222,7 +232,16 @@
                                             (height . 65)))
                   (line-spacing . 4)))
 
+      (leaf nano
+        :load-path "~/.emacs.d/el-get/nano-emacs/"
+        :require nano-base-colors nano-colors nano-faces nano-theme nano-theme-dark nano-modeline
+        :config
+        (nano-faces)
+        (nano-theme)
+        )
+      
       (leaf doom-themes
+        :disabled t
         :doc "an opinionated pack of modern color-themes"
         :req "emacs-25.1" "cl-lib-0.5"
         :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
@@ -283,7 +302,7 @@
                   (ns-right-option-modifier quote meta)
                   (ns-right-command-modifier quote super)
                   (ns-use-proxy-icon . nil)
-                  (frame-title-format . nil)
+                  ;; (frame-title-format . nil)
                   (default-frame-alist quote
                     ((inhibit-double-buffering . t)
                       (ns-transparent-titlebar . t)
@@ -1180,6 +1199,7 @@
             (magit-remote-add-set-remote\.pushDefault quote ask)))
 
 (leaf window-numbering
+  :disabled t
   :when window-system
   :doc "Numbered window shortcuts"
   :tag "matching" "faces"
