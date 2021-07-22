@@ -94,6 +94,12 @@
 
   (leaf *initialize-emacs
     :config
+    (leaf native-compile-conf
+      :emacs>= 28.0
+      :config
+      (setq package-native-compile t)
+      (native-compile-async "~/.emacs.d/el-get/" 'recursively))
+    
     (leaf cus-edit
       :doc "tools for customizing Emacs and Lisp packages"
       :tag "builtin" "faces" "help"
