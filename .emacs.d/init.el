@@ -156,12 +156,9 @@
                                              (assq 'name
                                                    (tab-bar--current-tab-find))))
                                      " - "
-                                     buffer-file-name "%f"
-                                     (dired-directory dired-directory "%b")))
-                ;; (frame-title-format quote
-                ;;                     ((:eval (cdr (assq 'name (tab-bar--current-tab-find))))
-                ;;                      " - "
-                ;;                      (:eval (if (buffer-file-name) " %f" "%b"))))
+                                     (:eval (if (buffer-file-name) "%f"
+                                              (if dired-directory dired-directory
+                                                "%b")))))
                 (blink-cursor-mode . t)
                 (show-paren-mode . 1)
                 (confirm-kill-emacs . 'y-or-n-p)
