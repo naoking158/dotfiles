@@ -124,7 +124,7 @@
         (shell-command "open ."))
 
       :bind (("M-ESC ESC" . c/redraw-frame)
-              ("M-ESC g" . c/garbage-collect))
+             ("M-ESC g" . c/garbage-collect))
       :custom '((fill-column . 85)
                 (tab-width . 4)
                 (tool-bar-mode . nil)
@@ -221,23 +221,25 @@
         :doc "`left' meens same value setting its left key"
         :when window-system
         :bind (("M-o" . finder-current-dir-open)
-                ("s-w" . kill-buffer)
-                ("s-q" . save-buffers-kill-emacs)
-                ("s-v" . yank)
-                ("s-c" . copy-region-as-kill))
+               ("s-w" . kill-buffer)
+               ("s-q" . save-buffers-kill-emacs)
+               ("s-v" . yank)
+               ("s-c" . copy-region-as-kill))
         :custom ((mac-control-modifier quote control)
-                  (mac-option-modifier quote meta)
-                  (mac-command-modifier quote super)
-                  (mac-right-control-modifier quote control)
-                  (mac-right-option-modifier quote meta)
-                  (mac-right-command-modifier quote super)
-                  (initial-frame-alist . '((width . 110)
-                                            (height . 65)))
-                  (line-spacing . 4)))
+                 (mac-option-modifier quote meta)
+                 (mac-command-modifier quote super)
+                 (mac-right-control-modifier quote control)
+                 (mac-right-option-modifier quote meta)
+                 (mac-right-command-modifier quote super)
+                 (initial-frame-alist . '((width . 110)
+                                          (height . 65)))
+                 (line-spacing . 4)))
 
       (leaf nano
         :load-path "~/.emacs.d/el-get/nano-emacs/"
-        :require nano-base-colors nano-colors nano-faces nano-theme nano-theme-dark nano-modeline
+        :require
+        (nano-base-colors nano-colors nano-faces nano-theme nano-theme-dark nano-modeline nano-help)
+        :custom (nano-font-family-monospaced . "JetBrains Mono")
         :config
         (nano-faces)
         (nano-theme))
