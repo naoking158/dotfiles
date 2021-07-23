@@ -1556,11 +1556,6 @@
                              skipped))
                    (if (not org-agenda-persistent-marks) "" " (kept marked)")))))
 
-  (defun jethro/org-inbox-capture ()
-    (interactive)
-    "Capture a task in agenda mode."
-    (org-capture nil "i"))
-
   (setq org-agenda-bulk-custom-functions `((,jethro/org-agenda-bulk-process-key jethro/org-agenda-process-inbox-item)))
 
   (defun jethro/set-todo-state-next ()
@@ -1570,46 +1565,40 @@
   (add-hook 'org-clock-in-hook 'jethro/set-todo-state-next 'append))
 
 (leaf org-agenda
-  :require t
-  :preface
-  (defun jethro/switch-to-agenda ()
-    (interactive)
-    (org-agenda nil " "))
-  :bind* (("C-c C-a" . jethro/switch-to-agenda)
+  :after org
+  :require t org-habit
+  :bind* (("C-c C-a" . org-agenda-cache)
           ("C-c C-m" . jethro/org-inbox-capture))
   :bind (org-agenda-mode-map
-          :package org-agenda
-          ("i" . org-agenda-clock-in)
-          ("r" . jethro/org-agenda-process-inbox-item)
-          ("R" . org-agenda-refile)
-          ("c" . jethro/org-inbox-capture)
-          ("q" . quit-window))
-  :custom (org-agenda-window-setup . 'current-window)
-  :config
+         :package org-agenda
+         ("i" . org-agenda-clock-in)
+         ("r" . jethro/org-agenda-process-inbox-item)
+         ("R" . org-agenda-refile)
+         ("c" . jethro/org-inbox-capture)
+         ("q" . quit-window))
+  :hook
+  ((kill-emacs-hook . ladicle/org-clock-out-and-save-when-exit)
+   (org-clock-in-hook .
+                      (lambda ()
+                        (setq org-mode-line-string (ladicle/task-clocked-time))
+                        (run-at-time 0 60 '(lambda ()
+                                             (setq org-mode-line-string (ladicle/task-clocked-time))
+                                             (force-mode-line-update)))
+                        (force-mode-line-update))))
+  :preface
   (defun org-agenda-cache (&optional regenerate)
-    "agendaを更新せずに表示する。"
+    "Show agenda buffer without updating if it exists"
     (interactive "P")
-    (when (or regenerate (null (get-buffer "*Org Agenda*")))
-      ;; "a" は org-agenda-custom-commands で常用する文字
-      (setq current-prefix-arg nil)
-      (org-agenda nil "a"))
-    (switch-to-buffer "*Org Agenda*")
-    (delete-other-windows))
+    (if (or regenerate (null (get-buffer "*Org Agenda*")))
+        (progn
+          (setq current-prefix-arg nil)
+          (org-agenda nil "a"))
+      (org-switch-to-buffer-other-window "*Org Agenda*")))
 
-  (require 'org-habit)
-  (add-to-list 'org-export-backends 'latex)
-
-  (setq org-agenda-block-separator nil
-        org-agenda-start-with-log-mode t
-        ;; 今日から予定を表示させる
-        org-agenda-start-on-weekday nil)
-
-  (setq org-agenda-current-time-string "← now")
-  (setq org-agenda-time-grid ;; Format is changed from 9.1
-        '((daily today require-timed)
-          (0800 01000 1200 1400 1600 1800 2000 2200 2400)
-          "-"
-          "────────────────"))
+  (defun jethro/org-inbox-capture ()
+    (interactive)
+    "Capture a task in agenda mode."
+    (org-capture nil "i"))
 
   (defun jethro/is-project-p ()
     "Any task with a todo keyword subtask"
@@ -1640,34 +1629,117 @@
          (t
           nil)))))
 
-  (setq org-columns-default-format "%40ITEM(Task) %Effort(EE){:} %CLOCKSUM(Time Spent) %SCHEDULED(Scheduled) %DEADLINE(Deadline)")
-  (setq org-agenda-custom-commands `((" " "Agenda"
-                                      ;; ((org-agenda-prefix-format
-                                      ;;   '((agenda . " %i %-12:c%?- t % s % e"))))
-                                      ((agenda ""
-                                               ((org-agenda-span 'week)
-                                                (org-deadline-warning-days 365)
-                                                (org-agenda-prefix-format " %i %-12:c%?- t % s % e")
-                                                ))
-                                       (todo "TODO"
-                                             ((org-agenda-overriding-header "Inbox")
-                                              (org-agenda-files '(,(concat jethro/org-agenda-directory "inbox.org")))))
-                                       (todo "NEXT"
-                                             ((org-agenda-overriding-header "In Progress")
-                                               (org-agenda-files '(,(concat jethro/org-agenda-directory "projects.org")
-                                                                    ,(concat org-directory "braindump/concepts/research.org")
-                                                                    ,(concat jethro/org-agenda-directory "daily.org")))))
-                                       (todo "TODO"
-                                             ((org-agenda-overriding-header "Active Projects")
-                                              (org-agenda-skip-function #'jethro/skip-projects)
-                                              (org-agenda-files '(,(concat jethro/org-agenda-directory "projects.org")
-                                                                    ,(concat org-directory "braindump/concepts/research.org")
-                                                                    ,(concat jethro/org-agenda-directory "daily.org")))))
-                                       (todo "TODO"
-                                             ((org-agenda-overriding-header "One-off Tasks")
-                                              (org-agenda-files '(,(concat jethro/org-agenda-directory "next.org")))
-                                              (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline))))))))
-  )
+  ;; (defun ladicle/get-today-diary ()
+  ;;   (concat private-directory
+  ;;           (format-time-string "diary/%Y/%m/%Y-%m-%d.org" (current-time))))
+  ;; (defun ladicle/get-yesterday-diary ()
+  ;;   (concat private-directory
+  ;;           (format-time-string "diary/%Y/%m/%Y-%m-%d.org"
+  ;;                               (time-add (current-time) (* -24 3600)))))
+  ;; (defun ladicle/get-diary-from-cal ()
+  ;;   (concat private-directory
+  ;;           (format-time-string
+  ;;            "diary/%Y/%m/%Y-%m-%d.org"
+  ;;            (apply 'encode-time (parse-time-string
+  ;;                                 (concat (org-read-date) " 00:00"))))))
+
+  ;; (defun ladicle/open-org-file (fname)
+  ;;   (switch-to-buffer (find-file-noselect fname)))
+  
+  (defun ladicle/org-clock-out-and-save-when-exit ()
+    "Save buffers and stop clocking when kill emacs."
+    (ignore-errors (org-clock-out) t)
+    (save-some-buffers t))
+  (defun ladicle/task-clocked-time ()
+    "Return a string with the clocked time and effort, if any"
+    (interactive)
+    (let* ((clocked-time (org-clock-get-clocked-time))
+           (h (truncate clocked-time 60))
+           (m (mod clocked-time 60))
+           (work-done-str (format "%d:%02d" h m)))
+      (if org-clock-effort
+          (let* ((effort-in-minutes
+                  (org-duration-to-minutes org-clock-effort))
+                 (effort-h (truncate effort-in-minutes 60))
+                 (effort-m (truncate (mod effort-in-minutes 60)))
+                 (effort-str (format "%d:%02d" effort-h effort-m)))
+            (format "%s/%s" work-done-str effort-str))
+        (format "%s" work-done-str))))
+  
+  :custom
+  `((org-agenda-window-setup . 'other-window)
+    (org-agenda-block-separator . nil)
+    (org-agenda-start-with-log-mode . t)
+    ;; 今日から予定を表示させる
+    (org-agenda-start-on-weekday . nil)
+    (org-agenda-current-time-string . "← now")
+    (org-agenda-time-grid quote ;; Format is changed from 9.1
+                          ((daily today require-timed)
+                           (0800 01000 1200 1400 1600 1800 2000 2200 2400)
+                           "-"
+                           "────────────────"))
+    (org-columns-default-format
+     quote
+     "%40ITEM(Task) %Effort(EE){:} %CLOCKSUM(Time Spent) %SCHEDULED(Scheduled) %DEADLINE(Deadline)"))
+  :config
+  (setq org-agenda-custom-commands
+        `(("a" "Agenda"
+           ;; ((org-agenda-prefix-format
+           ;;   '((agenda . " %i %-12:c%?- t % s % e"))))
+           ((agenda ""
+                    ((org-agenda-span 'week)
+                     (org-deadline-warning-days 365)
+                     (org-agenda-prefix-format " %i %-12:c%?- t % s % e")
+                     ))
+            (todo "TODO"
+                  ((org-agenda-overriding-header "Inbox")
+                   (org-agenda-files '(,(concat jethro/org-agenda-directory
+                                                "inbox.org")))))
+            (todo "NEXT"
+                  ((org-agenda-overriding-header "In Progress")
+                   (org-agenda-files '(,(concat jethro/org-agenda-directory
+                                                "projects.org")
+                                       ,(concat org-directory
+                                                "braindump/concepts/research.org")
+                                       ,(concat jethro/org-agenda-directory
+                                                "daily.org")))))
+            (todo "TODO"
+                  ((org-agenda-overriding-header "Active Projects")
+                   (org-agenda-skip-function #'jethro/skip-projects)
+                   (org-agenda-files '(,(concat jethro/org-agenda-directory
+                                                "projects.org")
+                                       ,(concat org-directory
+                                                "braindump/concepts/research.org")
+                                       ,(concat jethro/org-agenda-directory
+                                                "daily.org")))))
+            (todo "TODO"
+                  ((org-agenda-overriding-header "One-off Tasks")
+                   (org-agenda-files '(,(concat jethro/org-agenda-directory
+                                                "next.org")))
+                   (org-agenda-skip-function '(org-agenda-skip-entry-if
+                                               'deadline))))))))
+
+  (leaf org-pomodoro
+    :ensure t
+    :custom
+    ((org-pomodoro-ask-upon-killing . t)
+     (org-pomodoro-format . "🍅%s")
+     (org-pomodoro-short-break-format . "%s")
+     (org-pomodoro-long-break-format . "🍺%s"))
+    :custom-face
+    (org-pomodoro-mode-line . '((t (:foreground "#ff5555"))))
+    (org-pomodoro-mode-line-break. '((t (:foreground "#50fa7b"))))
+    :hook
+    (org-pomodoro-started . (lambda () (notifications-notify
+                                        :title "org-pomodoro"
+                                        :body "Let's focus for 25 minutes!"
+                                        :app-icon "~/.emacs.d/tomato.png")))
+    (org-pomodoro-finished . (lambda () (notifications-notify
+                                         :title "org-pomodoro"
+                                         :body "Well done! Take a break."
+                                         :app-icon "~/.emacs.d/img/coffee.png")))
+    :bind (org-agenda-mode-map
+           ("p" . org-pomodoro))))
 
 (leaf *org-insert-clipboard-image
   :after org
