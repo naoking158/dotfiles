@@ -242,7 +242,46 @@
         :custom (nano-font-family-monospaced . "JetBrains Mono")
         :config
         (nano-faces)
-        (nano-theme))
+        (nano-theme)
+        :advice (:override nano-modeline-compose my/nano-modeline-compose)
+        :preface
+        (defun my/nano-modeline-compose (status name primary secondary)
+          "Compose a string with provided information"
+          (let* ((char-width    (window-font-width nil 'header-line))
+                 (window        (get-buffer-window (current-buffer)))
+                 (space-up       +0.15)
+                 (space-down     -0.20)
+	             (prefix (cond ((string= status "RO")
+			                    (propertize (if (window-dedicated-p)" -- " " RO ")
+                                            'face 'nano-face-header-popout))
+                               ((string= status "**")
+			                    (propertize (if (window-dedicated-p)" -- " " ** ")
+                                            'face 'nano-face-header-critical))
+                               ((string= status "RW")
+			                    (propertize (if (window-dedicated-p)" -- " " RW ")
+                                            'face 'nano-face-header-faded))
+                               (t (propertize status 'face 'nano-face-header-popout))))
+                 (left (concat
+                        (propertize " "  'face 'nano-face-header-default
+			                        'display `(raise ,space-up))
+                        (propertize name 'face 'nano-face-header-strong)
+                        (propertize " "  'face 'nano-face-header-default
+			                        'display `(raise ,space-down))
+		                (propertize primary 'face 'nano-face-header-default)))
+                 (right (if (not (eq major-mode 'org-mode))
+                            (concat org-mode-line-string " "
+                                    secondary " ")
+                          (concat secondary " ")))
+                 (available-width (- (window-total-width) 
+			                         (length prefix) (length left) (length right)
+			                         (/ (window-right-divider-width) char-width)))
+	             (available-width (max 1 available-width)))
+            (concat prefix
+	                left
+	                (propertize (make-string available-width ?\ )
+                                'face 'nano-face-header-default)
+	                (propertize right 'face `(:inherit nano-face-header-default
+                                                       :foreground ,nano-color-faded))))))
       
       (leaf doom-themes
         :disabled t
