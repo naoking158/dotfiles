@@ -164,7 +164,7 @@
                 (confirm-kill-emacs . 'y-or-n-p)
                 (recentf-auto-cleanup . 'never)
                 (save-place-mode . 1))
-      :config      
+      :config
       (let ((gls "/usr/local/bin/gls"))
         (if (file-exists-p gls) (setq insert-directory-program gls)))
 
@@ -349,7 +349,7 @@
                                  (recents . 15)
                                  (projects . 5)
                                  (bookmarks . 5)))
-               (dashboard-startup-banner . "~/.emacs.d/banner/ascii-gorilla.txt"))
+               (dashboard-startup-banner . "~/.emacs.d/banner/inv-ascii-gorilla.txt"))
       :config
       (dashboard-setup-startup-hook)))
 
