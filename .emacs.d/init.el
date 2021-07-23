@@ -125,7 +125,7 @@
 
       :bind (("M-ESC ESC" . c/redraw-frame)
              ("M-ESC g" . c/garbage-collect))
-      :custom '((fill-column . 85)
+      :custom '((fill-column . 81)
                 (tab-width . 4)
                 (tool-bar-mode . nil)
                 (user-full-name . "Naoki Sakamoto")
@@ -852,6 +852,8 @@
     :emacs>= 25
     :ensure t
     :custom ((ein:output-area-inlined-images . t)))
+
+(leaf fill-column-indicator :ensure t)
 
 (leaf fish-mode
   :doc "Major mode for fish shell scripts"
