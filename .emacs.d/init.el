@@ -125,7 +125,7 @@
 
       :bind (("M-ESC ESC" . c/redraw-frame)
              ("M-ESC g" . c/garbage-collect))
-      :custom '((fill-column . 85)
+      :custom '((fill-column . 81)
                 (tab-width . 4)
                 (tool-bar-mode . nil)
                 (user-full-name . "Naoki Sakamoto")
@@ -164,7 +164,7 @@
                 (confirm-kill-emacs . 'y-or-n-p)
                 (recentf-auto-cleanup . 'never)
                 (save-place-mode . 1))
-      :config      
+      :config
       (let ((gls "/usr/local/bin/gls"))
         (if (file-exists-p gls) (setq insert-directory-program gls)))
 
@@ -242,7 +242,46 @@
         :custom (nano-font-family-monospaced . "JetBrains Mono")
         :config
         (nano-faces)
-        (nano-theme))
+        (nano-theme)
+        :advice (:override nano-modeline-compose my/nano-modeline-compose)
+        :preface
+        (defun my/nano-modeline-compose (status name primary secondary)
+          "Compose a string with provided information"
+          (let* ((char-width    (window-font-width nil 'header-line))
+                 (window        (get-buffer-window (current-buffer)))
+                 (space-up       +0.15)
+                 (space-down     -0.20)
+	             (prefix (cond ((string= status "RO")
+			                    (propertize (if (window-dedicated-p)" -- " " RO ")
+                                            'face 'nano-face-header-popout))
+                               ((string= status "**")
+			                    (propertize (if (window-dedicated-p)" -- " " ** ")
+                                            'face 'nano-face-header-critical))
+                               ((string= status "RW")
+			                    (propertize (if (window-dedicated-p)" -- " " RW ")
+                                            'face 'nano-face-header-faded))
+                               (t (propertize status 'face 'nano-face-header-popout))))
+                 (left (concat
+                        (propertize " "  'face 'nano-face-header-default
+			                        'display `(raise ,space-up))
+                        (propertize name 'face 'nano-face-header-strong)
+                        (propertize " "  'face 'nano-face-header-default
+			                        'display `(raise ,space-down))
+		                (propertize primary 'face 'nano-face-header-default)))
+                 (right (if (not (eq major-mode 'org-mode))
+                            (concat org-mode-line-string " "
+                                    secondary " ")
+                          (concat secondary " ")))
+                 (available-width (- (window-total-width) 
+			                         (length prefix) (length left) (length right)
+			                         (/ (window-right-divider-width) char-width)))
+	             (available-width (max 1 available-width)))
+            (concat prefix
+	                left
+	                (propertize (make-string available-width ?\ )
+                                'face 'nano-face-header-default)
+	                (propertize right 'face `(:inherit nano-face-header-default
+                                                       :foreground ,nano-color-faded))))))
       
       (leaf doom-themes
         :disabled t
@@ -349,7 +388,7 @@
                                  (recents . 15)
                                  (projects . 5)
                                  (bookmarks . 5)))
-               (dashboard-startup-banner . "~/.emacs.d/banner/ascii-gorilla.txt"))
+               (dashboard-startup-banner . "~/.emacs.d/banner/inv-ascii-gorilla.txt"))
       :config
       (dashboard-setup-startup-hook)))
 
@@ -405,70 +444,11 @@
   ((aw-leading-char-face . '((t (:height 4.0 :foreground "#f1fa8c")))))
   )
 
-(leaf auctex
-  :doc "Integrated environment for *TeX*"
-  :req "emacs-24.3" "cl-lib-1.0"
-  :tag "preview-latex" "doctex" "context" "texinfo" "latex" "tex" "emacs>=24.3"
-  :emacs>= 24.3
-  :ensure t
-  :setq-default ((TeX-master . nil))
-  :custom
-  ((TeX-auto-save . t)
-   (TeX-parse-self . t)
-   (TeX-source-correlate-method . 'synctex)
-   (TeX-source-correlate-start-server . t)
-   (TeX-PDF-mode . t)
-   (fill-column . 86))
-  :defvar (TeX-command-list)
-  :config
-  (leaf latex-extra
-    :doc "Adds several useful functionalities to LaTeX-mode."
-    :req "auctex-11.86.1" "cl-lib-0.5"
-    :tag "tex"
-    :url "http://github.com/Malabarba/latex-extra"
-    :ensure t)
-
-  (add-hook 'LaTeX-mode-hook 'visual-line-mode)
-  (add-hook 'LaTeX-mode-hook #'latex-extra-mode)
-  (add-hook 'after-init-hook 'global-company-mode)
-  (add-hook 'LaTeX-mode-hook
-            (function (lambda ()
-                        (add-to-list 'TeX-command-list
-                                     '("ja"
-                                       "sh ~/drive/lab/latextemplate/ja_latex.sh '%s'"
-                                       TeX-run-command t nil))
-                        (add-to-list 'TeX-command-list
-                                     '("en"
-                                       "sh ~/drive/lab/latextemplate/en_latex.sh '%s'"
-                                       TeX-run-command t nil))
-                        (add-to-list 'TeX-command-list
-                                     '("pdfview" "open '%s.pdf' "
-                                       TeX-run-command t nil))
-                        )))
-  ;; SyncTeX
-  (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
-  (add-hook 'LaTeX-mode-hook
-            (function (lambda ()
-                        (add-to-list 'TeX-command-list
-                                     '("Displayline" "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b" TeX-run-command t nil))
-                        )))
-  ;; RefTeX
-  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-  ;; Change key bindings
-  (add-hook 'reftex-mode-hook
-            '(lambda ()
-               (define-key reftex-mode-map (kbd "\C-cr") 'reftex-reference)
-               (define-key reftex-mode-map (kbd "\C-cl") 'reftex-label)
-               (define-key reftex-mode-map (kbd "\C-cc") 'reftex-citation)
-               ))
-  ) ;; end of auctex
-
 (leaf autorevert
   :doc "revert buffers when files on disk change"
   :tag "builtin"
   :ensure t
-  :custom (auto-revert-interval . 0.1)
-  )
+  :custom (auto-revert-interval . 1))
 
 (leaf auto-rsync
   :disabled t
@@ -814,6 +794,8 @@
     :ensure t
     :custom ((ein:output-area-inlined-images . t)))
 
+(leaf fill-column-indicator :ensure t)
+
 (leaf fish-mode
   :doc "Major mode for fish shell scripts"
   :req "emacs-24"
@@ -1061,6 +1043,60 @@
   (key-chord-define-global "rl" 'rotate-layout)
   (key-chord-define-global "rw" 'rotate-window)
   (key-chord-define-global "jb" 'jump-back!))
+
+(leaf *latex
+  :config
+  (leaf auctex
+    :doc "Integrated environment for *TeX*"
+    :req "emacs-24.3" "cl-lib-1.0"
+    :tag "preview-latex" "doctex" "context" "texinfo" "latex" "tex" "emacs>=24.3"
+    :emacs>= 24.3
+    :ensure t
+    :require reftex
+    :custom
+    ((TeX-master . nil)
+     (TeX-auto-save . t)
+     (TeX-parse-self . t)
+     (TeX-source-correlate-method . 'synctex)
+     (TeX-source-correlate-start-server . t)
+     (TeX-PDF-mode . t))
+    :preface
+    (defun my/latex-mode-hook nil
+      (visual-line-mode)
+      (add-to-list 'TeX-command-list
+                   '("ja"
+                     "sh ~/drive/lab/latextemplate/ja_latex.sh '%s'"
+                     TeX-run-command t nil))
+      (add-to-list 'TeX-command-list
+                   '("en"
+                     "sh ~/drive/lab/latextemplate/en_latex.sh '%s'"
+                     TeX-run-command t nil))
+      (add-to-list 'TeX-command-list
+                   '("pdfview" "open '%s.pdf' "
+                     TeX-run-command t nil))
+      (add-to-list 'TeX-command-list
+                   '("Displayline" "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b"
+                     TeX-run-command t nil)))
+    :hook ((after-init-hook . global-company-mode)
+           (LaTeX-mode-hook . my/latex-mode-hook)))
+
+  (leaf latex-extra
+    :doc "Adds several useful functionalities to LaTeX-mode."
+    :req "auctex-11.86.1" "cl-lib-0.5"
+    :tag "tex"
+    :url "http://github.com/Malabarba/latex-extra"
+    :ensure t
+    :hook (LaTeX-mode-hook . latex-extra-mode))
+
+  (leaf reftex
+    :require t
+    :hook (LaTeX-mode-hook . reftex-mode)
+    :bind (reftex-mode-map
+           ("C-c r" . reftex-reference)
+           ("C-c l" . reftex-label)
+           ("C-c c" . reftex-citation))
+    :custom
+    (reftex-ref-style-default-list . '("Cleveref"))))
 
 (leaf lsp-mode
   :doc "LSP mode"
@@ -1556,11 +1592,6 @@
                              skipped))
                    (if (not org-agenda-persistent-marks) "" " (kept marked)")))))
 
-  (defun jethro/org-inbox-capture ()
-    (interactive)
-    "Capture a task in agenda mode."
-    (org-capture nil "i"))
-
   (setq org-agenda-bulk-custom-functions `((,jethro/org-agenda-bulk-process-key jethro/org-agenda-process-inbox-item)))
 
   (defun jethro/set-todo-state-next ()
@@ -1570,46 +1601,32 @@
   (add-hook 'org-clock-in-hook 'jethro/set-todo-state-next 'append))
 
 (leaf org-agenda
-  :require t
-  :preface
-  (defun jethro/switch-to-agenda ()
-    (interactive)
-    (org-agenda nil " "))
-  :bind* (("C-c C-a" . jethro/switch-to-agenda)
+  :after org
+  :require t org-habit
+  :bind* (("C-c C-a" . org-agenda-cache)
           ("C-c C-m" . jethro/org-inbox-capture))
   :bind (org-agenda-mode-map
-          :package org-agenda
-          ("i" . org-agenda-clock-in)
-          ("r" . jethro/org-agenda-process-inbox-item)
-          ("R" . org-agenda-refile)
-          ("c" . jethro/org-inbox-capture)
-          ("q" . quit-window))
-  :custom (org-agenda-window-setup . 'current-window)
-  :config
+         :package org-agenda
+         ("i" . org-agenda-clock-in)
+         ("r" . jethro/org-agenda-process-inbox-item)
+         ("R" . org-agenda-refile)
+         ("c" . jethro/org-inbox-capture)
+         ("q" . quit-window))
+  :hook (kill-emacs-hook . ladicle/org-clock-out-and-save-when-exit)
+  :preface
   (defun org-agenda-cache (&optional regenerate)
-    "agendaを更新せずに表示する。"
+    "Show agenda buffer without updating if it exists"
     (interactive "P")
-    (when (or regenerate (null (get-buffer "*Org Agenda*")))
-      ;; "a" は org-agenda-custom-commands で常用する文字
-      (setq current-prefix-arg nil)
-      (org-agenda nil "a"))
-    (switch-to-buffer "*Org Agenda*")
-    (delete-other-windows))
+    (if (or regenerate (null (get-buffer "*Org Agenda*")))
+        (progn
+          (setq current-prefix-arg nil)
+          (org-agenda nil "a"))
+      (org-switch-to-buffer-other-window "*Org Agenda*")))
 
-  (require 'org-habit)
-  (add-to-list 'org-export-backends 'latex)
-
-  (setq org-agenda-block-separator nil
-        org-agenda-start-with-log-mode t
-        ;; 今日から予定を表示させる
-        org-agenda-start-on-weekday nil)
-
-  (setq org-agenda-current-time-string "← now")
-  (setq org-agenda-time-grid ;; Format is changed from 9.1
-        '((daily today require-timed)
-          (0800 01000 1200 1400 1600 1800 2000 2200 2400)
-          "-"
-          "────────────────"))
+  (defun jethro/org-inbox-capture ()
+    (interactive)
+    "Capture a task in agenda mode."
+    (org-capture nil "i"))
 
   (defun jethro/is-project-p ()
     "Any task with a todo keyword subtask"
@@ -1640,34 +1657,80 @@
          (t
           nil)))))
 
-  (setq org-columns-default-format "%40ITEM(Task) %Effort(EE){:} %CLOCKSUM(Time Spent) %SCHEDULED(Scheduled) %DEADLINE(Deadline)")
-  (setq org-agenda-custom-commands `((" " "Agenda"
-                                      ;; ((org-agenda-prefix-format
-                                      ;;   '((agenda . " %i %-12:c%?- t % s % e"))))
-                                      ((agenda ""
-                                               ((org-agenda-span 'week)
-                                                (org-deadline-warning-days 365)
-                                                (org-agenda-prefix-format " %i %-12:c%?- t % s % e")
-                                                ))
-                                       (todo "TODO"
-                                             ((org-agenda-overriding-header "Inbox")
-                                              (org-agenda-files '(,(concat jethro/org-agenda-directory "inbox.org")))))
-                                       (todo "NEXT"
-                                             ((org-agenda-overriding-header "In Progress")
-                                               (org-agenda-files '(,(concat jethro/org-agenda-directory "projects.org")
-                                                                    ,(concat org-directory "braindump/concepts/research.org")
-                                                                    ,(concat jethro/org-agenda-directory "daily.org")))))
-                                       (todo "TODO"
-                                             ((org-agenda-overriding-header "Active Projects")
-                                              (org-agenda-skip-function #'jethro/skip-projects)
-                                              (org-agenda-files '(,(concat jethro/org-agenda-directory "projects.org")
-                                                                    ,(concat org-directory "braindump/concepts/research.org")
-                                                                    ,(concat jethro/org-agenda-directory "daily.org")))))
-                                       (todo "TODO"
-                                             ((org-agenda-overriding-header "One-off Tasks")
-                                              (org-agenda-files '(,(concat jethro/org-agenda-directory "next.org")))
-                                              (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline))))))))
-  )
+  ;; (defun ladicle/get-today-diary ()
+  ;;   (concat private-directory
+  ;;           (format-time-string "diary/%Y/%m/%Y-%m-%d.org" (current-time))))
+  ;; (defun ladicle/get-yesterday-diary ()
+  ;;   (concat private-directory
+  ;;           (format-time-string "diary/%Y/%m/%Y-%m-%d.org"
+  ;;                               (time-add (current-time) (* -24 3600)))))
+  ;; (defun ladicle/get-diary-from-cal ()
+  ;;   (concat private-directory
+  ;;           (format-time-string
+  ;;            "diary/%Y/%m/%Y-%m-%d.org"
+  ;;            (apply 'encode-time (parse-time-string
+  ;;                                 (concat (org-read-date) " 00:00"))))))
+
+  ;; (defun ladicle/open-org-file (fname)
+  ;;   (switch-to-buffer (find-file-noselect fname)))
+  
+  (defun ladicle/org-clock-out-and-save-when-exit ()
+    "Save buffers and stop clocking when kill emacs."
+    (ignore-errors (org-clock-out) t)
+    (save-some-buffers t))
+  
+  :custom
+  `((org-agenda-window-setup . 'other-window)
+    (org-agenda-block-separator . nil)
+    (org-agenda-start-with-log-mode . t)
+    ;; 今日から予定を表示させる
+    (org-agenda-start-on-weekday . nil)
+    (org-agenda-current-time-string . "← now")
+    (org-agenda-time-grid quote ;; Format is changed from 9.1
+                          ((daily today require-timed)
+                           (0800 01000 1200 1400 1600 1800 2000 2200 2400)
+                           "-"
+                           "────────────────"))
+    (org-columns-default-format
+     quote
+     "%40ITEM(Task) %Effort(EE){:} %CLOCKSUM(Time Spent) %SCHEDULED(Scheduled) %DEADLINE(Deadline)"))
+  :config
+  (setq org-agenda-custom-commands
+        `(("a" "Agenda"
+           ;; ((org-agenda-prefix-format
+           ;;   '((agenda . " %i %-12:c%?- t % s % e"))))
+           ((agenda ""
+                    ((org-agenda-span 'week)
+                     (org-deadline-warning-days 365)
+                     (org-agenda-prefix-format " %i %-12:c%?- t % s % e")
+                     ))
+            (todo "TODO"
+                  ((org-agenda-overriding-header "Inbox")
+                   (org-agenda-files '(,(concat jethro/org-agenda-directory
+                                                "inbox.org")))))
+            (todo "NEXT"
+                  ((org-agenda-overriding-header "In Progress")
+                   (org-agenda-files '(,(concat jethro/org-agenda-directory
+                                                "projects.org")
+                                       ,(concat org-directory
+                                                "braindump/concepts/research.org")
+                                       ,(concat jethro/org-agenda-directory
+                                                "daily.org")))))
+            (todo "TODO"
+                  ((org-agenda-overriding-header "Active Projects")
+                   (org-agenda-skip-function #'jethro/skip-projects)
+                   (org-agenda-files '(,(concat jethro/org-agenda-directory
+                                                "projects.org")
+                                       ,(concat org-directory
+                                                "braindump/concepts/research.org")
+                                       ,(concat jethro/org-agenda-directory
+                                                "daily.org")))))
+            (todo "TODO"
+                  ((org-agenda-overriding-header "One-off Tasks")
+                   (org-agenda-files '(,(concat jethro/org-agenda-directory
+                                                "next.org")))
+                   (org-agenda-skip-function '(org-agenda-skip-entry-if
+                                               'deadline)))))))))
 
 (leaf *org-insert-clipboard-image
   :after org
