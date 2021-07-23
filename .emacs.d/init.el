@@ -444,70 +444,11 @@
   ((aw-leading-char-face . '((t (:height 4.0 :foreground "#f1fa8c")))))
   )
 
-(leaf auctex
-  :doc "Integrated environment for *TeX*"
-  :req "emacs-24.3" "cl-lib-1.0"
-  :tag "preview-latex" "doctex" "context" "texinfo" "latex" "tex" "emacs>=24.3"
-  :emacs>= 24.3
-  :ensure t
-  :setq-default ((TeX-master . nil))
-  :custom
-  ((TeX-auto-save . t)
-   (TeX-parse-self . t)
-   (TeX-source-correlate-method . 'synctex)
-   (TeX-source-correlate-start-server . t)
-   (TeX-PDF-mode . t)
-   (fill-column . 86))
-  :defvar (TeX-command-list)
-  :config
-  (leaf latex-extra
-    :doc "Adds several useful functionalities to LaTeX-mode."
-    :req "auctex-11.86.1" "cl-lib-0.5"
-    :tag "tex"
-    :url "http://github.com/Malabarba/latex-extra"
-    :ensure t)
-
-  (add-hook 'LaTeX-mode-hook 'visual-line-mode)
-  (add-hook 'LaTeX-mode-hook #'latex-extra-mode)
-  (add-hook 'after-init-hook 'global-company-mode)
-  (add-hook 'LaTeX-mode-hook
-            (function (lambda ()
-                        (add-to-list 'TeX-command-list
-                                     '("ja"
-                                       "sh ~/drive/lab/latextemplate/ja_latex.sh '%s'"
-                                       TeX-run-command t nil))
-                        (add-to-list 'TeX-command-list
-                                     '("en"
-                                       "sh ~/drive/lab/latextemplate/en_latex.sh '%s'"
-                                       TeX-run-command t nil))
-                        (add-to-list 'TeX-command-list
-                                     '("pdfview" "open '%s.pdf' "
-                                       TeX-run-command t nil))
-                        )))
-  ;; SyncTeX
-  (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
-  (add-hook 'LaTeX-mode-hook
-            (function (lambda ()
-                        (add-to-list 'TeX-command-list
-                                     '("Displayline" "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b" TeX-run-command t nil))
-                        )))
-  ;; RefTeX
-  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-  ;; Change key bindings
-  (add-hook 'reftex-mode-hook
-            '(lambda ()
-               (define-key reftex-mode-map (kbd "\C-cr") 'reftex-reference)
-               (define-key reftex-mode-map (kbd "\C-cl") 'reftex-label)
-               (define-key reftex-mode-map (kbd "\C-cc") 'reftex-citation)
-               ))
-  ) ;; end of auctex
-
 (leaf autorevert
   :doc "revert buffers when files on disk change"
   :tag "builtin"
   :ensure t
-  :custom (auto-revert-interval . 0.1)
-  )
+  :custom (auto-revert-interval . 1))
 
 (leaf auto-rsync
   :disabled t
@@ -1102,6 +1043,60 @@
   (key-chord-define-global "rl" 'rotate-layout)
   (key-chord-define-global "rw" 'rotate-window)
   (key-chord-define-global "jb" 'jump-back!))
+
+(leaf *latex
+  :config
+  (leaf auctex
+    :doc "Integrated environment for *TeX*"
+    :req "emacs-24.3" "cl-lib-1.0"
+    :tag "preview-latex" "doctex" "context" "texinfo" "latex" "tex" "emacs>=24.3"
+    :emacs>= 24.3
+    :ensure t
+    :require reftex
+    :custom
+    ((TeX-master . nil)
+     (TeX-auto-save . t)
+     (TeX-parse-self . t)
+     (TeX-source-correlate-method . 'synctex)
+     (TeX-source-correlate-start-server . t)
+     (TeX-PDF-mode . t))
+    :preface
+    (defun my/latex-mode-hook nil
+      (visual-line-mode)
+      (add-to-list 'TeX-command-list
+                   '("ja"
+                     "sh ~/drive/lab/latextemplate/ja_latex.sh '%s'"
+                     TeX-run-command t nil))
+      (add-to-list 'TeX-command-list
+                   '("en"
+                     "sh ~/drive/lab/latextemplate/en_latex.sh '%s'"
+                     TeX-run-command t nil))
+      (add-to-list 'TeX-command-list
+                   '("pdfview" "open '%s.pdf' "
+                     TeX-run-command t nil))
+      (add-to-list 'TeX-command-list
+                   '("Displayline" "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b"
+                     TeX-run-command t nil)))
+    :hook ((after-init-hook . global-company-mode)
+           (LaTeX-mode-hook . my/latex-mode-hook)))
+
+  (leaf latex-extra
+    :doc "Adds several useful functionalities to LaTeX-mode."
+    :req "auctex-11.86.1" "cl-lib-0.5"
+    :tag "tex"
+    :url "http://github.com/Malabarba/latex-extra"
+    :ensure t
+    :hook (LaTeX-mode-hook . latex-extra-mode))
+
+  (leaf reftex
+    :require t
+    :hook (LaTeX-mode-hook . reftex-mode)
+    :bind (reftex-mode-map
+           ("C-c r" . reftex-reference)
+           ("C-c l" . reftex-label)
+           ("C-c c" . reftex-citation))
+    :custom
+    (reftex-ref-style-default-list . '("Cleveref"))))
 
 (leaf lsp-mode
   :doc "LSP mode"
