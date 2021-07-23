@@ -1617,15 +1617,7 @@
          ("R" . org-agenda-refile)
          ("c" . jethro/org-inbox-capture)
          ("q" . quit-window))
-  :hook
-  ((kill-emacs-hook . ladicle/org-clock-out-and-save-when-exit)
-   (org-clock-in-hook .
-                      (lambda ()
-                        (setq org-mode-line-string (ladicle/task-clocked-time))
-                        (run-at-time 0 60 '(lambda ()
-                                             (setq org-mode-line-string (ladicle/task-clocked-time))
-                                             (force-mode-line-update)))
-                        (force-mode-line-update))))
+  :hook (kill-emacs-hook . ladicle/org-clock-out-and-save-when-exit)
   :preface
   (defun org-agenda-cache (&optional regenerate)
     "Show agenda buffer without updating if it exists"
@@ -1691,21 +1683,6 @@
     "Save buffers and stop clocking when kill emacs."
     (ignore-errors (org-clock-out) t)
     (save-some-buffers t))
-  (defun ladicle/task-clocked-time ()
-    "Return a string with the clocked time and effort, if any"
-    (interactive)
-    (let* ((clocked-time (org-clock-get-clocked-time))
-           (h (truncate clocked-time 60))
-           (m (mod clocked-time 60))
-           (work-done-str (format "%d:%02d" h m)))
-      (if org-clock-effort
-          (let* ((effort-in-minutes
-                  (org-duration-to-minutes org-clock-effort))
-                 (effort-h (truncate effort-in-minutes 60))
-                 (effort-m (truncate (mod effort-in-minutes 60)))
-                 (effort-str (format "%d:%02d" effort-h effort-m)))
-            (format "%s/%s" work-done-str effort-str))
-        (format "%s" work-done-str))))
   
   :custom
   `((org-agenda-window-setup . 'other-window)
@@ -1758,29 +1735,7 @@
                    (org-agenda-files '(,(concat jethro/org-agenda-directory
                                                 "next.org")))
                    (org-agenda-skip-function '(org-agenda-skip-entry-if
-                                               'deadline))))))))
-
-  (leaf org-pomodoro
-    :ensure t
-    :custom
-    ((org-pomodoro-ask-upon-killing . t)
-     (org-pomodoro-format . "🍅%s")
-     (org-pomodoro-short-break-format . "%s")
-     (org-pomodoro-long-break-format . "🍺%s"))
-    :custom-face
-    (org-pomodoro-mode-line . '((t (:foreground "#ff5555"))))
-    (org-pomodoro-mode-line-break. '((t (:foreground "#50fa7b"))))
-    :hook
-    (org-pomodoro-started . (lambda () (notifications-notify
-                                        :title "org-pomodoro"
-                                        :body "Let's focus for 25 minutes!"
-                                        :app-icon "~/.emacs.d/tomato.png")))
-    (org-pomodoro-finished . (lambda () (notifications-notify
-                                         :title "org-pomodoro"
-                                         :body "Well done! Take a break."
-                                         :app-icon "~/.emacs.d/img/coffee.png")))
-    :bind (org-agenda-mode-map
-           ("p" . org-pomodoro))))
+                                               'deadline)))))))))
 
 (leaf *org-insert-clipboard-image
   :after org
