@@ -714,7 +714,7 @@
   :doc "Show function arglist or variable docstring in echo area"
   :tag "builtin"
   :blackout t
-  :custom ((eldoc-idle-delay . 0.3)))
+  :custom (eldoc-idle-delay . 0.1))
 
 (leaf *font
   :when window-system
@@ -1174,7 +1174,8 @@
              (lsp-ui-doc-max-height . 30)
              (lsp-ui-doc-use-childframe . t)
              (lsp-ui-doc-use-webkit . nil)
-             (lsp-ui-doc-show-with-mouse . nil)
+             (lsp-ui-doc-show-with-mouse . t)
+             (lsp-ui-doc-show-with-cursor . t)
              ;; lsp-ui-flycheck
              (lsp-ui-flycheck-enable . nil)
              ;; lsp-ui-sideline
@@ -1857,7 +1858,8 @@
   :url "https://github.com/jkitchin/org-ref"
   :ensure t
   :after org-roam
-  :bind (("C-c c" . org-ref-insert-cite-link))
+  :bind (org-mode-map
+         ("C-c c" . org-ref-insert-cite-link))
   :custom `(;; RefTeX
            (reftex-plug-into-AUCTeX . t)
            (reftex-insert-label-flags quote ("s" "sfte"))
