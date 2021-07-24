@@ -388,7 +388,10 @@
                                  (recents . 15)
                                  (projects . 5)
                                  (bookmarks . 5)))
-               (dashboard-startup-banner . "~/.emacs.d/banner/inv-ascii-gorilla.txt"))
+               ;; (dashboard-startup-banner . "~/.emacs.d/banner/inv-ascii-gorilla.txt"))
+               ;; (dashboard-startup-banner . "~/.emacs.d/banner/ascii-chicken.txt"))
+               ;; (dashboard-startup-banner . "~/.emacs.d/banner/ascii-word.txt"))
+               (dashboard-startup-banner . "~/.emacs.d/banner/coffee.png"))
       :config
       (dashboard-setup-startup-hook)))
 

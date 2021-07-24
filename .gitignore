@@ -23,6 +23,8 @@
 
 !/.emacs.d/
 /.emacs.d/*
+!/.emacs.d/banner/
+!/.emacs.d/banner/**
 !/.emacs.d/init.el
 !/.emacs.d/el-get/
 !/.emacs.d/el-get/**
