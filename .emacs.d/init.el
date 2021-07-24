@@ -2481,28 +2481,14 @@
 
 (leaf orderless
   :ensure t
-  :require t
-  :custom ((completion-styles . '(orderless)))
-  :config
+  :custom ((completion-styles . '(orderless))
+           (completion-category-defaults . nil)
+           (completion-category-overrides . '((file (styles partial-completion)))))
+  :advice (:around company-capf--candidates just-one-face)
+  :preface
   (defun just-one-face (fn &rest args)
     (let ((orderless-match-faces [completions-common-part]))
-      (apply fn args)))
-
-  (advice-add 'company-capf--candidates :around #'just-one-face))
-
-(leaf selectrum
-  :ensure t
-  :custom ((selectrum-max-window-height . 20))
-  :config
-  (selectrum-mode +1)
-  ;; to make sorting and filtering more intelligent
-  (leaf selectrum-prescient
-    :ensure t
-    :config (selectrum-prescient-mode +1))
-  (leaf prescient
-    :ensure t
-    :custom (prescient-aggressive-file-save . t)
-    :config (prescient-persist-mode 1)))
+      (apply fn args))))
 
 (leaf marginalia
   :ensure t
@@ -2510,7 +2496,8 @@
 
 (leaf vertico
   :ensure t
-  :custom ((vertico-count . 20))
+  :custom ((vertico-count . 20)
+           (vertico-cycle . t))
   :global-minor-mode t savehist-mode)
 
 (provide 'init)
