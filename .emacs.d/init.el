@@ -488,12 +488,13 @@
            (company-idle-delay . 0.1)
            (company-dabbrev-downcase . 0)
            (company-minimum-prefix-length . 2)
-           (company-transformers quote
-                                 (company-sort-by-occurrence))
+           ;; (company-transformers quote
+           ;;                       (company-sort-by-occurrence))
            (company-require-match . 'never)
            (completion-ignore-case . nil)
            (company-math-allow-latex-symbols-in-faces . t)
-           (company-math-allow-unicode-symbols-in-faces . (quote (tex-math font-latex-math-face))))
+           (company-math-allow-unicode-symbols-in-faces
+            quote ((tex-math font-latex-math-face))))
   :global-minor-mode global-company-mode
   :config
   (add-to-list 'company-backends #'company-capf)
@@ -1036,13 +1037,14 @@
     :custom (;; lsp-ui-doc
              (lsp-ui-doc-enable . t)
              (lsp-ui-doc-header . t)
+             (lsp-ui-doc-delay . 1)
              (lsp-ui-doc-include-signature . t)
              (lsp-ui-doc-position . 'top) ;; top, bottom, or at-point
              (lsp-ui-doc-max-width . 150)
              (lsp-ui-doc-max-height . 30)
              (lsp-ui-doc-use-childframe . t)
              (lsp-ui-doc-use-webkit . nil)
-             (lsp-ui-doc-show-with-mouse . t)
+             (lsp-ui-doc-show-with-mouse . nil)
              (lsp-ui-doc-show-with-cursor . t)
              ;; lsp-ui-flycheck
              (lsp-ui-flycheck-enable . nil)
