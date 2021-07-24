@@ -811,17 +811,18 @@
   :tag "builtin"
   :bind (flymake-mode-map
          ("C-c C-n" . flymake-goto-next-error)
-          ("C-c C-p" . flymake-goto-prev-error))
+         ("C-c C-p" . flymake-goto-prev-error))
   :config
+  
   (leaf flymake-posframe
-    :disabled t
-    :when window-system
-    :hook (flymake-mode-hook . flymake-posframe-mode)
     :tag "out-of-MELPA"
-    ;; :url "https://github.com/Ladicle/flymake-posframe"
-    ;; :el-get Ladicle/flymake-posframe
     :load-path "/Users/naoki/.emacs.d/el-get/flymake-posframe"
-    :require t)
+    :when window-system
+    :require t
+    :hook (flymake-mode-hook . flymake-posframe-mode)
+    :custom ((flymake-posframe-error-prefix . " ► "))
+    :custom-face
+    (flymake-posframe-foreground-face . '((t (:foreground "white")))))
 
   (leaf flymake-diagnostic-at-point
     :doc "Display flymake diagnostics at point"
@@ -831,46 +832,11 @@
     :emacs>= 26.1
     :ensure t
     :after flymake
-    :defvar (flymake-diagnostic-at-point-error-prefix)
-    :custom ((flymake-diagnostic-at-point-timer-delay . 1)
-              (flymake-diagnostic-at-point-error-prefix . " ► ")
-              (flymake-diagnostic-at-point-display-diagnostic-function quote flymake-diagnostic-at-point-display-popup))
-    :hook ((flymake-mode-hook . flymake-diagnostic-at-point-mode))
-    :defvar (flymake-posframe-hide-posframe-hooks)
-    :defun (flymake-posframe-hide-posframe my/flymake-diagnostic-at-point-display-popup package-lint-setup-flymake posframe-hide flymake--diag-text)
-    :config
-    ;; (add-hook 'flymake-mode-hook #'flymake-diagnostic-at-point-mode)
-    ;; (add-hook 'emacs-lisp-mode-hook #'package-lint-setup-flymake)
-    (set-face-attribute 'popup-tip-face nil
-		  :background "dark slate gray" :foreground "white" :underline nil)
-    (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake)
-    ;; flymake-posframe
-    (defvar flymake-posframe-hide-posframe-hooks
-      '(pre-command-hook post-command-hook focus-out-hook)
-      "The hooks which should trigger automatic removal of the posframe.")
-
-    (defun flymake-posframe-hide-posframe ()
-      "Hide messages currently being shown if any."
-      (posframe-hide " *flymake-posframe-buffer*")
-      (dolist (hook flymake-posframe-hide-posframe-hooks)
-        (remove-hook hook #'flymake-posframe-hide-posframe t)))
-
-    (when window-system
-      (defun my/flymake-diagnostic-at-point-display-popup (text)
-        "Display the flymake diagnostic TEXT inside a posframe."
-        (posframe-show " *flymake-posframe-buffer*"
-		      :string (concat flymake-diagnostic-at-point-error-prefix
-				            (flymake--diag-text
-				              (get-char-property (point) 'flymake-diagnostic)))
-		      :position (point)
-		      :foreground-color "cyan"
-		      :internal-border-width 2
-		      :internal-border-color "red"
-		      :poshandler 'posframe-poshandler-window-bottom-left-corner)
-        (dolist (hook flymake-posframe-hide-posframe-hooks)
-          (add-hook hook #'flymake-posframe-hide-posframe nil t)))
-      (advice-add 'flymake-diagnostic-at-point-display-popup :override 'my/flymake-diagnostic-at-point-display-popup))
-    )
+    :custom ((flymake-diagnostic-at-point-timer-delay . 0.7)
+             (flymake-diagnostic-at-point-error-prefix . " ► ")
+             (flymake-diagnostic-at-point-display-diagnostic-function
+              quote flymake-diagnostic-at-point-display-popup))
+    :hook (flymake-mode-hook . flymake-diagnostic-at-point-mode))
   ) ;; end of flymake
 
 (leaf gcmh
