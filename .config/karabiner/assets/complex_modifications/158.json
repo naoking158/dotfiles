@@ -1,0 +1,115 @@
+{
+    "title": "Naoking158's Key bindings",
+    "maintainers": [
+        "naoking158"
+    ],
+    "rules": [
+        {
+            "description": "from [right_shift + Spacebar] to [^] (shift+6)",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "spacebar",
+                        "modifiers": { "mandatory": ["right_shift"] }
+                    },
+                    "to": [
+                        {
+                            "key_code": "6",
+                            "modifiers": ["shift"]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "from [right_shift + h] to [*] (shift+8)",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "h",
+                        "modifiers": { "mandatory": ["right_shift"] }
+                    },
+                    "to": [
+                        {
+                            "key_code": "8",
+                            "modifiers": ["shift"]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "from [right_shift + n] to [+] (shift + =)",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "n",
+                        "modifiers": { "mandatory": ["right_shift"] }
+                    },
+                    "to": [
+                        {
+                            "key_code": "equal_sign",
+                            "modifiers": ["shift"]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "from [right_shift + m] to [-] (hyphen)",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "m",
+                        "modifiers": { "mandatory": ["right_shift"] }
+                    },
+                    "to": [
+                        {"key_code": "hyphen"}
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "from [ctrl + h] to [backspace]",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "h",
+                        "modifiers": {
+                            "mandatory": ["control"],
+                            "optional": [
+                                "any"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {"key_code": "delete_or_backspace"}
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "from [ctrl + d] to [delete_forward]",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "d",
+                        "modifiers": {
+                            "mandatory": ["control"],
+                            "optional": ["any"]
+                        }
+                    },
+                    "to": [
+                        {"key_code": "delete_forward"}
+                    ]
+                }
+            ]
+        }
+    ]
+}

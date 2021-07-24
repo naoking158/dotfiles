@@ -1,28 +1,42 @@
 /*
 /.**
 
+
 !Makefile
 !/etc/
 !/bin/
 
+
 !/.git*
 !/README.md
+
 
 ## dotfiles
 !/.Brewfile
 !/.dir_colors
+!/.tmux**
 
-!/.tmux*
 
 !/.config/
+!/.config/fish/
+!/.config/fish/**
 /.config/fish/fish_variables
+
+
+!/.config/karabiner/
+!/.config/karabiner/**
+!/.config/iterm2/
+!/.config/iterm2/AppSupport/
+!/.config/iterm2/AppSupport/**/*.json
+!/.config/iterm2/AppSupport/**/*.plist
+
 
 !/.ssh/
 /.ssh/*
 !/.ssh/config
 
+
 !/.emacs.d/
-/.emacs.d/*
 !/.emacs.d/banner/
 !/.emacs.d/banner/**
 !/.emacs.d/init.el
@@ -31,4 +45,7 @@
 !/.emacs.d/snippets/
 !/.emacs.d/snippets/**
 
+
 /**/.DS_Store
+/**/*~
+/**/*.lock
