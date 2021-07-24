@@ -473,8 +473,7 @@
   :ensure t
   :blackout t
   :leaf-defer nil
-  :bind (;; ("<tab>" . company-indent-or-complete-common)
-         (company-active-map
+  :bind ((company-active-map
           ("M-n")
           ("M-p")
           ("C-s" . company-filter-candidates)
@@ -516,7 +515,6 @@
     :doc "company-mode completion backend for Yasnippet"
     :tag "out-of-MELPA"
     :after yasnippet
-    :defvar (company-backends)
     :preface
     (defun c/company-mode-with-yas nil
       (setq company-backends (mapc
@@ -544,75 +542,7 @@
     :emacs>= 26.0
     :ensure t
     :global-minor-mode t
-    :diminish t
-    :hook (company-mode-hook . company-posframe-mode)
-    )
-
-  ;; Show pretty icons
-  (leaf company-box
-    :disabled t
-    :diminish
-    :hook (company-mode-hook . company-box-mode)
-    :init (setq company-box-icons-alist 'company-box-icons-all-the-icons)
-    :disabled (eq window-system 'x)
-    :doc "Company front-end with icons"
-    :url "https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-company.el"
-    :req "emacs-26.0.91" "dash-2.13" "dash-functional-1.2.0" "company-0.9.6"
-    :tag "convenience" "front-end" "completion" "company" "emacs>=26.0.91"
-    :url "https://github.com/sebastiencs/company-box"
-    :emacs>= 26.0
-    :ensure t
-    :custom ((company-box-max-candidates . 20)
-             (company-box-backends-colors . nil)
-              (company-box-show-single-candidate . t))
-    :require t
-    :config
-    (when (memq window-system
-                '(ns mac))
-      (defun company-box-icons--elisp (candidate)
-        (when (derived-mode-p 'emacs-lisp-mode)
-          (let ((sym (intern candidate)))
-            (cond ((fboundp sym) 'Function)
-                  ((featurep sym) 'Module)
-                  ((facep sym) 'Color)
-                  ((boundp sym) 'Variable)
-                  ((symbolp sym) 'Text)
-                  (t . nil)))))
-
-      (with-eval-after-load 'all-the-icons
-        (declare-function all-the-icons-faicon 'all-the-icons)
-        (declare-function all-the-icons-fileicon 'all-the-icons)
-        (declare-function all-the-icons-material 'all-the-icons)
-        (declare-function all-the-icons-octicon 'all-the-icons)
-        (setq company-box-icons-all-the-icons
-              `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.7 :v-adjust -0.15))
-                (Text . ,(all-the-icons-faicon "book" :height 0.68 :v-adjust -0.15))
-                (Method . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
-                (Function . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
-                (Constructor . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
-                (Field . ,(all-the-icons-faicon "tags" :height 0.65 :v-adjust -0.15 :face 'font-lock-warning-face))
-                (Variable . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face))
-                (Class . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
-                (Interface . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01))
-                (Module . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.15))
-                (Property . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face)) ;; Golang module
-                (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.7 :v-adjust -0.15))
-                (Value . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'font-lock-constant-face))
-                (Enum . ,(all-the-icons-material "storage" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-orange))
-                (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.7 :v-adjust -0.15))
-                (Snippet . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))
-                (Color . ,(all-the-icons-material "palette" :height 0.7 :v-adjust -0.15))
-                (File . ,(all-the-icons-faicon "file-o" :height 0.7 :v-adjust -0.05))
-                (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.7 :v-adjust -0.15))
-                (Folder . ,(all-the-icons-octicon "file-directory" :height 0.7 :v-adjust -0.05))
-                (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-blueb))
-                (Constant . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05))
-                (Struct . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
-                (Event . ,(all-the-icons-faicon "bolt" :height 0.7 :v-adjust -0.05 :face 'all-the-icons-orange))
-                (Operator . ,(all-the-icons-fileicon "typedoc" :height 0.65 :v-adjust 0.05))
-                (TypeParameter . ,(all-the-icons-faicon "hashtag" :height 0.65 :v-adjust 0.07 :face 'font-lock-const-face))
-                (Template . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))))))
-    )
+    :diminish t)
 
   (leaf company-math
     :doc "Completion backends for unicode math symbols and latex tags"
@@ -626,31 +556,12 @@
                   (append
                    '((company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
                    company-backends)))
-
     :hook ((org-mode-hook . c/latex-mode-setup)
-           (TeX-mode-hook . c/latex-mode-setup))
-    )
+           (LaTeX-mode-hook . c/latex-mode-setup)))
 
   (leaf company-tabnine
     :ensure t
-    :config
-    (add-to-list 'company-backends #'company-tabnine)
-    ;; workaround for company-transformers
-    (setq company-tabnine--disable-next-transform nil)
-    (defun my-company--transform-candidates (func &rest args)
-      (if (not company-tabnine--disable-next-transform)
-          (apply func args)
-        (setq company-tabnine--disable-next-transform nil)
-        (car args)))
-
-    (defun my-company-tabnine (func &rest args)
-      (when (eq (car args) 'candidates)
-        (setq company-tabnine--disable-next-transform t))
-      (apply func args))
-
-    (advice-add #'company--transform-candidates :around #'my-company--transform-candidates)
-    (advice-add #'company-tabnine :around #'my-company-tabnine)
-    )
+    :config (add-to-list 'company-backends #'company-tabnine))
   )  ;; end company
 
 (leaf avy
@@ -1077,41 +988,34 @@
   :emacs>= 25.1
   :ensure t
   :custom `((lsp-keymap-prefix . "s-l")
-             (gc-cons-threshold \,
-               (* 3 1024 1024 1024)
-               )  ;; 3GB
-             (gcmh-low-cons-threshold \,
-               (* 512 1024 1024)
-               )  ;; 512MB
-             (read-process-output-max \,
-               (* 1 1024 1024)
-               )  ;; 1MB
-             ;; (lsp-diagnostics-modeline-scope . :project)
-             ;; debug
-             ;; (lsp-auto-guess-root . t)
-             (lsp-print-io . nil)
-             (lsp-log-io . nil)
-             (lsp-trace . nil)
-             (lsp-print-performance . nil)
-             ;; general
-             (lsp-idle-delay . 0.5)
-             (lsp-document-sync-method . 2)
-             (lsp-response-timeout . 5)
-             (lsp-prefer-flymake . t)
-             (lsp-prefer-capf . t)
-             (lsp-enable-completion-at-point . nil)
-             (lsp-enable-indentation . nil)
-             (lsp-restart . 'ignore))
+            (gc-cons-threshold . ,(* 3 1024 1024 1024))  ;; 3GB
+            (gcmh-low-cons-threshold . ,(* 512 1024 1024))  ;; 512MB
+            (read-process-output-max . ,(* 1 1024 1024))  ;; 1MB
+            ;; (lsp-diagnostics-modeline-scope . :project)
+            ;; debug
+            ;; (lsp-auto-guess-root . t)
+            (lsp-print-io . nil)
+            (lsp-log-io . nil)
+            (lsp-trace . nil)
+            (lsp-print-performance . nil)
+            ;; general
+            (lsp-idle-delay . 0.5)
+            (lsp-document-sync-method . 2)
+            (lsp-response-timeout . 5)
+            (lsp-prefer-flymake . t)
+            (lsp-prefer-capf . t)
+            (lsp-enable-completion-at-point . t)
+            (lsp-enable-indentation . nil)
+            (lsp-restart . 'ignore))
   :hook ((lsp-mode-hook . lsp-enable-which-key-integration)
-          (lsp-managed-mode-hook . lsp-modeline-diagnostics-mode))
+         (lsp-managed-mode-hook . lsp-modeline-diagnostics-mode))
   :config
   (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\AtCoder\\'")
   (advice-add 'lsp
-    :before (lambda (&rest _args)
-              (eval '(setf (lsp-session-server-id->folders
-                             (lsp-session))
-                       (ht))))
-    )
+              :before (lambda (&rest _args)
+                        (eval '(setf (lsp-session-server-id->folders
+                                      (lsp-session))
+                                     (ht)))))
 
   (leaf lsp-latex
     :doc "lsp-mode client for LaTeX, on texlab"
@@ -1120,9 +1024,7 @@
     :url "https://github.com/ROCKTAKEY/lsp-latex"
     :emacs>= 25.1
     :ensure t
-    :config
-    (add-hook 'TeX-mode-hook 'lsp)
-    )
+    :hook (LaTeX-mode-hook . lsp))
 
   (leaf lsp-ui
     :doc "UI modules for lsp-mode"
@@ -1176,8 +1078,7 @@
       ("C-c s"   . lsp-ui-sideline-mode)
       ("C-c d"   . ladicle/toggle-lsp-ui-doc)))
     :hook
-    (lsp-mode-hook . lsp-ui-mode)
-    )
+    (lsp-mode-hook . lsp-ui-mode))
 
   (leaf lsp-ivy
     :disabled t
@@ -1317,7 +1218,8 @@
   :ensure org-plus-contrib
   :preface
   (defun my-org-mode-hook ()
-    (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
+    (add-hook 'completion-at-point-functions
+              'pcomplete-completions-at-point nil t))
   :hook (org-mode-hook . my-org-mode-hook)
   :custom
   ((org-directory . "~/org/")
@@ -2034,8 +1936,9 @@
                     (puthash lang doc-func org-eldoc-local-functions-cache))
                   doc-func)
               cached-func))))
-
-      :advice (:around org-eldoc-get-mode-local-documentation-function c/org-eldoc-get-mode-local-documentation-function))
+      :advice
+      (:around org-eldoc-get-mode-local-documentation-function
+               c/org-eldoc-get-mode-local-documentation-function))
 
     (leaf *org-patch-split-horizontal
       :disabled t
@@ -2158,16 +2061,14 @@
     :ensure t
     :require t
     :config
-    (cond
-     (window-system
-      (custom-set-variables
-       '(conda-anaconda-home (expand-file-name "~/miniconda/"))
-       '(conda-env-home-directory (expand-file-name "~/miniconda/"))))
-     (t
-      (custom-set-variables
-       '(conda-anaconda-home (expand-file-name "~/miniconda3/"))
-       '(conda-env-home-directory (expand-file-name "~/miniconda3/"))))
-     )
+    (cond (window-system
+           (custom-set-variables
+            '(conda-anaconda-home (expand-file-name "~/miniconda/"))
+            '(conda-env-home-directory (expand-file-name "~/miniconda/"))))
+          (t
+           (custom-set-variables
+            '(conda-anaconda-home (expand-file-name "~/miniconda3/"))
+            '(conda-env-home-directory (expand-file-name "~/miniconda3/")))))
     (conda-env-initialize-interactive-shells)
     (conda-env-initialize-eshell)
     ;; these hooks can't go in the :hook section since lsp-restart-workspace
@@ -2471,8 +2372,8 @@
            ("C-s-g" . consult-ghq-grep)))
   (leaf consult-lsp
     :ensure t
-    :bind ((lsp-mode-map
-            ([remap xref-find-apropos] . consult-lsp-symbols))))
+    :bind (lsp-mode-map
+           ([remap xref-find-apropos] . consult-lsp-symbols)))
   (leaf embark-consult
     :ensure t
     :hook ((embark-collect-mode-hook . consult-preview-at-point-mode))
