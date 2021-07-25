@@ -1368,10 +1368,14 @@
   (setq org-agenda-files (directory-files-recursively org-directory "\\.org$"))
 
   (setq org-capture-templates
-        `(("i" "inbox" entry (file ,(concat jethro/org-agenda-directory "inbox.org"))
+        `(("i" "inbox" entry (file ,(concat jethro/org-agenda-directory
+                                            "inbox.org"))
            "* TODO %?")
-          ("w" "Weekly Review" entry (file+olp+datetree ,(concat jethro/org-agenda-directory "reviews.org"))
-           (file ,(concat jethro/org-agenda-directory "templates/weekly_review.org")))))
+          ("d" "Daily memo" entry (file+olp+datetree
+                                   ,(concat jethro/org-agenda-directory
+                                            "daily.org"))
+           ,(format-time-string "* %H:%M %?\n" (current-time))
+           :jump-to-captured 1)))
 
   (setq org-todo-keywords
         '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
@@ -1500,7 +1504,7 @@
   (defun jethro/org-inbox-capture ()
     (interactive)
     "Capture a task in agenda mode."
-    (org-capture nil "i"))
+    (org-capture))
 
   (defun jethro/is-project-p ()
     "Any task with a todo keyword subtask"
