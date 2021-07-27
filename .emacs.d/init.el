@@ -1225,93 +1225,94 @@
   :hook (org-mode-hook . my-org-mode-hook)
   :custom
   ((org-directory . "~/org/")
-    (org-ellipsis . " ▼ ")
-    (org-adapt-indentation . nil)
-    (org-habit-show-habits-only-for-today . t)
-    (org-startup-indented . nil)
-    (org-use-speed-commands . t)
-    (org-enforce-todo-dependencies . t)
-    (org-log-done . t)
-    (org-return-follows-link . t)
-    (org-highlight-latex-and-related quote
-      (latex script entities))
-    (org-src-window-setup . 'current-window)
-    (org-return-follows-link . t)
-    (org-babel-load-languages . '((emacs-lisp . t)
-                                   (python . t)
-                                   (latex . t)
-                                   (shell . t)
-                                   ))
-    (org-confirm-babel-evaluate . nil)
-    (org-catch-invisible-edits . 'show)
-    (org-preview-latex-image-directory . "~/tmp/ltximg/")
-    (org-structure-template-alist . '(("b" . "src sh")
-                                       ("c" . "center")
-                                       ("C" . "comment")
-                                       ("e" . "example")
-                                       ("E" . "export")
-                                       ("h" . "export html")
-                                       ("l" . "export latex")
-                                       ("q" . "quote")
-                                       ("s" . "src")
-                                       ("p" . "src python :results output
+   (org-ellipsis . " ▼ ")
+   (org-cycle-separator-lines . 1)
+   (org-adapt-indentation . nil)
+   (org-habit-show-habits-only-for-today . t)
+   (org-startup-indented . t)
+   (org-use-speed-commands . t)
+   (org-enforce-todo-dependencies . t)
+   (org-log-done . t)
+   (org-return-follows-link . t)
+   (org-highlight-latex-and-related quote
+                                    (latex script entities))
+   (org-src-window-setup . 'current-window)
+   (org-return-follows-link . t)
+   (org-babel-load-languages . '((emacs-lisp . t)
+                                 (python . t)
+                                 (latex . t)
+                                 (shell . t)
+                                 ))
+   (org-confirm-babel-evaluate . nil)
+   (org-catch-invisible-edits . 'show)
+   (org-preview-latex-image-directory . "~/tmp/ltximg/")
+   (org-structure-template-alist . '(("b" . "src sh")
+                                     ("c" . "center")
+                                     ("C" . "comment")
+                                     ("e" . "example")
+                                     ("E" . "export")
+                                     ("h" . "export html")
+                                     ("l" . "export latex")
+                                     ("q" . "quote")
+                                     ("s" . "src")
+                                     ("p" . "src python :results output
 ")
-                                       ("d" . "definition")
-                                       ("t" . "theorem")
-                                       ("mc" . "quoting")
-                                       ("mq" . "question")
-                                       ("mt" . "todo")
-                                       ("ms" . "summary")
-                                       ))
-    (search-highlight . t)
-    (search-whitespace-regexp . ".*?")
-    (isearch-lax-whitespace . t)
-    (isearch-regexp-lax-whitespace . nil)
-    (isearch-lazy-highlight . t)
-    (isearch-lazy-count . t)
-    (lazy-count-prefix-format . " (%s/%s) ")
-    (lazy-count-suffix-format . nil)
-    (isearch-yank-on-move . 'shift)
-    (isearch-allow-scroll . 'unlimited)
-    (org-show-notification-handler . '(lambda (msg) (timed-notification nil msg)))
-    ) ;; end custom
+                                     ("d" . "definition")
+                                     ("t" . "theorem")
+                                     ("mc" . "quoting")
+                                     ("mq" . "question")
+                                     ("mt" . "todo")
+                                     ("ms" . "summary")
+                                     ))
+   (search-highlight . t)
+   (search-whitespace-regexp . ".*?")
+   (isearch-lax-whitespace . t)
+   (isearch-regexp-lax-whitespace . nil)
+   (isearch-lazy-highlight . t)
+   (isearch-lazy-count . t)
+   (lazy-count-prefix-format . " (%s/%s) ")
+   (lazy-count-suffix-format . nil)
+   (isearch-yank-on-move . 'shift)
+   (isearch-allow-scroll . 'unlimited)
+   (org-show-notification-handler . '(lambda (msg) (timed-notification nil msg)))
+   ) ;; end custom
   :commands (org-with-remote-undo)
   :config
   (custom-theme-set-faces
-    'user
-    '(org-block ((t (:inherit fixed-pitch))))
-    '(org-code ((t (:inherit (shadow fixed-pitch)))))
-    '(org-document-info ((t (:foreground "dark orange"))))
-    '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
-    '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
-    '(org-link ((t (:foreground "royal blue" :underline t))))
-    '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-    '(org-property-value ((t (:inherit fixed-pitch))) t)
-    '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-    '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
-    '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.9))))
-    '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
-    '(org-agenda-current-time ((t (:foreground "chartreuse"))))
-    '(org-agenda-done ((t (:foreground "gray" :weight book))))
-    '(org-scheduled-today ((t (:foreground "orange" :weight book))))
-    '(org-agenda-date ((t (:foreground "forest green" :height 1.1))))
-    '(org-agenda-date-today ((t (:foreground "#98be65" :height 1.1)))))
+   'user
+   '(org-block ((t (:inherit fixed-pitch))))
+   '(org-code ((t (:inherit (shadow fixed-pitch)))))
+   '(org-document-info ((t (:foreground "dark orange"))))
+   '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+   '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+   '(org-link ((t (:foreground "royal blue" :underline t))))
+   '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+   '(org-property-value ((t (:inherit fixed-pitch))) t)
+   '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+   '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
+   '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.9))))
+   '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
+   '(org-agenda-current-time ((t (:foreground "chartreuse"))))
+   '(org-agenda-done ((t (:foreground "gray" :weight book))))
+   '(org-scheduled-today ((t (:foreground "orange" :weight book))))
+   '(org-agenda-date ((t (:foreground "forest green" :height 1.1))))
+   '(org-agenda-date-today ((t (:foreground "#98be65" :height 1.1)))))
 
   (custom-set-faces
-    '(org-level-1 ((t (:inherit outline-1 :height 1.8 :underline t :weight bold))))
-    '(org-level-2 ((t (:inherit outline-2 :height 1.6 :underline t :weight bold))))
-    '(org-level-3 ((t (:inherit outline-3 :height 1.4 :underline t :weight bold))))
-    '(org-level-4 ((t (:inherit outline-4 :height 1.2 :weight bold))))
-    '(org-level-5 ((t (:inherit outline-5 :height 1.0 :weight bold)))))
+   '(org-level-1 ((t (:inherit outline-1 :height 1.8 :underline t :weight bold))))
+   '(org-level-2 ((t (:inherit outline-2 :height 1.6 :underline t :weight bold))))
+   '(org-level-3 ((t (:inherit outline-3 :height 1.4 :underline t :weight bold))))
+   '(org-level-4 ((t (:inherit outline-4 :height 1.2 :weight bold))))
+   '(org-level-5 ((t (:inherit outline-5 :height 1.0 :weight bold)))))
 
   (setq org-format-latex-options
-    '(:foreground default
-       :background default
-       :scale 1.7
-       :html-foreground "Black"
-       :html-background "Transparent"
-       :html-scale 1.0
-       :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
+        '(:foreground default
+                      :background default
+                      :scale 1.7
+                      :html-foreground "Black"
+                      :html-background "Transparent"
+                      :html-scale 1.0
+                      :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
 
   (when (fboundp 'mac-toggle-input-method)
     (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii))
@@ -1542,7 +1543,7 @@
     (org-agenda-current-time-string . "← now")
     (org-agenda-time-grid quote ;; Format is changed from 9.1
                           ((daily today require-timed)
-                           (0800 01000 1200 1400 1600 1800 2000 2200 2400)
+                           (0800 1100 1500 1900 2100 2400)
                            "-"
                            "────────────────"))
     (org-columns-default-format
@@ -1568,8 +1569,8 @@
                                                 "projects.org")
                                        ,(concat org-directory
                                                 "braindump/concepts/research.org")
-                                       ,(concat jethro/org-agenda-directory
-                                                "daily.org")))))
+                                       ,(concat org-directory
+                                                "braindump/daily/")))))
             (todo "TODO"
                   ((org-agenda-overriding-header "Active Projects")
                    (org-agenda-skip-function #'jethro/skip-projects)
@@ -1577,8 +1578,8 @@
                                                 "projects.org")
                                        ,(concat org-directory
                                                 "braindump/concepts/research.org")
-                                       ,(concat jethro/org-agenda-directory
-                                                "daily.org")))))
+                                       ,(concat org-directory
+                                                "braindump/daily/")))))
             (todo "TODO"
                   ((org-agenda-overriding-header "One-off Tasks")
                    (org-agenda-files '(,(concat jethro/org-agenda-directory
@@ -2382,6 +2383,16 @@
   :custom ((vertico-count . 20)
            (vertico-cycle . t))
   :global-minor-mode t savehist-mode)
+
+(leaf google-translate
+  :ensure t
+  :require t
+  :bind ("C-c t" . google-translate-smooth-translate)
+  :custom
+  (google-translate-translation-directions-alist . '(("en" . "ja")
+                                                      ("ja" . "en")))
+  :config
+  (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
 
 (provide 'init)
 
