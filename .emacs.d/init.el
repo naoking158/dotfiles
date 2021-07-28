@@ -471,6 +471,7 @@
   :config
   (auto-rsync-mode t))
 
+
 (leaf company
   :disabled t
   :doc "Modular text completion framework"
@@ -2197,7 +2198,7 @@
   :emacs>= 24.3
   :ensure t
   :bind* (("C-/" . undo-fu-only-undo)
-          ("C-M-/" . undo-fu-only-redo)))
+          ("C-?" . undo-fu-only-redo)))
 
 (leaf volatile-highlights
   :diminish
@@ -2254,7 +2255,7 @@
   :blackout yas-minor-mode
   :custom (yas-indent-line . 'fixed)
   :global-minor-mode yas-global-mode
-  :bind ((;; yas-keymap
+  :bind (;;( yas-keymap
           ;; ("<tab>" . nil))            ; conflict with company
          (yas-minor-mode-map
           ("C-c y i" . yas-insert-snippet)
@@ -2408,6 +2409,45 @@
                                                       ("ja" . "en")))
   :config
   (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
+
+
+(leaf corfu
+  :ensure t
+  :require t
+  ;; Optional customizations
+  :custom
+  ((corfu-cycle . t)                ;; Enable cycling for `corfu-next/previous'
+   (corfu-auto . t)                 ;; Enable auto completion
+  ;; (corfu-commit-predicate . nil)   ;; Do not commit selected candidates on next input
+  ;; (corfu-quit-at-boundary . t)     ;; Automatically quit at word boundary
+  ;; (corfu-quit-no-match . t)        ;; Automatically quit if there is no match
+   ;; (corfu-echo-documentation . nil) ;; Do not show documentation in the echo area
+
+   ;; Enable indentation+completion using the TAB key.
+  ;; `completion-at-point' is often bound to M-TAB.
+  (tab-always-indent . 'complete))
+  
+  ;; Optionally use TAB for cycling, default is `corfu-complete'.
+  ;; :bind (:map corfu-map
+  ;;        ("TAB" . corfu-next)
+  ;;        ([tab] . corfu-next)
+  ;;        ("S-TAB" . corfu-previous)
+  ;;        ([backtab] . corfu-previous))
+
+  ;; You may want to enable Corfu only for certain modes.
+  ;; :hook ((prog-mode . corfu-mode)
+  ;;        (shell-mode . corfu-mode)
+  ;;        (eshell-mode . corfu-mode))
+
+  ;; Recommended: Enable Corfu globally.
+  ;; This is recommended since dabbrev can be used globally (M-/).
+  :global-minor-mode corfu-global-mode)
+
+;; Dabbrev works with Corfu
+(leaf dabbrev
+  ;; Swap M-/ and C-M-/
+  :bind (("M-/" . dabbrev-completion)
+         ("C-M-/" . dabbrev-expand)))
 
 (provide 'init)
 
