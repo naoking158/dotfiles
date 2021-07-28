@@ -159,6 +159,12 @@
                                      (:eval (if (buffer-file-name) "%f"
                                               (if dired-directory dired-directory
                                                 "%b")))))
+                
+                                     ;; " - "
+                                     ;; (:eval org-mode-line-string)
+
+
+                
                 (blink-cursor-mode . t)
                 (show-paren-mode . 1)
                 (confirm-kill-emacs . 'y-or-n-p)
@@ -268,6 +274,7 @@
                         (propertize " "  'face 'nano-face-header-default
 			                        'display `(raise ,space-down))
 		                (propertize primary 'face 'nano-face-header-default)))
+                 ;; show org-clock at headline in all major mode
                  (right (if (not (eq major-mode 'org-mode))
                             (concat org-mode-line-string " "
                                     secondary " ")
@@ -1538,7 +1545,11 @@
   `((org-agenda-window-setup . 'other-window)
     (org-agenda-block-separator . nil)
     (org-agenda-start-with-log-mode . t)
-    ;; 今日から予定を表示させる
+    ;; speed up techniques
+    (org-agenda-dim-blocked-tasks . nil)
+    (org-agenda-use-tag-inheritance . '(search timeline agenda))
+    (org-agenda-ignore-drawer-properties . '(effort appt category))
+    ;; show agenda from today
     (org-agenda-start-on-weekday . nil)
     (org-agenda-current-time-string . "← now")
     (org-agenda-time-grid quote ;; Format is changed from 9.1
@@ -1673,6 +1684,7 @@
   ((org-download-image-dir . "imgs")))
 
 (leaf org-ql
+  :disabled t
   :doc "Org Query Language, search command, and agenda-like view"
   :req "emacs-26.1" "dash-2.13" "dash-functional-1.2.0" "f-0.17.2" "map-2.1" "org-9.0" "org-super-agenda-1.2" "ov-1.0.6" "peg-1.0" "s-1.12.0" "transient-0.1" "ts-0.2.-1"
   :tag "agenda" "org" "outlines" "hypermedia" "emacs>=26.1"
@@ -1680,20 +1692,16 @@
   :emacs>= 26.1
   :ensure t
   :after map org org-super-agenda peg ts)
-(leaf org-super-agenda
-  :doc "Supercharge your agenda"
-  :req "emacs-26.1" "s-1.10.0" "dash-2.13" "org-9.0" "ht-2.2" "ts-0.2"
-  :tag "agenda" "org" "outlines" "hypermedia" "emacs>=26.1"
-  :url "http://github.com/alphapapa/org-super-agenda"
-  :emacs>= 26.1
-  :ensure t
-  :after org ts)
+
 (leaf org-analyzer
+  :disabled t
   :doc "org-analyzer is a tool that extracts time tracking data from org files."
   :tag "calendar"
   :url "https://github.com/rksm/clj-org-analyzer"
   :ensure t)
+
 (leaf org-edna
+  :disabled t
   :doc "Extensible Dependencies 'N' Actions"
   :req "emacs-25.1" "seq-2.19" "org-9.0.5"
   :tag "org" "text" "convenience" "emacs>=25.1"
