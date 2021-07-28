@@ -472,6 +472,7 @@
   (auto-rsync-mode t))
 
 (leaf company
+  :disabled t
   :doc "Modular text completion framework"
   :req "emacs-24.3"
   :tag "matching" "convenience" "abbrev" "emacs>=24.3"
@@ -965,8 +966,7 @@
       (add-to-list 'TeX-command-list
                    '("Displayline" "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b"
                      TeX-run-command t nil)))
-    :hook ((after-init-hook . global-company-mode)
-           (LaTeX-mode-hook . my/latex-mode-hook)))
+    :hook (LaTeX-mode-hook . my/latex-mode-hook))
 
   (leaf latex-extra
     :doc "Adds several useful functionalities to LaTeX-mode."
@@ -2088,11 +2088,12 @@
                                 (require 'lsp-pyright)
                                 (lsp))))
 
-  (defadvice python-shell-completion-at-point (around fix-company-bug activate)
-    "python-shell-completion-at-point breaks when point is before the prompt"
-    (when (or (not comint-last-prompt)
-              (>= (point) (cdr comint-last-prompt)))
-      ad-do-it)))
+  ;; (defadvice python-shell-completion-at-point (around fix-company-bug activate)
+  ;;   "python-shell-completion-at-point breaks when point is before the prompt"
+  ;;   (when (or (not comint-last-prompt)
+  ;;             (>= (point) (cdr comint-last-prompt)))
+  ;;     ad-do-it))
+  )
 
 (leaf rainbow-delimiters
   :doc "Highlight brackets according to their depth"
@@ -2251,17 +2252,16 @@
 (leaf yasnippet
   :ensure t
   :blackout yas-minor-mode
-  :custom ((yas-indent-line . 'fixed)
-           (yas-global-mode . t))
-  :bind ((yas-keymap
-          ("<tab>" . nil))            ; conflict with company
+  :custom (yas-indent-line . 'fixed)
+  :global-minor-mode yas-global-mode
+  :bind ((;; yas-keymap
+          ;; ("<tab>" . nil))            ; conflict with company
          (yas-minor-mode-map
           ("C-c y i" . yas-insert-snippet)
           ("C-c y n" . yas-new-snippet)
           ("C-c y v" . yas-visit-snippet-file)
           ("C-c y l" . yas-describe-tables)
           ("C-c y g" . yas-reload-all)))
-  :defun (company-mode/backend-with-yas)
   :config
   (leaf yasnippet-snippets :ensure t)
   (leaf yatemplate
@@ -2269,18 +2269,19 @@
     :config
     (yatemplate-fill-alist))
 
-  (defvar company-mode/enable-yas t
-    "Enable yasnippet for all backends.")
-  (defun company-mode/backend-with-yas (backend)
-    (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-      backend
-      (append (if (consp backend) backend (list backend))
-        '(:with company-yasnippet))))
-  (defun set-yas-as-company-backend ()
-    (setq company-backends (mapc #'company-mode/backend-with-yas company-backends))
-    )
-  :hook
-  ((company-mode-hook . set-yas-as-company-backend)))
+  ;; (defvar company-mode/enable-yas t
+  ;;   "Enable yasnippet for all backends.")
+  ;; (defun company-mode/backend-with-yas (backend)
+  ;;   (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
+  ;;     backend
+  ;;     (append (if (consp backend) backend (list backend))
+  ;;       '(:with company-yasnippet))))
+  ;; (defun set-yas-as-company-backend ()
+  ;;   (setq company-backends (mapc #'company-mode/backend-with-yas company-backends))
+  ;;   )
+  ;; :hook
+  ;; ((company-mode-hook . set-yas-as-company-backend))
+  )
 
 
 (leaf affe
