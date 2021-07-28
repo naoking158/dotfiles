@@ -2299,6 +2299,7 @@
 (leaf embark
   :ensure t
   :require t
+  :after consult
   :bind (("C-s-a" . embark-act)
          ("C-;" . embark-dwim)
          ("C-s-b" . embark-bindings))
@@ -2310,7 +2311,13 @@
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                  nil
-                 (window-parameters (mode-line-format . none)))))
+                 (window-parameters (mode-line-format . none))))
+  (leaf embark-consult
+    :ensure t
+    :require t
+    :hook ((embark-collect-mode-hook . consult-preview-at-point-mode))
+    :bind (minibuffer-local-map
+           ("C-c C-e" . embark-export))))
 
 (leaf consult
   ;; consult-line ... swiper の代替
@@ -2320,7 +2327,7 @@
   ;; その後、C-uつきで呼び出すと、隠れていた部分が表示される（もとに戻る, widen）
   ;; consult-recent-file ... 最近開いたファイルを選択
   :ensure t
-  :after embark
+  :require t
   :commands consult-customize
   ;; :custom ((consult-preview-key . '(list (kbd "<C-M-n>") (kbd "<C-M-p>"))))
            ;; (consult-preview-key . 'any))
@@ -2364,30 +2371,29 @@
   (leaf consult-lsp
     :ensure t
     :bind (lsp-mode-map
-           ([remap xref-find-apropos] . consult-lsp-symbols)))
-  (leaf embark-consult
-    :ensure t
-    :hook ((embark-collect-mode-hook . consult-preview-at-point-mode))
-    :bind (minibuffer-local-map
-           ("C-c C-e" . embark-export))))
+           ([remap xref-find-apropos] . consult-lsp-symbols))))
 
 (leaf orderless
   :ensure t
+  :require t
   :custom ((completion-styles . '(orderless))
            (completion-category-defaults . nil)
            (completion-category-overrides . '((file (styles partial-completion)))))
-  :advice (:around company-capf--candidates just-one-face)
-  :preface
-  (defun just-one-face (fn &rest args)
-    (let ((orderless-match-faces [completions-common-part]))
-      (apply fn args))))
+  ;; :advice (:around company-capf--candidates just-one-face)
+  ;; :preface
+  ;; (defun just-one-face (fn &rest args)
+  ;;   (let ((orderless-match-faces [completions-common-part]))
+  ;;     (apply fn args)))
+  )
 
 (leaf marginalia
   :ensure t
+  :require t
   :global-minor-mode t)
 
 (leaf vertico
   :ensure t
+  :require t
   :custom ((vertico-count . 20)
            (vertico-cycle . t))
   :global-minor-mode t savehist-mode)
