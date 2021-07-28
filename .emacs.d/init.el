@@ -1013,7 +1013,7 @@
             (lsp-response-timeout . 5)
             (lsp-prefer-flymake . t)
             (lsp-prefer-capf . t)
-            (lsp-enable-completion-at-point . t)
+            (lsp-enable-completion-at-point . nil)
             (lsp-enable-indentation . nil)
             (lsp-restart . 'ignore))
   :hook ((lsp-mode-hook . lsp-enable-which-key-integration)
