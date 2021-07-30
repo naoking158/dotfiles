@@ -880,7 +880,14 @@
 (leaf ispell
   :doc "interface to spell checkers"
   :tag "builtin"
-  :setq-default (ispell-program-name . "aspell"))
+  :custom ((ispell-program-name . "aspell")
+           (ispell-local-dictionary . "en_US"))
+  :config
+  ;; for text mixed English and Japanese
+  (add-to-list 'ispell-skip-region-alist '("[^\000-\377]+"))
+
+  (leaf flyspell
+    :hook (LaTeX-mode-hook org-mode-hook markdown-mode-hook text-mode-hook)))
 
 (leaf json-rpc
   :doc "JSON-RPC library"
