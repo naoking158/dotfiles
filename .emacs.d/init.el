@@ -1002,7 +1002,7 @@
             (read-process-output-max . ,(* 1 1024 1024))  ;; 1MB
             ;; (lsp-diagnostics-modeline-scope . :project)
             ;; debug
-            ;; (lsp-auto-guess-root . t)
+            (lsp-auto-guess-root . nil)
             (lsp-print-io . nil)
             (lsp-log-io . nil)
             (lsp-trace . nil)
@@ -1013,7 +1013,8 @@
             (lsp-response-timeout . 5)
             (lsp-prefer-flymake . t)
             (lsp-prefer-capf . t)
-            (lsp-enable-completion-at-point . nil)
+            (lsp-enable-completion-at-point . t)
+            (lsp-completion-provider . :none)
             (lsp-enable-indentation . nil)
             (lsp-restart . 'ignore))
   :hook ((lsp-mode-hook . lsp-enable-which-key-integration)
@@ -2410,17 +2411,17 @@
   :config
   (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
 
-
 (leaf corfu
   :ensure t
   :require t
   ;; Optional customizations
   :custom
-  ((corfu-cycle . t)                ;; Enable cycling for `corfu-next/previous'
+  ((corfu-auto-prefix . 2)
+   (corfu-cycle . t)                ;; Enable cycling for `corfu-next/previous'
    (corfu-auto . t)                 ;; Enable auto completion
   ;; (corfu-commit-predicate . nil)   ;; Do not commit selected candidates on next input
   ;; (corfu-quit-at-boundary . t)     ;; Automatically quit at word boundary
-  ;; (corfu-quit-no-match . t)        ;; Automatically quit if there is no match
+  (corfu-quit-no-match . t)        ;; Automatically quit if there is no match
    ;; (corfu-echo-documentation . nil) ;; Do not show documentation in the echo area
 
    ;; Enable indentation+completion using the TAB key.
@@ -2428,11 +2429,8 @@
   (tab-always-indent . 'complete))
   
   ;; Optionally use TAB for cycling, default is `corfu-complete'.
-  ;; :bind (:map corfu-map
-  ;;        ("TAB" . corfu-next)
-  ;;        ([tab] . corfu-next)
-  ;;        ("S-TAB" . corfu-previous)
-  ;;        ([backtab] . corfu-previous))
+  :bind (corfu-map
+         ("<tab>" . corfu-complete))
 
   ;; You may want to enable Corfu only for certain modes.
   ;; :hook ((prog-mode . corfu-mode)
@@ -2443,11 +2441,30 @@
   ;; This is recommended since dabbrev can be used globally (M-/).
   :global-minor-mode corfu-global-mode)
 
+
 ;; Dabbrev works with Corfu
 (leaf dabbrev
-  ;; Swap M-/ and C-M-/
-  :bind (("M-/" . dabbrev-completion)
-         ("C-M-/" . dabbrev-expand)))
+  :doc """cite from Sec. 3.1.8.2 at https://protesilaos.com/dotemacs/#h:675ebef4-d74d-41af-808d-f9579c2a5ec4
+
+Whereas dabbrev-completion benefits from minibuffer interactivity and the pattern matching styles in effect (Completion framework and extras). With the help of Corfu, the completion candidates are displayed in a pop-up window near point (Corfu for in-buffer completion).
+
+The dabbrev-abbrev-char-regexp is configured to match both regular words and symbols (e.g. words separated by hyphens). This makes it equally suitable for code and ordinary language.
+
+While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words and symbols that start with any of these: $, *, /, =, ~, '. This regexp may be expanded in the future, but the idea is to be able to perform completion in contexts where the known word/symbol is preceded by a special character. For example, in the org-mode version of this document, all inline code must be placed between the equals sign. So now typing the =, then a letter, will still allow me to expand text based on that input.
+  """
+  :require t
+  :custom ((dabbrev-abbrev-char-regexp . "\\sw\\|\\s_")
+           (dabbrev-abbrev-skip-leading-regexp . "[$*/=~']")
+           (dabbrev-backward-only . nil)
+           (dabbrev-case-distinction . 'case-replace)
+           (dabbrev-case-fold-search . nil)
+           (dabbrev-case-replace . 'case-replace)
+           (dabbrev-check-other-buffers . t)
+           (dabbrev-eliminate-newlines . t)
+           (dabbrev-upcase-means-case-search . t))
+  
+  :bind* (("M-/" . dabbrev-expand)
+          ("C-M-/" . dabbrev-completion)))
 
 (provide 'init)
 
