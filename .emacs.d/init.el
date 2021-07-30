@@ -727,15 +727,18 @@
   :emacs>= 24
   :ensure t)
 
+
 (leaf flymake
   :doc "A universal on-the-fly syntax checker"
   :tag "builtin"
+  :custom (flymake-gui-warnings-enabled . t)
   :bind (flymake-mode-map
          ("C-c C-n" . flymake-goto-next-error)
          ("C-c C-p" . flymake-goto-prev-error))
   :config
   
   (leaf flymake-posframe
+    :disabled t
     :tag "out-of-MELPA"
     :load-path "/Users/naoki/.emacs.d/el-get/flymake-posframe"
     :when window-system
@@ -755,8 +758,11 @@
     :after flymake
     :custom ((flymake-diagnostic-at-point-timer-delay . 0.7)
              (flymake-diagnostic-at-point-error-prefix . " ► ")
+             ;; (flymake-diagnostic-at-point-display-diagnostic-function
+             ;;  quote flymake-diagnostic-at-point-display-popup))
              (flymake-diagnostic-at-point-display-diagnostic-function
-              quote flymake-diagnostic-at-point-display-popup))
+              quote flymake-diagnostic-at-point-display-minibuffer))
+    
     :hook (flymake-mode-hook . flymake-diagnostic-at-point-mode))
   ) ;; end of flymake
 
