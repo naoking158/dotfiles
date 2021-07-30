@@ -2303,9 +2303,9 @@
   :ensure t
   :require t
   :after consult
-  :bind (("C-s-a" . embark-act)
+  :bind (("C-," . embark-act)
          ("C-;" . embark-dwim)
-         ("C-s-b" . embark-bindings))
+         ("C-. b" . embark-bindings))
   :init
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
