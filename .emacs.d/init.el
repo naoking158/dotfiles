@@ -473,7 +473,6 @@
 
 
 (leaf company
-  :disabled t
   :doc "Modular text completion framework"
   :req "emacs-24.3"
   :tag "matching" "convenience" "abbrev" "emacs>=24.3"
@@ -494,11 +493,11 @@
           ("C-n" . company-select-next)
           ("C-p" . company-select-previous)))
   :custom ((company-tooltip-limit . 15)
-           (company-idle-delay . 0.1)
+           (company-idle-delay . 0.2)
            (company-dabbrev-downcase . 0)
            (company-minimum-prefix-length . 2)
-           ;; (company-transformers quote
-           ;;                       (company-sort-by-occurrence))
+           (company-transformers quote
+                                 (company-sort-by-occurrence))
            (company-require-match . 'never)
            (completion-ignore-case . nil)
            (company-math-allow-latex-symbols-in-faces . t)
@@ -572,7 +571,7 @@
   (leaf company-tabnine
     :ensure t
     :config (add-to-list 'company-backends #'company-tabnine))
-  )  ;; end company
+  ) ;; end company
 
 (leaf avy
   :doc "Jump to arbitrary positions in visible text and select text quickly."
@@ -1020,7 +1019,6 @@
             ;; (lsp-diagnostics-modeline-scope . :project)
             ;; debug
             (lsp-auto-guess-root . nil)
-            (lsp-print-io . nil)
             (lsp-log-io . nil)
             (lsp-trace . nil)
             (lsp-print-performance . nil)
@@ -1029,9 +1027,8 @@
             (lsp-document-sync-method . 2)
             (lsp-response-timeout . 5)
             (lsp-prefer-flymake . t)
-            (lsp-prefer-capf . t)
-            (lsp-enable-completion-at-point . t)
-            (lsp-completion-provider . :none)
+            (lsp-completion-enable . t)
+            (lsp-completion-provider . :capf)
             (lsp-enable-indentation . nil)
             (lsp-restart . 'ignore))
   :hook ((lsp-mode-hook . lsp-enable-which-key-integration)
@@ -2066,7 +2063,6 @@
     :tag "conda" "environment" "python" "emacs>=24.4"
     :added "2021-04-10"
     :url "http://github.com/necaris/conda.el"
-    :after lsp-pyright
     :emacs>= 24.4
     :ensure t
     :require t
@@ -2085,8 +2081,7 @@
     ;; is not available if lsp isn't active
     ;; (add-hook 'conda-postactivate-hook (lambda () (lsp-restart-workspace)))
     ;; (add-hook 'conda-postdeactivate-hook (lambda () (lsp-restart-workspace)))
-    (add-hook 'conda-postactivate-hook (lambda () (lsp-pyright-setup-when-conda)))
-    (add-hook 'conda-postdeactivate-hook (lambda () (lsp-pyright-setup-when-conda))))
+    )
 
   (leaf lsp-pyright
     :doc "Python LSP client using Pyright"
@@ -2095,18 +2090,20 @@
     :url "https://github.com/emacs-lsp/lsp-pyright"
     :emacs>= 26.1
     :ensure t
-    :init
+    :preface
     (defun lsp-pyright-setup-when-conda ()
       (setq-local lsp-pyright-venv-path python-shell-virtualenv-root)
       (lsp-restart-workspace))
-    :hook (python-mode-hook . (lambda ()
-                                (setq
-                                  indent-tabs-mode nil
-                                  python-indent 4
-                                  tab-width 4)
-                                (require 'lsp-pyright)
-                                (lsp))))
-
+    :hook
+    ((conda-postactivate-hook . (lambda () (lsp-pyright-setup-when-conda)))
+     (conda-postdeactivate-hook . (lambda () (lsp-pyright-setup-when-conda)))
+     (python-mode-hook . (lambda ()
+                           (setq
+                            indent-tabs-mode nil
+                            python-indent 4
+                            tab-width 4)
+                           (require 'lsp-pyright)
+                           (lsp)))))
   ;; (defadvice python-shell-completion-at-point (around fix-company-bug activate)
   ;;   "python-shell-completion-at-point breaks when point is before the prompt"
   ;;   (when (or (not comint-last-prompt)
@@ -2399,11 +2396,11 @@
   :custom ((completion-styles . '(orderless))
            (completion-category-defaults . nil)
            (completion-category-overrides . '((file (styles partial-completion)))))
-  ;; :advice (:around company-capf--candidates just-one-face)
-  ;; :preface
-  ;; (defun just-one-face (fn &rest args)
-  ;;   (let ((orderless-match-faces [completions-common-part]))
-  ;;     (apply fn args)))
+  :advice (:around company-capf--candidates just-one-face)
+  :preface
+  (defun just-one-face (fn &rest args)
+    (let ((orderless-match-faces [completions-common-part]))
+      (apply fn args)))
   )
 
 (leaf marginalia
@@ -2429,6 +2426,7 @@
   (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
 
 (leaf corfu
+  :disabled t
   :ensure t
   :require t
   ;; Optional customizations
@@ -2480,8 +2478,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (dabbrev-eliminate-newlines . t)
            (dabbrev-upcase-means-case-search . t))
   
-  :bind* (("M-/" . dabbrev-expand)
-          ("C-M-/" . dabbrev-completion)))
+  :bind* (("M-/" . dabbrev-completion)
+          ("C-M-/" . dabbrev-expand)))
 
 (provide 'init)
 
