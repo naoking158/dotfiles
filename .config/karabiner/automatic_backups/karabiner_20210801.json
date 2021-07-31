@@ -1073,7 +1073,7 @@
                         ]
                     },
                     {
-                        "description": "Open Terminal.app by pressing left-option twice",
+                        "description": "Open Alacritty by pressing left-option twice",
                         "manipulators": [
                             {
                                 "conditions": [
@@ -1088,7 +1088,7 @@
                                 },
                                 "to": [
                                     {
-                                        "shell_command": "open -a terminal"
+                                        "shell_command": "open -a alacritty"
                                     }
                                 ],
                                 "type": "basic"
@@ -1138,30 +1138,6 @@
                                         }
                                     ]
                                 },
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "from [ctrl + `] to [open Alacritty]",
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "grave_accent_and_tilde",
-                                    "modifiers": {
-                                        "mandatory": [
-                                            "control"
-                                        ],
-                                        "optional": [
-                                            "any"
-                                        ]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "shell_command": "open -a alacritty"
-                                    }
-                                ],
                                 "type": "basic"
                             }
                         ]

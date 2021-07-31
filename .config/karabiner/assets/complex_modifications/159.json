@@ -90,6 +90,51 @@
                     }
                 }
             ]
+        },
+        {
+            "description": "Open Terminal.app by pressing left-option twice",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "conditions": [
+                        {
+                            "type": "variable_if",
+                            "name": "l_option",
+                            "value": 1
+                        }
+                    ],
+                    "from": { "key_code": "left_option" },
+                    "to": [
+                        { "shell_command": "open -a terminal" }
+                    ]
+                },
+                {
+                    "type": "basic",
+                    "conditions": [
+                        {
+                            "type": "variable_if",
+                            "name": "l_option",
+                            "value": 0
+                        }
+                    ],
+                    "from": {
+                        "key_code": "left_option",
+                        "modifiers": { "optional": [ "any" ] }
+                    },
+                    "to": [
+                        { "set_variable": { "name": "l_option", "value": 1 } },
+                        { "key_code": "left_option" }
+                    ],
+                    "to_delayed_action": {
+                        "to_if_invoked": [
+                            { "set_variable": { "name": "l_option", "value": 0 } }
+                        ],
+                        "to_if_canceled": [
+                            { "set_variable": { "name": "l_option", "value": 0 } }
+                        ]
+                    }
+                }
+            ]
         }
     ]
 }
