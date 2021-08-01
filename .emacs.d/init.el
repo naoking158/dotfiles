@@ -471,7 +471,6 @@
   :config
   (auto-rsync-mode t))
 
-
 (leaf company
   :doc "Modular text completion framework"
   :req "emacs-24.3"
@@ -489,8 +488,8 @@
            ;; provide the correct casing.
            (company-dabbrev-ignore-case . t)
            (company-minimum-prefix-length . 2)
-           ;; (company-transformers . (company-sort-by-occurrence))
-           (company-transformers . nil)
+           (company-transformers . (company-sort-by-occurrence))
+           ;; (company-transformers . nil)
            (company-require-match . 'never)
            (completion-ignore-case . nil)
            (company-math-allow-latex-symbols-in-faces . t)
@@ -2058,22 +2057,22 @@
     :emacs>= 24.4
     :ensure t
     :require t
+    :preface
+    (defun string-trim-final-newline (string)
+      (let ((len (length string)))
+        (cond
+         ((and (> len 0) (eql (aref string (- len 1)) ?\n))
+          (substring string 0 (- len 1)))
+         (t string))))
+    (setq path-to-miniconda
+          (string-trim-final-newline
+           (shell-command-to-string
+            "find $HOME -maxdepth 1 -type d -name miniconda* | head -n 1")))
+    :custom ((conda-anaconda-home . path-to-miniconda)
+             (conda-env-home-directory . path-to-miniconda))
     :config
-    (cond (window-system
-           (custom-set-variables
-            '(conda-anaconda-home (expand-file-name "~/miniconda/"))
-            '(conda-env-home-directory (expand-file-name "~/miniconda/"))))
-          (t
-           (custom-set-variables
-            '(conda-anaconda-home (expand-file-name "~/miniconda3/"))
-            '(conda-env-home-directory (expand-file-name "~/miniconda3/")))))
     (conda-env-initialize-interactive-shells)
-    (conda-env-initialize-eshell)
-    ;; these hooks can't go in the :hook section since lsp-restart-workspace
-    ;; is not available if lsp isn't active
-    ;; (add-hook 'conda-postactivate-hook (lambda () (lsp-restart-workspace)))
-    ;; (add-hook 'conda-postdeactivate-hook (lambda () (lsp-restart-workspace)))
-    )
+    (conda-env-initialize-eshell))
 
   (leaf lsp-pyright
     :doc "Python LSP client using Pyright"
