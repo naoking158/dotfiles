@@ -481,32 +481,25 @@
   :ensure t
   :blackout t
   :leaf-defer nil
-  :bind ((company-active-map
-          ("M-n")
-          ("M-p")
-          ("C-s" . company-filter-candidates)
-          ("C-n" . company-select-next)
-          ("C-p" . company-select-previous)
-          ;; ("<tab>" . company-complete-selection)
-          )
-         (company-search-map
-          ("C-n" . company-select-next)
-          ("C-p" . company-select-previous)))
-  :custom ((company-tooltip-limit . 15)
-           (company-idle-delay . 0.2)
-           (company-dabbrev-downcase . 0)
+  :custom ((company-dabbrev-other-buffers . t)
+           (company-dabbrev-code-other-buffers . t)
+           ;; Do not downcase completions by default.
+           (company-dabbrev-downcase . nil)
+           ;; Even if I write something with the wrong case,
+           ;; provide the correct casing.
+           (company-dabbrev-ignore-case . t)
            (company-minimum-prefix-length . 2)
-           (company-transformers quote
-                                 (company-sort-by-occurrence))
+           ;; (company-transformers . (company-sort-by-occurrence))
+           (company-transformers . nil)
            (company-require-match . 'never)
            (completion-ignore-case . nil)
            (company-math-allow-latex-symbols-in-faces . t)
            (company-math-allow-unicode-symbols-in-faces
-            quote ((tex-math font-latex-math-face))))
+            quote ((tex-math font-latex-math-face)))
+           ;; No company-mode in shell & eshell
+           (company-global-modes . '(not eshell-mode shell-mode)))
   :global-minor-mode global-company-mode
   :config
-  (add-to-list 'company-backends #'company-capf)
-
   (leaf company-org-block
     :ensure t
     :custom
@@ -539,8 +532,8 @@
                                    '(:with company-yasnippet))))
                               company-backends)))
 
-    :hook ((prog-mode-hook . c/company-mode-with-yas))
-    )
+    :hook ((prog-mode-hook . c/company-mode-with-yas)))
+  
   ;; using child frame
   (leaf company-posframe
     :when window-system
@@ -726,7 +719,6 @@
   :emacs>= 24
   :ensure t)
 
-
 (leaf flymake
   :doc "A universal on-the-fly syntax checker"
   :tag "builtin"
@@ -759,7 +751,7 @@
     :emacs>= 26.1
     :ensure t
     :after flymake
-    :custom ((flymake-diagnostic-at-point-timer-delay . 0.7)
+    :custom ((flymake-diagnostic-at-point-timer-delay . 0.8)
              (flymake-diagnostic-at-point-error-prefix . " ► ")
              ;; (flymake-diagnostic-at-point-display-diagnostic-function
              ;;  quote flymake-diagnostic-at-point-display-popup))
@@ -1060,7 +1052,7 @@
     :custom (;; lsp-ui-doc
              (lsp-ui-doc-enable . t)
              (lsp-ui-doc-header . t)
-             (lsp-ui-doc-delay . 1)
+             (lsp-ui-doc-delay . 2)
              (lsp-ui-doc-include-signature . t)
              (lsp-ui-doc-position . 'top) ;; top, bottom, or at-point
              (lsp-ui-doc-max-width . 150)
@@ -2478,8 +2470,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (dabbrev-eliminate-newlines . t)
            (dabbrev-upcase-means-case-search . t))
   
-  :bind* (("M-/" . dabbrev-completion)
-          ("C-M-/" . dabbrev-expand)))
+  :bind* (("M-/" . dabbrev-expand)
+          ("C-M-/" . dabbrev-completion)))
 
 (provide 'init)
 
