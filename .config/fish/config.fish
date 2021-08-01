@@ -19,19 +19,9 @@
 # -u / --unexport
 #     子プロセスにexport されない ようにする。
 
-
-
-################################################################
-# Change the user name
-################################################################
 set -xg USER naoki    # A local network user
-
-################################################################
-# Path to the directory fo 'USER' on the local HD
-# Make sure that the directory is created for each local machine
 set -xg localhome /Users/$USER
 
-################################################################
 set -xg HOST gateway.mdl.cs.tsukuba.ac.jp    # Host Name for GIP
 set -xg MDL ssh-user@$HOST
 
@@ -41,23 +31,18 @@ set -xg MDL ssh-user@$HOST
 #To solve a locate problem happens in ipython notebook
 set -xg LC_ALL en_US.UTF-8
 set -xg LANG en_US.UTF-8
-set -xg MYREPO $HOME/src/github.com/naoking158
+# set -xg LANG ja_JP.UTF-8
 
+# github
+set -xg G_USER (string split -f2 = (git config -l | grep user.name))
+set -xg G_ROOT (string split -f2 = (git config -l | grep ghq.root))
+set -xg G_REPO $HOME/src/github.com/naoking158
 
-if test -e $MYREPO
-    set -xg PYTHONPATH $MYREPO $PYTHONPATH
+if test -e $G_REPO
+    set -xg PYTHONPATH $G_REPO $PYTHONPATH
 end
-if test -e $MYREPO/research/neptune_api_token
-    set -xg NEPTUNE_API_TOKEN (cat $MYREPO/research/neptune_api_token)
-end
-
-if test -e $HOME/.dir_colors
-    alias ls='gls --color=auto'
-    if test (uname -s) = "Darwin"
-        eval (gdircolors -c ~/.dir_colors)
-    else
-        eval (dircolors -c ~/.dir_colors)
-    end
+if test -e $G_REPO/research/neptune_api_token
+    set -xg NEPTUNE_API_TOKEN (cat $G_REPO/research/neptune_api_token)
 end
 
 if test (uname -s) = "Darwin"
@@ -82,21 +67,6 @@ if test (uname -s) = "Darwin"
     set -x FZF_DEFAULT_COMMAND 'rg -a --files --hidden --no-ignore --follow'
 
     set -g fish_user_paths "/usr/local/sbin" $fish_user_paths
-
-    # # For compilers to find openblas you may need to set:
-    # set -gx LDFLAGS "-L/usr/local/opt/openblas/lib"
-    # set -gx CPPFLAGS "-I/usr/local/opt/openblas/include"
-
-    # # For pkg-config to find openblas you may need to set:
-    # set -gx PKG_CONFIG_PATH "/usr/local/opt/openblas/lib/pkgconfig" $PKG_CONFIG_PATH
-
-    # set -gx LDFLAGS "-L/usr/local/opt/libxml2/lib" $LDFLAGS
-    # set -gx CPPFLAGS "-I/usr/local/opt/libxml2/include" $CPPFLAGS
-    # set -gx PKG_CONFIG_PATH "/usr/local/opt/libxml2/lib/pkgconfig" $PKG_CONFIG_PATH
-
-    # set -gx LDFLAGS "-L/usr/local/opt/imagemagick@6/lib"
-    # set -gx CPPFLAGS "-I/usr/local/opt/imagemagick@6/include"
-    # set -gx PKG_CONFIG_PATH "/usr/local/opt/imagemagick@6/lib/pkgconfig"
 end
 
 
@@ -118,13 +88,11 @@ function rm
     end
 end
 
-
-# # cd -> ls
-# functions --copy cd standard_cd
-
-# function cd
-#     standard_cd $argv; and ls
-# end
+# cd -> ls
+functions --copy cd standard_cd
+function cd
+    standard_cd $argv; and ls
+end
 
 function du
     command /usr/bin/du -shc * | sort -h
@@ -349,15 +317,13 @@ function ja_latex
     command latexmk -pvc $argv
 end
 
+set MINICONDA (find $HOME -maxdepth 1 -type d -name miniconda | head -n 1) 
+if test -e $MINICONDA
+    eval $MINICONDA/condabin/conda "shell.fish" "hook" $argv | source
+end
+
 if test (uname -s) = "Darwin"
-    if test -e $HOME/miniconda
-        eval $HOME/miniconda/condabin/conda "shell.fish" "hook" $argv | source
-    end
     set -gx LDFLAGS "-L/usr/local/opt/ruby/lib" $LDFLAGS
     set -gx CPPFLAGS "-I/usr/local/opt/ruby/include" $CPPFLAGS
     set -gx PKG_CONFIG_PATH "/usr/local/opt/ruby/lib/pkgconfig" $PKG_CONFIG_PATH
-else
-    if test -e $HOME/miniconda3
-        eval $HOME/miniconda3/condabin/conda "shell.fish" "hook" $argv | source
-    end
 end
