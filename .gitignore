@@ -18,6 +18,8 @@
 
 
 !/.config/
+!/.config/alacritty/
+!/.config/alacritty/**
 !/.config/fish/
 !/.config/fish/**
 /.config/fish/fish_variables

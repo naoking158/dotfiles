@@ -159,6 +159,12 @@
                                      (:eval (if (buffer-file-name) "%f"
                                               (if dired-directory dired-directory
                                                 "%b")))))
+                
+                                     ;; " - "
+                                     ;; (:eval org-mode-line-string)
+
+
+                
                 (blink-cursor-mode . t)
                 (show-paren-mode . 1)
                 (confirm-kill-emacs . 'y-or-n-p)
@@ -268,6 +274,7 @@
                         (propertize " "  'face 'nano-face-header-default
 			                        'display `(raise ,space-down))
 		                (propertize primary 'face 'nano-face-header-default)))
+                 ;; show org-clock at headline in all major mode
                  (right (if (not (eq major-mode 'org-mode))
                             (concat org-mode-line-string " "
                                     secondary " ")
@@ -473,32 +480,25 @@
   :ensure t
   :blackout t
   :leaf-defer nil
-  :bind (;; ("<tab>" . company-indent-or-complete-common)
-         (company-active-map
-          ("M-n")
-          ("M-p")
-          ("C-s" . company-filter-candidates)
-          ("C-n" . company-select-next)
-          ("C-p" . company-select-previous)
-          ;; ("<tab>" . company-complete-selection)
-          )
-         (company-search-map
-          ("C-n" . company-select-next)
-          ("C-p" . company-select-previous)))
-  :custom ((company-tooltip-limit . 15)
-           (company-idle-delay . 0.1)
-           (company-dabbrev-downcase . 0)
+  :custom ((company-dabbrev-other-buffers . t)
+           (company-dabbrev-code-other-buffers . t)
+           ;; Do not downcase completions by default.
+           (company-dabbrev-downcase . nil)
+           ;; Even if I write something with the wrong case,
+           ;; provide the correct casing.
+           (company-dabbrev-ignore-case . t)
            (company-minimum-prefix-length . 2)
-           (company-transformers quote
-                                 (company-sort-by-occurrence))
+           (company-transformers . (company-sort-by-occurrence))
+           ;; (company-transformers . nil)
            (company-require-match . 'never)
            (completion-ignore-case . nil)
            (company-math-allow-latex-symbols-in-faces . t)
-           (company-math-allow-unicode-symbols-in-faces . (quote (tex-math font-latex-math-face))))
+           (company-math-allow-unicode-symbols-in-faces
+            quote ((tex-math font-latex-math-face)))
+           ;; No company-mode in shell & eshell
+           (company-global-modes . '(not eshell-mode shell-mode)))
   :global-minor-mode global-company-mode
   :config
-  (add-to-list 'company-backends #'company-capf)
-
   (leaf company-org-block
     :ensure t
     :custom
@@ -516,7 +516,6 @@
     :doc "company-mode completion backend for Yasnippet"
     :tag "out-of-MELPA"
     :after yasnippet
-    :defvar (company-backends)
     :preface
     (defun c/company-mode-with-yas nil
       (setq company-backends (mapc
@@ -532,8 +531,8 @@
                                    '(:with company-yasnippet))))
                               company-backends)))
 
-    :hook ((prog-mode-hook . c/company-mode-with-yas))
-    )
+    :hook ((prog-mode-hook . c/company-mode-with-yas)))
+  
   ;; using child frame
   (leaf company-posframe
     :when window-system
@@ -544,75 +543,7 @@
     :emacs>= 26.0
     :ensure t
     :global-minor-mode t
-    :diminish t
-    :hook (company-mode-hook . company-posframe-mode)
-    )
-
-  ;; Show pretty icons
-  (leaf company-box
-    :disabled t
-    :diminish
-    :hook (company-mode-hook . company-box-mode)
-    :init (setq company-box-icons-alist 'company-box-icons-all-the-icons)
-    :disabled (eq window-system 'x)
-    :doc "Company front-end with icons"
-    :url "https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-company.el"
-    :req "emacs-26.0.91" "dash-2.13" "dash-functional-1.2.0" "company-0.9.6"
-    :tag "convenience" "front-end" "completion" "company" "emacs>=26.0.91"
-    :url "https://github.com/sebastiencs/company-box"
-    :emacs>= 26.0
-    :ensure t
-    :custom ((company-box-max-candidates . 20)
-             (company-box-backends-colors . nil)
-              (company-box-show-single-candidate . t))
-    :require t
-    :config
-    (when (memq window-system
-                '(ns mac))
-      (defun company-box-icons--elisp (candidate)
-        (when (derived-mode-p 'emacs-lisp-mode)
-          (let ((sym (intern candidate)))
-            (cond ((fboundp sym) 'Function)
-                  ((featurep sym) 'Module)
-                  ((facep sym) 'Color)
-                  ((boundp sym) 'Variable)
-                  ((symbolp sym) 'Text)
-                  (t . nil)))))
-
-      (with-eval-after-load 'all-the-icons
-        (declare-function all-the-icons-faicon 'all-the-icons)
-        (declare-function all-the-icons-fileicon 'all-the-icons)
-        (declare-function all-the-icons-material 'all-the-icons)
-        (declare-function all-the-icons-octicon 'all-the-icons)
-        (setq company-box-icons-all-the-icons
-              `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.7 :v-adjust -0.15))
-                (Text . ,(all-the-icons-faicon "book" :height 0.68 :v-adjust -0.15))
-                (Method . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
-                (Function . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
-                (Constructor . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
-                (Field . ,(all-the-icons-faicon "tags" :height 0.65 :v-adjust -0.15 :face 'font-lock-warning-face))
-                (Variable . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face))
-                (Class . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
-                (Interface . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01))
-                (Module . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.15))
-                (Property . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face)) ;; Golang module
-                (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.7 :v-adjust -0.15))
-                (Value . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'font-lock-constant-face))
-                (Enum . ,(all-the-icons-material "storage" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-orange))
-                (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.7 :v-adjust -0.15))
-                (Snippet . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))
-                (Color . ,(all-the-icons-material "palette" :height 0.7 :v-adjust -0.15))
-                (File . ,(all-the-icons-faicon "file-o" :height 0.7 :v-adjust -0.05))
-                (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.7 :v-adjust -0.15))
-                (Folder . ,(all-the-icons-octicon "file-directory" :height 0.7 :v-adjust -0.05))
-                (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-blueb))
-                (Constant . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05))
-                (Struct . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
-                (Event . ,(all-the-icons-faicon "bolt" :height 0.7 :v-adjust -0.05 :face 'all-the-icons-orange))
-                (Operator . ,(all-the-icons-fileicon "typedoc" :height 0.65 :v-adjust 0.05))
-                (TypeParameter . ,(all-the-icons-faicon "hashtag" :height 0.65 :v-adjust 0.07 :face 'font-lock-const-face))
-                (Template . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))))))
-    )
+    :diminish t)
 
   (leaf company-math
     :doc "Completion backends for unicode math symbols and latex tags"
@@ -626,32 +557,13 @@
                   (append
                    '((company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
                    company-backends)))
-
     :hook ((org-mode-hook . c/latex-mode-setup)
-           (TeX-mode-hook . c/latex-mode-setup))
-    )
+           (LaTeX-mode-hook . c/latex-mode-setup)))
 
   (leaf company-tabnine
     :ensure t
-    :config
-    (add-to-list 'company-backends #'company-tabnine)
-    ;; workaround for company-transformers
-    (setq company-tabnine--disable-next-transform nil)
-    (defun my-company--transform-candidates (func &rest args)
-      (if (not company-tabnine--disable-next-transform)
-          (apply func args)
-        (setq company-tabnine--disable-next-transform nil)
-        (car args)))
-
-    (defun my-company-tabnine (func &rest args)
-      (when (eq (car args) 'candidates)
-        (setq company-tabnine--disable-next-transform t))
-      (apply func args))
-
-    (advice-add #'company--transform-candidates :around #'my-company--transform-candidates)
-    (advice-add #'company-tabnine :around #'my-company-tabnine)
-    )
-  )  ;; end company
+    :config (add-to-list 'company-backends #'company-tabnine))
+  ) ;; end company
 
 (leaf avy
   :doc "Jump to arbitrary positions in visible text and select text quickly."
@@ -714,7 +626,7 @@
   :doc "Show function arglist or variable docstring in echo area"
   :tag "builtin"
   :blackout t
-  :custom ((eldoc-idle-delay . 0.3)))
+  :custom (eldoc-idle-delay . 0.1))
 
 (leaf *font
   :when window-system
@@ -809,19 +721,26 @@
 (leaf flymake
   :doc "A universal on-the-fly syntax checker"
   :tag "builtin"
+  :custom (flymake-gui-warnings-enabled . t)
   :bind (flymake-mode-map
          ("C-c C-n" . flymake-goto-next-error)
-          ("C-c C-p" . flymake-goto-prev-error))
+         ("C-c C-p" . flymake-goto-prev-error))
   :config
+  (leaf flymake-proselint
+    :ensure t
+    :hook
+    ((markdown-mode-hook org-mode-hook text-mode-hook) . flymake-proselint-setup))
+  
   (leaf flymake-posframe
     :disabled t
-    :when window-system
-    :hook (flymake-mode-hook . flymake-posframe-mode)
     :tag "out-of-MELPA"
-    ;; :url "https://github.com/Ladicle/flymake-posframe"
-    ;; :el-get Ladicle/flymake-posframe
     :load-path "/Users/naoki/.emacs.d/el-get/flymake-posframe"
-    :require t)
+    :when window-system
+    :require t
+    :hook (flymake-mode-hook . flymake-posframe-mode)
+    :custom ((flymake-posframe-error-prefix . " ► "))
+    :custom-face
+    (flymake-posframe-foreground-face . '((t (:foreground "white")))))
 
   (leaf flymake-diagnostic-at-point
     :doc "Display flymake diagnostics at point"
@@ -831,46 +750,14 @@
     :emacs>= 26.1
     :ensure t
     :after flymake
-    :defvar (flymake-diagnostic-at-point-error-prefix)
-    :custom ((flymake-diagnostic-at-point-timer-delay . 1)
-              (flymake-diagnostic-at-point-error-prefix . " ► ")
-              (flymake-diagnostic-at-point-display-diagnostic-function quote flymake-diagnostic-at-point-display-popup))
-    :hook ((flymake-mode-hook . flymake-diagnostic-at-point-mode))
-    :defvar (flymake-posframe-hide-posframe-hooks)
-    :defun (flymake-posframe-hide-posframe my/flymake-diagnostic-at-point-display-popup package-lint-setup-flymake posframe-hide flymake--diag-text)
-    :config
-    ;; (add-hook 'flymake-mode-hook #'flymake-diagnostic-at-point-mode)
-    ;; (add-hook 'emacs-lisp-mode-hook #'package-lint-setup-flymake)
-    (set-face-attribute 'popup-tip-face nil
-		  :background "dark slate gray" :foreground "white" :underline nil)
-    (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake)
-    ;; flymake-posframe
-    (defvar flymake-posframe-hide-posframe-hooks
-      '(pre-command-hook post-command-hook focus-out-hook)
-      "The hooks which should trigger automatic removal of the posframe.")
-
-    (defun flymake-posframe-hide-posframe ()
-      "Hide messages currently being shown if any."
-      (posframe-hide " *flymake-posframe-buffer*")
-      (dolist (hook flymake-posframe-hide-posframe-hooks)
-        (remove-hook hook #'flymake-posframe-hide-posframe t)))
-
-    (when window-system
-      (defun my/flymake-diagnostic-at-point-display-popup (text)
-        "Display the flymake diagnostic TEXT inside a posframe."
-        (posframe-show " *flymake-posframe-buffer*"
-		      :string (concat flymake-diagnostic-at-point-error-prefix
-				            (flymake--diag-text
-				              (get-char-property (point) 'flymake-diagnostic)))
-		      :position (point)
-		      :foreground-color "cyan"
-		      :internal-border-width 2
-		      :internal-border-color "red"
-		      :poshandler 'posframe-poshandler-window-bottom-left-corner)
-        (dolist (hook flymake-posframe-hide-posframe-hooks)
-          (add-hook hook #'flymake-posframe-hide-posframe nil t)))
-      (advice-add 'flymake-diagnostic-at-point-display-popup :override 'my/flymake-diagnostic-at-point-display-popup))
-    )
+    :custom ((flymake-diagnostic-at-point-timer-delay . 0.8)
+             (flymake-diagnostic-at-point-error-prefix . " ► ")
+             ;; (flymake-diagnostic-at-point-display-diagnostic-function
+             ;;  quote flymake-diagnostic-at-point-display-popup))
+             (flymake-diagnostic-at-point-display-diagnostic-function
+              quote flymake-diagnostic-at-point-display-minibuffer))
+    
+    :hook (flymake-mode-hook . flymake-diagnostic-at-point-mode))
   ) ;; end of flymake
 
 (leaf gcmh
@@ -983,7 +870,14 @@
 (leaf ispell
   :doc "interface to spell checkers"
   :tag "builtin"
-  :setq-default (ispell-program-name . "aspell"))
+  :custom ((ispell-program-name . "aspell")
+           (ispell-local-dictionary . "en_US"))
+  :config
+  ;; for text mixed English and Japanese
+  (add-to-list 'ispell-skip-region-alist '("[^\000-\377]+"))
+
+  (leaf flyspell
+    :hook (LaTeX-mode-hook org-mode-hook markdown-mode-hook text-mode-hook)))
 
 (leaf json-rpc
   :doc "JSON-RPC library"
@@ -1080,8 +974,7 @@
       (add-to-list 'TeX-command-list
                    '("Displayline" "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b"
                      TeX-run-command t nil)))
-    :hook ((after-init-hook . global-company-mode)
-           (LaTeX-mode-hook . my/latex-mode-hook)))
+    :hook (LaTeX-mode-hook . my/latex-mode-hook))
 
   (leaf latex-extra
     :doc "Adds several useful functionalities to LaTeX-mode."
@@ -1111,41 +1004,33 @@
   :emacs>= 25.1
   :ensure t
   :custom `((lsp-keymap-prefix . "s-l")
-             (gc-cons-threshold \,
-               (* 3 1024 1024 1024)
-               )  ;; 3GB
-             (gcmh-low-cons-threshold \,
-               (* 512 1024 1024)
-               )  ;; 512MB
-             (read-process-output-max \,
-               (* 1 1024 1024)
-               )  ;; 1MB
-             ;; (lsp-diagnostics-modeline-scope . :project)
-             ;; debug
-             ;; (lsp-auto-guess-root . t)
-             (lsp-print-io . nil)
-             (lsp-log-io . nil)
-             (lsp-trace . nil)
-             (lsp-print-performance . nil)
-             ;; general
-             (lsp-idle-delay . 0.5)
-             (lsp-document-sync-method . 2)
-             (lsp-response-timeout . 5)
-             (lsp-prefer-flymake . t)
-             (lsp-prefer-capf . t)
-             (lsp-enable-completion-at-point . nil)
-             (lsp-enable-indentation . nil)
-             (lsp-restart . 'ignore))
+            (gc-cons-threshold . ,(* 3 1024 1024 1024))  ;; 3GB
+            (gcmh-low-cons-threshold . ,(* 512 1024 1024))  ;; 512MB
+            (read-process-output-max . ,(* 1 1024 1024))  ;; 1MB
+            ;; (lsp-diagnostics-modeline-scope . :project)
+            ;; debug
+            (lsp-auto-guess-root . nil)
+            (lsp-log-io . nil)
+            (lsp-trace . nil)
+            (lsp-print-performance . nil)
+            ;; general
+            (lsp-idle-delay . 0.5)
+            (lsp-document-sync-method . 2)
+            (lsp-response-timeout . 5)
+            (lsp-prefer-flymake . t)
+            (lsp-completion-enable . t)
+            (lsp-completion-provider . :capf)
+            (lsp-enable-indentation . nil)
+            (lsp-restart . 'ignore))
   :hook ((lsp-mode-hook . lsp-enable-which-key-integration)
-          (lsp-managed-mode-hook . lsp-modeline-diagnostics-mode))
+         (lsp-managed-mode-hook . lsp-modeline-diagnostics-mode))
   :config
   (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\AtCoder\\'")
   (advice-add 'lsp
-    :before (lambda (&rest _args)
-              (eval '(setf (lsp-session-server-id->folders
-                             (lsp-session))
-                       (ht))))
-    )
+              :before (lambda (&rest _args)
+                        (eval '(setf (lsp-session-server-id->folders
+                                      (lsp-session))
+                                     (ht)))))
 
   (leaf lsp-latex
     :doc "lsp-mode client for LaTeX, on texlab"
@@ -1154,9 +1039,7 @@
     :url "https://github.com/ROCKTAKEY/lsp-latex"
     :emacs>= 25.1
     :ensure t
-    :config
-    (add-hook 'TeX-mode-hook 'lsp)
-    )
+    :hook (LaTeX-mode-hook . lsp))
 
   (leaf lsp-ui
     :doc "UI modules for lsp-mode"
@@ -1168,6 +1051,7 @@
     :custom (;; lsp-ui-doc
              (lsp-ui-doc-enable . t)
              (lsp-ui-doc-header . t)
+             (lsp-ui-doc-delay . 2)
              (lsp-ui-doc-include-signature . t)
              (lsp-ui-doc-position . 'top) ;; top, bottom, or at-point
              (lsp-ui-doc-max-width . 150)
@@ -1175,6 +1059,7 @@
              (lsp-ui-doc-use-childframe . t)
              (lsp-ui-doc-use-webkit . nil)
              (lsp-ui-doc-show-with-mouse . nil)
+             (lsp-ui-doc-show-with-cursor . t)
              ;; lsp-ui-flycheck
              (lsp-ui-flycheck-enable . nil)
              ;; lsp-ui-sideline
@@ -1209,8 +1094,7 @@
       ("C-c s"   . lsp-ui-sideline-mode)
       ("C-c d"   . ladicle/toggle-lsp-ui-doc)))
     :hook
-    (lsp-mode-hook . lsp-ui-mode)
-    )
+    (lsp-mode-hook . lsp-ui-mode))
 
   (leaf lsp-ivy
     :disabled t
@@ -1350,97 +1234,99 @@
   :ensure org-plus-contrib
   :preface
   (defun my-org-mode-hook ()
-    (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
+    (add-hook 'completion-at-point-functions
+              'pcomplete-completions-at-point nil t))
   :hook (org-mode-hook . my-org-mode-hook)
   :custom
   ((org-directory . "~/org/")
-    (org-ellipsis . " ▼ ")
-    (org-adapt-indentation . nil)
-    (org-habit-show-habits-only-for-today . t)
-    (org-startup-indented . nil)
-    (org-use-speed-commands . t)
-    (org-enforce-todo-dependencies . t)
-    (org-log-done . t)
-    (org-return-follows-link . t)
-    (org-highlight-latex-and-related quote
-      (latex script entities))
-    (org-src-window-setup . 'current-window)
-    (org-return-follows-link . t)
-    (org-babel-load-languages . '((emacs-lisp . t)
-                                   (python . t)
-                                   (latex . t)
-                                   (shell . t)
-                                   ))
-    (org-confirm-babel-evaluate . nil)
-    (org-catch-invisible-edits . 'show)
-    (org-preview-latex-image-directory . "~/tmp/ltximg/")
-    (org-structure-template-alist . '(("b" . "src sh")
-                                       ("c" . "center")
-                                       ("C" . "comment")
-                                       ("e" . "example")
-                                       ("E" . "export")
-                                       ("h" . "export html")
-                                       ("l" . "export latex")
-                                       ("q" . "quote")
-                                       ("s" . "src")
-                                       ("p" . "src python :results output
+   (org-ellipsis . " ▼ ")
+   (org-cycle-separator-lines . 1)
+   (org-adapt-indentation . nil)
+   (org-habit-show-habits-only-for-today . t)
+   (org-startup-indented . t)
+   (org-use-speed-commands . t)
+   (org-enforce-todo-dependencies . t)
+   (org-log-done . t)
+   (org-return-follows-link . t)
+   (org-highlight-latex-and-related quote
+                                    (latex script entities))
+   (org-src-window-setup . 'current-window)
+   (org-return-follows-link . t)
+   (org-babel-load-languages . '((emacs-lisp . t)
+                                 (python . t)
+                                 (latex . t)
+                                 (shell . t)
+                                 ))
+   (org-confirm-babel-evaluate . nil)
+   (org-catch-invisible-edits . 'show)
+   (org-preview-latex-image-directory . "~/tmp/ltximg/")
+   (org-structure-template-alist . '(("b" . "src sh")
+                                     ("c" . "center")
+                                     ("C" . "comment")
+                                     ("e" . "example")
+                                     ("E" . "export")
+                                     ("h" . "export html")
+                                     ("l" . "export latex")
+                                     ("q" . "quote")
+                                     ("s" . "src")
+                                     ("p" . "src python :results output
 ")
-                                       ("d" . "definition")
-                                       ("t" . "theorem")
-                                       ("mc" . "quoting")
-                                       ("mq" . "question")
-                                       ("mt" . "todo")
-                                       ("ms" . "summary")
-                                       ))
-    (search-highlight . t)
-    (search-whitespace-regexp . ".*?")
-    (isearch-lax-whitespace . t)
-    (isearch-regexp-lax-whitespace . nil)
-    (isearch-lazy-highlight . t)
-    (isearch-lazy-count . t)
-    (lazy-count-prefix-format . " (%s/%s) ")
-    (lazy-count-suffix-format . nil)
-    (isearch-yank-on-move . 'shift)
-    (isearch-allow-scroll . 'unlimited)
-    (org-show-notification-handler . '(lambda (msg) (timed-notification nil msg)))
-    ) ;; end custom
+                                     ("d" . "definition")
+                                     ("t" . "theorem")
+                                     ("mc" . "quoting")
+                                     ("mq" . "question")
+                                     ("mt" . "todo")
+                                     ("ms" . "summary")
+                                     ))
+   (search-highlight . t)
+   (search-whitespace-regexp . ".*?")
+   (isearch-lax-whitespace . t)
+   (isearch-regexp-lax-whitespace . nil)
+   (isearch-lazy-highlight . t)
+   (isearch-lazy-count . t)
+   (lazy-count-prefix-format . " (%s/%s) ")
+   (lazy-count-suffix-format . nil)
+   (isearch-yank-on-move . 'shift)
+   (isearch-allow-scroll . 'unlimited)
+   (org-show-notification-handler . '(lambda (msg) (timed-notification nil msg)))
+   ) ;; end custom
   :commands (org-with-remote-undo)
   :config
   (custom-theme-set-faces
-    'user
-    '(org-block ((t (:inherit fixed-pitch))))
-    '(org-code ((t (:inherit (shadow fixed-pitch)))))
-    '(org-document-info ((t (:foreground "dark orange"))))
-    '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
-    '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
-    '(org-link ((t (:foreground "royal blue" :underline t))))
-    '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-    '(org-property-value ((t (:inherit fixed-pitch))) t)
-    '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-    '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
-    '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.9))))
-    '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
-    '(org-agenda-current-time ((t (:foreground "chartreuse"))))
-    '(org-agenda-done ((t (:foreground "gray" :weight book))))
-    '(org-scheduled-today ((t (:foreground "orange" :weight book))))
-    '(org-agenda-date ((t (:foreground "forest green" :height 1.1))))
-    '(org-agenda-date-today ((t (:foreground "#98be65" :height 1.1)))))
+   'user
+   '(org-block ((t (:inherit fixed-pitch))))
+   '(org-code ((t (:inherit (shadow fixed-pitch)))))
+   '(org-document-info ((t (:foreground "dark orange"))))
+   '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+   '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+   '(org-link ((t (:foreground "royal blue" :underline t))))
+   '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+   '(org-property-value ((t (:inherit fixed-pitch))) t)
+   '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+   '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
+   '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.9))))
+   '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
+   '(org-agenda-current-time ((t (:foreground "chartreuse"))))
+   '(org-agenda-done ((t (:foreground "gray" :weight book))))
+   '(org-scheduled-today ((t (:foreground "orange" :weight book))))
+   '(org-agenda-date ((t (:foreground "forest green" :height 1.1))))
+   '(org-agenda-date-today ((t (:foreground "#98be65" :height 1.1)))))
 
   (custom-set-faces
-    '(org-level-1 ((t (:inherit outline-1 :height 1.8 :underline t :weight bold))))
-    '(org-level-2 ((t (:inherit outline-2 :height 1.6 :underline t :weight bold))))
-    '(org-level-3 ((t (:inherit outline-3 :height 1.4 :underline t :weight bold))))
-    '(org-level-4 ((t (:inherit outline-4 :height 1.2 :weight bold))))
-    '(org-level-5 ((t (:inherit outline-5 :height 1.0 :weight bold)))))
+   '(org-level-1 ((t (:inherit outline-1 :height 1.8 :underline t :weight bold))))
+   '(org-level-2 ((t (:inherit outline-2 :height 1.6 :underline t :weight bold))))
+   '(org-level-3 ((t (:inherit outline-3 :height 1.4 :underline t :weight bold))))
+   '(org-level-4 ((t (:inherit outline-4 :height 1.2 :weight bold))))
+   '(org-level-5 ((t (:inherit outline-5 :height 1.0 :weight bold)))))
 
   (setq org-format-latex-options
-    '(:foreground default
-       :background default
-       :scale 1.7
-       :html-foreground "Black"
-       :html-background "Transparent"
-       :html-scale 1.0
-       :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
+        '(:foreground default
+                      :background default
+                      :scale 1.7
+                      :html-foreground "Black"
+                      :html-background "Transparent"
+                      :html-scale 1.0
+                      :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
 
   (when (fboundp 'mac-toggle-input-method)
     (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii))
@@ -1457,35 +1343,11 @@
     (mac-toggle-input-method nil)
     (run-hooks 'my:ime-off-hook))
 
+  (leaf ob-async :ensure t)
+  
   (leaf org-fragtog
     :ensure t
     :hook (org-mode-hook . org-fragtog-mode))
-  
-  (leaf *terminal-notifier
-    :when window-system
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;; Terminal notifier
-    ;; requires 'brew install terminal-notifier'
-    ;; stolen from erc-notifier
-    :preface
-    (defvar terminal-notifier-command (executable-find "terminal-notifier") "The path to terminal-notifier.")
-
-    ;; (terminal-notifier-notify "Emacs notification" "Something amusing happened")
-
-    (defun terminal-notifier-notify (title message)
-      "Show a message with
-        terminal-notifier-command
-    ."
-      (start-process "terminal-notifier"
-                     "terminal-notifier"
-                     terminal-notifier-command
-                     "-title" title
-                     "-message" message
-                     "-activate" "org.gnu.Emacs"))
-
-    (defun timed-notification (time msg)
-      (interactive "sNotification when (e.g: 2 minutes, 60 seconds, 3 days): \nsMessage: ")
-      (run-at-time time nil (lambda (msg) (terminal-notifier-notify "Emacs" msg)) msg)))
 
 
   (defun jethro/org-archive-done-tasks ()
@@ -1497,10 +1359,14 @@
   (setq org-agenda-files (directory-files-recursively org-directory "\\.org$"))
 
   (setq org-capture-templates
-        `(("i" "inbox" entry (file ,(concat jethro/org-agenda-directory "inbox.org"))
+        `(("i" "inbox" entry (file ,(concat jethro/org-agenda-directory
+                                            "inbox.org"))
            "* TODO %?")
-          ("w" "Weekly Review" entry (file+olp+datetree ,(concat jethro/org-agenda-directory "reviews.org"))
-           (file ,(concat jethro/org-agenda-directory "templates/weekly_review.org")))))
+          ("d" "Daily memo" entry (file+olp+datetree
+                                   ,(concat jethro/org-agenda-directory
+                                            "daily.org"))
+           ,(format-time-string "* %H:%M %?\n" (current-time))
+           :jump-to-captured 1)))
 
   (setq org-todo-keywords
         '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
@@ -1629,7 +1495,7 @@
   (defun jethro/org-inbox-capture ()
     (interactive)
     "Capture a task in agenda mode."
-    (org-capture nil "i"))
+    (org-capture))
 
   (defun jethro/is-project-p ()
     "Any task with a todo keyword subtask"
@@ -1686,12 +1552,16 @@
   `((org-agenda-window-setup . 'other-window)
     (org-agenda-block-separator . nil)
     (org-agenda-start-with-log-mode . t)
-    ;; 今日から予定を表示させる
+    ;; speed up techniques
+    (org-agenda-dim-blocked-tasks . nil)
+    (org-agenda-use-tag-inheritance . '(search timeline agenda))
+    (org-agenda-ignore-drawer-properties . '(effort appt category))
+    ;; show agenda from today
     (org-agenda-start-on-weekday . nil)
     (org-agenda-current-time-string . "← now")
     (org-agenda-time-grid quote ;; Format is changed from 9.1
                           ((daily today require-timed)
-                           (0800 01000 1200 1400 1600 1800 2000 2200 2400)
+                           (0800 1100 1500 1900 2100 2400)
                            "-"
                            "────────────────"))
     (org-columns-default-format
@@ -1717,8 +1587,10 @@
                                                 "projects.org")
                                        ,(concat org-directory
                                                 "braindump/concepts/research.org")
-                                       ,(concat jethro/org-agenda-directory
-                                                "daily.org")))))
+                                       ,(concat org-directory
+                                                "braindump/concepts/journal2021.org")
+                                       ,(concat org-directory
+                                                "braindump/daily/")))))
             (todo "TODO"
                   ((org-agenda-overriding-header "Active Projects")
                    (org-agenda-skip-function #'jethro/skip-projects)
@@ -1726,8 +1598,10 @@
                                                 "projects.org")
                                        ,(concat org-directory
                                                 "braindump/concepts/research.org")
-                                       ,(concat jethro/org-agenda-directory
-                                                "daily.org")))))
+                                       ,(concat org-directory
+                                                "braindump/concepts/journal2021.org")
+                                       ,(concat org-directory
+                                                "braindump/daily/")))))
             (todo "TODO"
                   ((org-agenda-overriding-header "One-off Tasks")
                    (org-agenda-files '(,(concat jethro/org-agenda-directory
@@ -1821,6 +1695,7 @@
   ((org-download-image-dir . "imgs")))
 
 (leaf org-ql
+  :disabled t
   :doc "Org Query Language, search command, and agenda-like view"
   :req "emacs-26.1" "dash-2.13" "dash-functional-1.2.0" "f-0.17.2" "map-2.1" "org-9.0" "org-super-agenda-1.2" "ov-1.0.6" "peg-1.0" "s-1.12.0" "transient-0.1" "ts-0.2.-1"
   :tag "agenda" "org" "outlines" "hypermedia" "emacs>=26.1"
@@ -1828,20 +1703,16 @@
   :emacs>= 26.1
   :ensure t
   :after map org org-super-agenda peg ts)
-(leaf org-super-agenda
-  :doc "Supercharge your agenda"
-  :req "emacs-26.1" "s-1.10.0" "dash-2.13" "org-9.0" "ht-2.2" "ts-0.2"
-  :tag "agenda" "org" "outlines" "hypermedia" "emacs>=26.1"
-  :url "http://github.com/alphapapa/org-super-agenda"
-  :emacs>= 26.1
-  :ensure t
-  :after org ts)
+
 (leaf org-analyzer
+  :disabled t
   :doc "org-analyzer is a tool that extracts time tracking data from org files."
   :tag "calendar"
   :url "https://github.com/rksm/clj-org-analyzer"
   :ensure t)
+
 (leaf org-edna
+  :disabled t
   :doc "Extensible Dependencies 'N' Actions"
   :req "emacs-25.1" "seq-2.19" "org-9.0.5"
   :tag "org" "text" "convenience" "emacs>=25.1"
@@ -1857,7 +1728,8 @@
   :url "https://github.com/jkitchin/org-ref"
   :ensure t
   :after org-roam
-  :bind (("C-c c" . org-ref-insert-cite-link))
+  :bind (org-mode-map
+         ("C-c c" . org-ref-insert-cite-link))
   :custom `(;; RefTeX
            (reftex-plug-into-AUCTeX . t)
            (reftex-insert-label-flags quote ("s" "sfte"))
@@ -2066,8 +1938,9 @@
                     (puthash lang doc-func org-eldoc-local-functions-cache))
                   doc-func)
               cached-func))))
-
-      :advice (:around org-eldoc-get-mode-local-documentation-function c/org-eldoc-get-mode-local-documentation-function))
+      :advice
+      (:around org-eldoc-get-mode-local-documentation-function
+               c/org-eldoc-get-mode-local-documentation-function))
 
     (leaf *org-patch-split-horizontal
       :disabled t
@@ -2130,7 +2003,7 @@
                                                              "#+title: ${title}\n")
                                           :unnarrowed t)
                                          ("c" "concept" plain "%?"
-                                          :if-new (file+head "concept/${slug}.org"
+                                          :if-new (file+head "concepts/${slug}.org"
                                                              "#+title: ${title}\n")
                                           :unnarrowed t)
                                          ("p" "private" plain "%?"
@@ -2185,29 +2058,25 @@
     :tag "conda" "environment" "python" "emacs>=24.4"
     :added "2021-04-10"
     :url "http://github.com/necaris/conda.el"
-    :after lsp-pyright
     :emacs>= 24.4
     :ensure t
     :require t
+    :preface
+    (defun string-trim-final-newline (string)
+      (let ((len (length string)))
+        (cond
+         ((and (> len 0) (eql (aref string (- len 1)) ?\n))
+          (substring string 0 (- len 1)))
+         (t string))))
+    (setq path-to-miniconda
+          (string-trim-final-newline
+           (shell-command-to-string
+            "find $HOME -maxdepth 1 -type d -name miniconda* | head -n 1")))
+    :custom ((conda-anaconda-home . path-to-miniconda)
+             (conda-env-home-directory . path-to-miniconda))
     :config
-    (cond
-     (window-system
-      (custom-set-variables
-       '(conda-anaconda-home (expand-file-name "~/miniconda/"))
-       '(conda-env-home-directory (expand-file-name "~/miniconda/"))))
-     (t
-      (custom-set-variables
-       '(conda-anaconda-home (expand-file-name "~/miniconda3/"))
-       '(conda-env-home-directory (expand-file-name "~/miniconda3/"))))
-     )
     (conda-env-initialize-interactive-shells)
-    (conda-env-initialize-eshell)
-    ;; these hooks can't go in the :hook section since lsp-restart-workspace
-    ;; is not available if lsp isn't active
-    ;; (add-hook 'conda-postactivate-hook (lambda () (lsp-restart-workspace)))
-    ;; (add-hook 'conda-postdeactivate-hook (lambda () (lsp-restart-workspace)))
-    (add-hook 'conda-postactivate-hook (lambda () (lsp-pyright-setup-when-conda)))
-    (add-hook 'conda-postdeactivate-hook (lambda () (lsp-pyright-setup-when-conda))))
+    (conda-env-initialize-eshell))
 
   (leaf lsp-pyright
     :doc "Python LSP client using Pyright"
@@ -2216,23 +2085,26 @@
     :url "https://github.com/emacs-lsp/lsp-pyright"
     :emacs>= 26.1
     :ensure t
-    :init
+    :preface
     (defun lsp-pyright-setup-when-conda ()
       (setq-local lsp-pyright-venv-path python-shell-virtualenv-root)
       (lsp-restart-workspace))
-    :hook (python-mode-hook . (lambda ()
-                                (setq
-                                  indent-tabs-mode nil
-                                  python-indent 4
-                                  tab-width 4)
-                                (require 'lsp-pyright)
-                                (lsp))))
-
-  (defadvice python-shell-completion-at-point (around fix-company-bug activate)
-    "python-shell-completion-at-point breaks when point is before the prompt"
-    (when (or (not comint-last-prompt)
-              (>= (point) (cdr comint-last-prompt)))
-      ad-do-it)))
+    :hook
+    ((conda-postactivate-hook . (lambda () (lsp-pyright-setup-when-conda)))
+     (conda-postdeactivate-hook . (lambda () (lsp-pyright-setup-when-conda)))
+     (python-mode-hook . (lambda ()
+                           (setq
+                            indent-tabs-mode nil
+                            python-indent 4
+                            tab-width 4)
+                           (require 'lsp-pyright)
+                           (lsp)))))
+  ;; (defadvice python-shell-completion-at-point (around fix-company-bug activate)
+  ;;   "python-shell-completion-at-point breaks when point is before the prompt"
+  ;;   (when (or (not comint-last-prompt)
+  ;;             (>= (point) (cdr comint-last-prompt)))
+  ;;     ad-do-it))
+  )
 
 (leaf rainbow-delimiters
   :doc "Highlight brackets according to their depth"
@@ -2336,7 +2208,7 @@
   :emacs>= 24.3
   :ensure t
   :bind* (("C-/" . undo-fu-only-undo)
-          ("C-M-/" . undo-fu-only-redo)))
+          ("C-?" . undo-fu-only-redo)))
 
 (leaf volatile-highlights
   :diminish
@@ -2391,17 +2263,16 @@
 (leaf yasnippet
   :ensure t
   :blackout yas-minor-mode
-  :custom ((yas-indent-line . 'fixed)
-           (yas-global-mode . t))
-  :bind ((yas-keymap
-          ("<tab>" . nil))            ; conflict with company
+  :custom (yas-indent-line . 'fixed)
+  :global-minor-mode yas-global-mode
+  :bind (;;( yas-keymap
+          ;; ("<tab>" . nil))            ; conflict with company
          (yas-minor-mode-map
           ("C-c y i" . yas-insert-snippet)
           ("C-c y n" . yas-new-snippet)
           ("C-c y v" . yas-visit-snippet-file)
           ("C-c y l" . yas-describe-tables)
           ("C-c y g" . yas-reload-all)))
-  :defun (company-mode/backend-with-yas)
   :config
   (leaf yasnippet-snippets :ensure t)
   (leaf yatemplate
@@ -2409,18 +2280,19 @@
     :config
     (yatemplate-fill-alist))
 
-  (defvar company-mode/enable-yas t
-    "Enable yasnippet for all backends.")
-  (defun company-mode/backend-with-yas (backend)
-    (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-      backend
-      (append (if (consp backend) backend (list backend))
-        '(:with company-yasnippet))))
-  (defun set-yas-as-company-backend ()
-    (setq company-backends (mapc #'company-mode/backend-with-yas company-backends))
-    )
-  :hook
-  ((company-mode-hook . set-yas-as-company-backend)))
+  ;; (defvar company-mode/enable-yas t
+  ;;   "Enable yasnippet for all backends.")
+  ;; (defun company-mode/backend-with-yas (backend)
+  ;;   (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
+  ;;     backend
+  ;;     (append (if (consp backend) backend (list backend))
+  ;;       '(:with company-yasnippet))))
+  ;; (defun set-yas-as-company-backend ()
+  ;;   (setq company-backends (mapc #'company-mode/backend-with-yas company-backends))
+  ;;   )
+  ;; :hook
+  ;; ((company-mode-hook . set-yas-as-company-backend))
+  )
 
 
 (leaf affe
@@ -2439,9 +2311,10 @@
 (leaf embark
   :ensure t
   :require t
-  :bind (("C-s-a" . embark-act)
+  :after consult
+  :bind (("C-," . embark-act)
          ("C-;" . embark-dwim)
-         ("C-s-b" . embark-bindings))
+         ("C-. b" . embark-bindings))
   :init
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
@@ -2450,7 +2323,13 @@
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                  nil
-                 (window-parameters (mode-line-format . none)))))
+                 (window-parameters (mode-line-format . none))))
+  (leaf embark-consult
+    :ensure t
+    :require t
+    :hook ((embark-collect-mode-hook . consult-preview-at-point-mode))
+    :bind (minibuffer-local-map
+           ("C-c C-e" . embark-export))))
 
 (leaf consult
   ;; consult-line ... swiper の代替
@@ -2460,7 +2339,7 @@
   ;; その後、C-uつきで呼び出すと、隠れていた部分が表示される（もとに戻る, widen）
   ;; consult-recent-file ... 最近開いたファイルを選択
   :ensure t
-  :after embark
+  :require t
   :commands consult-customize
   ;; :custom ((consult-preview-key . '(list (kbd "<C-M-n>") (kbd "<C-M-p>"))))
            ;; (consult-preview-key . 'any))
@@ -2503,47 +2382,99 @@
            ("C-s-g" . consult-ghq-grep)))
   (leaf consult-lsp
     :ensure t
-    :bind ((lsp-mode-map
-            ([remap xref-find-apropos] . consult-lsp-symbols))))
-  (leaf embark-consult
-    :ensure t
-    :hook ((embark-collect-mode-hook . consult-preview-at-point-mode))
-    :bind (minibuffer-local-map
-           ("C-c C-e" . embark-export))))
+    :bind (lsp-mode-map
+           ([remap xref-find-apropos] . consult-lsp-symbols))))
 
 (leaf orderless
   :ensure t
   :require t
-  :custom ((completion-styles . '(orderless)))
-  :config
+  :custom ((completion-styles . '(orderless))
+           (completion-category-defaults . nil)
+           (completion-category-overrides . '((file (styles partial-completion)))))
+  :advice (:around company-capf--candidates just-one-face)
+  :preface
   (defun just-one-face (fn &rest args)
     (let ((orderless-match-faces [completions-common-part]))
       (apply fn args)))
-
-  (advice-add 'company-capf--candidates :around #'just-one-face))
-
-(leaf selectrum
-  :ensure t
-  :custom ((selectrum-max-window-height . 20))
-  :config
-  (selectrum-mode +1)
-  ;; to make sorting and filtering more intelligent
-  (leaf selectrum-prescient
-    :ensure t
-    :config (selectrum-prescient-mode +1))
-  (leaf prescient
-    :ensure t
-    :custom (prescient-aggressive-file-save . t)
-    :config (prescient-persist-mode 1)))
+  )
 
 (leaf marginalia
   :ensure t
+  :require t
   :global-minor-mode t)
 
 (leaf vertico
   :ensure t
-  :custom ((vertico-count . 20))
+  :require t
+  :custom ((vertico-count . 20)
+           (vertico-cycle . t))
   :global-minor-mode t savehist-mode)
+
+(leaf google-translate
+  :ensure t
+  :require t
+  :bind ("C-c t" . google-translate-smooth-translate)
+  :custom
+  (google-translate-translation-directions-alist . '(("en" . "ja")
+                                                      ("ja" . "en")))
+  :config
+  (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
+
+(leaf corfu
+  :disabled t
+  :ensure t
+  :require t
+  ;; Optional customizations
+  :custom
+  ((corfu-auto-prefix . 2)
+   (corfu-cycle . t)                ;; Enable cycling for `corfu-next/previous'
+   (corfu-auto . t)                 ;; Enable auto completion
+  ;; (corfu-commit-predicate . nil)   ;; Do not commit selected candidates on next input
+  ;; (corfu-quit-at-boundary . t)     ;; Automatically quit at word boundary
+  (corfu-quit-no-match . t)        ;; Automatically quit if there is no match
+   ;; (corfu-echo-documentation . nil) ;; Do not show documentation in the echo area
+
+   ;; Enable indentation+completion using the TAB key.
+  ;; `completion-at-point' is often bound to M-TAB.
+  (tab-always-indent . 'complete))
+  
+  ;; Optionally use TAB for cycling, default is `corfu-complete'.
+  :bind (corfu-map
+         ("<tab>" . corfu-complete))
+
+  ;; You may want to enable Corfu only for certain modes.
+  ;; :hook ((prog-mode . corfu-mode)
+  ;;        (shell-mode . corfu-mode)
+  ;;        (eshell-mode . corfu-mode))
+
+  ;; Recommended: Enable Corfu globally.
+  ;; This is recommended since dabbrev can be used globally (M-/).
+  :global-minor-mode corfu-global-mode)
+
+
+;; Dabbrev works with Corfu
+(leaf dabbrev
+  :doc """cite from Sec. 3.1.8.2 at https://protesilaos.com/dotemacs/#h:675ebef4-d74d-41af-808d-f9579c2a5ec4
+
+Whereas dabbrev-completion benefits from minibuffer interactivity and the pattern matching styles in effect (Completion framework and extras). With the help of Corfu, the completion candidates are displayed in a pop-up window near point (Corfu for in-buffer completion).
+
+The dabbrev-abbrev-char-regexp is configured to match both regular words and symbols (e.g. words separated by hyphens). This makes it equally suitable for code and ordinary language.
+
+While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words and symbols that start with any of these: $, *, /, =, ~, '. This regexp may be expanded in the future, but the idea is to be able to perform completion in contexts where the known word/symbol is preceded by a special character. For example, in the org-mode version of this document, all inline code must be placed between the equals sign. So now typing the =, then a letter, will still allow me to expand text based on that input.
+  """
+  :require t
+  :custom ((dabbrev-abbrev-char-regexp . "\\sw\\|\\s_")
+           (dabbrev-abbrev-skip-leading-regexp . "[$*/=~']")
+           (dabbrev-backward-only . nil)
+           (dabbrev-case-distinction . 'case-replace)
+           (dabbrev-case-fold-search . nil)
+           (dabbrev-case-replace . 'case-replace)
+           (dabbrev-check-other-buffers . t)
+           (dabbrev-eliminate-newlines . t)
+           (dabbrev-upcase-means-case-search . t))
+  
+  :bind* (("M-/" . dabbrev-expand)
+          ("C-M-/" . dabbrev-completion)))
 
 (provide 'init)
 
