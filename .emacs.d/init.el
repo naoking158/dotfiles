@@ -240,15 +240,24 @@
                  (initial-frame-alist . '((width . 110)
                                           (height . 65)))
                  (line-spacing . 4)))
-
+      
       (leaf nano
         :load-path "~/.emacs.d/el-get/nano-emacs/"
         :require
         (nano-base-colors nano-colors nano-faces nano-theme nano-theme-dark nano-modeline nano-help)
+        ;; (nano-base-colors nano-colors nano-faces nano-theme nano-theme-light nano-modeline nano-help)
         :custom (nano-font-family-monospaced . "JetBrains Mono")
         :config
         (nano-faces)
+        (set-face-attribute 'nano-face-strong nil
+                            :foreground (face-foreground 'nano-face-default)
+                            :weight 'bold)
+        (set-face-attribute 'nano-face-faded nil
+                            :foreground nano-color-faded
+                            :weight 'light
+                            :slant 'italic)
         (nano-theme)
+
         :advice (:override nano-modeline-compose my/nano-modeline-compose)
         :preface
         (defun my/nano-modeline-compose (status name primary secondary)
@@ -472,6 +481,7 @@
   (auto-rsync-mode t))
 
 (leaf company
+  :disabled t
   :doc "Modular text completion framework"
   :req "emacs-24.3"
   :tag "matching" "convenience" "abbrev" "emacs>=24.3"
@@ -628,65 +638,46 @@
   :blackout t
   :custom (eldoc-idle-delay . 0.1))
 
-(leaf *font
+(leaf font
   :when window-system
   :hook (after-init-hook . font-setting)
   :preface
   (defun font-setting ()
-    ;; フォントセットを作る
-    (let* ((fontset-name "myfonts") ; フォントセットの名前
-            (size 14) ; ASCIIフォントのサイズ [9/10/12/14/15/17/19/20/...]
-            (asciifont "JetBrains Mono") ; ASCIIフォント
-            (jpfont "Noto Serif CJK JP") ; 日本語フォント
-            (font (format "%s-%d:weight=normal:slant=normal" asciifont size))
-            (fontspec (font-spec :family asciifont))
-            (jp-fontspec (font-spec :family jpfont))
-            (fsn (create-fontset-from-ascii-font font nil fontset-name)))
-      (set-fontset-font fsn 'japanese-jisx0213.2004-1 jp-fontspec)
-      (set-fontset-font fsn 'japanese-jisx0213-2 jp-fontspec)
-      (set-fontset-font fsn 'katakana-jisx0201 jp-fontspec) ; 半角カナ
-      (set-fontset-font fsn '(#x0080 . #x024F) fontspec)    ; 分音符付きラテン
-      (set-fontset-font fsn '(#x0370 . #x03FF) fontspec)    ; ギリシャ文字
-      ;; )  ;; commented 2021/05/29
-
-      ;; デフォルトのフレームパラメータでフォントセットを指定
-      (add-to-list 'default-frame-alist '(font . "fontset-myfonts"))
-      )  ;; add 2021/05/29
-
-    ;; デフォルトフェイスにフォントセットを設定
-    ;; # これは起動時に default-frame-alist に従ったフレームが作成されない現象への対処
-    (set-face-font 'default "fontset-myfonts")
-
-    ;; Ligatureの設定 (対応フォント限定: Fira Code や JetBrains Mono)
-    (let ((alist '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
-                    (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
-                    (36 . ".\\(?:>\\)")
-                    (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
-                    (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
-                    (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
-                    (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
-                    (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
-                    (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
-                    (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
-                    (48 . ".\\(?:x[a-zA-Z]\\)")
-                    (58 . ".\\(?:::\\|[:=]\\)")
-                    (59 . ".\\(?:;;\\|;\\)")
-                    (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
-                    (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
-                    (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
-                    (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
-                    (91 . ".\\(?:]\\)")
-                    (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
-                    (94 . ".\\(?:=\\)")
-                    (119 . ".\\(?:ww\\)")
-                    (123 . ".\\(?:-\\)")
-                    (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
-                    (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)")
-                    )
-            ))
+    ;; ascii
+    (set-face-attribute 'default nil :family "JetBrains Mono" :weight 'normal)
+    ;; japanese
+    (set-fontset-font t 'unicode (font-spec :family "Noto Serif CJK JP")
+                      nil 'append)
+    
+    ;; Ligature
+    (let ((alist
+           '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
+             (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
+             (36 . ".\\(?:>\\)")
+             (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
+             (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
+             (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
+             (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
+             (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
+             (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
+             (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
+             (48 . ".\\(?:x[a-zA-Z]\\)")
+             (58 . ".\\(?:::\\|[:=]\\)")
+             (59 . ".\\(?:;;\\|;\\)")
+             (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
+             (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
+             (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
+             (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
+             (91 . ".\\(?:]\\)")
+             (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
+             (94 . ".\\(?:=\\)")
+             (119 . ".\\(?:ww\\)")
+             (123 . ".\\(?:-\\)")
+             (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
+             (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
       (dolist (char-regexp alist)
         (set-char-table-range composition-function-table (car char-regexp)
-          `([,(cdr char-regexp) 0 font-shape-gstring]))))
+                              `([,(cdr char-regexp) 0 font-shape-gstring]))))
     )
   )
 
@@ -1019,7 +1010,7 @@
             (lsp-response-timeout . 5)
             (lsp-prefer-flymake . t)
             (lsp-completion-enable . t)
-            (lsp-completion-provider . :capf)
+            (lsp-completion-provider . :none)
             (lsp-enable-indentation . nil)
             (lsp-restart . 'ignore))
   :hook ((lsp-mode-hook . lsp-enable-which-key-integration)
@@ -1240,8 +1231,20 @@
   :custom
   ((org-directory . "~/org/")
    (org-ellipsis . " ▼ ")
-   (org-cycle-separator-lines . 1)
+
+   (org-cycle-separator-lines . 2)
+   (org-hide-emphasis-markers . t)
+   (org-src-preserve-indentation . nil)
+   (org-src-window-setup . 'current-window)
+   (org-src-tab-acts-natively . t)
+   (org-src-fontify-natively . t)
+   (org-fontify-quote-and-verse-blocks . t)
+   (org-fontify-emphasized-text . t)
+   (org-hide-block-startup . nil)
+   (org-startup-folded . 'content)
+
    (org-adapt-indentation . nil)
+   (org-indent-indentation-per-level . 1)
    (org-habit-show-habits-only-for-today . t)
    (org-startup-indented . t)
    (org-use-speed-commands . t)
@@ -1250,8 +1253,7 @@
    (org-return-follows-link . t)
    (org-highlight-latex-and-related quote
                                     (latex script entities))
-   (org-src-window-setup . 'current-window)
-   (org-return-follows-link . t)
+   
    (org-babel-load-languages . '((emacs-lisp . t)
                                  (python . t)
                                  (latex . t)
@@ -1288,7 +1290,8 @@
    (lazy-count-suffix-format . nil)
    (isearch-yank-on-move . 'shift)
    (isearch-allow-scroll . 'unlimited)
-   (org-show-notification-handler . '(lambda (msg) (timed-notification nil msg)))
+   (org-show-notification-handler . '(lambda (msg)
+                                       (timed-notification nil msg)))
    ) ;; end custom
   :commands (org-with-remote-undo)
   :config
@@ -1296,16 +1299,6 @@
    'user
    '(org-block ((t (:inherit fixed-pitch))))
    '(org-code ((t (:inherit (shadow fixed-pitch)))))
-   '(org-document-info ((t (:foreground "dark orange"))))
-   '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
-   '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
-   '(org-link ((t (:foreground "royal blue" :underline t))))
-   '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-   '(org-property-value ((t (:inherit fixed-pitch))) t)
-   '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-   '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
-   '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.9))))
-   '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
    '(org-agenda-current-time ((t (:foreground "chartreuse"))))
    '(org-agenda-done ((t (:foreground "gray" :weight book))))
    '(org-scheduled-today ((t (:foreground "orange" :weight book))))
@@ -1313,9 +1306,9 @@
    '(org-agenda-date-today ((t (:foreground "#98be65" :height 1.1)))))
 
   (custom-set-faces
-   '(org-level-1 ((t (:inherit outline-1 :height 1.8 :underline t :weight bold))))
-   '(org-level-2 ((t (:inherit outline-2 :height 1.6 :underline t :weight bold))))
-   '(org-level-3 ((t (:inherit outline-3 :height 1.4 :underline t :weight bold))))
+   '(org-level-1 ((t (:inherit outline-1 :height 1.8 :weight bold))))
+   '(org-level-2 ((t (:inherit outline-2 :height 1.6 :weight bold))))
+   '(org-level-3 ((t (:inherit outline-3 :height 1.4 :weight bold))))
    '(org-level-4 ((t (:inherit outline-4 :height 1.2 :weight bold))))
    '(org-level-5 ((t (:inherit outline-5 :height 1.0 :weight bold)))))
 
@@ -2401,6 +2394,7 @@
 (leaf marginalia
   :ensure t
   :require t
+  :after vertico
   :global-minor-mode t)
 
 (leaf vertico
@@ -2421,7 +2415,7 @@
   (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
 
 (leaf corfu
-  :disabled t
+  :disabled nil
   :ensure t
   :require t
   ;; Optional customizations
@@ -2430,7 +2424,7 @@
    (corfu-cycle . t)                ;; Enable cycling for `corfu-next/previous'
    (corfu-auto . t)                 ;; Enable auto completion
   ;; (corfu-commit-predicate . nil)   ;; Do not commit selected candidates on next input
-  ;; (corfu-quit-at-boundary . t)     ;; Automatically quit at word boundary
+  (corfu-quit-at-boundary . t)     ;; Automatically quit at word boundary
   (corfu-quit-no-match . t)        ;; Automatically quit if there is no match
    ;; (corfu-echo-documentation . nil) ;; Do not show documentation in the echo area
 
