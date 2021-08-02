@@ -3,11 +3,11 @@
 ## Status
 
 As of writing (2021-06-22) it works for me on my machine.
-- **macOS** Catallina 10.15.7
+- **macOS** Big Sur 11.4 (intel)
 - **Ubuntu** 18.04.5 LTS
 - **[fish](https://github.com/fish-shell/fish-shell)** 3.2.2
 - **[Tmux](https://github.com/tmux/tmux/wiki)** 3.1c
-- **Emacs** 28.0.05
+- **Emacs** 28.0.50
 - **[iTerm2](https://iterm2.com)** 3.4.8
 
 Note: You can clone or fork them freely, but I don't guarantee that they fit you.
