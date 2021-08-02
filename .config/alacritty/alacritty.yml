@@ -172,7 +172,8 @@ font:
   # it is recommended to set `use_thin_strokes` to `false`.
   #use_thin_strokes: true
 
-
+# If `true`, bold text is drawn using the bright color variants.
+draw_bold_text_with_bright_colors: true
 
 # Nord theme
 colors:
@@ -264,7 +265,7 @@ colors:
   #     program: notify-send
   #     args: ["Hello, World!"]
   #
-  #command: None
+  command: None
 
 # Background opacity
 #
@@ -295,8 +296,9 @@ live_config_reload: true
 #   - (Linux/BSD) user login shell
 #   - (Windows) powershell
 shell:
-  program: /usr/local/bin/fish
+  program: /bin/zsh
   args:
+   - -l
    - -c
    - "/usr/local/bin/tmux a -t 0 || /usr/local/bin/tmux"
 
