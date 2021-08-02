@@ -1588,6 +1588,8 @@
                                        ,(concat org-directory
                                                 "braindump/concepts/research.org")
                                        ,(concat org-directory
+                                                "braindump/concepts/journal2021.org")
+                                       ,(concat org-directory
                                                 "braindump/daily/")))))
             (todo "TODO"
                   ((org-agenda-overriding-header "Active Projects")
@@ -1596,6 +1598,8 @@
                                                 "projects.org")
                                        ,(concat org-directory
                                                 "braindump/concepts/research.org")
+                                       ,(concat org-directory
+                                                "braindump/concepts/journal2021.org")
                                        ,(concat org-directory
                                                 "braindump/daily/")))))
             (todo "TODO"
@@ -1999,7 +2003,7 @@
                                                              "#+title: ${title}\n")
                                           :unnarrowed t)
                                          ("c" "concept" plain "%?"
-                                          :if-new (file+head "concept/${slug}.org"
+                                          :if-new (file+head "concepts/${slug}.org"
                                                              "#+title: ${title}\n")
                                           :unnarrowed t)
                                          ("p" "private" plain "%?"
