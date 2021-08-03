@@ -240,15 +240,24 @@
                  (initial-frame-alist . '((width . 110)
                                           (height . 65)))
                  (line-spacing . 4)))
-
+      
       (leaf nano
         :load-path "~/.emacs.d/el-get/nano-emacs/"
         :require
         (nano-base-colors nano-colors nano-faces nano-theme nano-theme-dark nano-modeline nano-help)
+        ;; (nano-base-colors nano-colors nano-faces nano-theme nano-theme-light nano-modeline nano-help)
         :custom (nano-font-family-monospaced . "JetBrains Mono")
         :config
         (nano-faces)
+        (set-face-attribute 'nano-face-strong nil
+                            :foreground (face-foreground 'nano-face-default)
+                            :weight 'bold)
+        (set-face-attribute 'nano-face-faded nil
+                            :foreground nano-color-faded
+                            :weight 'light
+                            :slant 'italic)
         (nano-theme)
+
         :advice (:override nano-modeline-compose my/nano-modeline-compose)
         :preface
         (defun my/nano-modeline-compose (status name primary secondary)
@@ -472,6 +481,7 @@
   (auto-rsync-mode t))
 
 (leaf company
+  :disabled t
   :doc "Modular text completion framework"
   :req "emacs-24.3"
   :tag "matching" "convenience" "abbrev" "emacs>=24.3"
@@ -628,65 +638,46 @@
   :blackout t
   :custom (eldoc-idle-delay . 0.1))
 
-(leaf *font
+(leaf font
   :when window-system
   :hook (after-init-hook . font-setting)
   :preface
   (defun font-setting ()
-    ;; フォントセットを作る
-    (let* ((fontset-name "myfonts") ; フォントセットの名前
-            (size 14) ; ASCIIフォントのサイズ [9/10/12/14/15/17/19/20/...]
-            (asciifont "JetBrains Mono") ; ASCIIフォント
-            (jpfont "Noto Serif CJK JP") ; 日本語フォント
-            (font (format "%s-%d:weight=normal:slant=normal" asciifont size))
-            (fontspec (font-spec :family asciifont))
-            (jp-fontspec (font-spec :family jpfont))
-            (fsn (create-fontset-from-ascii-font font nil fontset-name)))
-      (set-fontset-font fsn 'japanese-jisx0213.2004-1 jp-fontspec)
-      (set-fontset-font fsn 'japanese-jisx0213-2 jp-fontspec)
-      (set-fontset-font fsn 'katakana-jisx0201 jp-fontspec) ; 半角カナ
-      (set-fontset-font fsn '(#x0080 . #x024F) fontspec)    ; 分音符付きラテン
-      (set-fontset-font fsn '(#x0370 . #x03FF) fontspec)    ; ギリシャ文字
-      ;; )  ;; commented 2021/05/29
-
-      ;; デフォルトのフレームパラメータでフォントセットを指定
-      (add-to-list 'default-frame-alist '(font . "fontset-myfonts"))
-      )  ;; add 2021/05/29
-
-    ;; デフォルトフェイスにフォントセットを設定
-    ;; # これは起動時に default-frame-alist に従ったフレームが作成されない現象への対処
-    (set-face-font 'default "fontset-myfonts")
-
-    ;; Ligatureの設定 (対応フォント限定: Fira Code や JetBrains Mono)
-    (let ((alist '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
-                    (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
-                    (36 . ".\\(?:>\\)")
-                    (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
-                    (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
-                    (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
-                    (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
-                    (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
-                    (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
-                    (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
-                    (48 . ".\\(?:x[a-zA-Z]\\)")
-                    (58 . ".\\(?:::\\|[:=]\\)")
-                    (59 . ".\\(?:;;\\|;\\)")
-                    (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
-                    (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
-                    (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
-                    (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
-                    (91 . ".\\(?:]\\)")
-                    (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
-                    (94 . ".\\(?:=\\)")
-                    (119 . ".\\(?:ww\\)")
-                    (123 . ".\\(?:-\\)")
-                    (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
-                    (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)")
-                    )
-            ))
+    ;; ascii
+    (set-face-attribute 'default nil :family "JetBrains Mono" :weight 'normal)
+    ;; japanese
+    (set-fontset-font t 'unicode (font-spec :family "Noto Serif CJK JP")
+                      nil 'append)
+    
+    ;; Ligature
+    (let ((alist
+           '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
+             (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
+             (36 . ".\\(?:>\\)")
+             (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
+             (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
+             (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
+             (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
+             (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
+             (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
+             (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
+             (48 . ".\\(?:x[a-zA-Z]\\)")
+             (58 . ".\\(?:::\\|[:=]\\)")
+             (59 . ".\\(?:;;\\|;\\)")
+             (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
+             (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
+             (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
+             (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
+             (91 . ".\\(?:]\\)")
+             (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
+             (94 . ".\\(?:=\\)")
+             (119 . ".\\(?:ww\\)")
+             (123 . ".\\(?:-\\)")
+             (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
+             (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
       (dolist (char-regexp alist)
         (set-char-table-range composition-function-table (car char-regexp)
-          `([,(cdr char-regexp) 0 font-shape-gstring]))))
+                              `([,(cdr char-regexp) 0 font-shape-gstring]))))
     )
   )
 
@@ -887,37 +878,6 @@
   :emacs>= 24.1
   :ensure t)
 
-(leaf jump-back!
-  :require ring edmacro
-  :preface
-  (defun jump-back!--ring-update nil
-    (let ((marker (point-marker)))
-      (unless jump-back!--marker-ring
-        (setq jump-back!--marker-ring (make-ring 30)))
-      (ring-insert jump-back!--marker-ring marker)))
-  (defun jump-back! nil
-    (interactive)
-    (if (ring-empty-p jump-back!--marker-ring)
-        (error "No further undo information")
-      (let ((marker (ring-ref jump-back!--marker-ring 0))
-            (repeat-key (vector last-input-event)))
-        (ring-remove jump-back!--marker-ring 0)
-        (if (=
-             (point-marker)
-             marker)
-            (jump-back!)
-          (goto-char marker)
-          (message "(Type %s to repeat)"
-                   (edmacro-format-keys repeat-key))
-          (;; set-temporary-overlay-map
-           set-transient-map
-           (let ((km (make-sparse-keymap)))
-             (define-key km repeat-key 'jump-back!)
-             km))))))
-  :config
-  (defvar-local jump-back!--marker-ring nil)
-  (run-with-idle-timer 1 t 'jump-back!--ring-update))
-
 (leaf key-chord
   :doc "map pairs of simultaneously pressed keys to commands"
   :req "emacs-24"
@@ -938,8 +898,7 @@
   (key-chord-define-global "x5" '"\C-x52")
   (key-chord-define-global "gr" 'consult-ripgrep)
   (key-chord-define-global "rl" 'rotate-layout)
-  (key-chord-define-global "rw" 'rotate-window)
-  (key-chord-define-global "jb" 'jump-back!))
+  (key-chord-define-global "rw" 'rotate-window))
 
 (leaf *latex
   :config
@@ -1019,7 +978,7 @@
             (lsp-response-timeout . 5)
             (lsp-prefer-flymake . t)
             (lsp-completion-enable . t)
-            (lsp-completion-provider . :capf)
+            (lsp-completion-provider . :none)
             (lsp-enable-indentation . nil)
             (lsp-restart . 'ignore))
   :hook ((lsp-mode-hook . lsp-enable-which-key-integration)
@@ -1039,7 +998,7 @@
     :url "https://github.com/ROCKTAKEY/lsp-latex"
     :emacs>= 25.1
     :ensure t
-    :hook (LaTeX-mode-hook . lsp))
+    :hook (LaTeX-mode-hook . lsp-deferred))
 
   (leaf lsp-ui
     :doc "UI modules for lsp-mode"
@@ -1240,8 +1199,20 @@
   :custom
   ((org-directory . "~/org/")
    (org-ellipsis . " ▼ ")
-   (org-cycle-separator-lines . 1)
+
+   (org-cycle-separator-lines . 2)
+   (org-hide-emphasis-markers . t)
+   (org-src-preserve-indentation . nil)
+   (org-src-window-setup . 'current-window)
+   (org-src-tab-acts-natively . t)
+   (org-src-fontify-natively . t)
+   (org-fontify-quote-and-verse-blocks . t)
+   (org-fontify-emphasized-text . t)
+   (org-hide-block-startup . nil)
+   (org-startup-folded . 'content)
+
    (org-adapt-indentation . nil)
+   (org-indent-indentation-per-level . 1)
    (org-habit-show-habits-only-for-today . t)
    (org-startup-indented . t)
    (org-use-speed-commands . t)
@@ -1250,8 +1221,7 @@
    (org-return-follows-link . t)
    (org-highlight-latex-and-related quote
                                     (latex script entities))
-   (org-src-window-setup . 'current-window)
-   (org-return-follows-link . t)
+   
    (org-babel-load-languages . '((emacs-lisp . t)
                                  (python . t)
                                  (latex . t)
@@ -1288,7 +1258,8 @@
    (lazy-count-suffix-format . nil)
    (isearch-yank-on-move . 'shift)
    (isearch-allow-scroll . 'unlimited)
-   (org-show-notification-handler . '(lambda (msg) (timed-notification nil msg)))
+   (org-show-notification-handler . '(lambda (msg)
+                                       (timed-notification nil msg)))
    ) ;; end custom
   :commands (org-with-remote-undo)
   :config
@@ -1296,16 +1267,6 @@
    'user
    '(org-block ((t (:inherit fixed-pitch))))
    '(org-code ((t (:inherit (shadow fixed-pitch)))))
-   '(org-document-info ((t (:foreground "dark orange"))))
-   '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
-   '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
-   '(org-link ((t (:foreground "royal blue" :underline t))))
-   '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-   '(org-property-value ((t (:inherit fixed-pitch))) t)
-   '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-   '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
-   '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.9))))
-   '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
    '(org-agenda-current-time ((t (:foreground "chartreuse"))))
    '(org-agenda-done ((t (:foreground "gray" :weight book))))
    '(org-scheduled-today ((t (:foreground "orange" :weight book))))
@@ -1313,9 +1274,9 @@
    '(org-agenda-date-today ((t (:foreground "#98be65" :height 1.1)))))
 
   (custom-set-faces
-   '(org-level-1 ((t (:inherit outline-1 :height 1.8 :underline t :weight bold))))
-   '(org-level-2 ((t (:inherit outline-2 :height 1.6 :underline t :weight bold))))
-   '(org-level-3 ((t (:inherit outline-3 :height 1.4 :underline t :weight bold))))
+   '(org-level-1 ((t (:inherit outline-1 :height 1.8 :weight bold))))
+   '(org-level-2 ((t (:inherit outline-2 :height 1.6 :weight bold))))
+   '(org-level-3 ((t (:inherit outline-3 :height 1.4 :weight bold))))
    '(org-level-4 ((t (:inherit outline-4 :height 1.2 :weight bold))))
    '(org-level-5 ((t (:inherit outline-5 :height 1.0 :weight bold)))))
 
@@ -1987,34 +1948,39 @@
   :after org
   :ensure t
   :hook (after-init-hook . org-roam-setup)
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find)
-         ("C-c n g" . org-roam-graph)
-         ("C-c n i" . org-roam-node-insert)
-         ("C-c n c" . org-roam-capture)
-         ;; Dailies
-         ("C-c n j" . org-roam-dailies-capture-today))
-  :require t  ;; Required for variables to be initialized correctly
-  :custom `((org-roam-directory . ,(file-truename "~/org/braindump/"))
-            (org-roam-v2-ack . t)
-            (org-roam-capture-templates quote
-                                        (("l" "lit" plain "%?"
-                                          :if-new (file+head "lit/${slug}.org"
-                                                             "#+title: ${title}\n")
-                                          :unnarrowed t)
-                                         ("c" "concept" plain "%?"
-                                          :if-new (file+head "concepts/${slug}.org"
-                                                             "#+title: ${title}\n")
-                                          :unnarrowed t)
-                                         ("p" "private" plain "%?"
-                                          :if-new (file+head "private/${slug}.org"
-                                                             "#+title: ${title}\n")
-                                          :unnarrowed t))))
+  :bind* (("C-c n l" . org-roam-buffer-toggle)
+          ("C-c n f" . org-roam-node-find)
+          ("C-c n g" . org-roam-graph)
+          ("C-c n i" . org-roam-node-insert)
+          ("C-c n c" . org-roam-capture)
+          ;; Dailies
+          ("C-c n j" . org-roam-dailies-capture-today)
+          ("C-c d d" . org-roam-dailies-find-directory)
+          ("C-c d t" . org-roam-dailies-goto-today)
+          ("C-c d n" . org-roam-dailies-goto-tomorrow)
+          ("C-c d y" . org-roam-dailies-goto-yesterday))
+  :require t  ;; This is necessary for variables to be initialized correctly.
+  :custom
+  `((org-roam-v2-ack . t)
+    (org-roam-directory . ,(file-truename "~/org/braindump/"))
+    (org-roam-db-location . ,(expand-file-name
+                              "org-roam.db"
+                              (file-truename "~/org/braindump/")))
+    (org-roam-db-gc-threshold . most-positive-fixnum)
+    (org-id-link-to-org-use-id . t)
+    (org-roam-capture-templates . '(("l" "lit" plain "%?"
+                                     :if-new (file+head "lit/${slug}.org"
+                                                        "#+title: ${title}\n")
+                                     :unnarrowed t)
+                                    ("c" "concept" plain "%?"
+                                     :if-new (file+head "concepts/${slug}.org"
+                                                        "#+title: ${title}\n")
+                                     :unnarrowed t)
+                                    ("p" "private" plain "%?"
+                                     :if-new (file+head "private/${slug}.org"
+                                                        "#+title: ${title}\n")
+                                     :unnarrowed t))))
   :config
-  (leaf org-roam-db
-    :require t
-    :custom `(org-roam-db-location . ,(concat org-roam-directory "org-roam.db")))
-  
   ;; for org-roam-buffer-toggle
   ;; Recommendation in the official manual
   (add-to-list 'display-buffer-alist
@@ -2098,7 +2064,7 @@
                             python-indent 4
                             tab-width 4)
                            (require 'lsp-pyright)
-                           (lsp)))))
+                           (lsp-deferred)))))
   ;; (defadvice python-shell-completion-at-point (around fix-company-bug activate)
   ;;   "python-shell-completion-at-point breaks when point is before the prompt"
   ;;   (when (or (not comint-last-prompt)
@@ -2277,29 +2243,14 @@
   (leaf yasnippet-snippets :ensure t)
   (leaf yatemplate
     :ensure t
-    :config
-    (yatemplate-fill-alist))
-
-  ;; (defvar company-mode/enable-yas t
-  ;;   "Enable yasnippet for all backends.")
-  ;; (defun company-mode/backend-with-yas (backend)
-  ;;   (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-  ;;     backend
-  ;;     (append (if (consp backend) backend (list backend))
-  ;;       '(:with company-yasnippet))))
-  ;; (defun set-yas-as-company-backend ()
-  ;;   (setq company-backends (mapc #'company-mode/backend-with-yas company-backends))
-  ;;   )
-  ;; :hook
-  ;; ((company-mode-hook . set-yas-as-company-backend))
-  )
+    :config (yatemplate-fill-alist)))
 
 
 (leaf affe
   :ensure t
   :after orderless
-  ;; :bind (("C-M-f" . affe-grep)
-  ;;        ("C-M-z" . affe-find))
+  :bind (("C-c g" . affe-grep)
+         ("C-c f" . affe-find))
   :custom
   ;; Orderlessを利用する
   ((affe-highlight-function function orderless-highlight-matches)
@@ -2351,7 +2302,8 @@
          ("C-c o" . consult-outline)
          ("C-x C-o" . consult-file-externally)
          ("C-S-s" . consult-imenu)
-         ("C-c b j" . consult-bookmark))
+         ("C-c b j" . consult-bookmark)
+         ("C-c j" . consult-mark))
   :preface
   ;; C-uを付けるとカーソル位置の文字列を使うmy-consult-lineコマンドを定義する
   (defun my-consult-line (&optional at-point)
@@ -2401,6 +2353,7 @@
 (leaf marginalia
   :ensure t
   :require t
+  :after vertico
   :global-minor-mode t)
 
 (leaf vertico
@@ -2421,7 +2374,7 @@
   (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
 
 (leaf corfu
-  :disabled t
+  :disabled nil
   :ensure t
   :require t
   ;; Optional customizations
@@ -2430,7 +2383,7 @@
    (corfu-cycle . t)                ;; Enable cycling for `corfu-next/previous'
    (corfu-auto . t)                 ;; Enable auto completion
   ;; (corfu-commit-predicate . nil)   ;; Do not commit selected candidates on next input
-  ;; (corfu-quit-at-boundary . t)     ;; Automatically quit at word boundary
+  (corfu-quit-at-boundary . t)     ;; Automatically quit at word boundary
   (corfu-quit-no-match . t)        ;; Automatically quit if there is no match
    ;; (corfu-echo-documentation . nil) ;; Do not show documentation in the echo area
 
