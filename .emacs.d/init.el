@@ -999,7 +999,7 @@
     :url "https://github.com/ROCKTAKEY/lsp-latex"
     :emacs>= 25.1
     :ensure t
-    :hook (LaTeX-mode-hook . lsp))
+    :hook (LaTeX-mode-hook . lsp-deferred))
 
   (leaf lsp-ui
     :doc "UI modules for lsp-mode"
@@ -2060,7 +2060,7 @@
                             python-indent 4
                             tab-width 4)
                            (require 'lsp-pyright)
-                           (lsp)))))
+                           (lsp-deferred)))))
   ;; (defadvice python-shell-completion-at-point (around fix-company-bug activate)
   ;;   "python-shell-completion-at-point breaks when point is before the prompt"
   ;;   (when (or (not comint-last-prompt)
