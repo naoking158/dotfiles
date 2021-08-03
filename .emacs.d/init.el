@@ -878,37 +878,6 @@
   :emacs>= 24.1
   :ensure t)
 
-(leaf jump-back!
-  :require ring edmacro
-  :preface
-  (defun jump-back!--ring-update nil
-    (let ((marker (point-marker)))
-      (unless jump-back!--marker-ring
-        (setq jump-back!--marker-ring (make-ring 30)))
-      (ring-insert jump-back!--marker-ring marker)))
-  (defun jump-back! nil
-    (interactive)
-    (if (ring-empty-p jump-back!--marker-ring)
-        (error "No further undo information")
-      (let ((marker (ring-ref jump-back!--marker-ring 0))
-            (repeat-key (vector last-input-event)))
-        (ring-remove jump-back!--marker-ring 0)
-        (if (=
-             (point-marker)
-             marker)
-            (jump-back!)
-          (goto-char marker)
-          (message "(Type %s to repeat)"
-                   (edmacro-format-keys repeat-key))
-          (;; set-temporary-overlay-map
-           set-transient-map
-           (let ((km (make-sparse-keymap)))
-             (define-key km repeat-key 'jump-back!)
-             km))))))
-  :config
-  (defvar-local jump-back!--marker-ring nil)
-  (run-with-idle-timer 1 t 'jump-back!--ring-update))
-
 (leaf key-chord
   :doc "map pairs of simultaneously pressed keys to commands"
   :req "emacs-24"
