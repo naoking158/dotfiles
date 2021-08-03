@@ -1949,34 +1949,39 @@
   :after org
   :ensure t
   :hook (after-init-hook . org-roam-setup)
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find)
-         ("C-c n g" . org-roam-graph)
-         ("C-c n i" . org-roam-node-insert)
-         ("C-c n c" . org-roam-capture)
-         ;; Dailies
-         ("C-c n j" . org-roam-dailies-capture-today))
-  :require t  ;; Required for variables to be initialized correctly
-  :custom `((org-roam-directory . ,(file-truename "~/org/braindump/"))
-            (org-roam-v2-ack . t)
-            (org-roam-capture-templates quote
-                                        (("l" "lit" plain "%?"
-                                          :if-new (file+head "lit/${slug}.org"
-                                                             "#+title: ${title}\n")
-                                          :unnarrowed t)
-                                         ("c" "concept" plain "%?"
-                                          :if-new (file+head "concepts/${slug}.org"
-                                                             "#+title: ${title}\n")
-                                          :unnarrowed t)
-                                         ("p" "private" plain "%?"
-                                          :if-new (file+head "private/${slug}.org"
-                                                             "#+title: ${title}\n")
-                                          :unnarrowed t))))
+  :bind* (("C-c n l" . org-roam-buffer-toggle)
+          ("C-c n f" . org-roam-node-find)
+          ("C-c n g" . org-roam-graph)
+          ("C-c n i" . org-roam-node-insert)
+          ("C-c n c" . org-roam-capture)
+          ;; Dailies
+          ("C-c n j" . org-roam-dailies-capture-today)
+          ("C-c d d" . org-roam-dailies-find-directory)
+          ("C-c d t" . org-roam-dailies-goto-today)
+          ("C-c d n" . org-roam-dailies-goto-tomorrow)
+          ("C-c d y" . org-roam-dailies-goto-yesterday))
+  :require t  ;; This is necessary for variables to be initialized correctly.
+  :custom
+  `((org-roam-v2-ack . t)
+    (org-roam-directory . ,(file-truename "~/org/braindump/"))
+    (org-roam-db-location . ,(expand-file-name
+                              "org-roam.db"
+                              (file-truename "~/org/braindump/")))
+    (org-roam-db-gc-threshold . most-positive-fixnum)
+    (org-id-link-to-org-use-id . t)
+    (org-roam-capture-templates . '(("l" "lit" plain "%?"
+                                     :if-new (file+head "lit/${slug}.org"
+                                                        "#+title: ${title}\n")
+                                     :unnarrowed t)
+                                    ("c" "concept" plain "%?"
+                                     :if-new (file+head "concepts/${slug}.org"
+                                                        "#+title: ${title}\n")
+                                     :unnarrowed t)
+                                    ("p" "private" plain "%?"
+                                     :if-new (file+head "private/${slug}.org"
+                                                        "#+title: ${title}\n")
+                                     :unnarrowed t))))
   :config
-  (leaf org-roam-db
-    :require t
-    :custom `(org-roam-db-location . ,(concat org-roam-directory "org-roam.db")))
-  
   ;; for org-roam-buffer-toggle
   ;; Recommendation in the official manual
   (add-to-list 'display-buffer-alist
