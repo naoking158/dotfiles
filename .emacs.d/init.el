@@ -898,8 +898,7 @@
   (key-chord-define-global "x5" '"\C-x52")
   (key-chord-define-global "gr" 'consult-ripgrep)
   (key-chord-define-global "rl" 'rotate-layout)
-  (key-chord-define-global "rw" 'rotate-window)
-  (key-chord-define-global "jb" 'jump-back!))
+  (key-chord-define-global "rw" 'rotate-window))
 
 (leaf *latex
   :config
@@ -2244,29 +2243,14 @@
   (leaf yasnippet-snippets :ensure t)
   (leaf yatemplate
     :ensure t
-    :config
-    (yatemplate-fill-alist))
-
-  ;; (defvar company-mode/enable-yas t
-  ;;   "Enable yasnippet for all backends.")
-  ;; (defun company-mode/backend-with-yas (backend)
-  ;;   (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-  ;;     backend
-  ;;     (append (if (consp backend) backend (list backend))
-  ;;       '(:with company-yasnippet))))
-  ;; (defun set-yas-as-company-backend ()
-  ;;   (setq company-backends (mapc #'company-mode/backend-with-yas company-backends))
-  ;;   )
-  ;; :hook
-  ;; ((company-mode-hook . set-yas-as-company-backend))
-  )
+    :config (yatemplate-fill-alist)))
 
 
 (leaf affe
   :ensure t
   :after orderless
-  ;; :bind (("C-M-f" . affe-grep)
-  ;;        ("C-M-z" . affe-find))
+  :bind (("C-c g" . affe-grep)
+         ("C-c f" . affe-find))
   :custom
   ;; Orderlessを利用する
   ((affe-highlight-function function orderless-highlight-matches)
@@ -2318,7 +2302,8 @@
          ("C-c o" . consult-outline)
          ("C-x C-o" . consult-file-externally)
          ("C-S-s" . consult-imenu)
-         ("C-c b j" . consult-bookmark))
+         ("C-c b j" . consult-bookmark)
+         ("C-c j" . consult-mark))
   :preface
   ;; C-uを付けるとカーソル位置の文字列を使うmy-consult-lineコマンドを定義する
   (defun my-consult-line (&optional at-point)
