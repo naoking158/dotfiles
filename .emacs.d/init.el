@@ -299,9 +299,23 @@
                                 'face 'nano-face-header-default)
 	                (propertize right 'face `(:inherit nano-face-header-default
                                                        :foreground ,nano-color-faded))))))
-      
+
+      (leaf nord-theme
+        :ensure t
+        :config
+        (load-theme 'nord t)
+
+        (leaf nano-modeline
+          :load-path "~/.emacs.d/el-get/nano-emacs/"
+          :require t nano-base-colors nano-colors nano-faces nano-theme
+          :config
+          (nano-faces)
+          (nano-modeline)
+          (nano-theme--mode-line)
+          (nano-theme--hl-line)))      
+
       (leaf doom-themes
-        :disabled nil
+        :disabled t
         :doc "an opinionated pack of modern color-themes"
         :req "emacs-25.1" "cl-lib-0.5"
         :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
@@ -320,11 +334,13 @@
         (doom-themes-org-config)
 
         (leaf minions
+          :disabled t
           :ensure t
           :after doom-modeline
           :hook (doom-modeline-mode . minions-mode))
 
         (leaf doom-modeline
+          :disabled t
           :doc "A minimal and modern mode-line"
           :req "emacs-25.1" "all-the-icons-2.2.0" "shrink-path-0.2.0" "dash-2.11.0"
           :tag "mode-line" "faces" "emacs>=25.1"
