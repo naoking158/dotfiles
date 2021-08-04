@@ -2037,7 +2037,7 @@
     (setq path-to-miniconda
           (string-trim-final-newline
            (shell-command-to-string
-            "find $HOME -maxdepth 1 -type d -name miniconda* | head -n 1")))
+            "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
     :custom ((conda-anaconda-home . path-to-miniconda)
              (conda-env-home-directory . path-to-miniconda))
     :config
