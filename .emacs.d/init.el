@@ -643,12 +643,20 @@
   :hook (after-init-hook . font-setting)
   :preface
   (defun font-setting ()
-    ;; ascii
-    (set-face-attribute 'default nil :family "JetBrains Mono" :weight 'normal)
-    ;; japanese
-    (set-fontset-font t 'unicode (font-spec :family "Noto Serif CJK JP")
-                      nil 'append)
-    
+    (let ((font-size 14))
+      ;; ascii
+      (set-face-attribute 'default nil
+                          :family "JetBrains Mono"
+                          :weight 'light
+                          :height (* font-size 10))
+      
+      ;; japanese
+      (set-fontset-font t 'unicode (font-spec
+                                    :family "Noto Serif CJK JP"
+                                    :weight 'light
+                                    :height (* font-size 10))
+                        nil 'append))
+      
     ;; Ligature
     (let ((alist
            '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
@@ -2244,7 +2252,6 @@
   (leaf yatemplate
     :ensure t
     :config (yatemplate-fill-alist)))
-
 
 (leaf affe
   :ensure t
