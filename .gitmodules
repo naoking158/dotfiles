@@ -4,3 +4,6 @@
 [submodule ".emacs.d/el-get/flymake-posframe"]
 	path = .emacs.d/el-get/flymake-posframe
 	url = https://github.com/Ladicle/flymake-posframe.git
+[submodule ".tmux/plugins/tpm"]
+	path = .tmux/plugins/tpm
+	url = https://github.com/tmux-plugins/tpm
