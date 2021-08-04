@@ -2429,6 +2429,32 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :bind* (("M-/" . dabbrev-expand)
           ("C-M-/" . dabbrev-completion)))
 
+(leaf visual-fill-column
+  :ensure t
+  :custom ((visual-fill-column-width . 82)
+           (visual-fill-column-center-text . t))
+  :hook (org-mode-hook . visual-fill-column-mode))
+
+(leaf helpful
+  :ensure t
+  :bind (("C-c h f" . helpful-function)
+         ("C-c h s" . helpful-symbol)
+         ("C-c h v" . helpful-variable)
+         ("C-c h c" . helpful-command)
+         ("C-c h k" . helpful-key)))
+
+(leaf vterm
+  :ensure t
+  :custom (vterm-max-scrollback . 10000)
+  :config
+  (leaf vterm-toggle
+    :ensure t
+    :bind (("C-c v" . vterm-toggle)
+           (vterm-mode-map
+            ("C-<return>" . vterm-toggle-insert-cd)))
+    :custom ((vterm-toggle-reset-window-configration-after-exit . t)
+             (vterm-toggle-hide-method . 'reset-window-configration))))
+
 (provide 'init)
 
 ;; Local Variables:
