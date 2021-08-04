@@ -240,8 +240,9 @@
                  (initial-frame-alist . '((width . 110)
                                           (height . 65)))
                  (line-spacing . 4)))
-      
+
       (leaf nano
+        :disabled t
         :load-path "~/.emacs.d/el-get/nano-emacs/"
         :require
         (nano-base-colors nano-colors nano-faces nano-theme nano-theme-dark nano-modeline nano-help)
@@ -300,7 +301,7 @@
                                                        :foreground ,nano-color-faded))))))
       
       (leaf doom-themes
-        :disabled t
+        :disabled nil
         :doc "an opinionated pack of modern color-themes"
         :req "emacs-25.1" "cl-lib-0.5"
         :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
@@ -309,14 +310,19 @@
         :ensure t
         :custom
         ((doom-themes-enable-italic . t)
-          (doom-themes-enable-bold . t))
+         (doom-themes-enable-bold . t))
         :config
         ;; (load-theme 'doom-one t)
-        ;; (load-theme 'doom-nord t)
+        (load-theme 'doom-nord t)
         ;; (load-theme 'doom-badger t)
-        (load-theme 'doom-material t)
+        ;; (load-theme 'doom-material t)
         (doom-themes-neotree-config)
         (doom-themes-org-config)
+
+        (leaf minions
+          :ensure t
+          :after doom-modeline
+          :hook (doom-modeline-mode . minions-mode))
 
         (leaf doom-modeline
           :doc "A minimal and modern mode-line"
@@ -325,21 +331,24 @@
           :url "https://github.com/seagle0128/doom-modeline"
           :emacs>= 25.1
           :ensure t
-          :hook (after-init-hook . doom-modeline-mode)
+          :hook (after-init-hook . doom-modeline-init)
+          :custom-face ((mode-line . '((t (:height 0.9))))
+                        (mode-line-inactive . '((t (:height 0.9)))))
           :custom ((doom-modeline-buffer-file-name-style . 'truncate-from-project)
                    (doom-modeline-project-detection . 'project)
                    (doom-modeline-icon . t)
                    (doom-modeline-major-mode-icon . nil)
                    (doom-modeline-minor-modes . nil)
                    (doom-modeline-hud . t)
-                   (doom-modeline-env-version . t))
+                   (doom-modeline-env-version . t)
+                   (doom-modeline-height . 16)
+                   (doom-modeline-bar-width . 7)
+                   (doom-modeline-lsp . t)
+                   (doom-modeline-github . nil)
+                   (doom-modeline-persp-name . nil))
           :config
           (setq inhibit-compacting-font-caches t)
-          (line-number-mode 1)
-          (column-number-mode 1)
-          (doom-modeline-def-modeline 'main
-            '(bar workspace-name window-number matches buffer-info remote-host buffer-position parrot selection-info)
-            '(misc-info persp-name lsp github debug minor-modes input-method major-mode process vcs checker))))
+          (column-number-mode 1)))
 
       (leaf hide-mode-line
         :doc "minor mode that hides/masks your modeline"
@@ -586,17 +595,14 @@
           ("C-c a c" . avy-goto-char-2)))
 
 (leaf beacon
+  :disabled t
   :doc "Highlight the cursor whenever the window scrolls"
   :req "seq-2.14"
   :tag "convenience"
   :url "https://github.com/Malabarba/beacon"
   :ensure t
-  :custom
-  ((beacon-color . "cyan")
-    ;; (beacon-color . "yellow")
-    )
-  :config
-  (beacon-mode 1))
+  :custom (beacon-color . "cyan")
+  :config (beacon-mode 1))
 
 (leaf cl-lib
   :doc "Common Lisp extensions for Emacs"
@@ -643,12 +649,20 @@
   :hook (after-init-hook . font-setting)
   :preface
   (defun font-setting ()
-    ;; ascii
-    (set-face-attribute 'default nil :family "JetBrains Mono" :weight 'normal)
-    ;; japanese
-    (set-fontset-font t 'unicode (font-spec :family "Noto Serif CJK JP")
-                      nil 'append)
-    
+    (let ((font-size 14))
+      ;; ascii
+      (set-face-attribute 'default nil
+                          :family "JetBrains Mono"
+                          :weight 'light
+                          :height (* font-size 10))
+      
+      ;; japanese
+      (set-fontset-font t 'unicode (font-spec
+                                    :family "Noto Serif CJK JP"
+                                    :weight 'light
+                                    :height (* font-size 10))
+                        nil 'append))
+      
     ;; Ligature
     (let ((alist
            '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
@@ -2245,7 +2259,6 @@
     :ensure t
     :config (yatemplate-fill-alist)))
 
-
 (leaf affe
   :ensure t
   :after orderless
@@ -2428,6 +2441,32 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   
   :bind* (("M-/" . dabbrev-expand)
           ("C-M-/" . dabbrev-completion)))
+
+(leaf visual-fill-column
+  :ensure t
+  :custom ((visual-fill-column-width . 82)
+           (visual-fill-column-center-text . t))
+  :hook (org-mode-hook . visual-fill-column-mode))
+
+(leaf helpful
+  :ensure t
+  :bind (("C-c h f" . helpful-function)
+         ("C-c h s" . helpful-symbol)
+         ("C-c h v" . helpful-variable)
+         ("C-c h c" . helpful-command)
+         ("C-c h k" . helpful-key)))
+
+(leaf vterm
+  :ensure t
+  :custom (vterm-max-scrollback . 10000)
+  :config
+  (leaf vterm-toggle
+    :ensure t
+    :bind (("C-c v" . vterm-toggle)
+           (vterm-mode-map
+            ("C-<return>" . vterm-toggle-insert-cd)))
+    :custom ((vterm-toggle-reset-window-configration-after-exit . t)
+             (vterm-toggle-hide-method . 'reset-window-configration))))
 
 (provide 'init)
 

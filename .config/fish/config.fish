@@ -327,3 +327,10 @@ if test (uname -s) = "Darwin"
     set -gx CPPFLAGS "-I/usr/local/opt/ruby/include" $CPPFLAGS
     set -gx PKG_CONFIG_PATH "/usr/local/opt/ruby/lib/pkgconfig" $PKG_CONFIG_PATH
 end
+
+if [ "$INSIDE_EMACS" = 'vterm' ]
+    function clear
+        vterm_printf "51;Evterm-clear-scrollback";
+        tput clear;
+    end
+end
