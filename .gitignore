@@ -14,7 +14,7 @@
 ## dotfiles
 !/.Brewfile
 !/.dir_colors
-!/.tmux**
+!/.tmux.conf
 
 
 !/.config/
