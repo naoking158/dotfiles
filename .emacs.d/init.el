@@ -586,17 +586,14 @@
           ("C-c a c" . avy-goto-char-2)))
 
 (leaf beacon
+  :disabled t
   :doc "Highlight the cursor whenever the window scrolls"
   :req "seq-2.14"
   :tag "convenience"
   :url "https://github.com/Malabarba/beacon"
   :ensure t
-  :custom
-  ((beacon-color . "cyan")
-    ;; (beacon-color . "yellow")
-    )
-  :config
-  (beacon-mode 1))
+  :custom (beacon-color . "cyan")
+  :config (beacon-mode 1))
 
 (leaf cl-lib
   :doc "Common Lisp extensions for Emacs"
