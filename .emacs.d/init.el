@@ -240,8 +240,9 @@
                  (initial-frame-alist . '((width . 110)
                                           (height . 65)))
                  (line-spacing . 4)))
-      
+
       (leaf nano
+        :disabled t
         :load-path "~/.emacs.d/el-get/nano-emacs/"
         :require
         (nano-base-colors nano-colors nano-faces nano-theme nano-theme-dark nano-modeline nano-help)
@@ -300,7 +301,7 @@
                                                        :foreground ,nano-color-faded))))))
       
       (leaf doom-themes
-        :disabled t
+        :disabled nil
         :doc "an opinionated pack of modern color-themes"
         :req "emacs-25.1" "cl-lib-0.5"
         :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
@@ -309,14 +310,19 @@
         :ensure t
         :custom
         ((doom-themes-enable-italic . t)
-          (doom-themes-enable-bold . t))
+         (doom-themes-enable-bold . t))
         :config
         ;; (load-theme 'doom-one t)
-        ;; (load-theme 'doom-nord t)
+        (load-theme 'doom-nord t)
         ;; (load-theme 'doom-badger t)
-        (load-theme 'doom-material t)
+        ;; (load-theme 'doom-material t)
         (doom-themes-neotree-config)
         (doom-themes-org-config)
+
+        (leaf minions
+          :ensure t
+          :after doom-modeline
+          :hook (doom-modeline-mode . minions-mode))
 
         (leaf doom-modeline
           :doc "A minimal and modern mode-line"
@@ -325,21 +331,24 @@
           :url "https://github.com/seagle0128/doom-modeline"
           :emacs>= 25.1
           :ensure t
-          :hook (after-init-hook . doom-modeline-mode)
+          :hook (after-init-hook . doom-modeline-init)
+          :custom-face ((mode-line . '((t (:height 0.9))))
+                        (mode-line-inactive . '((t (:height 0.9)))))
           :custom ((doom-modeline-buffer-file-name-style . 'truncate-from-project)
                    (doom-modeline-project-detection . 'project)
                    (doom-modeline-icon . t)
                    (doom-modeline-major-mode-icon . nil)
                    (doom-modeline-minor-modes . nil)
                    (doom-modeline-hud . t)
-                   (doom-modeline-env-version . t))
+                   (doom-modeline-env-version . t)
+                   (doom-modeline-height . 16)
+                   (doom-modeline-bar-width . 7)
+                   (doom-modeline-lsp . t)
+                   (doom-modeline-github . nil)
+                   (doom-modeline-persp-name . nil))
           :config
           (setq inhibit-compacting-font-caches t)
-          (line-number-mode 1)
-          (column-number-mode 1)
-          (doom-modeline-def-modeline 'main
-            '(bar workspace-name window-number matches buffer-info remote-host buffer-position parrot selection-info)
-            '(misc-info persp-name lsp github debug minor-modes input-method major-mode process vcs checker))))
+          (column-number-mode 1)))
 
       (leaf hide-mode-line
         :doc "minor mode that hides/masks your modeline"
