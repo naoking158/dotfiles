@@ -72,8 +72,9 @@ else
         eval ~/.linuxbrew/bin/brew shellenv
     else if test -e /home/linuxbrew/.linuxbrew
         eval /home/linuxbrew/.linuxbrew/bin/brew shellenv
-    end
-    eval (brew --prefix)/bin/brew shellenv
+    else
+        eval (brew --prefix)/bin/brew shellenv
+end
 end
 
 ################################################################
