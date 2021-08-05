@@ -506,11 +506,11 @@
   (auto-rsync-mode t))
 
 (leaf company
-  :disabled t
   :doc "Modular text completion framework"
   :req "emacs-24.3"
   :tag "matching" "convenience" "abbrev" "emacs>=24.3"
   :url "http://company-mode.github.io/"
+  :when (not window-system)
   :emacs>= 24.3
   :ensure t
   :blackout t
@@ -714,10 +714,11 @@
 (leaf tab-bar
   :doc "frame-local tabs with named persistent window configurations"
   :tag "builtin"
-  :bind (("s-]" . tab-bar-switch-to-next-tab)
-          ("s-[" . tab-bar-switch-to-prev-tab)
-          ("s-d" . tab-bar-close-tab)
-          ("s-R" . tab-bar-rename-tab))
+  :bind (("C-c C-t" . tab-next)
+         ("s-]" . tab-bar-switch-to-next-tab)
+         ("s-[" . tab-bar-switch-to-prev-tab)
+         ("s-R" . tab-bar-rename-tab))
+  :custom ((tab-bar-show . nil))
   :config
   (tab-bar-mode)
   (tab-bar-new-tab))
@@ -843,50 +844,50 @@
   ;; (set-face-foreground 'highlight-indent-guides-character-face "dimgray")
   )
 
-(leaf *indent-region-custom
-  :preface
-  (defun indent-region-custom(numSpaces)
-    (progn
-      ;; default to start and end of current line
-      (setq regionStart (line-beginning-position))
-      (setq regionEnd (line-end-position))
-      ;; if there's a selection, use that instead of the current line
-      (when (use-region-p)
-        (setq regionStart (region-beginning))
-        (setq regionEnd (region-end))
-        )
+;; (leaf *indent-region-custom
+;;   :preface
+;;   (defun indent-region-custom(numSpaces)
+;;     (progn
+;;       ;; default to start and end of current line
+;;       (setq regionStart (line-beginning-position))
+;;       (setq regionEnd (line-end-position))
+;;       ;; if there's a selection, use that instead of the current line
+;;       (when (use-region-p)
+;;         (setq regionStart (region-beginning))
+;;         (setq regionEnd (region-end))
+;;         )
 
-      (save-excursion ; restore the position afterwards
-        (goto-char regionStart) ; go to the start of region
-        (setq start (line-beginning-position)) ; save the start of the line
-        (goto-char regionEnd) ; go to the end of region
-        (setq end (line-end-position)) ; save the end of the line
+;;       (save-excursion ; restore the position afterwards
+;;         (goto-char regionStart) ; go to the start of region
+;;         (setq start (line-beginning-position)) ; save the start of the line
+;;         (goto-char regionEnd) ; go to the end of region
+;;         (setq end (line-end-position)) ; save the end of the line
+        
+;;         (indent-rigidly start end numSpaces) ; indent between start and end
+;;         (setq deactivate-mark nil) ; restore the selected region
+;;         )))
+;;   :config
+;;   (leaf *untab-region
+;;     :bind (("M-[" . untab-region))
+;;     :preface
+;;     (defun untab-region nil
+;;       (interactive)
+;;       (indent-region-custom -4))
+;;     )
 
-        (indent-rigidly start end numSpaces) ; indent between start and end
-        (setq deactivate-mark nil) ; restore the selected region
-        )))
-  :config
-  (leaf *untab-region
-    :bind (("M-[" . untab-region))
-    :preface
-    (defun untab-region nil
-      (interactive)
-      (indent-region-custom -4))
-    )
-
-  (leaf *tab-region
-    :bind (("M-]" . tab-region))
-    :preface
-    (defun tab-region nil
-      (interactive)
-      (if (active-minibuffer-window)
-          (minibuffer-complete)    ; tab is pressed in minibuffer window -> do completion
-        (if (use-region-p)    ; tab is pressed is any other buffer -> execute with space insertion
-            (indent-region-custom 4) ; region was selected, call indent-region-custom
-          (insert "    ") ; else insert four spaces as expected
-          )))
-    )
-  )
+;;   (leaf *tab-region
+;;     :bind (("M-]" . tab-region))
+;;     :preface
+;;     (defun tab-region nil
+;;       (interactive)
+;;       (if (active-minibuffer-window)
+;;           (minibuffer-complete)    ; tab is pressed in minibuffer window -> do completion
+;;         (if (use-region-p)    ; tab is pressed is any other buffer -> execute with space insertion
+;;             (indent-region-custom 4) ; region was selected, call indent-region-custom
+;;           (insert "    ") ; else insert four spaces as expected
+;;           )))
+;;     )
+;;   )
 
 (leaf ispell
   :doc "interface to spell checkers"
@@ -992,6 +993,9 @@
   :url "https://github.com/MaskRay/ccls/wiki/lsp-mode#find-definitionsreferences"
   :emacs>= 25.1
   :ensure t
+  :init
+  (when window-system
+    (custom-set-variables '(lsp-completion-provider :none)))
   :custom `((lsp-keymap-prefix . "s-l")
             (gc-cons-threshold . ,(* 3 1024 1024 1024))  ;; 3GB
             (gcmh-low-cons-threshold . ,(* 512 1024 1024))  ;; 512MB
@@ -1008,13 +1012,12 @@
             (lsp-response-timeout . 5)
             (lsp-prefer-flymake . t)
             (lsp-completion-enable . t)
-            (lsp-completion-provider . :none)
             (lsp-enable-indentation . nil)
             (lsp-restart . 'ignore))
   :hook ((lsp-mode-hook . lsp-enable-which-key-integration)
          (lsp-managed-mode-hook . lsp-modeline-diagnostics-mode))
-  :config
-  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\AtCoder\\'")
+  :config  
+  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\atcoder\\'")
   (advice-add 'lsp
               :before (lambda (&rest _args)
                         (eval '(setf (lsp-session-server-id->folders
@@ -2095,12 +2098,12 @@
                             tab-width 4)
                            (require 'lsp-pyright)
                            (lsp-deferred)))))
-  ;; (defadvice python-shell-completion-at-point (around fix-company-bug activate)
-  ;;   "python-shell-completion-at-point breaks when point is before the prompt"
-  ;;   (when (or (not comint-last-prompt)
-  ;;             (>= (point) (cdr comint-last-prompt)))
-  ;;     ad-do-it))
-  )
+  (when (not window-system)
+    (defadvice python-shell-completion-at-point (around fix-company-bug activate)
+      "python-shell-completion-at-point breaks when point is before the prompt"
+      (when (or (not comint-last-prompt)
+                (>= (point) (cdr comint-last-prompt)))
+        ad-do-it))))
 
 (leaf rainbow-delimiters
   :doc "Highlight brackets according to their depth"
@@ -2483,6 +2486,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
             ("C-<return>" . vterm-toggle-insert-cd)))
     :custom ((vterm-toggle-reset-window-configration-after-exit . t)
              (vterm-toggle-hide-method . 'reset-window-configration))))
+
+
+
 
 (provide 'init)
 
