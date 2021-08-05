@@ -67,8 +67,14 @@ if test (uname -s) = "Darwin"
     set -x FZF_DEFAULT_COMMAND 'rg -a --files --hidden --no-ignore --follow'
 
     set -g fish_user_paths "/usr/local/sbin" $fish_user_paths
+else
+    if test -e ~/.linuxbrew
+        eval ~/.linuxbrew/bin/brew shellenv
+    else if test -e /home/linuxbrew/.linuxbrew
+        eval /home/linuxbrew/.linuxbrew/bin/brew shellenv
+    end
+    eval (brew --prefix)/bin/brew shellenv
 end
-
 
 ################################################################
 # Functions
@@ -263,12 +269,6 @@ end
 function replace --argument-names 'before' 'after'
     find . -name "*$before*" | xargs rename -s $before $after
 end
-
-# if test (uname -s) = "Darwin"
-#     function ssh
-#         command ~/bin/ssh-change-profile.sh $argv
-#     end
-# end
 
 alias _sirius='ssh sirius'
 alias _kingkong='ssh kingkong'
