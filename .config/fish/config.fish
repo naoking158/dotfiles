@@ -96,14 +96,6 @@ if test (uname -s) = "Darwin"
     set -x FZF_DEFAULT_COMMAND 'rg -a --files --hidden --no-ignore --follow'
 
     set -g fish_user_paths "/usr/local/sbin" $fish_user_paths
-else
-    if test -e ~/.linuxbrew
-        eval ~/.linuxbrew/bin/brew shellenv
-    else if test -e /home/linuxbrew/.linuxbrew
-        eval /home/linuxbrew/.linuxbrew/bin/brew shellenv
-    else
-        eval (brew --prefix)/bin/brew shellenv
-end
 end
 
 ################################################################
