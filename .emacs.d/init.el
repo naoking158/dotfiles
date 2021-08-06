@@ -671,15 +671,15 @@
                           :family "JetBrains Mono"
                           :weight 'light
                           :height (* font-size 10))
-      
+
       ;; japanese
       (set-fontset-font t 'unicode (font-spec
                                     :family "Noto Serif CJK JP"
                                     :weight 'light
                                     :height (* font-size 10))
                         nil 'append))
-      
-    ;; Ligature
+
+    ;; Ligature for Fira Code or JetBrains Mono
     (let ((alist
            '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
              (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
@@ -1266,7 +1266,7 @@
    (org-structure-template-alist . '(("b" . "src sh")
                                      ("c" . "center")
                                      ("C" . "comment")
-                                     ("e" . "example")
+                                     ("e" . "emacs-lisp")
                                      ("E" . "export")
                                      ("h" . "export html")
                                      ("l" . "export latex")
