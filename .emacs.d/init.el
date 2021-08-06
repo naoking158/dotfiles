@@ -425,8 +425,8 @@
       :require dashboard-widgets
       :leaf-defer nil
       :custom ((dashboard-items quote
-                                ((agenda . 10)
-                                 (recents . 15)
+                                ((agenda . 5)
+                                 (recents . 5)
                                  (projects . 5)
                                  (bookmarks . 5)))
                ;; (dashboard-startup-banner . "~/.emacs.d/banner/inv-ascii-gorilla.txt"))
@@ -671,15 +671,15 @@
                           :family "JetBrains Mono"
                           :weight 'light
                           :height (* font-size 10))
-      
+
       ;; japanese
       (set-fontset-font t 'unicode (font-spec
                                     :family "Noto Serif CJK JP"
                                     :weight 'light
                                     :height (* font-size 10))
                         nil 'append))
-      
-    ;; Ligature
+
+    ;; Ligature for Fira Code or JetBrains Mono
     (let ((alist
            '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
              (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
@@ -714,11 +714,11 @@
 (leaf tab-bar
   :doc "frame-local tabs with named persistent window configurations"
   :tag "builtin"
-  :bind (("C-c C-t" . tab-next)
+  :bind (("C-x x n" . tab-next)
+         ("C-x x r" . tab-bar-rename-tab)
          ("s-]" . tab-bar-switch-to-next-tab)
-         ("s-[" . tab-bar-switch-to-prev-tab)
-         ("s-R" . tab-bar-rename-tab))
-  :custom ((tab-bar-show . nil))
+         ("s-[" . tab-bar-switch-to-prev-tab))
+  :custom (tab-bar-show . nil)
   :config
   (tab-bar-mode)
   (tab-bar-new-tab))
@@ -1266,7 +1266,7 @@
    (org-structure-template-alist . '(("b" . "src sh")
                                      ("c" . "center")
                                      ("C" . "comment")
-                                     ("e" . "example")
+                                     ("e" . "emacs-lisp")
                                      ("E" . "export")
                                      ("h" . "export html")
                                      ("l" . "export latex")
