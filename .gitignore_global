@@ -385,6 +385,9 @@ __pycache__/
 *.npy
 epoch_*
 
+!**/journal2021/**/*.npy
+
+
 # C extensions
 *.so
 
