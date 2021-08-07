@@ -122,9 +122,23 @@
       (defun finder-current-dir-open nil
         (interactive)
         (shell-command "open ."))
-
       :bind (("M-ESC ESC" . c/redraw-frame)
              ("M-ESC g" . c/garbage-collect))
+      :init
+      (when (window-system)
+        ;; This shoud be executed before exec `display-time`. 
+        (setq display-time-string-forms
+              '((format "%s %s %s" dayname monthname day)
+                (format "  %s:%s" 24-hours minutes)))
+        ;; activate display-time-string
+        (display-time)
+        (custom-set-variables
+         '(frame-title-format '((:eval org-pomodoro-mode-line)
+                                " - "
+                                display-time-string
+                                " - "
+                                (:eval org-mode-line-string)
+                                ))))
       :custom '((fill-column . 81)
                 (tab-width . 4)
                 (tool-bar-mode . nil)
@@ -151,20 +165,6 @@
                 (scroll-bar-mode)
                 (fringe-mode . 10)
                 (indent-tabs-mode)
-                (frame-title-format quote
-                                    ((:eval (cdr
-                                             (assq 'name
-                                                   (tab-bar--current-tab-find))))
-                                     " - "
-                                     (:eval (if (buffer-file-name) "%f"
-                                              (if dired-directory dired-directory
-                                                "%b")))))
-                
-                                     ;; " - "
-                                     ;; (:eval org-mode-line-string)
-
-
-                
                 (blink-cursor-mode . t)
                 (show-paren-mode . 1)
                 (confirm-kill-emacs . 'y-or-n-p)
@@ -312,7 +312,48 @@
           (nano-faces)
           (nano-modeline)
           (nano-theme--mode-line)
-          (nano-theme--hl-line)))      
+          (nano-theme--hl-line)
+          :advice (:override nano-modeline-compose my/nano-modeline-compose)
+          :preface
+          (defun my/nano-modeline-compose (status name primary secondary)
+            "Compose a string with provided information"
+            (let* ((char-width    (window-font-width nil 'header-line))
+                   (window        (get-buffer-window (current-buffer)))
+                   (space-up       +0.15)
+                   (space-down     -0.20)
+	               (prefix (cond ((string= status "RO")
+			                      (propertize (if (window-dedicated-p)" -- " " RO ")
+                                              'face 'nano-face-header-popout))
+                                 ((string= status "**")
+			                      (propertize (if (window-dedicated-p)" -- " " ** ")
+                                              'face 'nano-face-header-critical))
+                                 ((string= status "RW")
+			                      (propertize (if (window-dedicated-p)" -- " " RW ")
+                                              'face 'nano-face-header-faded))
+                                 (t (propertize status 'face 'nano-face-header-popout))))
+                   (left (concat
+                          (propertize " "  'face 'nano-face-header-default
+			                          'display `(raise ,space-up))
+                          (propertize name 'face 'nano-face-header-strong)
+                          (propertize " "  'face 'nano-face-header-default
+			                          'display `(raise ,space-down))
+		                  (propertize primary 'face 'nano-face-header-default)
+                          (propertize "  " 'face 'nano-face-header-default)
+                          (propertize secondary  'face 'nano-face-header-default)
+                          ))
+                   (right "")
+                   (available-width (- (window-total-width) 
+			                           (length prefix) (length left) (length right)
+			                           (/ (window-right-divider-width) char-width)))
+	               (available-width (max 1 available-width)))
+              (concat prefix
+	                  left
+	                  (propertize (make-string available-width ?\ )
+                                  'face 'nano-face-header-default)
+	                  (propertize right 'face `(:inherit nano-face-header-default
+                                                         :foreground ,nano-color-faded)))))
+          )
+        )      
 
       (leaf doom-themes
         :disabled t
