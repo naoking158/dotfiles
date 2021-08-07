@@ -304,7 +304,7 @@ alias _koike='ssh koike'
 alias _tanabe='ssh tanabe'
 
 alias e='emacsclient'
-alias ee='open ~/src/emacs28/builds/Emacs.app'
+alias ee='open ~/src/emacs28-macOS115/builds/Emacs.app'
 alias ekill='emacsclient -e "(kill-emacs)"'
 
 # alias black='echo -ne "\033]1337;SetProfile=Default\a"'
