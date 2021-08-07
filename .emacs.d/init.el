@@ -2528,8 +2528,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     :custom ((vterm-toggle-reset-window-configration-after-exit . t)
              (vterm-toggle-hide-method . 'reset-window-configration))))
 
-
-
+(leaf org-pomodoro
+  :ensure t
+  :custom (org-pomodoro-start-sound-p . t)
+  :hook ((org-clock-in-hook org-clock-out-hook) . (lambda () (org-pomodoro))))
 
 (provide 'init)
 
