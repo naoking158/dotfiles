@@ -1721,7 +1721,6 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 #+end_src
 
 * Runtime Performance
-
 ** Silent Garbage collection with gcmh
 :PROPERTIES:
 :ID:       92B6AEEC-6518-4EEA-9E45-5A58BEDCB289
@@ -1734,7 +1733,6 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
     :custom (gcmh-verbose . t)
     :hook after-init-hook)
 #+end_src
-
 
 * Org Mode
 ** Org Configuration
@@ -2595,7 +2593,6 @@ This package makes it much easier to edit Org documents when =org-hide-emphasis-
       :custom
       (reftex-ref-style-default-list . '("Cleveref"))))
 #+end_src
-
 
 * Applications
 ** Competitive Programming
