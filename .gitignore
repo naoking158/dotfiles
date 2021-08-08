@@ -44,6 +44,7 @@
 !/.emacs.d/banner/
 !/.emacs.d/banner/**
 !/.emacs.d/init.el
+!/.emacs.d/Emacs.org
 !/.emacs.d/el-get/
 !/.emacs.d/el-get/**
 !/.emacs.d/snippets/
