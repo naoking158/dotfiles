@@ -9,65 +9,17 @@
 ;; this enables this running method
 ;;   emacs -q -l ~/.debug.emacs.d/{{pkg}}/init.el
 
+    ;; (defun my/load-theme (appearance)
+    ;;   "Load theme, taking current system APPEARANCE into consideration."
+    ;;   (mapc #'disable-theme custom-enabled-themes)
+    ;;   (pcase appearance
+    ;;     ('light (load-theme 'tango t))
+    ;;     ('dark (load-theme 'tango-dark t))))
 
-(setq exec-profile nil)
-
-(when exec-profile
-    (defvar setup-tracker--level 0)
-  (defvar setup-tracker--parents nil)
-  (defvar setup-tracker--times nil)
-
-  (when load-file-name
-    (push load-file-name setup-tracker--parents)
-    (push (current-time) setup-tracker--times)
-    (setq setup-tracker--level (1+ setup-tracker--level)))
-
-  (add-variable-watcher
-   'load-file-name
-   (lambda (_ v &rest __)
-     (cond ((equal v (car setup-tracker--parents))
-            nil)
-           ((equal v (cadr setup-tracker--parents))
-            (setq setup-tracker--level (1- setup-tracker--level))
-            (let* ((now (current-time))
-                   (start (pop setup-tracker--times))
-                   (elapsed (+ (* (- (nth 1 now) (nth 1 start)) 1000)
-                               (/ (- (nth 2 now) (nth 2 start)) 1000))))
-              (with-current-buffer (get-buffer-create "*setup-tracker*")
-                (save-excursion
-                  (goto-char (point-min))
-                  (dotimes (_ setup-tracker--level) (insert "> "))
-                  (insert
-                   (file-name-nondirectory (pop setup-tracker--parents))
-                   " (" (number-to-string elapsed) " msec)\n")))))
-           (t
-            (push v setup-tracker--parents)
-            (push (current-time) setup-tracker--times)
-            (setq setup-tracker--level (1+ setup-tracker--level))))))
-
-
-  (defun efs/display-startup-time()
-    (message "Emacs loaded in %s with %d garbage collections."
-             (format "%.2f seconds"
-                     (float-time
-                      (time-subtract after-init-time before-init-time)))
-             gcs-done))
-  (add-hook 'emacs-startup-hook #'efs/display-startup-time))
-
+    ;; (add-hook 'ns-system-appearance-change-functions #'my/load-theme)
 
 
 (prog1 'emacs
-  (when (or load-file-name byte-compile-current-file)
-    (setq user-emacs-directory
-          (expand-file-name
-           (file-name-directory
-            (or load-file-name byte-compile-current-file)))))
-
-  (prog1 "install leaf"
-    (package-initialize)
-    (unless (package-installed-p 'leaf)
-      (package-refresh-contents)
-      (package-install 'leaf)))
 
   (leaf leaf
     :config
@@ -1205,6 +1157,7 @@
   :doc "Export Framework for Org Mode"
   :tag "builtin"
   :ensure org-plus-contrib
+  :require org-tempo  ;; need for org-template
   :hook (org-mode-hook . my-org-mode-hook)
   :preface
   (defun my-org-mode-hook ()
@@ -1238,29 +1191,10 @@
    (org-babel-load-languages . '((emacs-lisp . t)
                                  (python . t)
                                  (latex . t)
-                                 (shell . t)
-                                 ))
+                                 (shell . t)))
    (org-confirm-babel-evaluate . nil)
    (org-catch-invisible-edits . 'show)
    (org-preview-latex-image-directory . "~/tmp/ltximg/")
-   (org-structure-template-alist . '(("b" . "src sh")
-                                     ("c" . "center")
-                                     ("C" . "comment")
-                                     ("e" . "emacs-lisp")
-                                     ("E" . "export")
-                                     ("h" . "export html")
-                                     ("l" . "export latex")
-                                     ("q" . "quote")
-                                     ("s" . "src")
-                                     ("p" . "src python :results output
-")
-                                     ("d" . "definition")
-                                     ("t" . "theorem")
-                                     ("mc" . "quoting")
-                                     ("mq" . "question")
-                                     ("mt" . "todo")
-                                     ("ms" . "summary")
-                                     ))
    (search-highlight . t)
    (search-whitespace-regexp . ".*?")
    (isearch-lax-whitespace . t)
@@ -1273,25 +1207,59 @@
    (isearch-allow-scroll . 'unlimited)
    (org-show-notification-handler . '(lambda (msg)
                                        (timed-notification nil msg)))
+   (org-structure-template-alist . '(("sh" . "src shell")
+                                     ("c" . "center")
+                                     ("C" . "comment")
+                                     ("el" . "src emacs-lisp")
+                                     ("E" . "export")
+                                     ("ht" . "export html")
+                                     ("tex" . "export latex")
+                                     ("q" . "quote")
+                                     ("s" . "src")
+                                     ("py" . "src python :session")
+                                     ("d" . "definition")
+                                     ("t" . "theorem")
+                                     ("mc" . "quoting")
+                                     ("mq" . "question")
+                                     ("mt" . "todo")
+                                     ("ms" . "summary")
+                                     ))
    ) ;; end custom
   :commands (org-with-remote-undo)
   :config
+  (set-face-attribute 'org-level-1 nil
+                      :family "Noto Sans CJK JP" :weight 'medium :height 1.5)
+  (set-face-attribute 'org-level-2 nil
+                      :family "Noto Sans CJK JP" :weight 'medium :height 1.3)
+  (set-face-attribute 'org-level-3 nil
+                      :family "Noto Sans CJK JP" :weight 'medium :height 1.2)
+  (set-face-attribute 'org-level-4 nil
+                      :family "Noto Sans CJK JP" :weight 'medium :height 1.1)
+  (set-face-attribute 'org-level-5 nil
+                      :family "Noto Sans CJK JP" :weight 'medium :height 1.1)
+  (set-face-attribute 'org-level-6 nil
+                      :family "Noto Sans CJK JP" :weight 'medium :height 1.1)
+  (set-face-attribute 'org-level-7 nil
+                      :family "Noto Sans CJK JP" :weight 'medium :height 1.1)
+  (set-face-attribute 'org-level-8 nil
+                      :family "Noto Sans CJK JP" :weight 'medium :height 1.1)
+    
   ;; (custom-set-faces
-  ;;  '(org-level-1 ((t (:inherit outline-1 :height 1.8 :weight bold))))
-  ;;  '(org-level-2 ((t (:inherit outline-2 :height 1.6 :weight bold))))
-  ;;  '(org-level-3 ((t (:inherit outline-3 :height 1.4 :weight bold))))
-  ;;  '(org-level-4 ((t (:inherit outline-4 :height 1.2 :weight bold))))
-  ;;  '(org-level-5 ((t (:inherit outline-5 :height 1.0 :weight bold)))))
-  (dolist (face '((org-level-1 . 1.5)
-                  (org-level-2 . 1.3)
-                  (org-level-3 . 1.2)
-                  (org-level-4 . 1.1)
-                  (org-level-5 . 1.1)
-                  (org-level-6 . 1.1)
-                  (org-level-7 . 1.1)
-                  (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil
-                        :family "Helvetica Neue" :weight 'medium :height (cdr face)))
+  ;;  '(org-level-1 ((t (:inherit outline-1 :height 1.8 :weight 'bold))))
+  ;;  '(org-level-2 ((t (:inherit outline-2 :height 1.6 :weight 'bold))))
+  ;;  '(org-level-3 ((t (:inherit outline-3 :height 1.4 :weight 'bold))))
+  ;;  '(org-level-4 ((t (:inherit outline-4 :height 1.2 :weight 'bold))))
+  ;;  '(org-level-5 ((t (:inherit outline-5 :height 1.0 :weight 'bold)))))
+  ;; (dolist (face '((org-level-1 . 1.5)
+  ;;                 (org-level-2 . 1.3)
+  ;;                 (org-level-3 . 1.2)
+  ;;                 (org-level-4 . 1.1)
+  ;;                 (org-level-5 . 1.1)
+  ;;                 (org-level-6 . 1.1)
+  ;;                 (org-level-7 . 1.1)
+  ;;                 (org-level-8 . 1.1)))
+  ;;   (set-face-attribute (car face) nil
+  ;;                       :family "Helvetica Neue" :weight 'medium :height (cdr face)))
 
    ;; '(org-level-1                             ((t (:inherit nano-strong))))
    ;; '(org-level-2                             ((t (:inherit nano-strong))))
@@ -1476,7 +1444,10 @@
          ("R" . org-agenda-refile)
          ("c" . jethro/org-inbox-capture)
          ("q" . quit-window))
-  :hook (kill-emacs-hook . ladicle/org-clock-out-and-save-when-exit)
+  :hook ((kill-emacs-hook . ladicle/org-clock-out-and-save-when-exit)
+		 (after-init-hook . (lambda ()
+							  (add-to-list 'frame-title-format
+										   '(:eval org-mode-line-string) t))))
   :preface
   (defun org-agenda-cache (&optional regenerate)
     "Show agenda buffer without updating if it exists"
@@ -1560,10 +1531,9 @@
                            "-"
                            "────────────────"))
     (org-columns-default-format
-     quote
-     "%40ITEM(Task) %Effort(EE){:} %CLOCKSUM(Time Spent) %SCHEDULED(Scheduled) %DEADLINE(Deadline)"))
+	 quote
+	 "%40ITEM(Task) %Effort(EE){:} %CLOCKSUM(Time Spent) %SCHEDULED(Scheduled) %DEADLINE(Deadline)"))
   :config
-  (add-to-list 'frame-title-format '(:eval org-mode-line-string) t)
   (setq org-agenda-custom-commands
         `(("a" "Agenda"
            ;; ((org-agenda-prefix-format
