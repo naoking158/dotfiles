@@ -352,8 +352,10 @@
                                 'display `(raise ,space-down))
                     (propertize primary 'face 'nano-face-header-default)
                     (propertize "  " 'face 'nano-face-header-default)
-                    (propertize secondary  'face 'nano-face-header-default)
-                    ))
+                    (propertize secondary
+                                'face
+                                `(:inherit nano-face-header-default
+                                           :foreground ,nano-color-faded))))
              (right "")
              (available-width (- (window-total-width) 
                                  (length prefix) (length left) (length right)
@@ -425,55 +427,68 @@
       :hook
       ((neotree-mode imenu-list-minor-mode minimap-mode) . hide-mode-line-mode))))
 
-(leaf font
+(leaf *font
   :when window-system
-  :leaf-defer nil
-  :init (font-setting)
-  :preface
-  (defun font-setting ()
-    (let ((font-size 14))
-      ;; ascii
-      (set-face-attribute 'default nil
-                          :family "JetBrains Mono"
-                          :weight 'light
-                          :height (* font-size 10))
+  :config
+  ;; (set-language-environment "japanese")
+  (let ((font-size 14))
+    ;; ascii
+    (set-face-attribute 'default nil
+                        :font "JetBrains Mono"
+                        :weight 'light
+                        :height (* font-size 10))      
 
-      ;; japanese
-      (set-fontset-font t 'unicode (font-spec
-                                    :family "Noto Serif CJK JP"
-                                    :weight 'light
-                                    :height (* font-size 10))
-                        nil 'append))
+    ;; Set the fixed pitch face
+    (set-face-attribute 'fixed-pitch nil
+                        :font "JetBrains Mono"
+                        :weight 'light
+                        :height (* font-size 10))
 
-    ;; Ligature for Fira Code or JetBrains Mono
-    (let ((alist
-           '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
-             (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
-             (36 . ".\\(?:>\\)")
-             (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
-             (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
-             (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
-             (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
-             (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
-             (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
-             (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
-             (48 . ".\\(?:x[a-zA-Z]\\)")
-             (58 . ".\\(?:::\\|[:=]\\)")
-             (59 . ".\\(?:;;\\|;\\)")
-             (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
-             (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
-             (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
-             (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
-             (91 . ".\\(?:]\\)")
-             (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
-             (94 . ".\\(?:=\\)")
-             (119 . ".\\(?:ww\\)")
-             (123 . ".\\(?:-\\)")
-             (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
-             (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
-      (dolist (char-regexp alist)
-        (set-char-table-range composition-function-table (car char-regexp)
-                              `([,(cdr char-regexp) 0 font-shape-gstring]))))))
+    ;; Set the variable pitch face
+    (set-face-attribute 'variable-pitch nil
+                        :font "Iosevka Aile"
+                        :height (* font-size 10)
+                        :weight 'light)
+
+    ;; japanese
+    ;; (set-fontset-font t 'unicode
+    ;;                   "Noto Serif CJK JP-14"
+    ;;                   nil 'append))
+    (set-fontset-font t 'unicode
+                      (font-spec
+                       :family "Noto Sans CJK JP" 
+                       :height (* font-size 10))
+                      nil 'append))
+
+  ;; Ligature for Fira Code or JetBrains Mono
+  (let ((alist
+         '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
+           (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
+           (36 . ".\\(?:>\\)")
+           (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
+           (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
+           (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
+           (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
+           (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
+           (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
+           (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
+           (48 . ".\\(?:x[a-zA-Z]\\)")
+           (58 . ".\\(?:::\\|[:=]\\)")
+           (59 . ".\\(?:;;\\|;\\)")
+           (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
+           (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
+           (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
+           (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
+           (91 . ".\\(?:]\\)")
+           (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
+           (94 . ".\\(?:=\\)")
+           (119 . ".\\(?:ww\\)")
+           (123 . ".\\(?:-\\)")
+           (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
+           (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
+    (dolist (char-regexp alist)
+      (set-char-table-range composition-function-table (car char-regexp)
+                            `([,(cdr char-regexp) 0 font-shape-gstring])))))
 
 (leaf which-key
   :diminish which-key-mode
@@ -511,6 +526,42 @@
   :url "https://github.com/conao3/transient-dwim.el"
   :ensure t
   :bind ("M-=" . transient-dwim-dispatch))
+
+(leaf dired
+  :commands (dired dired-jump)
+  :config
+  (setq dired-listing-switches "-agho --group-directories-first"
+        dired-omit-files "^\\.[^.].*"
+        dired-omit-verbose nil
+        dired-hide-details-hide-symlink-targets nil
+        delete-by-moving-to-trash t)
+
+  (autoload 'dired-omit-mode "dired-x")
+
+  (add-hook 'dired-load-hook
+            (lambda ()
+              (interactive)
+              (dired-collapse)))
+
+  (add-hook 'dired-mode-hook
+            (lambda ()
+              (interactive)
+              (dired-omit-mode 1)
+              (dired-hide-details-mode 1)
+              (hl-line-mode 1)))
+
+  ;; (leaf dired-single
+  ;;   :ensure t)
+
+  ;; (leaf dired-ranger
+  ;;   :ensure t)
+
+  ;; (leaf dired-collapse
+  ;;   :ensure t)
+  )
+
+(leaf crux
+  :ensure t)
 
 (leaf magit
   :doc "A Git porcelain inside Emacs."
@@ -685,9 +736,12 @@
             "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
     :custom ((conda-anaconda-home . path-to-miniconda)
              (conda-env-home-directory . path-to-miniconda))
-    :config
-    (conda-env-initialize-interactive-shells)
-    (conda-env-initialize-eshell))
+    :hook ((vterm-mode-hook . (lambda ()
+                                (conda-env-initialize-interactive-shells)))
+           (eshell-mode-hook . (lambda ()
+                                 (conda-env-initialize-eshell)))))
+
+
 
   (leaf lsp-pyright
     :doc "Python LSP client using Pyright"
@@ -836,7 +890,8 @@
 
 (leaf smartparens
   :ensure t
-  :hook (prog-mode . smartparens-mode))
+  :require smartparens-config
+  :hook prog-mode-hook)
 
 (leaf rainbow-delimiters
   :doc "Highlight brackets according to their depth"
@@ -889,11 +944,14 @@
           ("C-c y l" . yas-describe-tables)
           ("C-c y g" . yas-reload-all)))
   :config
-  (leaf yasnippet-snippets :ensure t :after yasnippet)
+  (leaf yasnippet-snippets
+    :ensure t
+    :after yasnippet)
   (leaf yatemplate
     :ensure t
     :after yasnippet
-    :config (yatemplate-fill-alist)))
+    :hook (after-init-hook . (lambda ()
+                               (yatemplate-fill-alist)))))
 
 (leaf google-translate
   :ensure t
@@ -1375,173 +1433,197 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                      ("mt" . "todo")
                                      ("ms" . "summary"))))
   :commands (org-with-remote-undo)
-  :config
-  (set-face-attribute 'org-level-1 nil
-                      :family "Noto Sans CJK JP" :weight 'medium :height 1.5)
-  (set-face-attribute 'org-level-2 nil
-                      :family "Noto Sans CJK JP" :weight 'medium :height 1.3)
-  (set-face-attribute 'org-level-3 nil
-                      :family "Noto Sans CJK JP" :weight 'medium :height 1.2)
-  (set-face-attribute 'org-level-4 nil
-                      :family "Noto Sans CJK JP" :weight 'medium :height 1.1)
-  (set-face-attribute 'org-level-5 nil
-                      :family "Noto Sans CJK JP" :weight 'medium :height 1.1)
-  (set-face-attribute 'org-level-6 nil
-                      :family "Noto Sans CJK JP" :weight 'medium :height 1.1)
-  (set-face-attribute 'org-level-7 nil
-                      :family "Noto Sans CJK JP" :weight 'medium :height 1.1)
-  (set-face-attribute 'org-level-8 nil
-                      :family "Noto Sans CJK JP" :weight 'medium :height 1.1)
+  :config  
+  ;; Increase the size of various headings
+  (set-face-attribute 'org-document-title nil
+                      :font "Iosevka Aile" :weight 'bold :height 1.6)
 
-  ;; (custom-theme-set-faces
-  ;;  'user
-  ;;  '(org-block ((t (:inherit fixed-pitch))))
-  ;;  '(org-code ((t (:inherit (shadow fixed-pitch)))))
-  ;;  '(org-agenda-current-time ((t (:foreground "chartreuse"))))
-  ;;  '(org-agenda-done ((t (:foreground "gray" :weight book))))
-  ;;  '(org-scheduled-today ((t (:foreground "orange" :weight book))))
-  ;;  '(org-agenda-date ((t (:foreground "forest green" :height 1.1))))
-  ;;  '(org-agenda-date-today ((t (:foreground "#98be65" :height 1.1)))))
+  ;; (create-fontset-from-ascii-font "Iosevka Aile-14"
+  ;;                                 nil
+  ;;                                 "myoutline")
+  ;; (set-fontset-font "fontset-myoutline" 'unicode
+  ;;                   "Noto Sans CJK JP-14"
+  ;;                   nil 'append)
 
-  (setq org-format-latex-options
-        '(:foreground default
-                      :background default
-                      :scale 1.7
-                      :html-foreground "Black"
-                      :html-background "Transparent"
-                      :html-scale 1.0
-                      :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
+  ;; (set-face-attribute 'org-level-1 nil :font "fontset-myoutline" :weight 'normal :slant 'normal :height 1.6)
+  ;; (set-face-attribute 'org-level-2 nil :font "fontset-myoutline" :weight 'normal :slant 'normal :height 1.4)
 
-  (when (fboundp 'mac-toggle-input-method)
-    (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii))
+  (dolist (face '((org-level-1 . 1.6)
+                  (org-level-2 . 1.5)
+                  (org-level-3 . 1.3)
+                  (org-level-4 . 1.2)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.1)
+                  (org-level-7 . 1.1)
+                  (org-level-8 . 1.1)))
+    (set-face-attribute (car face) nil :font "Iosevka Aile" :weight 'normal :slant 'normal :height (cdr face)))
 
-  (leaf ob-async
-    :ensure t
-    :after org)
+  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
+  (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
 
-  (leaf org-fragtog
-    :ensure t
-    :hook (org-mode-hook . org-fragtog-mode))
-
-  (defun jethro/org-archive-done-tasks ()
-    "Archive all done tasks."
-    (interactive)
-    (org-map-entries 'org-archive-subtree "/DONE" 'file))
-
-  (setq jethro/org-agenda-directory (file-truename "~/org/gtd/"))
-  (setq org-agenda-files (directory-files-recursively org-directory "\\.org$"))
-
-  (setq org-capture-templates
-        `(("i" "inbox" entry (file ,(concat jethro/org-agenda-directory
-                                            "inbox.org"))
-           "* TODO %?")
-          ("d" "Daily memo" entry (file+olp+datetree
-                                   ,(concat jethro/org-agenda-directory
-                                            "daily.org"))
-           ,(format-time-string "* %H:%M %?\n" (current-time))
-           :jump-to-captured 1)))
-
-  (setq org-todo-keywords
-        '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-          (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)")))
-
-  (setq org-log-done 'time
-        org-log-into-drawer t
-        org-log-state-notes-insert-after-drawers nil)
-
-  (setq org-tag-alist '(("@errand" . ?e)
-                        ("@office" . ?o)
-                        ("@home" . ?h)
-                        ("@private" . ?p)
-                        (:newline)
-                        ("CANCELLED" . ?c)))
-
-  (setq org-fast-tag-selection-single-key nil)
-  (setq org-refile-use-outline-path 'file
-        org-outline-path-complete-in-steps nil)
-  (setq org-refile-allow-creating-parent-nodes 'confirm
-        org-refile-targets '((org-agenda-files . (:level . 1))))
-
-  (defvar jethro/org-agenda-bulk-process-key ?f
-    "Default key for bulk processing inbox items.")
-
-  (defun jethro/org-process-inbox ()
-    "Called in org-agenda-mode, processes all inbox items."
-    (interactive)
-    (org-agenda-bulk-mark-regexp "inbox:")
-    (jethro/bulk-process-entries))
-
-  (defvar jethro/org-current-effort "1:00"
-    "Current effort for agenda items.")
+  ;; Get rid of the background on column views
+  (set-face-attribute 'org-column nil :background nil)
+  (set-face-attribute 'org-column-title nil :background nil)
 
 
-  (defun jethro/my-org-agenda-set-effort (effort)
-    "Set the effort property for the current headline."
-    (interactive
-     (list (read-string (format "Effort [%s]: " jethro/org-current-effort) nil nil jethro/org-current-effort)))
-    (setq jethro/org-current-effort effort)
-    (org-agenda-check-no-diary)
-    (let* ((hdmarker (or (org-get-at-bol 'org-hd-marker)
-                         (org-agenda-error)))
-           (buffer (marker-buffer hdmarker))
-           (pos (marker-position hdmarker))
-           (inhibit-read-only t)
-           newhead)
-      (org-with-remote-undo buffer
-        (with-current-buffer buffer
-          (widen)
-          (goto-char pos)
-          (org-show-context 'agenda)
-          (funcall-interactively 'org-set-effort nil jethro/org-current-effort)
-          (end-of-line 1)
-          (setq newhead (org-get-heading)))
-        (org-agenda-change-all-lines newhead hdmarker))))
 
-  (defun jethro/org-agenda-process-inbox-item ()
-    "Process a single item in the org-agenda."
-    (interactive)
-    (org-with-wide-buffer
-     (org-agenda-set-tags)
-     (org-agenda-priority)
-     (call-interactively 'jethro/my-org-agenda-set-effort)
-     (org-agenda-refile nil nil t)))
+;; (custom-theme-set-faces
+;;  'user
+;;  '(org-block ((t (:inherit fixed-pitch))))
+;;  '(org-code ((t (:inherit (shadow fixed-pitch)))))
+;;  '(org-agenda-current-time ((t (:foreground "chartreuse"))))
+;;  '(org-agenda-done ((t (:foreground "gray" :weight book))))
+;;  '(org-scheduled-today ((t (:foreground "orange" :weight book))))
+;;  '(org-agenda-date ((t (:foreground "forest green" :height 1.1))))
+;;  '(org-agenda-date-today ((t (:foreground "#98be65" :height 1.1)))))
 
-  (defun jethro/bulk-process-entries ()
-    (if (not (null org-agenda-bulk-marked-entries))
-        (let ((entries (reverse org-agenda-bulk-marked-entries))
-              (processed 0)
-              (skipped 0))
-          (dolist (e entries)
-            (let ((pos (text-property-any (point-min) (point-max) 'org-hd-marker e)))
-              (if (not pos)
-                  (progn (message "Skipping removed entry at %s" e)
-                         (cl-incf skipped))
-                (goto-char pos)
-                (let (org-loop-over-headlines-in-active-region) (funcall 'jethro/org-agenda-process-inbox-item))
-                ;; `post-command-hook' is not run yet.  We make sure any
-                ;; pending log note is processed.
-                (when (or (memq 'org-add-log-note (default-value 'post-command-hook))
-                          (memq 'org-add-log-note post-command-hook))
-                  (org-add-log-note))
-                (cl-incf processed))))
-          (org-agenda-redo)
-          (unless org-agenda-persistent-marks (org-agenda-bulk-unmark-all))
-          (message "Acted on %d entries%s%s"
-                   processed
-                   (if (= skipped 0)
-                       ""
-                     (format ", skipped %d (disappeared before their turn)"
-                             skipped))
-                   (if (not org-agenda-persistent-marks) "" " (kept marked)")))))
+(setq org-format-latex-options
+      '(:foreground default
+                    :background default
+                    :scale 1.7
+                    :html-foreground "Black"
+                    :html-background "Transparent"
+                    :html-scale 1.0
+                    :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
 
-  (setq org-agenda-bulk-custom-functions `((,jethro/org-agenda-bulk-process-key
-                                            jethro/org-agenda-process-inbox-item)))
+(when (fboundp 'mac-toggle-input-method)
+  (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii))
 
-  (defun jethro/set-todo-state-next ()
-    "Visit each parent task and change NEXT states to TODO"
-    (org-todo "NEXT"))
+(leaf ob-async
+  :ensure t
+  :after org)
 
-  (add-hook 'org-clock-in-hook 'jethro/set-todo-state-next 'append))
+(leaf org-fragtog
+  :ensure t
+  :hook (org-mode-hook . org-fragtog-mode))
+
+(defun jethro/org-archive-done-tasks ()
+  "Archive all done tasks."
+  (interactive)
+  (org-map-entries 'org-archive-subtree "/DONE" 'file))
+
+(setq jethro/org-agenda-directory (file-truename "~/org/gtd/"))
+(setq org-agenda-files (directory-files-recursively org-directory "\\.org$"))
+
+(setq org-capture-templates
+      `(("i" "inbox" entry (file ,(concat jethro/org-agenda-directory
+                                          "inbox.org"))
+         "* TODO %?")
+        ("d" "Daily memo" entry (file+olp+datetree
+                                 ,(concat jethro/org-agenda-directory
+                                          "daily.org"))
+         ,(format-time-string "* %H:%M %?\n" (current-time))
+         :jump-to-captured 1)))
+
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+        (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)")))
+
+(setq org-log-done 'time
+      org-log-into-drawer t
+      org-log-state-notes-insert-after-drawers nil)
+
+(setq org-tag-alist '(("@errand" . ?e)
+                      ("@office" . ?o)
+                      ("@home" . ?h)
+                      ("@private" . ?p)
+                      (:newline)
+                      ("CANCELLED" . ?c)))
+
+(setq org-fast-tag-selection-single-key nil)
+(setq org-refile-use-outline-path 'file
+      org-outline-path-complete-in-steps nil)
+(setq org-refile-allow-creating-parent-nodes 'confirm
+      org-refile-targets '((org-agenda-files . (:level . 1))))
+
+(defvar jethro/org-agenda-bulk-process-key ?f
+  "Default key for bulk processing inbox items.")
+
+(defun jethro/org-process-inbox ()
+  "Called in org-agenda-mode, processes all inbox items."
+  (interactive)
+  (org-agenda-bulk-mark-regexp "inbox:")
+  (jethro/bulk-process-entries))
+
+(defvar jethro/org-current-effort "1:00"
+  "Current effort for agenda items.")
+
+
+(defun jethro/my-org-agenda-set-effort (effort)
+  "Set the effort property for the current headline."
+  (interactive
+   (list (read-string (format "Effort [%s]: " jethro/org-current-effort) nil nil jethro/org-current-effort)))
+  (setq jethro/org-current-effort effort)
+  (org-agenda-check-no-diary)
+  (let* ((hdmarker (or (org-get-at-bol 'org-hd-marker)
+                       (org-agenda-error)))
+         (buffer (marker-buffer hdmarker))
+         (pos (marker-position hdmarker))
+         (inhibit-read-only t)
+         newhead)
+    (org-with-remote-undo buffer
+      (with-current-buffer buffer
+        (widen)
+        (goto-char pos)
+        (org-show-context 'agenda)
+        (funcall-interactively 'org-set-effort nil jethro/org-current-effort)
+        (end-of-line 1)
+        (setq newhead (org-get-heading)))
+      (org-agenda-change-all-lines newhead hdmarker))))
+
+(defun jethro/org-agenda-process-inbox-item ()
+  "Process a single item in the org-agenda."
+  (interactive)
+  (org-with-wide-buffer
+   (org-agenda-set-tags)
+   (org-agenda-priority)
+   (call-interactively 'jethro/my-org-agenda-set-effort)
+   (org-agenda-refile nil nil t)))
+
+(defun jethro/bulk-process-entries ()
+  (if (not (null org-agenda-bulk-marked-entries))
+      (let ((entries (reverse org-agenda-bulk-marked-entries))
+            (processed 0)
+            (skipped 0))
+        (dolist (e entries)
+          (let ((pos (text-property-any (point-min) (point-max) 'org-hd-marker e)))
+            (if (not pos)
+                (progn (message "Skipping removed entry at %s" e)
+                       (cl-incf skipped))
+              (goto-char pos)
+              (let (org-loop-over-headlines-in-active-region) (funcall 'jethro/org-agenda-process-inbox-item))
+              ;; `post-command-hook' is not run yet.  We make sure any
+              ;; pending log note is processed.
+              (when (or (memq 'org-add-log-note (default-value 'post-command-hook))
+                        (memq 'org-add-log-note post-command-hook))
+                (org-add-log-note))
+              (cl-incf processed))))
+        (org-agenda-redo)
+        (unless org-agenda-persistent-marks (org-agenda-bulk-unmark-all))
+        (message "Acted on %d entries%s%s"
+                 processed
+                 (if (= skipped 0)
+                     ""
+                   (format ", skipped %d (disappeared before their turn)"
+                           skipped))
+                 (if (not org-agenda-persistent-marks) "" " (kept marked)")))))
+
+(setq org-agenda-bulk-custom-functions `((,jethro/org-agenda-bulk-process-key
+                                          jethro/org-agenda-process-inbox-item)))
+
+(defun jethro/set-todo-state-next ()
+  "Visit each parent task and change NEXT states to TODO"
+  (org-todo "NEXT"))
+
+(add-hook 'org-clock-in-hook 'jethro/set-todo-state-next 'append))
 
 (leaf org-agenda
   :after org
@@ -2011,7 +2093,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   ;; Automatically tangle my Emacs.org Config file when I save it
   (defun my/org-babel-tangle-config ()
     (when (string-equal (buffer-file-name)
-                        (expand-file-name "~/.emacs.d/Emacs.org"))
+                        (file-truename "~/.emacs.d/Emacs.org"))
       ;; Dynamic scoping to the rescue
       (let ((org-confirm-babel-evaluate nil))
         (org-babel-tangle)))))
