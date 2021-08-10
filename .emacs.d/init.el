@@ -70,52 +70,39 @@
              gcs-done))
   (add-hook 'emacs-startup-hook #'efs/display-startup-time))
 
-(leaf leaf
-  :config
-  (leaf leaf-convert :ensure t)
-  (leaf leaf-tree
-    :ensure t
-    :custom ((imenu-list-size . 30)
-             (imenu-list-position . 'left))))
+(prog1 'leaf-setup
+  (eval-and-compile
+    (custom-set-variables
+     '(warning-suppress-types '((comp)))
+     '(package-archives '(("celpa" . "https://celpa.conao3.com/packages/")
+                          ("org" . "https://orgmode.org/elpa/")
+                          ("melpa" . "https://melpa.org/packages/")
+                          ("gnu" . "https://elpa.gnu.org/packages/"))))
+    (package-initialize)
+    (unless (package-installed-p 'leaf)
+      (package-refresh-contents)
+      (package-install 'leaf))
 
-(leaf leaf-keywords
-  :ensure t
-  :init
-  (leaf hydra
-    :doc "Make bindings that stick around."
-    :req "cl-lib-0.5" "lv-0"
-    :tag "bindings"
-    :url "https://github.com/abo-abo/hydra"
-    :ensure t
-    :after lv)
-
-  (leaf blackout
-    :doc "Better mode lighter overriding"
-    :req "emacs-26"
-    :url "https://github.com/raxod502/blackout"
-    :leaf-defer nil
-    :ensure t)
-
-  (leaf key-chord
-    :doc "map pairs of simultaneously pressed keys to commands"
-    :req "emacs-24"
-    :tag "input" "chord" "keyboard" "emacs>=24"
-    :ensure t
-    :hook (after-init-hook . (lambda () (key-chord-mode 1)))
-    :custom ((key-chord-one-keys-delay . 0.02)
-             (key-chord-two-keys-delay . 0.03))
-    :config
-    (key-chord-define-global "x0" '"\C-x0")
-    (key-chord-define-global "x1" '"\C-x1")
-    (key-chord-define-global "x2" '"\C-x2")
-    (key-chord-define-global "x3" '"\C-x3")
-    (key-chord-define-global "x5" '"\C-x52"))
-
-  :config
-  (leaf-keywords-init))
+    (leaf leaf-keywords
+      :ensure t
+      :config
+      (leaf-keywords-init)
+      :init
+      (leaf hydra :ensure t)
+      (leaf blackout :ensure t)
+      (leaf key-chord
+        :ensure t
+        :hook (after-init-hook . (lambda () (key-chord-mode 1)))
+        :custom ((key-chord-one-keys-delay . 0.02)
+                 (key-chord-two-keys-delay . 0.03))
+        :config
+        (key-chord-define-global "x0" '"\C-x0")
+        (key-chord-define-global "x1" '"\C-x1")
+        (key-chord-define-global "x2" '"\C-x2")
+        (key-chord-define-global "x3" '"\C-x3")
+        (key-chord-define-global "x5" '"\C-x52")))))
 
 (leaf *general-configrations
-  :after leaf
   :config
   (leaf cus-edit
     :doc "tools for customizing Emacs and Lisp packages"
@@ -164,8 +151,7 @@
     :tag "environment" "unix"
     :url "https://github.com/purcell/exec-path-from-shell"
     :ensure t
-    :when (memq window-system
-                '(mac ns x))
+    :when (memq window-system '(mac ns x))
     :custom ((exec-path-from-shell-check-startup-files)
              (exec-path-from-shell-variables . '("PATH" "PYTHONPATH")))
     :config
@@ -175,19 +161,19 @@
     :doc "Show function arglist or variable docstring in echo area"
     :tag "builtin"
     :blackout
-    :custom (eldoc-idle-delay . 0.1)))
+    :custom (eldoc-idle-delay . 0.1))
 
-(leaf recentf
-  :custom ((recentf-exclude quote
-                            (".recentf" "bookmarks" "org-recent-headings.dat" "^/tmp\\.*"
-                             "^/private\\.*" "/TAGS$"))
-           (recentf-save-file . "~/.emacs.d/.recentf")
-           (recentf-max-saved-items . 300)             ;; recentf に保存するファイルの数
-           ;; (recentf-exclude . '(".recentf"))
-           ;; .recentf自体は含まない
-           (recentf-auto-cleanup . 'never)             ;; 保存する内容を整理
-           )
-  :config (recentf-mode 1))
+  (leaf recentf
+    :custom ((recentf-exclude quote
+                              (".recentf" "bookmarks" "org-recent-headings.dat" "^/tmp\\.*"
+                               "^/private\\.*" "/TAGS$"))
+             (recentf-save-file . "~/.emacs.d/.recentf")
+             (recentf-max-saved-items . 300)             ;; recentf に保存するファイルの数
+             ;; (recentf-exclude . '(".recentf"))
+             ;; .recentf自体は含まない
+             (recentf-auto-cleanup . 'never)             ;; 保存する内容を整理
+             )
+    :config (recentf-mode 1)))
 
 (leaf change-system-configuration
   :leaf-defer nil
@@ -237,13 +223,11 @@
   :url "https://github.com/bbatsov/super-save"
   :ensure t
   :blackout
-  :after ace-window
-  :hook (after-init-hook . (lambda ()
-                             (supwer-save-mode +1)))
+  :hook (after-init-hook . (lambda () (supwer-save-mode +1)))
   :custom ((super-save-auto-save-when-idle . t)
            (super-save-idle-duration . 10))
-  :defvar (super-save-triggers super-save-hook-triggers)
-  :config
+  :defer-config
+  (require 'ace-window)
   ;; add integration with ace-window
   (add-to-list 'super-save-triggers 'ace-window)
   ;; save on find-file
@@ -285,24 +269,23 @@
 
   (leaf set-title-bar
     :when window-system
-    :hook (after-init-hook . (lambda () (my/set-title-bar)))
-    :preface
-    (defun my/set-title-bar ()
-      ;; This shoud be set before exec `display-time`. 
-      (setq display-time-string-forms '((format "%s %s %s" dayname monthname day)
-                                        (format "  %s:%s" 24-hours minutes))
-            frame-title-format '(" - " display-time-string " - "))
-      (display-time))))
+    :defer-config
+    ;; This shoud be set before exec `display-time`. 
+    (setq display-time-string-forms '((format "%s %s %s" dayname monthname day)
+                                      (format "  %s:%s" 24-hours minutes))
+          frame-title-format '(" - " display-time-string " - "))
+    (display-time)))
 
 (leaf global-visual-line-mode
-  :commands global-visual-line-mode
-  :global-minor-mode t)
+  :tag "builtin"
+  :defer-config
+  (global-visual-line-mode))
 
 (leaf hl-line
   :doc "highlight the current line"
   :tag "builtin"
   :require t
-  :config
+  :defer-config
   ;;; hl-lineを無効にするメジャーモードを指定する
   (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
   (defun global-hl-line-timer-function ()
@@ -314,6 +297,7 @@
         (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
 
 (leaf nord-theme
+  :disabled t
   :ensure t
   :config
   (load-theme 'nord t)
@@ -369,7 +353,7 @@
                                                    :foreground ,nano-color-faded)))))))
 
 (leaf doom-themes
-  :disabled t
+  :disabled nil
   :doc "an opinionated pack of modern color-themes"
   :req "emacs-25.1" "cl-lib-0.5"
   :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
@@ -384,6 +368,56 @@
   ;; (load-theme 'doom-material t)
   (doom-themes-neotree-config)
   (doom-themes-org-config)
+
+  (leaf nano-modeline
+    :load-path "~/.emacs.d/el-get/nano-emacs/"
+    :require t nano-base-colors nano-colors nano-faces nano-theme
+    :config
+    (nano-faces)
+    (nano-modeline)
+    (nano-theme--mode-line)
+    (nano-theme--hl-line)
+    :advice (:override nano-modeline-compose my/nano-modeline-compose)
+    :preface
+    (defun my/nano-modeline-compose (status name primary secondary)
+      "Compose a string with provided information"
+      (let* ((char-width    (window-font-width nil 'header-line))
+             (window        (get-buffer-window (current-buffer)))
+             (space-up       +0.15)
+             (space-down     -0.20)
+             (prefix (cond ((string= status "RO")
+                            (propertize (if (window-dedicated-p)" -- " " RO ")
+                                        'face 'nano-face-header-popout))
+                           ((string= status "**")
+                            (propertize (if (window-dedicated-p)" -- " " ** ")
+                                        'face 'nano-face-header-critical))
+                           ((string= status "RW")
+                            (propertize (if (window-dedicated-p)" -- " " RW ")
+                                        'face 'nano-face-header-faded))
+                           (t (propertize status 'face 'nano-face-header-popout))))
+             (left (concat
+                    (propertize " "  'face 'nano-face-header-default
+                                'display `(raise ,space-up))
+                    (propertize name 'face 'nano-face-header-strong)
+                    (propertize " "  'face 'nano-face-header-default
+                                'display `(raise ,space-down))
+                    (propertize primary 'face 'nano-face-header-default)
+                    (propertize "  " 'face 'nano-face-header-default)
+                    (propertize secondary
+                                'face
+                                `(:inherit nano-face-header-default
+                                           :foreground ,nano-color-faded))))
+             (right "")
+             (available-width (- (window-total-width) 
+                                 (length prefix) (length left) (length right)
+                                 (/ (window-right-divider-width) char-width)))
+             (available-width (max 1 available-width)))
+        (concat prefix
+                left
+                (propertize (make-string available-width ?\ )
+                            'face 'nano-face-header-default)
+                (propertize right 'face `(:inherit nano-face-header-default
+                                                   :foreground ,nano-color-faded))))))
 
   (leaf minions
     :disabled t
@@ -430,7 +464,6 @@
 (leaf *font
   :when window-system
   :config
-  ;; (set-language-environment "japanese")
   (let ((font-size 14))
     ;; ascii
     (set-face-attribute 'default nil
@@ -491,10 +524,8 @@
                             `([,(cdr char-regexp) 0 font-shape-gstring])))))
 
 (leaf which-key
-  :diminish which-key-mode
   :doc "Display available keybindings in popup"
   :req "emacs-24.4"
-  :tag "emacs>=24.4"
   :url "https://github.com/justbur/emacs-which-key"
   :ensure t
   :blackout t
@@ -510,22 +541,23 @@
                                           "→")
                                          (("<\\([[:alnum:]-]+\\)>")
                                           "\\1"))))
-  :global-minor-mode t)
+  :defer-config
+  (which-key-mode))
 
 (leaf transient
   :doc "Transient commands"
   :req "emacs-25.1"
   :url "https://github.com/magit/transient"
   :ensure t
-  :custom ((transient-detect-key-conflicts . t)))
-
-(leaf transient-dwim
-  :doc "Useful preset transient commands"
-  :req "emacs-26.1" "transient-0.1.0"
-  :tag "conao3" "conao3-dev" "out-of-MELPA"
-  :url "https://github.com/conao3/transient-dwim.el"
-  :ensure t
-  :bind ("M-=" . transient-dwim-dispatch))
+  :custom ((transient-detect-key-conflicts . t))
+  :config
+  (leaf transient-dwim
+    :doc "Useful preset transient commands"
+    :req "emacs-26.1" "transient-0.1.0"
+    :tag "conao3" "conao3-dev" "out-of-MELPA"
+    :url "https://github.com/conao3/transient-dwim.el"
+    :ensure t
+    :bind ("M-=" . transient-dwim-dispatch)))
 
 (leaf dired
   :commands (dired dired-jump)
@@ -560,8 +592,7 @@
   ;;   :ensure t)
   )
 
-(leaf crux
-  :ensure t)
+(leaf crux :ensure t)
 
 (leaf magit
   :doc "A Git porcelain inside Emacs."
@@ -598,12 +629,10 @@
 (leaf projectile
   :doc "Manage and navigate projects in Emacs easily"
   :req "emacs-25.1" "pkg-info-0.4"
-  :tag "convenience" "project" "emacs>=25.1"
   :url "https://github.com/bbatsov/projectile"
-  :emacs>= 25.1
   :ensure t
-  :hook after-init-hook
-  :custom (projectile-enable-caching . t))
+  :custom (projectile-enable-caching . t)
+  :defer-config (projectile-mode))
 
 (leaf lsp-mode
   :doc "LSP mode"
@@ -1438,12 +1467,23 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   (set-face-attribute 'org-document-title nil
                       :font "Iosevka Aile" :weight 'bold :height 1.6)
 
-  ;; (create-fontset-from-ascii-font "Iosevka Aile-14"
-  ;;                                 nil
-  ;;                                 "myoutline")
-  ;; (set-fontset-font "fontset-myoutline" 'unicode
-  ;;                   "Noto Sans CJK JP-14"
-  ;;                   nil 'append)
+  ;; (create-fontset-from-fontset-spec
+  ;;  "-*-Iosevka Aile-normal-normal-normal-*-*-*-*-*-*-*-fontset-myoutline, ascii:-*-Iosevka Aile-normal-normal-normal-*-140-*-*-*-p-0-iso10646-1, latin:-*-Iosevka Aile-normal-normal-normal-*-140-*-*-*-p-0-iso10646-1, unicode:-*-Noto Sans CJK JP-normal-normal-normal-*-140-*-*-*-p-0-iso10646-1" t)
+  ;; (create-fontset-from-fontset-spec
+  ;;  "-*-*-normal-normal-normal-*-*-*-*-*-*-*-fontset-myoutline, ascii:-*-Iosevka Aile-normal-normal-normal-*-140-*-*-*-p-0-iso10646-1, latin:-*-Iosevka Aile-normal-normal-normal-*-140-*-*-*-p-0-iso10646-1, unicode:-*-Noto Sans CJK JP-normal-normal-normal-*-140-*-*-*-p-0-iso10646-1" t)
+
+
+  ;; (create-fontset-from-fontset-spec
+;;    "-apple-monaco-medium-r-normal--14-*-*-*-*-*-fontset-monaco,
+;; ascii:-apple-monaco-medium-r-normal--14-140-75-75-m-140-mac-roman,
+;; latin-iso8859-1:-apple-monaco-medium-r-normal--14-140-75-75-m-140-mac-roman")
+
+  (create-fontset-from-ascii-font "Iosevka Aile-14"
+                                  nil
+                                  "myoutline")
+  (set-fontset-font "fontset-myoutline" 'unicode
+                    "Noto Sans CJK JP-14"
+                    nil 'append)
 
   ;; (set-face-attribute 'org-level-1 nil :font "fontset-myoutline" :weight 'normal :slant 'normal :height 1.6)
   ;; (set-face-attribute 'org-level-2 nil :font "fontset-myoutline" :weight 'normal :slant 'normal :height 1.4)
@@ -1456,7 +1496,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                   (org-level-6 . 1.1)
                   (org-level-7 . 1.1)
                   (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "Iosevka Aile" :weight 'normal :slant 'normal :height (cdr face)))
+    (set-face-attribute (car face) nil
+                        :font "fontset-myoutline"
+                        :weight 'normal
+                        :slant 'normal
+                        :height (cdr face)))
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
   (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
@@ -1472,8 +1516,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   ;; Get rid of the background on column views
   (set-face-attribute 'org-column nil :background nil)
   (set-face-attribute 'org-column-title nil :background nil)
-
-
 
 ;; (custom-theme-set-faces
 ;;  'user
