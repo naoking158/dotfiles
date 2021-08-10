@@ -314,6 +314,7 @@
         (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
 
 (leaf nord-theme
+  :disabled t
   :ensure t
   :config
   (load-theme 'nord t)
@@ -369,7 +370,7 @@
                                                    :foreground ,nano-color-faded)))))))
 
 (leaf doom-themes
-  :disabled t
+  :disabled nil
   :doc "an opinionated pack of modern color-themes"
   :req "emacs-25.1" "cl-lib-0.5"
   :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
@@ -384,6 +385,56 @@
   ;; (load-theme 'doom-material t)
   (doom-themes-neotree-config)
   (doom-themes-org-config)
+
+  (leaf nano-modeline
+    :load-path "~/.emacs.d/el-get/nano-emacs/"
+    :require t nano-base-colors nano-colors nano-faces nano-theme
+    :config
+    (nano-faces)
+    (nano-modeline)
+    (nano-theme--mode-line)
+    (nano-theme--hl-line)
+    :advice (:override nano-modeline-compose my/nano-modeline-compose)
+    :preface
+    (defun my/nano-modeline-compose (status name primary secondary)
+      "Compose a string with provided information"
+      (let* ((char-width    (window-font-width nil 'header-line))
+             (window        (get-buffer-window (current-buffer)))
+             (space-up       +0.15)
+             (space-down     -0.20)
+             (prefix (cond ((string= status "RO")
+                            (propertize (if (window-dedicated-p)" -- " " RO ")
+                                        'face 'nano-face-header-popout))
+                           ((string= status "**")
+                            (propertize (if (window-dedicated-p)" -- " " ** ")
+                                        'face 'nano-face-header-critical))
+                           ((string= status "RW")
+                            (propertize (if (window-dedicated-p)" -- " " RW ")
+                                        'face 'nano-face-header-faded))
+                           (t (propertize status 'face 'nano-face-header-popout))))
+             (left (concat
+                    (propertize " "  'face 'nano-face-header-default
+                                'display `(raise ,space-up))
+                    (propertize name 'face 'nano-face-header-strong)
+                    (propertize " "  'face 'nano-face-header-default
+                                'display `(raise ,space-down))
+                    (propertize primary 'face 'nano-face-header-default)
+                    (propertize "  " 'face 'nano-face-header-default)
+                    (propertize secondary
+                                'face
+                                `(:inherit nano-face-header-default
+                                           :foreground ,nano-color-faded))))
+             (right "")
+             (available-width (- (window-total-width) 
+                                 (length prefix) (length left) (length right)
+                                 (/ (window-right-divider-width) char-width)))
+             (available-width (max 1 available-width)))
+        (concat prefix
+                left
+                (propertize (make-string available-width ?\ )
+                            'face 'nano-face-header-default)
+                (propertize right 'face `(:inherit nano-face-header-default
+                                                   :foreground ,nano-color-faded))))))
 
   (leaf minions
     :disabled t
@@ -1438,12 +1489,23 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   (set-face-attribute 'org-document-title nil
                       :font "Iosevka Aile" :weight 'bold :height 1.6)
 
-  ;; (create-fontset-from-ascii-font "Iosevka Aile-14"
-  ;;                                 nil
-  ;;                                 "myoutline")
-  ;; (set-fontset-font "fontset-myoutline" 'unicode
-  ;;                   "Noto Sans CJK JP-14"
-  ;;                   nil 'append)
+  ;; (create-fontset-from-fontset-spec
+  ;;  "-*-Iosevka Aile-normal-normal-normal-*-*-*-*-*-*-*-fontset-myoutline, ascii:-*-Iosevka Aile-normal-normal-normal-*-140-*-*-*-p-0-iso10646-1, latin:-*-Iosevka Aile-normal-normal-normal-*-140-*-*-*-p-0-iso10646-1, unicode:-*-Noto Sans CJK JP-normal-normal-normal-*-140-*-*-*-p-0-iso10646-1" t)
+  ;; (create-fontset-from-fontset-spec
+  ;;  "-*-*-normal-normal-normal-*-*-*-*-*-*-*-fontset-myoutline, ascii:-*-Iosevka Aile-normal-normal-normal-*-140-*-*-*-p-0-iso10646-1, latin:-*-Iosevka Aile-normal-normal-normal-*-140-*-*-*-p-0-iso10646-1, unicode:-*-Noto Sans CJK JP-normal-normal-normal-*-140-*-*-*-p-0-iso10646-1" t)
+
+
+  ;; (create-fontset-from-fontset-spec
+;;    "-apple-monaco-medium-r-normal--14-*-*-*-*-*-fontset-monaco,
+;; ascii:-apple-monaco-medium-r-normal--14-140-75-75-m-140-mac-roman,
+;; latin-iso8859-1:-apple-monaco-medium-r-normal--14-140-75-75-m-140-mac-roman")
+
+  (create-fontset-from-ascii-font "Iosevka Aile-14"
+                                  nil
+                                  "myoutline")
+  (set-fontset-font "fontset-myoutline" 'unicode
+                    "Noto Sans CJK JP-14"
+                    nil 'append)
 
   ;; (set-face-attribute 'org-level-1 nil :font "fontset-myoutline" :weight 'normal :slant 'normal :height 1.6)
   ;; (set-face-attribute 'org-level-2 nil :font "fontset-myoutline" :weight 'normal :slant 'normal :height 1.4)
@@ -1456,7 +1518,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                   (org-level-6 . 1.1)
                   (org-level-7 . 1.1)
                   (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "Iosevka Aile" :weight 'normal :slant 'normal :height (cdr face)))
+    (set-face-attribute (car face) nil
+                        :font "fontset-myoutline"
+                        :weight 'normal
+                        :slant 'normal
+                        :height (cdr face)))
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
   (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
@@ -1472,8 +1538,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   ;; Get rid of the background on column views
   (set-face-attribute 'org-column nil :background nil)
   (set-face-attribute 'org-column-title nil :background nil)
-
-
 
 ;; (custom-theme-set-faces
 ;;  'user
