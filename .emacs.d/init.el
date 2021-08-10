@@ -26,7 +26,7 @@
 ;;   :added "2021-02-06"
 ;;   :leaf-defer t)
 
-(setq exec-profile nil)
+(setq exec-profile t)
 
 (when exec-profile
   (defvar setup-tracker--level 0)
@@ -102,14 +102,57 @@
         (key-chord-define-global "x3" '"\C-x3")
         (key-chord-define-global "x5" '"\C-x52")))))
 
-(leaf *general-configrations
+(leaf *keep-clean
   :config
+  ;; Use no-littering to automatically set common paths to the new user-emacs-directory
+  (leaf no-littering
+    :ensure t
+    :leaf-defer nil
+    :config
+    ;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
+
+    (setq user-emacs-directory (expand-file-name "~/.cache/emacs/")
+          url-history-file (expand-file-name "url/history" user-emacs-directory))
+    (setq no-littering-etc-directory
+          (expand-file-name "etc/" user-emacs-directory))
+    (setq no-littering-var-directory
+          (expand-file-name "var/" user-emacs-directory)))
+
+  ;; Keep customization settings in a temporary file
   (leaf cus-edit
     :doc "tools for customizing Emacs and Lisp packages"
     :tag "builtin" "faces" "help"
-    :custom
-    `((custom-file . ,(locate-user-emacs-file "custom.el"))))
+    :config
+    (setq custom-file
+          (if (boundp 'server-socket-dir)
+              (expand-file-name "custom.el" server-socket-dir)
+            (expand-file-name
+             (format "emacs-custom-%s.el" (user-uid))
+             temporary-file-directory)))
+    (load custom-file t))
 
+  (leaf recentf
+    :require no-littering
+    :custom ((recentf-exclude . `(".recentf"
+                                  "bookmarks"
+                                  "org-recent-headings.dat"
+                                  "^/tmp\\.*"
+                                  "^/private\\.*"
+                                  "/TAGS$"
+                                  ,no-littering-var-directory
+                                  ,no-littering-etc-directory))
+             (recentf-save-file . "~/.emacs.d/.recentf")
+             (recentf-max-saved-items . 1000)
+             (recentf-auto-cleanup . 'never))
+    :global-minor-mode t)
+
+  (leaf *auto-save
+    :config
+    (setq auto-save-file-name-transforms
+      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
+
+(leaf *general-configrations
+  :config
   (leaf cus-start
     :doc "define customization properties of builtins"
     :tag "builtin" "internal"
@@ -161,19 +204,7 @@
     :doc "Show function arglist or variable docstring in echo area"
     :tag "builtin"
     :blackout
-    :custom (eldoc-idle-delay . 0.1))
-
-  (leaf recentf
-    :custom ((recentf-exclude quote
-                              (".recentf" "bookmarks" "org-recent-headings.dat" "^/tmp\\.*"
-                               "^/private\\.*" "/TAGS$"))
-             (recentf-save-file . "~/.emacs.d/.recentf")
-             (recentf-max-saved-items . 300)             ;; recentf に保存するファイルの数
-             ;; (recentf-exclude . '(".recentf"))
-             ;; .recentf自体は含まない
-             (recentf-auto-cleanup . 'never)             ;; 保存する内容を整理
-             )
-    :config (recentf-mode 1)))
+    :custom (eldoc-idle-delay . 0.1)))
 
 (leaf change-system-configuration
   :leaf-defer nil
@@ -215,23 +246,26 @@
 (leaf autorevert
   :doc "revert buffers when files on disk change"
   :tag "builtin"
-  :custom (auto-revert-interval . 1))
+  :custom ((auto-revert-interval . 1)
+           (global-auto-revert-non-file-buffers . t))
+  :config (global-auto-revert-mode 1))
 
 (leaf super-save
   :doc "Auto-save buffers, based on your activity."
   :req "emacs-24.4"
   :url "https://github.com/bbatsov/super-save"
   :ensure t
+  :require ace-window
   :blackout
-  :hook (after-init-hook . (lambda () (supwer-save-mode +1)))
   :custom ((super-save-auto-save-when-idle . t)
-           (super-save-idle-duration . 10))
+           (super-save-idle-duration . 7))
   :defer-config
   (require 'ace-window)
   ;; add integration with ace-window
   (add-to-list 'super-save-triggers 'ace-window)
   ;; save on find-file
-  (add-to-list 'super-save-hook-triggers 'find-file-hook))
+  (add-to-list 'super-save-hook-triggers 'find-file-hook)
+  (supwer-save-mode +1))
 
 (leaf undo-fu
   :doc "Undo helper with redo"
@@ -278,8 +312,7 @@
 
 (leaf global-visual-line-mode
   :tag "builtin"
-  :defer-config
-  (global-visual-line-mode))
+  :global-minor-mode t)
 
 (leaf hl-line
   :doc "highlight the current line"
@@ -1405,7 +1438,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf org
   :doc "Export Framework for Org Mode"
   :tag "builtin"
-  :ensure org-plus-contrib
+  :mode "\\.org\\'"
   :require org-tempo  ;; need for org-template
   :hook (org-mode-hook . my-org-mode-hook)
   :preface
@@ -1462,7 +1495,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                      ("mt" . "todo")
                                      ("ms" . "summary"))))
   :commands (org-with-remote-undo)
-  :config  
+  :defer-config
+  (leaf org-plus-contrib :ensure t)
+
   ;; Increase the size of various headings
   (set-face-attribute 'org-document-title nil
                       :font "Iosevka Aile" :weight 'bold :height 1.6)
@@ -1545,127 +1580,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf org-fragtog
   :ensure t
-  :hook (org-mode-hook . org-fragtog-mode))
-
-(defun jethro/org-archive-done-tasks ()
-  "Archive all done tasks."
-  (interactive)
-  (org-map-entries 'org-archive-subtree "/DONE" 'file))
-
-(setq jethro/org-agenda-directory (file-truename "~/org/gtd/"))
-(setq org-agenda-files (directory-files-recursively org-directory "\\.org$"))
-
-(setq org-capture-templates
-      `(("i" "inbox" entry (file ,(concat jethro/org-agenda-directory
-                                          "inbox.org"))
-         "* TODO %?")
-        ("d" "Daily memo" entry (file+olp+datetree
-                                 ,(concat jethro/org-agenda-directory
-                                          "daily.org"))
-         ,(format-time-string "* %H:%M %?\n" (current-time))
-         :jump-to-captured 1)))
-
-(setq org-todo-keywords
-      '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-        (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)")))
-
-(setq org-log-done 'time
-      org-log-into-drawer t
-      org-log-state-notes-insert-after-drawers nil)
-
-(setq org-tag-alist '(("@errand" . ?e)
-                      ("@office" . ?o)
-                      ("@home" . ?h)
-                      ("@private" . ?p)
-                      (:newline)
-                      ("CANCELLED" . ?c)))
-
-(setq org-fast-tag-selection-single-key nil)
-(setq org-refile-use-outline-path 'file
-      org-outline-path-complete-in-steps nil)
-(setq org-refile-allow-creating-parent-nodes 'confirm
-      org-refile-targets '((org-agenda-files . (:level . 1))))
-
-(defvar jethro/org-agenda-bulk-process-key ?f
-  "Default key for bulk processing inbox items.")
-
-(defun jethro/org-process-inbox ()
-  "Called in org-agenda-mode, processes all inbox items."
-  (interactive)
-  (org-agenda-bulk-mark-regexp "inbox:")
-  (jethro/bulk-process-entries))
-
-(defvar jethro/org-current-effort "1:00"
-  "Current effort for agenda items.")
-
-
-(defun jethro/my-org-agenda-set-effort (effort)
-  "Set the effort property for the current headline."
-  (interactive
-   (list (read-string (format "Effort [%s]: " jethro/org-current-effort) nil nil jethro/org-current-effort)))
-  (setq jethro/org-current-effort effort)
-  (org-agenda-check-no-diary)
-  (let* ((hdmarker (or (org-get-at-bol 'org-hd-marker)
-                       (org-agenda-error)))
-         (buffer (marker-buffer hdmarker))
-         (pos (marker-position hdmarker))
-         (inhibit-read-only t)
-         newhead)
-    (org-with-remote-undo buffer
-      (with-current-buffer buffer
-        (widen)
-        (goto-char pos)
-        (org-show-context 'agenda)
-        (funcall-interactively 'org-set-effort nil jethro/org-current-effort)
-        (end-of-line 1)
-        (setq newhead (org-get-heading)))
-      (org-agenda-change-all-lines newhead hdmarker))))
-
-(defun jethro/org-agenda-process-inbox-item ()
-  "Process a single item in the org-agenda."
-  (interactive)
-  (org-with-wide-buffer
-   (org-agenda-set-tags)
-   (org-agenda-priority)
-   (call-interactively 'jethro/my-org-agenda-set-effort)
-   (org-agenda-refile nil nil t)))
-
-(defun jethro/bulk-process-entries ()
-  (if (not (null org-agenda-bulk-marked-entries))
-      (let ((entries (reverse org-agenda-bulk-marked-entries))
-            (processed 0)
-            (skipped 0))
-        (dolist (e entries)
-          (let ((pos (text-property-any (point-min) (point-max) 'org-hd-marker e)))
-            (if (not pos)
-                (progn (message "Skipping removed entry at %s" e)
-                       (cl-incf skipped))
-              (goto-char pos)
-              (let (org-loop-over-headlines-in-active-region) (funcall 'jethro/org-agenda-process-inbox-item))
-              ;; `post-command-hook' is not run yet.  We make sure any
-              ;; pending log note is processed.
-              (when (or (memq 'org-add-log-note (default-value 'post-command-hook))
-                        (memq 'org-add-log-note post-command-hook))
-                (org-add-log-note))
-              (cl-incf processed))))
-        (org-agenda-redo)
-        (unless org-agenda-persistent-marks (org-agenda-bulk-unmark-all))
-        (message "Acted on %d entries%s%s"
-                 processed
-                 (if (= skipped 0)
-                     ""
-                   (format ", skipped %d (disappeared before their turn)"
-                           skipped))
-                 (if (not org-agenda-persistent-marks) "" " (kept marked)")))))
-
-(setq org-agenda-bulk-custom-functions `((,jethro/org-agenda-bulk-process-key
-                                          jethro/org-agenda-process-inbox-item)))
-
-(defun jethro/set-todo-state-next ()
-  "Visit each parent task and change NEXT states to TODO"
-  (org-todo "NEXT"))
-
-(add-hook 'org-clock-in-hook 'jethro/set-todo-state-next 'append))
+  :hook (org-mode-hook . org-fragtog-mode)))
 
 (leaf org-agenda
   :after org
@@ -1673,16 +1588,35 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :bind* (("C-c C-a" . org-agenda-cache)
           ("C-c C-m" . jethro/org-inbox-capture))
   :bind (org-agenda-mode-map
-         :package org-agenda
          ("i" . org-agenda-clock-in)
          ("r" . jethro/org-agenda-process-inbox-item)
          ("R" . org-agenda-refile)
          ("c" . jethro/org-inbox-capture)
          ("q" . quit-window))
   :hook ((kill-emacs-hook . ladicle/org-clock-out-and-save-when-exit)
-         (org-agenda-mode . (lambda ()
-                              (add-to-list 'frame-title-format
-                                           '(:eval org-mode-line-string) t))))
+         ;; (org-agenda-mode-hook . (lambda ()
+         ;;                           (add-to-list 'frame-title-format
+         ;;                                        '(:eval org-mode-line-string) t))
+         )
+  :custom
+  `((org-agenda-window-setup . 'other-window)
+    (org-agenda-block-separator . nil)
+    (org-agenda-start-with-log-mode . t)
+    ;; speed up techniques
+    (org-agenda-dim-blocked-tasks . nil)
+    (org-agenda-use-tag-inheritance . '(search timeline agenda))
+    (org-agenda-ignore-drawer-properties . '(effort appt category))
+    ;; show agenda from today
+    (org-agenda-start-on-weekday . nil)
+    (org-agenda-current-time-string . "← now")
+    (org-agenda-time-grid quote ;; Format is changed from 9.1
+                          ((daily today require-timed)
+                           (0800 1100 1500 1900 2100 2400)
+                           "-"
+                           "────────────────"))
+    (org-columns-default-format
+     quote
+     "%40ITEM(Task) %Effort(EE){:} %CLOCKSUM(Time Spent) %SCHEDULED(Scheduled) %DEADLINE(Deadline)"))
   :preface
   (defun org-agenda-cache (&optional regenerate)
     "Show agenda buffer without updating if it exists"
@@ -1698,34 +1632,76 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     "Capture a task in agenda mode."
     (org-capture))
 
-  (defun jethro/is-project-p ()
-    "Any task with a todo keyword subtask"
-    (save-restriction
-      (widen)
-      (let ((has-subtask)
-            (subtree-end (save-excursion (org-end-of-subtree t)))
-            (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
-        (save-excursion
-          (forward-line 1)
-          (while (and (not has-subtask)
-                      (< (point) subtree-end)
-                      (re-search-forward "^\*+ " subtree-end t))
-            (when (member (org-get-todo-state) org-todo-keywords-1)
-              (setq has-subtask t))))
-        (and is-a-task has-subtask))))
+  (defvar jethro/org-current-effort "1:00"
+    "Current effort for agenda items.")
 
-  (defun jethro/skip-projects ()
-    "Skip trees that are projects"
-    (save-restriction
-      (widen)
-      (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-        (cond
-         ((org-is-habit-p)
-          next-headline)
-         ((jethro/is-project-p)
-          next-headline)
-         (t
-          nil)))))
+  (defun jethro/my-org-agenda-set-effort (effort)
+    "Set the effort property for the current headline."
+    (interactive
+     (list (read-string (format "Effort [%s]: " jethro/org-current-effort) nil nil jethro/org-current-effort)))
+    (setq jethro/org-current-effort effort)
+    (org-agenda-check-no-diary)
+    (let* ((hdmarker (or (org-get-at-bol 'org-hd-marker)
+                         (org-agenda-error)))
+           (buffer (marker-buffer hdmarker))
+           (pos (marker-position hdmarker))
+           (inhibit-read-only t)
+           newhead)
+      (org-with-remote-undo buffer
+        (with-current-buffer buffer
+          (widen)
+          (goto-char pos)
+          (org-show-context 'agenda)
+          (funcall-interactively 'org-set-effort nil jethro/org-current-effort)
+          (end-of-line 1)
+          (setq newhead (org-get-heading)))
+        (org-agenda-change-all-lines newhead hdmarker))))
+
+  (defun jethro/org-agenda-process-inbox-item ()
+    "Process a single item in the org-agenda."
+    (interactive)
+    (org-with-wide-buffer
+     (org-agenda-set-tags)
+     (org-agenda-priority)
+     (call-interactively 'jethro/my-org-agenda-set-effort)
+     (org-agenda-refile nil nil t)))
+
+  (defvar jethro/org-agenda-bulk-process-key ?f
+    "Default key for bulk processing inbox items.")
+
+  (defun jethro/bulk-process-entries ()
+    (if (not (null org-agenda-bulk-marked-entries))
+        (let ((entries (reverse org-agenda-bulk-marked-entries))
+              (processed 0)
+              (skipped 0))
+          (dolist (e entries)
+            (let ((pos (text-property-any (point-min) (point-max) 'org-hd-marker e)))
+              (if (not pos)
+                  (progn (message "Skipping removed entry at %s" e)
+                         (cl-incf skipped))
+                (goto-char pos)
+                (let (org-loop-over-headlines-in-active-region) (funcall 'jethro/org-agenda-process-inbox-item))
+                ;; `post-command-hook' is not run yet.  We make sure any
+                ;; pending log note is processed.
+                (when (or (memq 'org-add-log-note (default-value 'post-command-hook))
+                          (memq 'org-add-log-note post-command-hook))
+                  (org-add-log-note))
+                (cl-incf processed))))
+          (org-agenda-redo)
+          (unless org-agenda-persistent-marks (org-agenda-bulk-unmark-all))
+          (message "Acted on %d entries%s%s"
+                   processed
+                   (if (= skipped 0)
+                       ""
+                     (format ", skipped %d (disappeared before their turn)"
+                             skipped))
+                   (if (not org-agenda-persistent-marks) "" " (kept marked)")))))
+
+  (defun jethro/org-process-inbox ()
+    "Called in org-agenda-mode, processes all inbox items."
+    (interactive)
+    (org-agenda-bulk-mark-regexp "inbox:")
+    (jethro/bulk-process-entries))
 
   ;; (defun ladicle/get-today-diary ()
   ;;   (concat private-directory
@@ -1749,26 +1725,83 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (ignore-errors (org-clock-out) t)
     (save-some-buffers t))
 
-  :custom
-  `((org-agenda-window-setup . 'other-window)
-    (org-agenda-block-separator . nil)
-    (org-agenda-start-with-log-mode . t)
-    ;; speed up techniques
-    (org-agenda-dim-blocked-tasks . nil)
-    (org-agenda-use-tag-inheritance . '(search timeline agenda))
-    (org-agenda-ignore-drawer-properties . '(effort appt category))
-    ;; show agenda from today
-    (org-agenda-start-on-weekday . nil)
-    (org-agenda-current-time-string . "← now")
-    (org-agenda-time-grid quote ;; Format is changed from 9.1
-                          ((daily today require-timed)
-                           (0800 1100 1500 1900 2100 2400)
-                           "-"
-                           "────────────────"))
-    (org-columns-default-format
-     quote
-     "%40ITEM(Task) %Effort(EE){:} %CLOCKSUM(Time Spent) %SCHEDULED(Scheduled) %DEADLINE(Deadline)"))
-  :config
+  :defer-config
+  (defun jethro/org-archive-done-tasks ()
+    "Archive all done tasks."
+    (interactive)
+    (org-map-entries 'org-archive-subtree "/DONE" 'file))
+
+  (setq jethro/org-agenda-directory (file-truename "~/org/gtd/"))
+  (setq org-agenda-files (directory-files-recursively org-directory "\\.org$"))
+
+  (setq org-capture-templates
+        `(("i" "inbox" entry (file ,(concat jethro/org-agenda-directory
+                                            "inbox.org"))
+           "* TODO %?")
+          ("d" "Daily memo" entry (file+olp+datetree
+                                   ,(concat jethro/org-agenda-directory
+                                            "daily.org"))
+           ,(format-time-string "* %H:%M %?\n" (current-time))
+           :jump-to-captured 1)))
+
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+          (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)")))
+
+  (setq org-log-done 'time
+        org-log-into-drawer t
+        org-log-state-notes-insert-after-drawers nil)
+
+  (setq org-tag-alist '(("@errand" . ?e)
+                        ("@office" . ?o)
+                        ("@home" . ?h)
+                        ("@private" . ?p)
+                        (:newline)
+                        ("CANCELLED" . ?c)))
+
+  (setq org-fast-tag-selection-single-key nil)
+  (setq org-refile-use-outline-path 'file
+        org-outline-path-complete-in-steps nil)
+  (setq org-refile-allow-creating-parent-nodes 'confirm
+        org-refile-targets '((org-agenda-files . (:level . 1))))
+
+  (setq org-agenda-bulk-custom-functions `((,jethro/org-agenda-bulk-process-key
+                                            jethro/org-agenda-process-inbox-item)))
+
+  (defun jethro/set-todo-state-next ()
+    "Visit each parent task and change NEXT states to TODO"
+    (org-todo "NEXT"))
+
+  (add-hook 'org-clock-in-hook 'jethro/set-todo-state-next 'append)
+
+  (defun jethro/is-project-p ()
+    "Any task with a todo keyword subtask"
+    (save-restriction
+      (widen)
+      (let ((has-subtask)
+            (subtree-end (save-excursion (org-end-of-subtree t)))
+            (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
+        (save-excursion
+          (forward-line 1)
+          (while (and (not has-subtask)
+                      (< (point) subtree-end)
+                      (re-search-forward "^\*+ " subtree-end t))
+            (when (member (org-get-todo-state) org-todo-keywords-1)
+              (setq has-subtask t))))
+        (and is-a-task has-subtask))))
+  (defun jethro/skip-projects ()
+    "Skip trees that are projects"
+    (save-restriction
+      (widen)
+      (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+        (cond
+         ((org-is-habit-p)
+          next-headline)
+         ((jethro/is-project-p)
+          next-headline)
+         (t
+          nil)))))
+
   (setq org-agenda-custom-commands
         `(("a" "Agenda"
            ;; ((org-agenda-prefix-format
@@ -1808,7 +1841,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                    (org-agenda-files '(,(concat jethro/org-agenda-directory
                                                 "next.org")))
                    (org-agenda-skip-function '(org-agenda-skip-entry-if
-                                               'deadline)))))))))
+                                               'deadline))))))))
+  ;; (add-to-list 'frame-title-format
+  ;;              '(:eval org-mode-line-string) t)
+  )
 
 (leaf org-pomodoro
   :ensure t
@@ -1987,7 +2023,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :url "https://github.com/org-roam/org-roam"
   :after org
   :ensure t
-  :hook (after-init-hook . (lambda () (org-roam-setup)))
   :bind* (("C-c n l" . org-roam-buffer-toggle)
           ("C-c n f" . org-roam-node-find)
           ("C-c n g" . org-roam-graph)
@@ -2008,19 +2043,22 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                               (file-truename "~/org/braindump/")))
     (org-roam-db-gc-threshold . most-positive-fixnum)
     (org-id-link-to-org-use-id . t)
-    (org-roam-capture-templates . '(("l" "lit" plain "%?"
-                                     :if-new (file+head "lit/${slug}.org"
-                                                        "#+title: ${title}\n")
-                                     :unnarrowed t)
-                                    ("c" "concept" plain "%?"
-                                     :if-new (file+head "concepts/${slug}.org"
-                                                        "#+title: ${title}\n")
-                                     :unnarrowed t)
-                                    ("p" "private" plain "%?"
-                                     :if-new (file+head "private/${slug}.org"
-                                                        "#+title: ${title}\n")
-                                     :unnarrowed t))))
-  :config
+    (org-roam-capture-templates
+     quote
+     (("l" "lit" plain "%?"
+       (file "~/org/braindump/preferences/LiteratureTemplate.org")
+       :if-new (file+head "lit/${slug}.org"
+                          "#+title: ${title}\n#+date: %U\n#+filetags: Literature")
+       :unnarrowed t)
+      ("c" "concept" plain "%?"
+       :if-new (file+head "concepts/${slug}.org"
+                          "#+title: ${title}\n#+date: %U")
+       :unnarrowed t)
+      ("p" "private" plain "%?"
+       :if-new (file+head "private/${slug}.org"
+                          "#+title: ${title}#+date: %U\n")
+       :unnarrowed t))))
+  :defer-config
   ;; for org-roam-buffer-toggle
   ;; Recommendation in the official manual
   (add-to-list 'display-buffer-alist
@@ -2028,7 +2066,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                  (display-buffer-in-direction)
                  (direction . right)
                  (window-width . 0.33)
-                 (window-height . fit-window-to-buffer))))
+                 (window-height . fit-window-to-buffer)))
+  (org-roam-setup))
 
 (leaf org-bullets
   :doc "Show bullets in org-mode as UTF-8 characters"
@@ -2139,6 +2178,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
       ;; Dynamic scoping to the rescue
       (let ((org-confirm-babel-evaluate nil))
         (org-babel-tangle)))))
+
+(leaf org-make-toc
+  :ensure t
+  :hook (org-mode . org-make-toc-mode))
 
 (leaf *latex
   :config
