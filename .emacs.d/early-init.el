@@ -52,29 +52,6 @@
 	  frame-inhibit-implied-resize t
 	  byte-compile-warnings '(cl-functions))
 
-
-;; Package initialization after `early-init-file'.
-(custom-set-variables
- '(warning-suppress-types '((comp)))
- '(package-archives
-   '(("celpa" . "https://celpa.conao3.com/packages/")
-     ("melpa" . "https://melpa.org/packages/")
-     ("org" . "https://orgmode.org/elpa/")
-     ("gnu" . "https://elpa.gnu.org/packages/"))))
-;; (setq package-enable-at-startup nil)
-
-(when (or load-file-name byte-compile-current-file)
-  (setq user-emacs-directory
-        (expand-file-name
-         (file-name-directory
-          (or load-file-name byte-compile-current-file)))))
-
-(prog1 "install leaf"
-  (package-initialize)
-  (unless (package-installed-p 'leaf)
-    (package-refresh-contents)
-    (package-install 'leaf)))
-
 (provide 'early-init)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; early-init.el ends here
