@@ -102,14 +102,57 @@
         (key-chord-define-global "x3" '"\C-x3")
         (key-chord-define-global "x5" '"\C-x52")))))
 
-(leaf *general-configrations
+(leaf *keep-clean
   :config
+  ;; Use no-littering to automatically set common paths to the new user-emacs-directory
+  (leaf no-littering
+    :ensure t
+    :leaf-defer nil
+    :config
+    ;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
+
+    (setq user-emacs-directory (expand-file-name "~/.cache/emacs/")
+          url-history-file (expand-file-name "url/history" user-emacs-directory))
+    (setq no-littering-etc-directory
+          (expand-file-name "etc/" user-emacs-directory))
+    (setq no-littering-var-directory
+          (expand-file-name "var/" user-emacs-directory)))
+
+  ;; Keep customization settings in a temporary file
   (leaf cus-edit
     :doc "tools for customizing Emacs and Lisp packages"
     :tag "builtin" "faces" "help"
-    :custom
-    `((custom-file . ,(locate-user-emacs-file "custom.el"))))
+    :config
+    (setq custom-file
+          (if (boundp 'server-socket-dir)
+              (expand-file-name "custom.el" server-socket-dir)
+            (expand-file-name
+             (format "emacs-custom-%s.el" (user-uid))
+             temporary-file-directory)))
+    (load custom-file t))
 
+  (leaf recentf
+    :require no-littering
+    :custom ((recentf-exclude . `(".recentf"
+                                  "bookmarks"
+                                  "org-recent-headings.dat"
+                                  "^/tmp\\.*"
+                                  "^/private\\.*"
+                                  "/TAGS$"
+                                  ,no-littering-var-directory
+                                  ,no-littering-etc-directory))
+             (recentf-save-file . "~/.emacs.d/.recentf")
+             (recentf-max-saved-items . 1000)
+             (recentf-auto-cleanup . 'never))
+    :global-minor-mode t)
+
+  (leaf *auto-save
+    :config
+    (setq auto-save-file-name-transforms
+      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
+
+(leaf *general-configrations
+  :config
   (leaf cus-start
     :doc "define customization properties of builtins"
     :tag "builtin" "internal"
@@ -161,19 +204,7 @@
     :doc "Show function arglist or variable docstring in echo area"
     :tag "builtin"
     :blackout
-    :custom (eldoc-idle-delay . 0.1))
-
-  (leaf recentf
-    :custom ((recentf-exclude quote
-                              (".recentf" "bookmarks" "org-recent-headings.dat" "^/tmp\\.*"
-                               "^/private\\.*" "/TAGS$"))
-             (recentf-save-file . "~/.emacs.d/.recentf")
-             (recentf-max-saved-items . 300)             ;; recentf に保存するファイルの数
-             ;; (recentf-exclude . '(".recentf"))
-             ;; .recentf自体は含まない
-             (recentf-auto-cleanup . 'never)             ;; 保存する内容を整理
-             )
-    :config (recentf-mode 1)))
+    :custom (eldoc-idle-delay . 0.1)))
 
 (leaf change-system-configuration
   :leaf-defer nil
@@ -215,23 +246,26 @@
 (leaf autorevert
   :doc "revert buffers when files on disk change"
   :tag "builtin"
-  :custom (auto-revert-interval . 1))
+  :custom ((auto-revert-interval . 1)
+           (global-auto-revert-non-file-buffers . t))
+  :config (global-auto-revert-mode 1))
 
 (leaf super-save
   :doc "Auto-save buffers, based on your activity."
   :req "emacs-24.4"
   :url "https://github.com/bbatsov/super-save"
   :ensure t
+  :require ace-window
   :blackout
-  :hook (after-init-hook . (lambda () (supwer-save-mode +1)))
   :custom ((super-save-auto-save-when-idle . t)
-           (super-save-idle-duration . 10))
+           (super-save-idle-duration . 7))
   :defer-config
   (require 'ace-window)
   ;; add integration with ace-window
   (add-to-list 'super-save-triggers 'ace-window)
   ;; save on find-file
-  (add-to-list 'super-save-hook-triggers 'find-file-hook))
+  (add-to-list 'super-save-hook-triggers 'find-file-hook)
+  (supwer-save-mode +1))
 
 (leaf undo-fu
   :doc "Undo helper with redo"
