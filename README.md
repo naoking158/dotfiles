@@ -3,12 +3,13 @@
 ## Status
 
 As of writing (2021-06-22) it works for me on my machine.
-- **macOS** Big Sur 11.4 (intel)
+- **macOS** Big Sur 11.5.1 (intel)
 - **Ubuntu** 18.04.5 LTS
-- **[fish](https://github.com/fish-shell/fish-shell)** 3.2.2
-- **[Tmux](https://github.com/tmux/tmux/wiki)** 3.1c
+- **[fish](https://github.com/fish-shell/fish-shell)** 3.3.1
+- **[Tmux](https://github.com/tmux/tmux/wiki)** 3.2a
 - **Emacs** 28.0.50
 - **[iTerm2](https://iterm2.com)** 3.4.8
+- **[Alacritty](https://github.com/alacritty/alacritty)** 0.9.0 (fed349a)
 
 Note: You can clone or fork them freely, but I don't guarantee that they fit you.
 
