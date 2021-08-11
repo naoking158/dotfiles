@@ -2,7 +2,7 @@
 
 ## Status
 
-As of writing (2021-06-22) it works for me on my machine.
+As of writing (2021-08-11) it works for me on my machine.
 - **macOS** Big Sur 11.5.1 (intel)
 - **Ubuntu** 18.04.5 LTS
 - **[fish](https://github.com/fish-shell/fish-shell)** 3.3.1
@@ -65,6 +65,7 @@ bash -c "$(curl -fsSL raw.githubusercontent.com/naoking158/dotfiles/main/etc/ins
 
 ## 💡 Inspiration
 
+- <https://github.com/daviwil/dotfiles>
 - <https://github.com/b4b4r07/dotfiles>
 - [最強の dotfiles 駆動開発と GitHub で管理する運用方法](https://qiita.com/b4b4r07/items/b70178e021bef12cd4a2#fnref2)
 
@@ -78,6 +79,10 @@ bash -c "$(curl -fsSL raw.githubusercontent.com/naoking158/dotfiles/main/etc/ins
 
 
 ### Emacs
+
+- My Emacs is configured with `init.el` and `early-init.el`.
+- `init.el` is exported by `org-babel-tangle` from [`~/.emacs.d/Emacs.org`](.emacs.d/Emacs.org).
+
 #### GUI
 <img width="1136" alt=" 2021-08-11 at 18 25 05" src="https://user-images.githubusercontent.com/29372455/129005605-1d7b59b9-5f1b-49cc-af0e-d11c6c25efb0.png">
 <img width="1136" alt=" 2021-08-11 at 17 45 48" src="https://user-images.githubusercontent.com/29372455/129005645-1ba4f05e-c9f7-4907-a5ca-f7e7650187a5.png">
