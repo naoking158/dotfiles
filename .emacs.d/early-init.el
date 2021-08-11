@@ -52,6 +52,10 @@
 	  frame-inhibit-implied-resize t
 	  byte-compile-warnings '(cl-functions))
 
+(setq inhibit-splash-screen t
+	  frame-inhibit-implied-resize t
+	  byte-compile-warnings '(cl-functions))
+
 (provide 'early-init)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; early-init.el ends here

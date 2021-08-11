@@ -127,7 +127,7 @@ This is an ongoing evolution of my original Emacs configuration files, inspired 
 By setting ~exec-profile~ to ~t~, profiling startup time is executed.
 
 #+begin_src emacs-lisp
-  (setq exec-profile t)
+  (setq exec-profile nil)
   
   (when exec-profile
     (defvar setup-tracker--level 0)
@@ -485,7 +485,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
   
     (leaf set-title-bar
       :when window-system
-      :defer-config
+      :config
       ;; This shoud be set before exec `display-time`. 
       (setq display-time-string-forms '((format "%s %s %s" dayname monthname day)
                                         (format "  %s:%s" 24-hours minutes))
@@ -796,10 +796,10 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                                             "→")
                                            (("<\\([[:alnum:]-]+\\)>")
                                             "\\1"))))
-    :defer-config
-    (which-key-mode))
+    :global-minor-mode t)
   
 #+end_src
+
 ** Transient Commands
 :PROPERTIES:
 :ID:       969836D1-7B4A-4EC2-86C2-6DCE273A7EAD
@@ -1299,12 +1299,66 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :END:
 
 #+begin_src emacs-lisp
+    
+    (leaf paredit
+    :ensure t
+    :require t
+    :hook
+    ((emacs-lisp-mode-hook lisp-interacton-mode-hook) . enable-paredit-mode))
   
   (leaf smartparens
     :ensure t
     :require smartparens-config
-    :hook prog-mode-hook)
+    :hook ((prog-mode-hook LaTeX-mode-hook) . turn-on-smartparens-strict-mode)
+    :bind (smartparens-mode-map
+           ("C-<down>" . sp-down-sexp)
+           ("C-<up>" . sp-up-sexp)
+           ("M-<down>" . sp-backward-down-sexp)
+           ("M-<up>" . sp-backward-up-sexp)
+           ("C-<right>" . sp-forward-slurp-sexp)
+           ("C-<left>" . sp-forward-barf-sexp)
+           ("M-<left>" . sp-backward-slurp-sexp)
+           ("M-<right>" . sp-backward-barf-sexp)
+           ("C-k" . sp-kill-hybrid-sexp)
+           ("M-k" . sp-backward-kill-sexp)
+           ("C-M-w" . sp-copy-sexp)
+           ("C-c (" . wrap-with-parens)
+           ("C-c [" . wrap-with-brackets)
+           ("C-c {" . wrap-with-braces)
+           ("C-c '" . wrap-with-single-quotes)
+           ("C-c \"" . wrap-with-double-quotes)
+           ("C-c _" . wrap-with-underscores)
+           ("C-c `" . wrap-with-back-quotes)
+           ("C-c u" . sp-unwrap-sexp))
+    :preface
+    (defmacro def-pairs (pairs)
+      "Define functions for pairing. PAIRS is an alist of (NAME . STRING)
+  conses, where NAME is the function name that will be created and
+  STRING is a single-character string that marks the opening character.
   
+    (def-pairs ((paren . \"(\")
+                (bracket . \"[\"))
+  
+  defines the functions WRAP-WITH-PAREN and WRAP-WITH-BRACKET,
+  respectively."
+      `(progn
+         ,@(cl-loop for (key . val) in pairs
+                 collect
+                 `(defun ,(read (concat
+                                 "wrap-with-"
+                                 (prin1-to-string key)
+                                 "s"))
+                      (&optional arg)
+                    (interactive "p")
+                    (sp-wrap-with-pair ,val)))))
+  
+    (def-pairs ((paren . "(")
+                (bracket . "[")
+                (brace . "{")
+                (single-quote . "'")
+                (double-quote . "\"")
+                (back-quote . "`"))))
+    
 #+end_src
 
 
@@ -2003,7 +2057,7 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 #+end_src
 
 * Org Mode
-** Org Configurationあああ非明示
+** Org Configuration
 :PROPERTIES:
 :ID:       D58073B1-A580-4070-82B4-063E2CBD8324
 :END:
@@ -2179,10 +2233,9 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
            ("c" . jethro/org-inbox-capture)
            ("q" . quit-window))
     :hook ((kill-emacs-hook . ladicle/org-clock-out-and-save-when-exit)
-           ;; (org-agenda-mode-hook . (lambda ()
-           ;;                           (add-to-list 'frame-title-format
-           ;;                                        '(:eval org-mode-line-string) t))
-           )
+           (org-clock-in . (lambda ()
+                             (add-to-list 'frame-title-format
+                                          '(:eval org-mode-line-string) t))))
     :custom
     `((org-agenda-window-setup . 'other-window)
       (org-agenda-block-separator . nil)
@@ -2426,10 +2479,8 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
                      (org-agenda-files '(,(concat jethro/org-agenda-directory
                                                   "next.org")))
                      (org-agenda-skip-function '(org-agenda-skip-entry-if
-                                                 'deadline))))))))
-    ;; (add-to-list 'frame-title-format
-    ;;              '(:eval org-mode-line-string) t)
-    )
+                                                 'deadline)))))))))
+  
 #+end_src
 ** Org Pomodoro
 :PROPERTIES:
@@ -2439,10 +2490,66 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 #+begin_src emacs-lisp
   
   (leaf org-pomodoro
+    :disabled t
     :ensure t
     :custom (org-pomodoro-start-sound-p . t)
     :hook ((org-clock-in-hook org-clock-out-hook) . (lambda () (org-pomodoro)))
     :config (add-to-list 'frame-title-format '(:eval org-pomodoro-mode-line)))
+  
+#+end_src
+** Presentations
+
+*** org-present
+:PROPERTIES:
+:ID:       C6039D29-54FA-4E04-BC1A-BE0425E792EC
+:END:
+
+=org-present= is the package I use for giving presentations in Emacs.
+
+#+begin_src emacs-lisp
+  
+  (leaf org-present
+    :ensure t
+    :bind (org-present-mode-keymap
+           ("C-c C-n" . dw/org-present-next)
+           ("C-c C-p" . dw/org-present-prev))
+    :hook ((org-present-mode-hook . dw/org-present-hook)
+           (org-present-mode-quit-hook . dw/org-present-quit-hook))
+    :preface
+    (defun dw/org-present-prepare-slide ()
+      (org-overview)
+      (org-show-entry)
+      (org-show-children))
+  
+    (defun dw/org-present-hook ()
+      (setq-local face-remapping-alist '((default (:height 1.5) variable-pitch)
+                                         (header-line (:height 4.5) variable-pitch)
+                                         (org-document-title (:height 1.75) org-document-title)
+                                         (org-code (:height 1.55) org-code)
+                                         (org-verbatim (:height 1.55) org-verbatim)
+                                         (org-block (:height 1.25) org-block)
+                                         (org-block-begin-line (:height 0.7) org-block)))
+      (setq header-line-format " ")
+      (org-appear-mode -1)
+      (org-display-inline-images)
+      (dw/org-present-prepare-slide))
+  
+    (defun dw/org-present-quit-hook ()
+      (setq-local face-remapping-alist '((default variable-pitch default)))
+      (setq header-line-format nil)
+      (org-present-small)
+      (org-remove-inline-images)
+      (org-appear-mode 1))
+  
+    (defun dw/org-present-prev ()
+      (interactive)
+      (org-present-prev)
+      (dw/org-present-prepare-slide))
+  
+    (defun dw/org-present-next ()
+      (interactive)
+      (org-present-next)
+      (dw/org-present-prepare-slide)))
   
 #+end_src
 
