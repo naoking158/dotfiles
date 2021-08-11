@@ -1590,6 +1590,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                         :slant 'normal
                         :height (cdr face)))
 
+  ;; Make sure org-indent face is available
+  (require 'org-indent)
+
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
   (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
@@ -2163,6 +2166,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   (org-roam-setup))
 
 (leaf org-bullets
+  :disabled t
   :doc "Show bullets in org-mode as UTF-8 characters"
   :url "https://github.com/integral-dw/org-bullets"
   :ensure t
@@ -2170,6 +2174,18 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   (org-bullets-bullet-list quote
                            ("" "" "" "" "" "" "" "" "" ""))
   :hook (org-mode-hook . org-bullets-mode))
+
+(leaf org-superstar
+  :ensure t
+  :after org
+  :hook (org-mode-hook . org-superstar-mode)
+  :custom
+  ((org-superstar-remove-leading-stars . t)
+   (org-superstar-headline-bullets-list . '("◉" "○" "●" "✿" "✸" " " " "))
+   (org-superstar-item-bullet-alist . '((?+ . ?➤)
+                                        (?* . ?-)
+                                        (?- . ?•)))
+   ))
 
 (leaf *org-insert-clipboard-image
   :after org

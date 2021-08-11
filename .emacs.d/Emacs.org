@@ -2125,7 +2125,7 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
     :commands (org-with-remote-undo)
     :defer-config
     (leaf org-plus-contrib :ensure t)
-    
+  
     ;; Increase the size of various headings
     (set-face-attribute 'org-document-title nil
                         :font "Iosevka Aile" :weight 'bold :height 1.6)
@@ -2164,6 +2164,9 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
                           :weight 'normal
                           :slant 'normal
                           :height (cdr face)))
+  
+    ;; Make sure org-indent face is available
+    (require 'org-indent)
   
     ;; Ensure that anything that should be fixed-pitch in Org files appears that way
     (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
@@ -2810,7 +2813,9 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 :END:
 
 #+begin_src emacs-lisp
+  
   (leaf org-bullets
+    :disabled t
     :doc "Show bullets in org-mode as UTF-8 characters"
     :url "https://github.com/integral-dw/org-bullets"
     :ensure t
@@ -2818,7 +2823,21 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
     (org-bullets-bullet-list quote
                              ("" "" "" "" "" "" "" "" "" ""))
     :hook (org-mode-hook . org-bullets-mode))
+  
+  (leaf org-superstar
+    :ensure t
+    :after org
+    :hook (org-mode-hook . org-superstar-mode)
+    :custom
+    ((org-superstar-remove-leading-stars . t)
+     (org-superstar-headline-bullets-list . '("◉" "○" "●" "✿" "✸" " " " "))
+     (org-superstar-item-bullet-alist . '((?+ . ?➤)
+                                          (?* . ?-)
+                                          (?- . ?•)))
+     ))
+  
 #+end_src
+
 
 ** Image Handling
 *** Insert Clipboard Image
