@@ -9,23 +9,6 @@
 ;; this enables this running method
 ;;   emacs -q -l ~/.debug.emacs.d/{{pkg}}/init.el
 
-    ;; (defun my/load-theme (appearance)
-    ;;   "Load theme, taking current system APPEARANCE into consideration."
-    ;;   (mapc #'disable-theme custom-enabled-themes)
-    ;;   (pcase appearance
-    ;;     ('light (load-theme 'tango t))
-    ;;     ('dark (load-theme 'tango-dark t))))
-
-    ;; (add-hook 'ns-system-appearance-change-functions #'my/load-theme)
-
-
-
-;; (leaf cl-lib
-;;   :doc "Common Lisp extensions for Emacs"
-;;   :tag "builtin"
-;;   :added "2021-02-06"
-;;   :leaf-defer t)
-
 (setq exec-profile nil)
 
 (when exec-profile
@@ -103,53 +86,54 @@
         (key-chord-define-global "x5" '"\C-x52")))))
 
 (leaf *keep-clean
-  :config
-  ;; Use no-littering to automatically set common paths to the new user-emacs-directory
-  (leaf no-littering
-    :ensure t
-    :leaf-defer nil
-    :config
-    ;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
+	:config
+	;; Use no-littering to automatically set common paths to the new user-emacs-directory
+	(leaf no-littering
+		:ensure t
+		:leaf-defer nil
+		:config
+		;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
 
-    (setq user-emacs-directory (expand-file-name "~/.cache/emacs/")
-          url-history-file (expand-file-name "url/history" user-emacs-directory))
-    (setq no-littering-etc-directory
-          (expand-file-name "etc/" user-emacs-directory))
-    (setq no-littering-var-directory
-          (expand-file-name "var/" user-emacs-directory)))
+		(setq user-emacs-directory (expand-file-name "~/.cache/emacs/")
+					url-history-file (expand-file-name "url/history" user-emacs-directory))
+		(setq no-littering-etc-directory
+					(expand-file-name "etc/" user-emacs-directory))
+		(setq no-littering-var-directory
+					(expand-file-name "var/" user-emacs-directory)))
 
-  ;; Keep customization settings in a temporary file
-  (leaf cus-edit
-    :doc "tools for customizing Emacs and Lisp packages"
-    :tag "builtin" "faces" "help"
-    :config
-    (setq custom-file
-          (if (boundp 'server-socket-dir)
-              (expand-file-name "custom.el" server-socket-dir)
-            (expand-file-name
-             (format "emacs-custom-%s.el" (user-uid))
-             temporary-file-directory)))
-    (load custom-file t))
+	;; Keep customization settings in a temporary file
+	(leaf cus-edit
+		:doc "tools for customizing Emacs and Lisp packages"
+		:tag "builtin" "faces" "help"
+		:config
+		(setq custom-file
+					(if (boundp 'server-socket-dir)
+							(expand-file-name "custom.el" server-socket-dir)
+						(expand-file-name
+						 (format "emacs-custom-%s.el" (user-uid))
+						 temporary-file-directory)))
+		(load custom-file t)
+		)
 
-  (leaf recentf
-    :require no-littering
-    :custom ((recentf-exclude . `(".recentf"
-                                  "bookmarks"
-                                  "org-recent-headings.dat"
-                                  "^/tmp\\.*"
-                                  "^/private\\.*"
-                                  "/TAGS$"
-                                  ,no-littering-var-directory
-                                  ,no-littering-etc-directory))
-             (recentf-save-file . "~/.emacs.d/.recentf")
-             (recentf-max-saved-items . 1000)
-             (recentf-auto-cleanup . 'never))
-    :global-minor-mode t)
+	(leaf recentf
+		:require no-littering
+		:custom ((recentf-exclude . `(".recentf"
+																	"bookmarks"
+																	"org-recent-headings.dat"
+																	"^/tmp\\.*"
+																	"^/private\\.*"
+																	"/TAGS$"
+																	,no-littering-var-directory
+																	,no-littering-etc-directory))
+						 (recentf-save-file . "~/.emacs.d/.recentf")
+						 (recentf-max-saved-items . 1000)
+						 (recentf-auto-cleanup . 'never))
+		:global-minor-mode t)
 
-  (leaf *auto-save
-    :config
-    (setq auto-save-file-name-transforms
-      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
+	(leaf *auto-save
+		:config
+		(setq auto-save-file-name-transforms
+			`((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
 
 (leaf *general-configrations
   :config
@@ -198,7 +182,25 @@
     :custom ((exec-path-from-shell-check-startup-files)
              (exec-path-from-shell-variables . '("PATH" "PYTHONPATH")))
     :config
-    (exec-path-from-shell-initialize))
+    (exec-path-from-shell-initialize)
+
+    (defun my/string-trim-final-newline (string)
+      (let ((len (length string)))
+        (cond
+         ((and (> len 0) (eql (aref string (- len 1)) ?\n))
+          (substring string 0 (- len 1)))
+         (t string))))
+
+    (setq path-to-miniconda
+          (my/string-trim-final-newline
+           (shell-command-to-string
+            "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
+
+    (let ((path-to-venv (expand-file-name "envs/torch" path-to-miniconda)))
+      (when (file-exists-p path-to-venv)
+        (setq path-to-venv-python (expand-file-name "bin/python" path-to-venv))
+        (custom-set-variables
+         '(org-babel-python-command path-to-venv-python)))))
 
   (leaf eldoc
     :doc "Show function arglist or variable docstring in echo area"
@@ -255,17 +257,18 @@
   :req "emacs-24.4"
   :url "https://github.com/bbatsov/super-save"
   :ensure t
+  :require t
   :require ace-window
   :blackout
   :custom ((super-save-auto-save-when-idle . t)
            (super-save-idle-duration . 7))
-  :defer-config
+  :config
   (require 'ace-window)
   ;; add integration with ace-window
   (add-to-list 'super-save-triggers 'ace-window)
   ;; save on find-file
   (add-to-list 'super-save-hook-triggers 'find-file-hook)
-  (supwer-save-mode +1))
+  (super-save-mode +1))
 
 (leaf undo-fu
   :doc "Undo helper with redo"
@@ -311,23 +314,24 @@
     (display-time)))
 
 (leaf global-visual-line-mode
-  :tag "builtin"
-  :global-minor-mode t)
+	:tag "builtin"
+	:global-minor-mode t)
 
 (leaf hl-line
-  :doc "highlight the current line"
-  :tag "builtin"
-  :require t
-  :defer-config
-  ;;; hl-lineを無効にするメジャーモードを指定する
-  (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
-  (defun global-hl-line-timer-function ()
-    (unless (memq major-mode global-hl-line-timer-exclude-modes)
-      (global-hl-line-unhighlight-all)
-      (let ((global-hl-line-mode t))
-        (global-hl-line-highlight))))
-  (setq global-hl-line-timer
-        (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
+	:doc "highlight the current line"
+	:tag "builtin"
+	:require t
+	:global-minor-mode t
+	:config
+	;;; hl-lineを無効にするメジャーモードを指定する
+	(defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
+	(defun global-hl-line-timer-function ()
+		(unless (memq major-mode global-hl-line-timer-exclude-modes)
+			(global-hl-line-unhighlight-all)
+			(let ((global-hl-line-mode t))
+				(global-hl-line-highlight))))
+	(setq global-hl-line-timer
+				(run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
 
 (leaf nord-theme
   :disabled t
@@ -664,7 +668,7 @@
   :url "https://github.com/bbatsov/projectile"
   :ensure t
   :custom (projectile-enable-caching . t)
-  :defer-config (projectile-mode))
+  :global-minor-mode t)
 
 (leaf lsp-mode
   :doc "LSP mode"
@@ -784,52 +788,40 @@
     :ensure t
     :require t
     :commands conda-env-activate
-    :preface
-    (defun string-trim-final-newline (string)
-      (let ((len (length string)))
-        (cond
-         ((and (> len 0) (eql (aref string (- len 1)) ?\n))
-          (substring string 0 (- len 1)))
-         (t string))))
-    (setq path-to-miniconda
-          (string-trim-final-newline
-           (shell-command-to-string
-            "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
+
     :custom ((conda-anaconda-home . path-to-miniconda)
              (conda-env-home-directory . path-to-miniconda))
-    :hook ((vterm-mode-hook . (lambda ()
+    :hook ((after-init-hook . (lambda ()
+                                (conda-env-initialize-eshell)
                                 (conda-env-initialize-interactive-shells)))
-           (eshell-mode-hook . (lambda ()
-                                 (conda-env-initialize-eshell)))))
+           )))
 
-
-
-  (leaf lsp-pyright
-    :doc "Python LSP client using Pyright"
-    :req "emacs-26.1" "lsp-mode-7.0" "dash-2.18.0" "ht-2.0"
-    :url "https://github.com/emacs-lsp/lsp-pyright"
-    :ensure t
-    :preface
-    (defun lsp-pyright-setup-when-conda ()
-      (setq-local lsp-pyright-venv-path python-shell-virtualenv-root)
-      (lsp-restart-workspace))
-    :hook
-    ((conda-postactivate-hook . (lambda () (lsp-pyright-setup-when-conda)))
-     (conda-postdeactivate-hook . (lambda () (lsp-pyright-setup-when-conda)))
-     (python-mode-hook . (lambda ()
-                           (setq
-                            indent-tabs-mode nil
-                            python-indent 4
-                            tab-width 4)
-                           (require 'lsp-pyright)
-                           (lsp-deferred))))
-    :config
-    (when (not window-system)
-      (defadvice python-shell-completion-at-point (around fix-company-bug activate)
-        "python-shell-completion-at-point breaks when point is before the prompt"
-        (when (or (not comint-last-prompt)
-                  (>= (point) (cdr comint-last-prompt)))
-          ad-do-it)))))
+(leaf lsp-pyright
+  :doc "Python LSP client using Pyright"
+  :req "emacs-26.1" "lsp-mode-7.0" "dash-2.18.0" "ht-2.0"
+  :url "https://github.com/emacs-lsp/lsp-pyright"
+  :ensure t
+  :preface
+  (defun lsp-pyright-setup-when-conda ()
+    (setq-local lsp-pyright-venv-path python-shell-virtualenv-root)
+    (lsp-restart-workspace))
+  :hook
+  ((conda-postactivate-hook . (lambda () (lsp-pyright-setup-when-conda)))
+   (conda-postdeactivate-hook . (lambda () (lsp-pyright-setup-when-conda)))
+   (python-mode-hook . (lambda ()
+                         (setq
+                          indent-tabs-mode nil
+                          python-indent 4
+                          tab-width 4)
+                         (require 'lsp-pyright)
+                         (lsp-deferred))))
+  :config
+  (when (not window-system)
+    (defadvice python-shell-completion-at-point (around fix-company-bug activate)
+      "python-shell-completion-at-point breaks when point is before the prompt"
+      (when (or (not comint-last-prompt)
+                (>= (point) (cdr comint-last-prompt)))
+        ad-do-it))))
 
 (leaf web-mode
   :ensure t
@@ -950,6 +942,7 @@
    (show-paren-when-point-in-periphery . t)))
 
 (leaf paredit
+  :disabled t
   :ensure t
   :require t
   :hook
@@ -960,17 +953,40 @@
   :require smartparens-config
   :hook ((prog-mode-hook LaTeX-mode-hook) . turn-on-smartparens-strict-mode)
   :bind (smartparens-mode-map
+         ("C-M-a" . sp-beginning-of-sexp)
+         ("C-M-e" . sp-end-of-sexp)
+
          ("C-<down>" . sp-down-sexp)
          ("C-<up>" . sp-up-sexp)
          ("M-<down>" . sp-backward-down-sexp)
          ("M-<up>" . sp-backward-up-sexp)
+
+         ("C-M-f" . sp-forward-sexp)
+         ("C-M-b" . sp-backward-sexp)
+
+         ("C-M-n" . sp-next-sexp)
+         ("C-M-p" . sp-previous-sexp)
+
+         ("C-S-f" . sp-forward-symbol)
+         ("C-S-b" . sp-backward-symbol)
+
          ("C-<right>" . sp-forward-slurp-sexp)
          ("C-<left>" . sp-forward-barf-sexp)
          ("M-<left>" . sp-backward-slurp-sexp)
          ("M-<right>" . sp-backward-barf-sexp)
+
+         ("C-M-k" . sp-kill-sexp)
          ("C-k" . sp-kill-hybrid-sexp)
          ("M-k" . sp-backward-kill-sexp)
          ("C-M-w" . sp-copy-sexp)
+         ("C-M-d" . sp-delete-region)
+
+         ("M-<backspace>" . backward-kill-word)
+         ("C-<backspace>" . sp-backward-kill-word)
+         ([remap sp-backward-kill-word] . backward-kill-ward)
+
+         ("M-s" . sp-unwrap-sexp)
+
          ("C-c (" . wrap-with-parens)
          ("C-c [" . wrap-with-brackets)
          ("C-c {" . wrap-with-braces)
@@ -978,7 +994,7 @@
          ("C-c \"" . wrap-with-double-quotes)
          ("C-c _" . wrap-with-underscores)
          ("C-c `" . wrap-with-back-quotes)
-         ("C-c u" . sp-unwrap-sexp))
+         )
   :preface
   (defmacro def-pairs (pairs)
     "Define functions for pairing. PAIRS is an alist of (NAME . STRING)
@@ -992,14 +1008,14 @@ defines the functions WRAP-WITH-PAREN and WRAP-WITH-BRACKET,
 respectively."
     `(progn
        ,@(cl-loop for (key . val) in pairs
-               collect
-               `(defun ,(read (concat
-                               "wrap-with-"
-                               (prin1-to-string key)
-                               "s"))
-                    (&optional arg)
-                  (interactive "p")
-                  (sp-wrap-with-pair ,val)))))
+                  collect
+                  `(defun ,(read (concat
+                                  "wrap-with-"
+                                  (prin1-to-string key)
+                                  "s"))
+                       (&optional arg)
+                     (interactive "p")
+                     (sp-wrap-with-pair ,val)))))
 
   (def-pairs ((paren . "(")
               (bracket . "[")
@@ -1491,8 +1507,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf org
   :doc "Export Framework for Org Mode"
   :tag "builtin"
-  :mode "\\.org\\'"
-  :require org-tempo  ;; need for org-template
+  :ensure org-plus-contrib
+  :require ob-async org-tempo  ;; need for org-template
   :hook (org-mode-hook . my-org-mode-hook)
   :preface
   (defun my-org-mode-hook ()
@@ -1516,7 +1532,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (org-log-done . t)
    (org-return-follows-link . t)
    (org-highlight-latex-and-related . '(latex script entities))
-
    (org-babel-load-languages . '((emacs-lisp . t)
                                  (python . t)
                                  (latex . t)
@@ -1540,17 +1555,14 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                      ("tex" . "export latex")
                                      ("q" . "quote")
                                      ("s" . "src")
-                                     ("py" . "src python :session")
+                                     ("py" . "src python :session py :async")
                                      ("d" . "definition")
                                      ("t" . "theorem")
                                      ("mc" . "quoting")
                                      ("mq" . "question")
                                      ("mt" . "todo")
                                      ("ms" . "summary"))))
-  :commands (org-with-remote-undo)
   :defer-config
-  (leaf org-plus-contrib :ensure t)
-
   ;; Increase the size of various headings
   (set-face-attribute 'org-document-title nil
                       :font "Iosevka Aile" :weight 'bold :height 1.6)
@@ -1562,9 +1574,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 
   ;; (create-fontset-from-fontset-spec
-;;    "-apple-monaco-medium-r-normal--14-*-*-*-*-*-fontset-monaco,
-;; ascii:-apple-monaco-medium-r-normal--14-140-75-75-m-140-mac-roman,
-;; latin-iso8859-1:-apple-monaco-medium-r-normal--14-140-75-75-m-140-mac-roman")
+  ;;    "-apple-monaco-medium-r-normal--14-*-*-*-*-*-fontset-monaco,
+  ;; ascii:-apple-monaco-medium-r-normal--14-140-75-75-m-140-mac-roman,
+  ;; latin-iso8859-1:-apple-monaco-medium-r-normal--14-140-75-75-m-140-mac-roman")
 
   (create-fontset-from-ascii-font "Iosevka Aile-14"
                                   nil
@@ -1598,7 +1610,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
   (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
   (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-  ;; (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+  (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
   (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
   (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
   (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
@@ -1608,35 +1620,33 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   (set-face-attribute 'org-column nil :background nil)
   (set-face-attribute 'org-column-title nil :background nil)
 
-;; (custom-theme-set-faces
-;;  'user
-;;  '(org-block ((t (:inherit fixed-pitch))))
-;;  '(org-code ((t (:inherit (shadow fixed-pitch)))))
-;;  '(org-agenda-current-time ((t (:foreground "chartreuse"))))
-;;  '(org-agenda-done ((t (:foreground "gray" :weight book))))
-;;  '(org-scheduled-today ((t (:foreground "orange" :weight book))))
-;;  '(org-agenda-date ((t (:foreground "forest green" :height 1.1))))
-;;  '(org-agenda-date-today ((t (:foreground "#98be65" :height 1.1)))))
+  ;; (custom-theme-set-faces
+  ;;  'user
+  ;;  '(org-block ((t (:inherit fixed-pitch))))
+  ;;  '(org-code ((t (:inherit (shadow fixed-pitch)))))
+  ;;  '(org-agenda-current-time ((t (:foreground "chartreuse"))))
+  ;;  '(org-agenda-done ((t (:foreground "gray" :weight book))))
+  ;;  '(org-scheduled-today ((t (:foreground "orange" :weight book))))
+  ;;  '(org-agenda-date ((t (:foreground "forest green" :height 1.1))))
+  ;;  '(org-agenda-date-today ((t (:foreground "#98be65" :height 1.1)))))
 
-(setq org-format-latex-options
-      '(:foreground default
-                    :background default
-                    :scale 1.7
-                    :html-foreground "Black"
-                    :html-background "Transparent"
-                    :html-scale 1.0
-                    :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
+  (setq org-format-latex-options
+        '(:foreground default
+                      :background default
+                      :scale 1.7
+                      :html-foreground "Black"
+                      :html-background "Transparent"
+                      :html-scale 1.0
+                      :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
 
-(when (fboundp 'mac-toggle-input-method)
-  (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii))
+  (when (fboundp 'mac-toggle-input-method)
+    (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii))
 
-(leaf ob-async
-  :ensure t
-  :after org)
+  (leaf ob-async :ensure t)
 
-(leaf org-fragtog
-  :ensure t
-  :hook (org-mode-hook . org-fragtog-mode)))
+  (leaf org-fragtog
+    :ensure t
+    :hook (org-mode-hook . org-fragtog-mode)))
 
 (leaf org-agenda
   :after org
@@ -2154,7 +2164,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
        :if-new (file+head "private/${slug}.org"
                           "#+title: ${title}#+date: %U\n")
        :unnarrowed t))))
-  :defer-config
+  :config
   ;; for org-roam-buffer-toggle
   ;; Recommendation in the official manual
   (add-to-list 'display-buffer-alist
@@ -2342,16 +2352,16 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (reftex-ref-style-default-list . '("Cleveref"))))
 
 (leaf oj
-  :doc "Competitive programming tools client for AtCoder, Codeforces"
-  :req "emacs-26.1" "quickrun-2.2"
-  :url "https://github.com/conao3/oj.el"
-  :ensure t
-  :commands oj-prepare oj-test oj-submit
-  :custom ((oj-default-online-judge quote atcoder)
-           (oj-compiler-python . "cpython")
-           (oj-home-dir . "~/drive/work/coder/AtCoder")
-           (oj-submit-args quote
-                           ("-y" "--wait=0"))))
+	:doc "Competitive programming tools client for AtCoder, Codeforces"
+	:req "emacs-26.1" "quickrun-2.2"
+	:url "https://github.com/conao3/oj.el"
+	:ensure t
+	:commands oj-prepare oj-test oj-submit
+	:custom ((oj-default-online-judge quote atcoder)
+					 (oj-compiler-python . "cpython")
+					 (oj-home-dir . "~/drive/work/coder/AtCoder")
+					 (oj-submit-args quote
+													 ("-y" "--wait=0"))))
 
 (leaf server
   :doc "Lisp code for GNU Emacs running as server process"
@@ -2359,5 +2369,22 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :require t
   :bind ("C-x C-c" . server-edit)
   :hook (after-init-hook . (lambda () (server-start))))
+
+;; (defun my/load-theme (appearance)
+;;   "Load theme, taking current system APPEARANCE into consideration."
+;;   (mapc #'disable-theme custom-enabled-themes)
+;;   (pcase appearance
+;;     ('light (load-theme 'tango t))
+;;     ('dark (load-theme 'tango-dark t))))
+
+;; (add-hook 'ns-system-appearance-change-functions #'my/load-theme)
+
+
+
+;; (leaf cl-lib
+;;   :doc "Common Lisp extensions for Emacs"
+;;   :tag "builtin"
+;;   :added "2021-02-06"
+;;   :leaf-defer t)
 
 (provide 'init)
