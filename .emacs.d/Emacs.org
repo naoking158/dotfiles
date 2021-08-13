@@ -481,9 +481,10 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
       :custom ((dashboard-items . '((agenda . 5)
                                     (recents . 5)
                                     (projects . 5)
-                                    (bookmarks . 5)))
-               (dashboard-startup-banner . "~/.emacs.d/banner/coffee.png"))
+                                    (bookmarks . 5))))
       :config
+      (when window-system
+        (setq dashboard-startup-banner "~/.emacs.d/banner/coffee.png"))
       (dashboard-setup-startup-hook))
   
     (leaf set-title-bar
@@ -1621,6 +1622,29 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
   
 #+end_src
 
+** Control Buffer Placement
+:PROPERTIES:
+:ID:       0993136C-F04A-42D0-8FBC-C143A5991F04
+:END:
+
+Emacs' default buffer placement algorithm is pretty disruptive if you like setting up window layouts a certain way in your workflow.  The =display-buffer-alist= variable controls this behavior and you can customize it to prevent Emacs from popping up new windows when you run commands.
+
+#+begin_src emacs-lisp
+  
+  (setq display-buffer-base-action
+        '(display-buffer-reuse-mode-window
+          display-buffer-reuse-window
+          display-buffer-same-window))
+  
+  ;; If a popup does happen, don't resize windows to be equal-sized
+  (setq even-window-sizes nil)
+  
+  (setq split-height-threshold nil)
+  (setq split-width-threshold 80)
+  
+#+end_src
+
+
 * Completion System
 ** Completions with Company
 :PROPERTIES:
@@ -2050,7 +2074,7 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
     :config
     (leaf vterm-toggle
       :ensure t
-      :bind (("C-c v" . vterm-toggle)
+      :bind (("C-M-'" . vterm-toggle)
              (vterm-mode-map
               ("C-<return>" . vterm-toggle-insert-cd)))
       :custom ((vterm-toggle-reset-window-configration-after-exit . t)
@@ -3148,12 +3172,12 @@ While browsing, remember the following:
 #+begin_src emacs-lisp :tangle no
   
   (leaf ace-link
-    :disabled t
+    :disabled nil
     :ensure t
     :config (ace-link-setup-default))
   
   (leaf w3m
-    :disabled t
+    :disabled nil
     :ensure t
     :require ace-link
     :commands w3m-goto-url w3m-search
@@ -3206,6 +3230,9 @@ While browsing, remember the following:
             )))
   
 #+end_src
+
+#+RESULTS:
+: w3m
 
 
 * Footer
