@@ -299,9 +299,10 @@
     :custom ((dashboard-items . '((agenda . 5)
                                   (recents . 5)
                                   (projects . 5)
-                                  (bookmarks . 5)))
-             (dashboard-startup-banner . "~/.emacs.d/banner/coffee.png"))
+                                  (bookmarks . 5))))
     :config
+    (when window-system
+      (setq dashboard-startup-banner "~/.emacs.d/banner/coffee.png"))
     (dashboard-setup-startup-hook))
 
   (leaf set-title-bar
@@ -1176,6 +1177,17 @@ respectively."
            (visual-fill-column-center-text . t))
   :hook (org-mode-hook . visual-fill-column-mode))
 
+(setq display-buffer-base-action
+      '(display-buffer-reuse-mode-window
+        display-buffer-reuse-window
+        display-buffer-same-window))
+
+;; If a popup does happen, don't resize windows to be equal-sized
+(setq even-window-sizes nil)
+
+(setq split-height-threshold nil)
+(setq split-width-threshold 80)
+
 (leaf company
   :doc "Modular text completion framework"
   :tag "matching" "convenience" "abbrev" "emacs>=24.3"
@@ -1492,7 +1504,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :config
   (leaf vterm-toggle
     :ensure t
-    :bind (("C-c v" . vterm-toggle)
+    :bind (("C-M-'" . vterm-toggle)
            (vterm-mode-map
             ("C-<return>" . vterm-toggle-insert-cd)))
     :custom ((vterm-toggle-reset-window-configration-after-exit . t)
