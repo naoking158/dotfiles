@@ -29,7 +29,7 @@
 			user-mail-address "naoki@bbo.cs.tsukuba.ac.jp"
 			user-login-name "naoking158"
 			package-native-compile t)
-(native-compile-async "~/.emacs.d/el-get/" 'recursively)
+(native-compile-async "~/.emacs.d/elisp/" 'recursively)
 (if (eq system-type 'darwin)
     (setq shell-file-name "/usr/local/bin/fish")
   (setq shell-file-name "/usr/bin/fish"))  
