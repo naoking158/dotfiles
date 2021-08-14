@@ -71,6 +71,7 @@
       :config
       (leaf-keywords-init)
       :init
+      (leaf leaf-convert :ensure t)
       (leaf hydra :ensure t)
       (leaf blackout :ensure t)
       (leaf key-chord
@@ -341,7 +342,7 @@
   (load-theme 'nord t)
 
   (leaf nano-modeline
-    :load-path "~/.emacs.d/el-get/nano-emacs/"
+    :load-path "~/.emacs.d/elisp/nano-emacs/"
     :require t nano-base-colors nano-colors nano-faces nano-theme
     :config
     (nano-faces)
@@ -408,7 +409,7 @@
   (doom-themes-org-config)
 
   (leaf nano-modeline
-    :load-path "~/.emacs.d/el-get/nano-emacs/"
+    :load-path "~/.emacs.d/elisp/nano-emacs/"
     :require t nano-base-colors nano-colors nano-faces nano-theme
     :config
     (nano-faces)
@@ -942,13 +943,6 @@
    (show-paren-when-point-inside-paren . t)
    (show-paren-when-point-in-periphery . t)))
 
-(leaf paredit
-  :disabled t
-  :ensure t
-  :require t
-  :hook
-  ((emacs-lisp-mode-hook lisp-interacton-mode-hook) . enable-paredit-mode))
-
 (leaf smartparens
   :ensure t
   :require smartparens-config
@@ -956,14 +950,6 @@
   :bind (smartparens-mode-map
          ("C-M-a" . sp-beginning-of-sexp)
          ("C-M-e" . sp-end-of-sexp)
-
-         ("C-<down>" . sp-down-sexp)
-         ("C-<up>" . sp-up-sexp)
-         ("M-<down>" . sp-backward-down-sexp)
-         ("M-<up>" . sp-backward-up-sexp)
-
-         ("C-M-f" . sp-forward-sexp)
-         ("C-M-b" . sp-backward-sexp)
 
          ("C-M-n" . sp-next-sexp)
          ("C-M-p" . sp-previous-sexp)
@@ -983,10 +969,13 @@
          ("C-M-d" . sp-delete-region)
 
          ("M-<backspace>" . backward-kill-word)
-         ("C-<backspace>" . sp-backward-kill-word)
-         ([remap sp-backward-kill-word] . backward-kill-ward)
+         ;; ([remap sp-backward-kill-word] . backward-kill-ward)
 
-         ("M-s" . sp-unwrap-sexp)
+         ;; ("M-s" . sp-unwrap-sexp)
+         ("M-s" . sp-splice-sexp) ;; depth-changing commands
+         ("M-<up>" . sp-splice-sexp-killing-backward)
+         ("M-<down>" . sp-splice-sexp-killing-forward)
+         ("M-r" . sp-splice-sexp-killing-around)
 
          ("C-c (" . wrap-with-parens)
          ("C-c [" . wrap-with-brackets)
@@ -1177,13 +1166,13 @@ respectively."
            (visual-fill-column-center-text . t))
   :hook (org-mode-hook . visual-fill-column-mode))
 
-(setq display-buffer-base-action
-      '(display-buffer-reuse-mode-window
-        display-buffer-reuse-window
-        display-buffer-same-window))
+;; (setq display-buffer-base-action
+;;       '(display-buffer-reuse-mode-window
+;;         display-buffer-reuse-window
+;;         display-buffer-same-window))
 
-;; If a popup does happen, don't resize windows to be equal-sized
-(setq even-window-sizes nil)
+;; ;; If a popup does happen, don't resize windows to be equal-sized
+;; (setq even-window-sizes nil)
 
 (setq split-height-threshold nil)
 (setq split-width-threshold 80)
@@ -1316,6 +1305,7 @@ respectively."
 
 (leaf affe
   :ensure t
+  :require t
   :after orderless
   :bind (("C-c g" . affe-grep)
          ("C-c f" . affe-find))
@@ -1323,7 +1313,9 @@ respectively."
   ;; Orderlessを利用する
   ((affe-highlight-function function orderless-highlight-matches)
    (affe-regexp-function function orderless-pattern-compiler)
-   (affe-find-command . "fd --color=never --full-path"))
+   (affe-find-command . "fd --color=never --full-path")
+   ;; (affe-grep-command . "rg --color=never --max-columns=1000 --no-heading --line-number -i -v ^$ .")
+   (affe-count . most-positive-fixnum))
   :config
   (consult-customize affe-grep :preview-key (kbd "M-.")))
 
@@ -1354,12 +1346,11 @@ respectively."
   :ensure t
   :require t
   :commands consult-customize
-  :chord (("gl" . goto-line)
-          ("fk" . consult-recentf)
-          ("gr" . consult-ripgrep))
+  :chord (("gl" . consult-goto-line)
+          ("fk" . consult-recentf))
   :bind (([remap switch-to-buffer] . consult-buffer) ; C-x b
-         ([remap yank-pop] . consult-yank-pop)         ; M-y
-         ([remap goto-line] . consult-goto-line)       ; M-g g
+         ([remap yank-pop] . consult-yank-pop)       ; M-y
+         ([remap goto-line] . consult-goto-line)     ; M-g g
          ("C-s" . my-consult-line)
          ("C-M-r" . consult-recent-file)
          ("C-c o" . consult-outline)
@@ -1507,8 +1498,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     :bind (("C-M-'" . vterm-toggle)
            (vterm-mode-map
             ("C-<return>" . vterm-toggle-insert-cd)))
-    :custom ((vterm-toggle-reset-window-configration-after-exit . t)
-             (vterm-toggle-hide-method . 'reset-window-configration))))
+    :custom ((vterm-toggle-reset-window-configration-after-exit . nil)
+             (vterm-toggle-hide-method . 'reset-window-configration)
+             )
+    ))
 
 (leaf gcmh
   :ensure t
@@ -1662,7 +1655,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf org-agenda
   :after org
-  :require t org-habit
+  :require t org-habit org-capture
   :bind* (("C-c C-a" . org-agenda-cache)
           ("C-c C-m" . jethro/org-inbox-capture))
   :bind (org-agenda-mode-map
@@ -1672,9 +1665,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
          ("c" . jethro/org-inbox-capture)
          ("q" . quit-window))
   :hook ((kill-emacs-hook . ladicle/org-clock-out-and-save-when-exit)
-         (org-clock-in . (lambda ()
-                           (add-to-list 'frame-title-format
-                                        '(:eval org-mode-line-string) t))))
+         (org-clock-in-hook . jethro/set-todo-state-next)
+         (org-clock-in-hook . (lambda ()
+                                (add-to-list 'frame-title-format
+                                             '(:eval org-mode-line-string) t))))
   :custom
   `((org-agenda-window-setup . 'other-window)
     (org-agenda-block-separator . nil)
@@ -1695,6 +1689,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
      quote
      "%40ITEM(Task) %Effort(EE){:} %CLOCKSUM(Time Spent) %SCHEDULED(Scheduled) %DEADLINE(Deadline)"))
   :preface
+  (defun jethro/set-todo-state-next ()
+    "Visit each parent task and change NEXT states to TODO"
+    (org-todo "NEXT"))
+
   (defun org-agenda-cache (&optional regenerate)
     "Show agenda buffer without updating if it exists"
     (interactive "P")
@@ -1715,7 +1713,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   (defun jethro/my-org-agenda-set-effort (effort)
     "Set the effort property for the current headline."
     (interactive
-     (list (read-string (format "Effort [%s]: " jethro/org-current-effort) nil nil jethro/org-current-effort)))
+     (list (read-string (format "Effort [%s]: " jethro/org-current-effort)
+                        nil nil jethro/org-current-effort)))
     (setq jethro/org-current-effort effort)
     (org-agenda-check-no-diary)
     (let* ((hdmarker (or (org-get-at-bol 'org-hd-marker)
@@ -1802,54 +1801,36 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (ignore-errors (org-clock-out) t)
     (save-some-buffers t))
 
+  :defvar (org-capture-templates)
   :defer-config
+  (setq
+   jethro/org-agenda-directory (file-truename "~/org/gtd/")
+   org-agenda-files (directory-files-recursively org-directory "\\.org$")
+   org-outline-path-complete-in-steps nil
+   org-log-done 'time
+   org-log-into-drawer t
+   org-log-state-notes-insert-after-drawers nil
+   org-tag-alist '(("@errand" . ?e)
+                   ("@office" . ?o)
+                   ("@home" . ?h)
+                   ("@private" . ?p)
+                   (:newline)
+                   ("CANCELLED" . ?c))
+   org-fast-tag-selection-single-key nil
+   org-todo-keywords '((sequence
+                        "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                       (sequence
+                        "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)"))
+   org-refile-use-outline-path 'file
+   org-refile-allow-creating-parent-nodes 'confirm
+   org-refile-targets '((org-agenda-files . (:level . 1)))
+   org-agenda-bulk-custom-functions `((,jethro/org-agenda-bulk-process-key
+                                       jethro/org-agenda-process-inbox-item)))
+
   (defun jethro/org-archive-done-tasks ()
     "Archive all done tasks."
     (interactive)
     (org-map-entries 'org-archive-subtree "/DONE" 'file))
-
-  (setq jethro/org-agenda-directory (file-truename "~/org/gtd/"))
-  (setq org-agenda-files (directory-files-recursively org-directory "\\.org$"))
-
-  (setq org-capture-templates
-        `(("i" "inbox" entry (file ,(concat jethro/org-agenda-directory
-                                            "inbox.org"))
-           "* TODO %?")
-          ("d" "Daily memo" entry (file+olp+datetree
-                                   ,(concat jethro/org-agenda-directory
-                                            "daily.org"))
-           ,(format-time-string "* %H:%M %?\n" (current-time))
-           :jump-to-captured 1)))
-
-  (setq org-todo-keywords
-        '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-          (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)")))
-
-  (setq org-log-done 'time
-        org-log-into-drawer t
-        org-log-state-notes-insert-after-drawers nil)
-
-  (setq org-tag-alist '(("@errand" . ?e)
-                        ("@office" . ?o)
-                        ("@home" . ?h)
-                        ("@private" . ?p)
-                        (:newline)
-                        ("CANCELLED" . ?c)))
-
-  (setq org-fast-tag-selection-single-key nil)
-  (setq org-refile-use-outline-path 'file
-        org-outline-path-complete-in-steps nil)
-  (setq org-refile-allow-creating-parent-nodes 'confirm
-        org-refile-targets '((org-agenda-files . (:level . 1))))
-
-  (setq org-agenda-bulk-custom-functions `((,jethro/org-agenda-bulk-process-key
-                                            jethro/org-agenda-process-inbox-item)))
-
-  (defun jethro/set-todo-state-next ()
-    "Visit each parent task and change NEXT states to TODO"
-    (org-todo "NEXT"))
-
-  (add-hook 'org-clock-in-hook 'jethro/set-todo-state-next 'append)
 
   (defun jethro/is-project-p ()
     "Any task with a todo keyword subtask"
@@ -1918,7 +1899,13 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                    (org-agenda-files '(,(concat jethro/org-agenda-directory
                                                 "next.org")))
                    (org-agenda-skip-function '(org-agenda-skip-entry-if
-                                               'deadline)))))))))
+                                               'deadline))))))))
+
+  (add-to-list 'org-capture-templates
+               `("i" "inbox" entry
+                 (file ,(concat jethro/org-agenda-directory "inbox.org"))
+                 "* TODO %?"))
+  )
 
 (leaf org-pomodoro
   :disabled t
@@ -2398,5 +2385,22 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 ;;   :tag "builtin"
 ;;   :added "2021-02-06"
 ;;   :leaf-defer t)
+
+(leaf tree-sitter
+  :ensure t tree-sitter-langs
+  :require tree-sitter-langs
+  :hook ((python-mode-hook . tree-sitter-hl-mode)
+         ;; Highlight Python docstrings with a different face.
+         (python-mode-hook . (lambda ()
+                               (add-function
+                                :before-until
+                                (local 'tree-sitter-hl-face-mapping-function)
+                                (lambda (capture-name)
+                                  (pcase capture-name
+                                    ("doc" 'font-lock-comment-face))))))))
+
+(leaf solaire-mode
+  :ensure t
+  :global-minor-mode solaire-global-mode)
 
 (provide 'init)

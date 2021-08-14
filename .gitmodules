@@ -1,8 +1,8 @@
-[submodule ".emacs.d/el-get/nano-emacs"]
-	path = .emacs.d/el-get/nano-emacs
+[submodule ".emacs.d/elisp/nano-emacs"]
+	path = .emacs.d/elisp/nano-emacs
 	url = https://github.com/rougier/nano-emacs.git
-[submodule ".emacs.d/el-get/flymake-posframe"]
-	path = .emacs.d/el-get/flymake-posframe
+[submodule ".emacs.d/elisp/flymake-posframe"]
+	path = .emacs.d/elisp/flymake-posframe
 	url = https://github.com/Ladicle/flymake-posframe.git
 [submodule ".tmux/plugins/tpm"]
 	path = .tmux/plugins/tpm

@@ -185,6 +185,7 @@ By setting ~exec-profile~ to ~t~, profiling startup time is executed.
         :config
         (leaf-keywords-init)
         :init
+        (leaf leaf-convert :ensure t)
         (leaf hydra :ensure t)
         (leaf blackout :ensure t)
         (leaf key-chord
@@ -198,8 +199,8 @@ By setting ~exec-profile~ to ~t~, profiling startup time is executed.
           (key-chord-define-global "x2" '"\C-x2")
           (key-chord-define-global "x3" '"\C-x3")
           (key-chord-define-global "x5" '"\C-x52")))))
-  
 #+end_src
+
 
 * Keep .emacs.d Clean
 :PROPERTIES:
@@ -540,7 +541,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
     (load-theme 'nord t)
   
     (leaf nano-modeline
-      :load-path "~/.emacs.d/el-get/nano-emacs/"
+      :load-path "~/.emacs.d/elisp/nano-emacs/"
       :require t nano-base-colors nano-colors nano-faces nano-theme
       :config
       (nano-faces)
@@ -607,7 +608,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
     (doom-themes-org-config)
   
     (leaf nano-modeline
-      :load-path "~/.emacs.d/el-get/nano-emacs/"
+      :load-path "~/.emacs.d/elisp/nano-emacs/"
       :require t nano-base-colors nano-colors nano-faces nano-theme
       :config
       (nano-faces)
@@ -1103,7 +1104,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                                   (conda-env-initialize-eshell)
                                   (conda-env-initialize-interactive-shells)))
              )))
-    
+  
   (leaf lsp-pyright
     :doc "Python LSP client using Pyright"
     :req "emacs-26.1" "lsp-mode-7.0" "dash-2.18.0" "ht-2.0"
@@ -1293,13 +1294,6 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 
 #+begin_src emacs-lisp
   
-  (leaf paredit
-    :disabled t
-    :ensure t
-    :require t
-    :hook
-    ((emacs-lisp-mode-hook lisp-interacton-mode-hook) . enable-paredit-mode))
-  
   (leaf smartparens
     :ensure t
     :require smartparens-config
@@ -1307,14 +1301,6 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
     :bind (smartparens-mode-map
            ("C-M-a" . sp-beginning-of-sexp)
            ("C-M-e" . sp-end-of-sexp)
-  
-           ("C-<down>" . sp-down-sexp)
-           ("C-<up>" . sp-up-sexp)
-           ("M-<down>" . sp-backward-down-sexp)
-           ("M-<up>" . sp-backward-up-sexp)
-  
-           ("C-M-f" . sp-forward-sexp)
-           ("C-M-b" . sp-backward-sexp)
   
            ("C-M-n" . sp-next-sexp)
            ("C-M-p" . sp-previous-sexp)
@@ -1334,10 +1320,13 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
            ("C-M-d" . sp-delete-region)
   
            ("M-<backspace>" . backward-kill-word)
-           ("C-<backspace>" . sp-backward-kill-word)
-           ([remap sp-backward-kill-word] . backward-kill-ward)
+           ;; ([remap sp-backward-kill-word] . backward-kill-ward)
   
-           ("M-s" . sp-unwrap-sexp)
+           ;; ("M-s" . sp-unwrap-sexp)
+           ("M-s" . sp-splice-sexp) ;; depth-changing commands
+           ("M-<up>" . sp-splice-sexp-killing-backward)
+           ("M-<down>" . sp-splice-sexp-killing-forward)
+           ("M-r" . sp-splice-sexp-killing-around)
   
            ("C-c (" . wrap-with-parens)
            ("C-c [" . wrap-with-brackets)
@@ -1631,13 +1620,13 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 
 #+begin_src emacs-lisp
   
-  (setq display-buffer-base-action
-        '(display-buffer-reuse-mode-window
-          display-buffer-reuse-window
-          display-buffer-same-window))
+  ;; (setq display-buffer-base-action
+  ;;       '(display-buffer-reuse-mode-window
+  ;;         display-buffer-reuse-window
+  ;;         display-buffer-same-window))
   
-  ;; If a popup does happen, don't resize windows to be equal-sized
-  (setq even-window-sizes nil)
+  ;; ;; If a popup does happen, don't resize windows to be equal-sized
+  ;; (setq even-window-sizes nil)
   
   (setq split-height-threshold nil)
   (setq split-width-threshold 80)
@@ -1760,7 +1749,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :bind ("M-c" . duplicate-thing))
 #+end_src
 
-** Multiple cursors
+* Multiple cursors
 :PROPERTIES:
 :ID:       6CF0AEB8-66DA-4730-8E60-A34059225471
 :END:
@@ -1802,6 +1791,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   
   (leaf affe
     :ensure t
+    :require t
     :after orderless
     :bind (("C-c g" . affe-grep)
            ("C-c f" . affe-find))
@@ -1809,7 +1799,9 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     ;; Orderlessを利用する
     ((affe-highlight-function function orderless-highlight-matches)
      (affe-regexp-function function orderless-pattern-compiler)
-     (affe-find-command . "fd --color=never --full-path"))
+     (affe-find-command . "fd --color=never --full-path")
+     ;; (affe-grep-command . "rg --color=never --max-columns=1000 --no-heading --line-number -i -v ^$ .")
+     (affe-count . most-positive-fixnum))
     :config
     (consult-customize affe-grep :preview-key (kbd "M-.")))
   
@@ -1858,12 +1850,11 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :ensure t
     :require t
     :commands consult-customize
-    :chord (("gl" . goto-line)
-            ("fk" . consult-recentf)
-            ("gr" . consult-ripgrep))
+    :chord (("gl" . consult-goto-line)
+            ("fk" . consult-recentf))
     :bind (([remap switch-to-buffer] . consult-buffer) ; C-x b
-           ([remap yank-pop] . consult-yank-pop)         ; M-y
-           ([remap goto-line] . consult-goto-line)       ; M-g g
+           ([remap yank-pop] . consult-yank-pop)       ; M-y
+           ([remap goto-line] . consult-goto-line)     ; M-g g
            ("C-s" . my-consult-line)
            ("C-M-r" . consult-recent-file)
            ("C-c o" . consult-outline)
@@ -2077,8 +2068,10 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
       :bind (("C-M-'" . vterm-toggle)
              (vterm-mode-map
               ("C-<return>" . vterm-toggle-insert-cd)))
-      :custom ((vterm-toggle-reset-window-configration-after-exit . t)
-               (vterm-toggle-hide-method . 'reset-window-configration))))
+      :custom ((vterm-toggle-reset-window-configration-after-exit . nil)
+               (vterm-toggle-hide-method . 'reset-window-configration)
+               )
+      ))
   
 #+end_src
 
@@ -2259,7 +2252,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 #+begin_src emacs-lisp
   (leaf org-agenda
     :after org
-    :require t org-habit
+    :require t org-habit org-capture
     :bind* (("C-c C-a" . org-agenda-cache)
             ("C-c C-m" . jethro/org-inbox-capture))
     :bind (org-agenda-mode-map
@@ -2269,9 +2262,10 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
            ("c" . jethro/org-inbox-capture)
            ("q" . quit-window))
     :hook ((kill-emacs-hook . ladicle/org-clock-out-and-save-when-exit)
-           (org-clock-in . (lambda ()
-                             (add-to-list 'frame-title-format
-                                          '(:eval org-mode-line-string) t))))
+           (org-clock-in-hook . jethro/set-todo-state-next)
+           (org-clock-in-hook . (lambda ()
+                                  (add-to-list 'frame-title-format
+                                               '(:eval org-mode-line-string) t))))
     :custom
     `((org-agenda-window-setup . 'other-window)
       (org-agenda-block-separator . nil)
@@ -2292,6 +2286,10 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
        quote
        "%40ITEM(Task) %Effort(EE){:} %CLOCKSUM(Time Spent) %SCHEDULED(Scheduled) %DEADLINE(Deadline)"))
     :preface
+    (defun jethro/set-todo-state-next ()
+      "Visit each parent task and change NEXT states to TODO"
+      (org-todo "NEXT"))
+  
     (defun org-agenda-cache (&optional regenerate)
       "Show agenda buffer without updating if it exists"
       (interactive "P")
@@ -2312,7 +2310,8 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     (defun jethro/my-org-agenda-set-effort (effort)
       "Set the effort property for the current headline."
       (interactive
-       (list (read-string (format "Effort [%s]: " jethro/org-current-effort) nil nil jethro/org-current-effort)))
+       (list (read-string (format "Effort [%s]: " jethro/org-current-effort)
+                          nil nil jethro/org-current-effort)))
       (setq jethro/org-current-effort effort)
       (org-agenda-check-no-diary)
       (let* ((hdmarker (or (org-get-at-bol 'org-hd-marker)
@@ -2399,54 +2398,36 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
       (ignore-errors (org-clock-out) t)
       (save-some-buffers t))
   
+    :defvar (org-capture-templates)
     :defer-config
+    (setq
+     jethro/org-agenda-directory (file-truename "~/org/gtd/")
+     org-agenda-files (directory-files-recursively org-directory "\\.org$")
+     org-outline-path-complete-in-steps nil
+     org-log-done 'time
+     org-log-into-drawer t
+     org-log-state-notes-insert-after-drawers nil
+     org-tag-alist '(("@errand" . ?e)
+                     ("@office" . ?o)
+                     ("@home" . ?h)
+                     ("@private" . ?p)
+                     (:newline)
+                     ("CANCELLED" . ?c))
+     org-fast-tag-selection-single-key nil
+     org-todo-keywords '((sequence
+                          "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                         (sequence
+                          "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)"))
+     org-refile-use-outline-path 'file
+     org-refile-allow-creating-parent-nodes 'confirm
+     org-refile-targets '((org-agenda-files . (:level . 1)))
+     org-agenda-bulk-custom-functions `((,jethro/org-agenda-bulk-process-key
+                                         jethro/org-agenda-process-inbox-item)))
+  
     (defun jethro/org-archive-done-tasks ()
       "Archive all done tasks."
       (interactive)
       (org-map-entries 'org-archive-subtree "/DONE" 'file))
-  
-    (setq jethro/org-agenda-directory (file-truename "~/org/gtd/"))
-    (setq org-agenda-files (directory-files-recursively org-directory "\\.org$"))
-  
-    (setq org-capture-templates
-          `(("i" "inbox" entry (file ,(concat jethro/org-agenda-directory
-                                              "inbox.org"))
-             "* TODO %?")
-            ("d" "Daily memo" entry (file+olp+datetree
-                                     ,(concat jethro/org-agenda-directory
-                                              "daily.org"))
-             ,(format-time-string "* %H:%M %?\n" (current-time))
-             :jump-to-captured 1)))
-  
-    (setq org-todo-keywords
-          '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-            (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)")))
-  
-    (setq org-log-done 'time
-          org-log-into-drawer t
-          org-log-state-notes-insert-after-drawers nil)
-  
-    (setq org-tag-alist '(("@errand" . ?e)
-                          ("@office" . ?o)
-                          ("@home" . ?h)
-                          ("@private" . ?p)
-                          (:newline)
-                          ("CANCELLED" . ?c)))
-  
-    (setq org-fast-tag-selection-single-key nil)
-    (setq org-refile-use-outline-path 'file
-          org-outline-path-complete-in-steps nil)
-    (setq org-refile-allow-creating-parent-nodes 'confirm
-          org-refile-targets '((org-agenda-files . (:level . 1))))
-  
-    (setq org-agenda-bulk-custom-functions `((,jethro/org-agenda-bulk-process-key
-                                              jethro/org-agenda-process-inbox-item)))
-  
-    (defun jethro/set-todo-state-next ()
-      "Visit each parent task and change NEXT states to TODO"
-      (org-todo "NEXT"))
-  
-    (add-hook 'org-clock-in-hook 'jethro/set-todo-state-next 'append)
   
     (defun jethro/is-project-p ()
       "Any task with a todo keyword subtask"
@@ -2515,8 +2496,13 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                      (org-agenda-files '(,(concat jethro/org-agenda-directory
                                                   "next.org")))
                      (org-agenda-skip-function '(org-agenda-skip-entry-if
-                                                 'deadline)))))))))
+                                                 'deadline))))))))
   
+    (add-to-list 'org-capture-templates
+                 `("i" "inbox" entry
+                   (file ,(concat jethro/org-agenda-directory "inbox.org"))
+                   "* TODO %?"))
+    )
 #+end_src
 ** Org Pomodoro
 :PROPERTIES:
@@ -3234,6 +3220,39 @@ While browsing, remember the following:
 #+RESULTS:
 : w3m
 
+** Tree Sitter
+:PROPERTIES:
+:ID:       2B53130F-3718-4EE5-9CF1-1E8C33996939
+:END:
+
+#+begin_src emacs-lisp
+  
+  (leaf tree-sitter
+    :ensure t tree-sitter-langs
+    :require tree-sitter-langs
+    :hook ((python-mode-hook . tree-sitter-hl-mode)
+           ;; Highlight Python docstrings with a different face.
+           (python-mode-hook . (lambda ()
+                                 (add-function
+                                  :before-until
+                                  (local 'tree-sitter-hl-face-mapping-function)
+                                  (lambda (capture-name)
+                                    (pcase capture-name
+                                      ("doc" 'font-lock-comment-face))))))))
+#+end_src
+
+** Solaire-Mode
+:PROPERTIES:
+:ID:       CC1789FF-76CB-414E-A01B-6F0B53C0A022
+:END:
+
+#+begin_src emacs-lisp
+  
+  (leaf solaire-mode
+    :ensure t
+    :global-minor-mode solaire-global-mode)
+  
+#+end_src
 
 * Footer
 :PROPERTIES:
