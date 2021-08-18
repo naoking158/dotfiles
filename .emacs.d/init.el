@@ -397,7 +397,8 @@
   :req "emacs-25.1" "cl-lib-0.5"
   :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
   :url "https://github.com/hlissner/emacs-doom-theme"
-  :ensure t
+  :ensure t neotree all-the-icons
+  :require neotree all-the-icons
   :custom ((doom-themes-enable-italic . t)
            (doom-themes-enable-bold . t))
   :config
@@ -631,6 +632,16 @@
   )
 
 (leaf crux :ensure t)
+
+(leaf neotree
+  :ensure t all-the-icons
+  :require all-the-icons
+  :bind ("C-c c" . neotree-show)
+  :custom ((neo-show-hidden-files . t)
+           (neo-smart-open . t)
+           (neo-window-fixed-size . nil)
+           (neo-confirm-create-file . 'y-or-n-p)
+           (neo-confirm-create-directory . 'y-or-n-p)))
 
 (leaf magit
   :doc "A Git porcelain inside Emacs."
@@ -1166,13 +1177,13 @@ respectively."
            (visual-fill-column-center-text . t))
   :hook (org-mode-hook . visual-fill-column-mode))
 
-;; (setq display-buffer-base-action
-;;       '(display-buffer-reuse-mode-window
-;;         display-buffer-reuse-window
-;;         display-buffer-same-window))
+(setq display-buffer-base-action
+      '(display-buffer-reuse-mode-window
+        display-buffer-reuse-window
+        display-buffer-same-window))
 
-;; ;; If a popup does happen, don't resize windows to be equal-sized
-;; (setq even-window-sizes nil)
+;; If a popup does happen, don't resize windows to be equal-sized
+(setq even-window-sizes nil)
 
 (setq split-height-threshold nil)
 (setq split-width-threshold 80)
@@ -1314,8 +1325,7 @@ respectively."
   ((affe-highlight-function function orderless-highlight-matches)
    (affe-regexp-function function orderless-pattern-compiler)
    (affe-find-command . "fd --color=never --full-path")
-   ;; (affe-grep-command . "rg --color=never --max-columns=1000 --no-heading --line-number -i -v ^$ .")
-   (affe-count . most-positive-fixnum))
+   (affe-grep-command . "rg --color=never --max-columns=1000 --no-heading --no-ignore --line-number -i -v ^$ ."))
   :config
   (consult-customize affe-grep :preview-key (kbd "M-.")))
 
@@ -1471,9 +1481,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :tag "location" "point" "emacs>=24.1"
   :url "https://github.com/abo-abo/avy"
   :ensure t
-  :bind (("C-c a w" . avy-goto-word-1)
-         ("C-c a c" . avy-goto-char-2)
-         ("C-c a l" . avy-goto-line)))
+  :bind (("C-c a" . avy-goto-char-2)
+         ;; ("C-c a w" . avy-goto-word-1)
+         ;; ("C-c a c" . avy-goto-char-2)
+         ;; ("C-c a l" . avy-goto-line)
+         ))
 
 (leaf mwim
   :doc "Switch between the beginning/end of line or code"
@@ -2029,7 +2041,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     :config
     (add-to-list 'org-capture-templates
                  '("b" "Create new blog post" entry
-                   (file+headline "~/src/github.com/naoking158/blog-src/org/naoki.org" "blog")
+                   (file+headline "~/src/omgithub.com/naoking158/blog-src/org/naoki.org" "blog")
                    "** TODO %?
 :PROPERTIES:
 :EXPORT_FILE_NAME: %(apply #'format \"%s-%s-%s\"
