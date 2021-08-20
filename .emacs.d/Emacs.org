@@ -718,7 +718,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
       ;; ascii
       (set-face-attribute 'default nil
                           :font "JetBrains Mono"
-                          :weight 'light
+                          :weight 'medium
                           :height (* font-size 10))      
   
       ;; Set the fixed pitch face
@@ -1665,8 +1665,8 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   ;; If a popup does happen, don't resize windows to be equal-sized
   (setq even-window-sizes nil)
   
-  (setq split-height-threshold nil)
-  (setq split-width-threshold 80)
+  ;; (setq split-height-threshold nil)
+  ;; (setq split-width-threshold nil)
   
 #+end_src
 
@@ -2139,6 +2139,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :tag "builtin"
     :ensure org-plus-contrib
     :require ob-async org-tempo  ;; need for org-template
+    :mode "\\.org\\'"
     :hook (org-mode-hook . my-org-mode-hook)
     :preface
     (defun my-org-mode-hook ()
@@ -2192,7 +2193,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                                        ("mq" . "question")
                                        ("mt" . "todo")
                                        ("ms" . "summary"))))
-    :defer-config
+    :config
     ;; Increase the size of various headings
     (set-face-attribute 'org-document-title nil
                         :font "Iosevka Aile" :weight 'bold :height 1.6)
@@ -3196,14 +3197,12 @@ While browsing, remember the following:
 #+begin_src emacs-lisp :tangle no
   
   (leaf ace-link
-    :disabled nil
     :ensure t
     :config (ace-link-setup-default))
   
   (leaf w3m
-    :disabled nil
     :ensure t
-    :require ace-link
+    :require t ace-link
     :commands w3m-goto-url w3m-search
     :init
     (setq browse-url-browser-function 'w3m-browse-url)
@@ -3211,10 +3210,11 @@ While browsing, remember the following:
     :hook (;; clean up the w3m buffers:
            (w3m-display-functions-hook . w3m-hide-stuff)
            (w3m-mode-hook . ace-link-mode))
-    :bind (("C-c w w" . w3m-goto-url)
-           ("C-c w l" . browse-url-at-point)
+    :bind (("C-c w w" . w3m)
+           ("C-c w o" . browse-url-at-point)
            ("C-c w s" . w3m-search)
            (w3m-mode-map
+            ("q" . quit-window)
             ("&" . w3m-view-url-with-external-browser)))
     :config
     ;; Web Page Cleanup

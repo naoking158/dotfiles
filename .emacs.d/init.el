@@ -508,7 +508,7 @@
     ;; ascii
     (set-face-attribute 'default nil
                         :font "JetBrains Mono"
-                        :weight 'light
+                        :weight 'medium
                         :height (* font-size 10))      
 
     ;; Set the fixed pitch face
@@ -1185,8 +1185,8 @@ respectively."
 ;; If a popup does happen, don't resize windows to be equal-sized
 (setq even-window-sizes nil)
 
-(setq split-height-threshold nil)
-(setq split-width-threshold 80)
+;; (setq split-height-threshold nil)
+;; (setq split-width-threshold nil)
 
 (leaf company
   :doc "Modular text completion framework"
@@ -1526,6 +1526,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :tag "builtin"
   :ensure org-plus-contrib
   :require ob-async org-tempo  ;; need for org-template
+  :mode "\\.org\\'"
   :hook (org-mode-hook . my-org-mode-hook)
   :preface
   (defun my-org-mode-hook ()
@@ -1579,7 +1580,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                      ("mq" . "question")
                                      ("mt" . "todo")
                                      ("ms" . "summary"))))
-  :defer-config
+  :config
   ;; Increase the size of various headings
   (set-face-attribute 'org-document-title nil
                       :font "Iosevka Aile" :weight 'bold :height 1.6)
