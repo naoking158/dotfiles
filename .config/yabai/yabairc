@@ -48,9 +48,9 @@ yabai -m config normal_window_opacity 0.8
 # float system preferences
 yabai -m rule --add app="^Audio MIDI Setup$" manage=off
 yabai -m rule --add app="^Finder$" manage=off
-yabai -m rule --add app="^Calender$" manage=off
+yabai -m rule --add app="^Calendar$" manage=off
 yabai -m rule --add app="^System Preferences$" manage=off
-yabai -m rule --add app="^Music$" manage=off
+yabai -m rule --add app="^ミュージック$" manage=off
 
 # sticky system preferences
 yabai -m rule --add app="^Digital Colou?r Meter$" sticky=on
