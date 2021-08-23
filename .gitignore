@@ -22,6 +22,10 @@
 !/.config/
 !/.config/alacritty/
 !/.config/alacritty/**
+!/.config/yabai/
+!/.config/yabai/**
+!/.config/skhd/
+!/.config/skhd/**
 !/.config/fish/
 !/.config/fish/**
 /.config/fish/fish_variables

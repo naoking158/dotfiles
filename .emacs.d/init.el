@@ -316,24 +316,33 @@
     (display-time)))
 
 (leaf global-visual-line-mode
-	:tag "builtin"
-	:global-minor-mode t)
+  :tag "builtin"
+  :global-minor-mode t)
 
 (leaf hl-line
-	:doc "highlight the current line"
-	:tag "builtin"
-	:require t
-	:global-minor-mode t
-	:config
-	;;; hl-lineを無効にするメジャーモードを指定する
-	(defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
-	(defun global-hl-line-timer-function ()
-		(unless (memq major-mode global-hl-line-timer-exclude-modes)
-			(global-hl-line-unhighlight-all)
-			(let ((global-hl-line-mode t))
-				(global-hl-line-highlight))))
-	(setq global-hl-line-timer
-				(run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
+  :doc "highlight the current line"
+  :tag "builtin"
+  :require t
+  :global-minor-mode t
+  :config
+  ;;; hl-lineを無効にするメジャーモードを指定する
+  (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
+  (defun global-hl-line-timer-function ()
+    (unless (memq major-mode global-hl-line-timer-exclude-modes)
+      (global-hl-line-unhighlight-all)
+      (let ((global-hl-line-mode t))
+        (global-hl-line-highlight))))
+  (setq global-hl-line-timer
+        (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
+
+(leaf *frame-transparency
+  :preface
+  (defun change-transparency (alpha-num)
+    "Sets the transparency of the frame window. 0=transparent/100=opaque"
+    (interactive "nTransparency Value 0 - 100 opaque:")
+    (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5))))
+  :config
+  (set-frame-parameter nil 'alpha '(90 85)))
 
 (leaf nord-theme
   :disabled t
@@ -508,7 +517,7 @@
     ;; ascii
     (set-face-attribute 'default nil
                         :font "JetBrains Mono"
-                        :weight 'medium
+                        :weight 'light
                         :height (* font-size 10))      
 
     ;; Set the fixed pitch face
@@ -1542,7 +1551,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (org-hide-block-startup . nil)
    (org-startup-folded . 'content)
 
-   (org-adapt-indentation . nil)
+   (org-adapt-indentation . t)
    (org-indent-indentation-per-level . 1)
    (org-startup-indented . t)
    (org-use-speed-commands . t)
@@ -1606,8 +1615,12 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   ;; (set-face-attribute 'org-level-1 nil :font "fontset-myoutline" :weight 'normal :slant 'normal :height 1.6)
   ;; (set-face-attribute 'org-level-2 nil :font "fontset-myoutline" :weight 'normal :slant 'normal :height 1.4)
 
-  (dolist (face '((org-level-1 . 1.6)
-                  (org-level-2 . 1.5)
+  (set-face-attribute 'org-level-1 nil
+                      :font "fontset-myoutline"
+                      :weight 'bold
+                      :slant 'normal
+                      :height 1.5)
+  (dolist (face '((org-level-2 . 1.4)
                   (org-level-3 . 1.3)
                   (org-level-4 . 1.2)
                   (org-level-5 . 1.1)
@@ -1628,7 +1641,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
   (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
   (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+  (set-face-attribute 'org-indent t :inherit '(org-hide fixed-pitch))
   (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
   (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
   (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
@@ -2202,11 +2215,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :after org
   :hook (org-mode-hook . org-superstar-mode)
   :custom
-  ((org-superstar-remove-leading-stars . t)
+  ((org-superstar-remove-leading-stars . nil)
    (org-superstar-headline-bullets-list . '("◉" "○" "●" "✿" "✸" " " " "))
    (org-superstar-item-bullet-alist . '((?+ . ?➤)
-                                        (?* . ?-)
-                                        (?- . ?•)))
+                                        (?* . ?•)
+                                        (?- . ?-)))
    ))
 
 (leaf *org-insert-clipboard-image
