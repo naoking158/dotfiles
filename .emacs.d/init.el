@@ -336,11 +336,13 @@
         (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
 
 (leaf *frame-transparency
+  :defun set-font
   :preface
   (defun change-transparency (alpha-num)
     "Sets the transparency of the frame window. 0=transparent/100=opaque"
     (interactive "nTransparency Value 0 - 100 opaque:")
-    (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5))))
+    (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5)))
+    (set-font))
   :config
   (set-frame-parameter nil 'alpha '(90 85)))
 
@@ -512,65 +514,72 @@
 
 (leaf *font
   :when window-system
-  :config
-  (let ((font-size 14))
-    ;; ascii
-    (set-face-attribute 'default nil
-                        :font "JetBrains Mono"
-                        :weight 'light
-                        :height (* font-size 10))      
+  :hook (after-init-hook . (lambda () (set-font)))
+  :preface
+  (defun set-font ()
+    (interactive)
+    (let ((font-size 14))
+      ;; ascii
+      (set-face-attribute 'default nil
+                          :font "JetBrains Mono"
+                          :weight 'light
+                          :height (* font-size 10)
+                          :foreground "white")      
 
-    ;; Set the fixed pitch face
-    (set-face-attribute 'fixed-pitch nil
-                        :font "JetBrains Mono"
-                        :weight 'light
-                        :height (* font-size 10))
+      ;; Set the fixed pitch face
+      (set-face-attribute 'fixed-pitch nil
+                          :font "JetBrains Mono"
+                          :weight 'light
+                          :height (* font-size 10)
+                          :foreground "white")
 
-    ;; Set the variable pitch face
-    (set-face-attribute 'variable-pitch nil
-                        :font "Iosevka Aile"
-                        :height (* font-size 10)
-                        :weight 'light)
+      ;; Set the variable pitch face
+      (set-face-attribute 'variable-pitch nil
+                          :font "Iosevka Aile"
+                          :height (* font-size 10)
+                          :weight 'light
+                          :foreground "white")
 
-    ;; japanese
-    ;; (set-fontset-font t 'unicode
-    ;;                   "Noto Serif CJK JP-14"
-    ;;                   nil 'append))
-    (set-fontset-font t 'unicode
-                      (font-spec
-                       :family "Noto Sans CJK JP" 
-                       :height (* font-size 10))
-                      nil 'append))
+      ;; japanese
+      ;; (set-fontset-font t 'unicode
+      ;;                   "Noto Serif CJK JP-14"
+      ;;                   nil 'append))
+      (set-fontset-font t 'unicode
+                        (font-spec
+                         :family "Noto Sans CJK JP" 
+                         :height (* font-size 10)
+                         :foreground "white")
+                        nil 'append))
 
-  ;; Ligature for Fira Code or JetBrains Mono
-  (let ((alist
-         '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
-           (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
-           (36 . ".\\(?:>\\)")
-           (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
-           (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
-           (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
-           (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
-           (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
-           (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
-           (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
-           (48 . ".\\(?:x[a-zA-Z]\\)")
-           (58 . ".\\(?:::\\|[:=]\\)")
-           (59 . ".\\(?:;;\\|;\\)")
-           (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
-           (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
-           (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
-           (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
-           (91 . ".\\(?:]\\)")
-           (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
-           (94 . ".\\(?:=\\)")
-           (119 . ".\\(?:ww\\)")
-           (123 . ".\\(?:-\\)")
-           (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
-           (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
-    (dolist (char-regexp alist)
-      (set-char-table-range composition-function-table (car char-regexp)
-                            `([,(cdr char-regexp) 0 font-shape-gstring])))))
+    ;; Ligature for Fira Code or JetBrains Mono
+    (let ((alist
+           '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
+             (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
+             (36 . ".\\(?:>\\)")
+             (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
+             (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
+             (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
+             (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
+             (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
+             (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
+             (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
+             (48 . ".\\(?:x[a-zA-Z]\\)")
+             (58 . ".\\(?:::\\|[:=]\\)")
+             (59 . ".\\(?:;;\\|;\\)")
+             (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
+             (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
+             (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
+             (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
+             (91 . ".\\(?:]\\)")
+             (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
+             (94 . ".\\(?:=\\)")
+             (119 . ".\\(?:ww\\)")
+             (123 . ".\\(?:-\\)")
+             (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
+             (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
+      (dolist (char-regexp alist)
+        (set-char-table-range composition-function-table (car char-regexp)
+                              `([,(cdr char-regexp) 0 font-shape-gstring]))))))
 
 (leaf which-key
   :doc "Display available keybindings in popup"

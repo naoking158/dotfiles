@@ -201,7 +201,6 @@ By setting ~exec-profile~ to ~t~, profiling startup time is executed.
           (key-chord-define-global "x5" '"\C-x52")))))
 #+end_src
 
-
 * Keep .emacs.d Clean
 :PROPERTIES:
 :ID:       68D98540-9112-4C5B-B6FC-A196DF4068B0
@@ -264,7 +263,6 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 				`((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
 	
 #+end_src
-
 
 * General Configuration
 :PROPERTIES:
@@ -526,14 +524,15 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
           (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
   
   (leaf *frame-transparency
+    :defun set-font
     :preface
     (defun change-transparency (alpha-num)
       "Sets the transparency of the frame window. 0=transparent/100=opaque"
       (interactive "nTransparency Value 0 - 100 opaque:")
-      (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5))))
+      (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5)))
+      (set-font))
     :config
     (set-frame-parameter nil 'alpha '(90 85)))
-  
   
 #+end_src
 
@@ -723,65 +722,72 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
   
   (leaf *font
     :when window-system
-    :config
-    (let ((font-size 14))
-      ;; ascii
-      (set-face-attribute 'default nil
-                          :font "JetBrains Mono"
-                          :weight 'light
-                          :height (* font-size 10))      
+    :hook (after-init-hook . (lambda () (set-font)))
+    :preface
+    (defun set-font ()
+      (interactive)
+      (let ((font-size 14))
+        ;; ascii
+        (set-face-attribute 'default nil
+                            :font "JetBrains Mono"
+                            :weight 'light
+                            :height (* font-size 10)
+                            :foreground "white")      
   
-      ;; Set the fixed pitch face
-      (set-face-attribute 'fixed-pitch nil
-                          :font "JetBrains Mono"
-                          :weight 'light
-                          :height (* font-size 10))
+        ;; Set the fixed pitch face
+        (set-face-attribute 'fixed-pitch nil
+                            :font "JetBrains Mono"
+                            :weight 'light
+                            :height (* font-size 10)
+                            :foreground "white")
   
-      ;; Set the variable pitch face
-      (set-face-attribute 'variable-pitch nil
-                          :font "Iosevka Aile"
-                          :height (* font-size 10)
-                          :weight 'light)
+        ;; Set the variable pitch face
+        (set-face-attribute 'variable-pitch nil
+                            :font "Iosevka Aile"
+                            :height (* font-size 10)
+                            :weight 'light
+                            :foreground "white")
   
-      ;; japanese
-      ;; (set-fontset-font t 'unicode
-      ;;                   "Noto Serif CJK JP-14"
-      ;;                   nil 'append))
-      (set-fontset-font t 'unicode
-                        (font-spec
-                         :family "Noto Sans CJK JP" 
-                         :height (* font-size 10))
-                        nil 'append))
+        ;; japanese
+        ;; (set-fontset-font t 'unicode
+        ;;                   "Noto Serif CJK JP-14"
+        ;;                   nil 'append))
+        (set-fontset-font t 'unicode
+                          (font-spec
+                           :family "Noto Sans CJK JP" 
+                           :height (* font-size 10)
+                           :foreground "white")
+                          nil 'append))
   
-    ;; Ligature for Fira Code or JetBrains Mono
-    (let ((alist
-           '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
-             (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
-             (36 . ".\\(?:>\\)")
-             (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
-             (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
-             (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
-             (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
-             (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
-             (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
-             (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
-             (48 . ".\\(?:x[a-zA-Z]\\)")
-             (58 . ".\\(?:::\\|[:=]\\)")
-             (59 . ".\\(?:;;\\|;\\)")
-             (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
-             (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
-             (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
-             (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
-             (91 . ".\\(?:]\\)")
-             (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
-             (94 . ".\\(?:=\\)")
-             (119 . ".\\(?:ww\\)")
-             (123 . ".\\(?:-\\)")
-             (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
-             (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
-      (dolist (char-regexp alist)
-        (set-char-table-range composition-function-table (car char-regexp)
-                              `([,(cdr char-regexp) 0 font-shape-gstring])))))
+      ;; Ligature for Fira Code or JetBrains Mono
+      (let ((alist
+             '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
+               (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
+               (36 . ".\\(?:>\\)")
+               (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
+               (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
+               (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
+               (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
+               (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
+               (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
+               (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
+               (48 . ".\\(?:x[a-zA-Z]\\)")
+               (58 . ".\\(?:::\\|[:=]\\)")
+               (59 . ".\\(?:;;\\|;\\)")
+               (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
+               (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
+               (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
+               (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
+               (91 . ".\\(?:]\\)")
+               (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
+               (94 . ".\\(?:=\\)")
+               (119 . ".\\(?:ww\\)")
+               (123 . ".\\(?:-\\)")
+               (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
+               (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
+        (dolist (char-regexp alist)
+          (set-char-table-range composition-function-table (car char-regexp)
+                                `([,(cdr char-regexp) 0 font-shape-gstring]))))))
 #+end_src
 
 #+RESULTS:
@@ -988,6 +994,7 @@ Only in Neotree Buffer:
      (git-gutter:deleted . '((t (:background "#ff79c6"))))))
   
 #+end_src
+
 ** Projectile
 :PROPERTIES:
 :ID:       B887BCAD-C177-4C2B-8655-1304091A35AF
@@ -1104,10 +1111,13 @@ Only in Neotree Buffer:
              (lsp-ui-peek-fontify . 'on-demand) ;; never, on-demand, or always
              ))
 #+end_src
+
+
 *** Emacs Lisp
 :PROPERTIES:
 :ID:       FD410FBA-E2FA-441C-9883-C739500E4BF5
 :END:
+
 #+begin_src emacs-lisp
   
   (leaf helpful
@@ -1123,6 +1133,8 @@ Only in Neotree Buffer:
     :bind (("C-c e" . macrostep-expand)))
   
 #+end_src
+
+
 *** Python
 :PROPERTIES:
 :ID:       9C320B3B-BEB9-40A0-A0DF-9587475A9D88
@@ -1179,6 +1191,8 @@ Only in Neotree Buffer:
                   (>= (point) (cdr comint-last-prompt)))
           ad-do-it))))
 #+end_src
+
+
 *** HTML
 :PROPERTIES:
 :ID:       8A817B4F-518D-40C2-BCEE-2573EACF9E9D
@@ -1253,6 +1267,8 @@ Only in Neotree Buffer:
                                  (add-to-list 'ispell-skip-region-alist
                                               '("[^\000-\377]+"))))))
 #+end_src
+
+
 *** Indent checking with highlight-indent-guides
 :PROPERTIES:
 :ID:       BF1D8C1E-1ED3-4B41-A3F5-0295C163418B
@@ -1315,6 +1331,8 @@ Only in Neotree Buffer:
             (insert "    ") ; else insert four spaces as expected
             )))))
 #+end_src
+
+
 *** Showing Pair of Brackets with Paren
 :PROPERTIES:
 :ID:       DDCDF00F-9DC8-47FD-8DFD-68B9B21E8A02
@@ -1610,6 +1628,8 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
                     (message "Quit")
                     (throw 'end-flag t))))))))
 #+end_src
+
+
 ** Named Window with tab-bar
 :PROPERTIES:
 :ID:       E76C0A4A-586E-4086-B576-99102F0D9724
@@ -1628,6 +1648,8 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
                                (tab-bar-mode)
                                (tab-bar-new-tab))))
 #+end_src
+
+
 ** Rotate Window Layout
 :PROPERTIES:
 :ID:       CB3337CE-AE80-4668-B754-7BC007AACA12
@@ -1643,6 +1665,8 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
             ("rw" . rotate-window)))
   
 #+end_src
+
+
 ** Set Margins
 :PROPERTIES:
 :ID:       4837B3E1-C7EF-4300-B52B-184ED9123165
@@ -1679,7 +1703,6 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   ;; (setq split-width-threshold nil)
   
 #+end_src
-
 
 * Completion System
 ** Completions with Company
@@ -2058,6 +2081,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 :PROPERTIES:
 :ID:       EC8B3264-A96A-4622-9A16-A8E7AED23B11
 :END:
+
 #+begin_src emacs-lisp
   (leaf avy
     :doc "Jump to arbitrary positions in visible text and select text quickly."
@@ -2071,6 +2095,8 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
            ;; ("C-c a l" . avy-goto-line)
            ))
 #+end_src
+
+
 ** Jumping beginning/end of line with mwim
 :PROPERTIES:
 :ID:       D8F51490-CACF-4A50-B0B8-2ADC6B58951B
@@ -2085,6 +2111,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :bind (("C-a" . mwim-beginning-of-code-or-line)
            ("C-e" . mwim-end-of-code-or-line)))
 #+end_src
+
 * Shell
 
 ** Fish Mode
@@ -2557,6 +2584,8 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                    "* TODO %?"))
     )
 #+end_src
+
+
 ** Org Pomodoro
 :PROPERTIES:
 :ID:       F0B67B65-0D01-4684-89C2-4A42F4009459
@@ -2572,6 +2601,8 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :config (add-to-list 'frame-title-format '(:eval org-pomodoro-mode-line)))
   
 #+end_src
+
+
 ** Presentations
 
 *** org-present
@@ -2671,6 +2702,8 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :after org)
   
 #+end_src
+
+
 ** Outline-based notes management and organizer
 *** Export framework Configuration
 :PROPERTIES:
@@ -2692,6 +2725,8 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
       (ox-extras-activate '(latex-header-blocks ignore-headlines))))
   
 #+end_src
+
+
 *** Export Hugo Markdown
 :PROPERTIES:
 :ID:       E2113B7A-0BAC-403F-BAFB-67F6B6E9D76F
@@ -2734,10 +2769,13 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   ")
                    'append)))
 #+end_src
+
+
 *** Export Latex
 :PROPERTIES:
 :ID:       4DBD2DF5-46B9-4132-B769-08B27E5E33DF
 :END:
+
 #+begin_src emacs-lisp
   (leaf ox-latex
     :doc "LaTeX Back-End for Org Export Engine"
@@ -2821,6 +2859,8 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
       (setq org-latex-pdf-process (list (my-latexmk-command TeX-engine "-pv" "%f" "%o")))
       ))
 #+end_src
+
+
 ** Org Roam
 :PROPERTIES:
 :ID:       2304CA71-831A-46DB-B88C-38ECB7178BAB
