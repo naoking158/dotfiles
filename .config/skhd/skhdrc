@@ -18,6 +18,7 @@ hyper - left  : yabai -m window --display prev; yabai -m display --focus prev
 ################################################################
 
 # focus window
+alt + cmd - o : yabai -m window --focus recent
 alt + cmd - h : yabai -m window --focus west
 alt + cmd - l : yabai -m window --focus east
 alt + cmd - j : yabai -m window --focus north

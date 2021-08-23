@@ -316,40 +316,35 @@
     (display-time)))
 
 (leaf global-visual-line-mode
-  :tag "builtin"
-  :global-minor-mode t)
+    :tag "builtin"
+    :global-minor-mode t)
 
-(leaf hl-line
-  :doc "highlight the current line"
-  :tag "builtin"
-  :require t
-  :global-minor-mode t
-  :config
-  ;;; hl-lineを無効にするメジャーモードを指定する
-  (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
-  (defun global-hl-line-timer-function ()
-    (unless (memq major-mode global-hl-line-timer-exclude-modes)
-      (global-hl-line-unhighlight-all)
-      (let ((global-hl-line-mode t))
-        (global-hl-line-highlight))))
-  (setq global-hl-line-timer
-        (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
+  (leaf hl-line
+    :doc "highlight the current line"
+    :tag "builtin"
+    :require t
+    :global-minor-mode t
+    :config
+    ;;; hl-lineを無効にするメジャーモードを指定する
+    (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
+    (defun global-hl-line-timer-function ()
+      (unless (memq major-mode global-hl-line-timer-exclude-modes)
+        (global-hl-line-unhighlight-all)
+        (let ((global-hl-line-mode t))
+          (global-hl-line-highlight))))
+    (setq global-hl-line-timer
+          (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
 
 (leaf *frame-transparency
+  :defun set-font
   :preface
-<<<<<<< HEAD
-  (defun set-alpha (alpha-num)
-    "set frame parameter 'alpha"
-    (interactive "nAlpha: ")
-    (set-frame-parameter nil 'alpha (cons alpha-num '(90))))
-=======
   (defun change-transparency (alpha-num)
     "Sets the transparency of the frame window. 0=transparent/100=opaque"
     (interactive "nTransparency Value 0 - 100 opaque:")
-    (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5))))
->>>>>>> dev
-  :config
-  (set-frame-parameter nil 'alpha '(90 85)))
+    (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5)))
+    (set-font)
+    :config
+    (set-frame-parameter nil 'alpha '(90 85))))
 
 (leaf nord-theme
   :disabled t
@@ -408,7 +403,7 @@
                                                    :foreground ,nano-color-faded)))))))
 
 (leaf doom-themes
-  :disabled nil
+  :disabled t
   :doc "an opinionated pack of modern color-themes"
   :req "emacs-25.1" "cl-lib-0.5"
   :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
@@ -517,67 +512,131 @@
       :hook
       ((neotree-mode imenu-list-minor-mode minimap-mode) . hide-mode-line-mode))))
 
+
+(leaf modus-themes
+  :ensure t
+  :init
+  ;; Add all your customizations prior to loading the themes
+  (setq modus-themes-italic-constructs t
+        modus-themes-bold-constructs t
+        modus-themes-region '(bg-only no-extend)
+        modus-themes-org-blocks 'gray-background
+        modus-themes-subtle-line-numbers t
+        modus-themes-variable-pitch-headings t
+        modus-themes-variable-pitch-ui t
+        modus-themes-fringes nil
+        modus-themes-prompts '(intense gray)
+        modus-themes-completions 'opinionated
+        modus-themes-paren-match '(bold intense underline)
+
+        modus-themes-org-agenda ; this is an alist: read the manual or its doc string
+        '((header-block . (variable-pitch scale-title))
+          (header-date . (grayscale workaholic bold-today))
+          (scheduled . uniform)
+          (habit . traffic-light-deuteranopia))
+
+        ;; modus-themes-scale-headings t
+        ;; modus-themes-scale-1 1.1
+        ;; modus-themes-scale-2 1.2
+        ;; modus-themes-scale-3 1.3
+        ;; modus-themes-scale-4 1.4
+        ;; modus-themes-scale-title 1.33
+        )
+
+  ;; Load the theme files before enabling a theme
+  (modus-themes-load-themes)
+  :config
+  ;; (modus-themes-load-operandi) ;; light
+  (modus-themes-load-vivendi)  ;; dark
+
+  (leaf moody
+    :ensure t
+    :config
+    (setq x-underline-at-descent-line t)
+    (column-number-mode 1)
+    (moody-replace-mode-line-buffer-identification)
+    (moody-replace-vc-mode))
+
+  (leaf minions
+    :ensure t
+    :config
+    (setq minions-mode-line-lighter ";"
+          minions-direct (list 'defining-kbd-macro
+                               'flymake-mode))
+    (minions-mode 1))
+  )
+
 (leaf *font
   :when window-system
-  :config
-  (let ((font-size 14))
-    ;; ascii
-    (set-face-attribute 'default nil
-                        :font "JetBrains Mono"
-                        :weight 'light
-                        :height (* font-size 10))      
+  :hook (after-init-hook . (lambda () (set-font)))
+  :preface
+  (defun set-font ()
+    (interactive)
+    ;; This is for Emacs28.
+    (setq-default text-scale-remap-header-line t)
 
-    ;; Set the fixed pitch face
-    (set-face-attribute 'fixed-pitch nil
-                        :font "JetBrains Mono"
-                        :weight 'light
-                        :height (* font-size 10))
+    (let ((font-size 14))
+      ;; ascii
+      (set-face-attribute 'default nil
+                          :font "JetBrains Mono"
+                          :weight 'semi-light
+                          :height (* font-size 10)
+                          :foreground "white")      
 
-    ;; Set the variable pitch face
-    (set-face-attribute 'variable-pitch nil
-                        :font "Iosevka Aile"
-                        :height (* font-size 10)
-                        :weight 'light)
+      ;; Set the fixed pitch face
+      (set-face-attribute 'fixed-pitch nil
+                          :font "JetBrains Mono"
+                          :weight 'semi-light
+                          :height (* font-size 10)
+                          :foreground "white")
 
-    ;; japanese
-    ;; (set-fontset-font t 'unicode
-    ;;                   "Noto Serif CJK JP-14"
-    ;;                   nil 'append))
-    (set-fontset-font t 'unicode
-                      (font-spec
-                       :family "Noto Sans CJK JP" 
-                       :height (* font-size 10))
-                      nil 'append))
+      ;; Set the variable pitch face
+      (set-face-attribute 'variable-pitch nil
+                          :font "Iosevka Aile"
+                          :height (* font-size 10)
+                          :weight 'semi-light
+                          :foreground "white")
 
-  ;; Ligature for Fira Code or JetBrains Mono
-  (let ((alist
-         '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
-           (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
-           (36 . ".\\(?:>\\)")
-           (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
-           (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
-           (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
-           (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
-           (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
-           (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
-           (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
-           (48 . ".\\(?:x[a-zA-Z]\\)")
-           (58 . ".\\(?:::\\|[:=]\\)")
-           (59 . ".\\(?:;;\\|;\\)")
-           (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
-           (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
-           (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
-           (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
-           (91 . ".\\(?:]\\)")
-           (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
-           (94 . ".\\(?:=\\)")
-           (119 . ".\\(?:ww\\)")
-           (123 . ".\\(?:-\\)")
-           (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
-           (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
-    (dolist (char-regexp alist)
-      (set-char-table-range composition-function-table (car char-regexp)
-                            `([,(cdr char-regexp) 0 font-shape-gstring])))))
+      ;; japanese
+      ;; (set-fontset-font t 'unicode
+      ;;                   "Noto Serif CJK JP-14"
+      ;;                   nil 'append))
+      (set-fontset-font t 'unicode
+                        (font-spec
+                         :family "Noto Sans CJK JP" 
+                         :height (* font-size 10)
+                         :foreground "white")
+                        nil 'append))
+
+    ;; Ligature for Fira Code or JetBrains Mono
+    (let ((alist
+           '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
+             (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
+             (36 . ".\\(?:>\\)")
+             (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
+             (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
+             (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
+             (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
+             (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
+             (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
+             (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
+             (48 . ".\\(?:x[a-zA-Z]\\)")
+             (58 . ".\\(?:::\\|[:=]\\)")
+             (59 . ".\\(?:;;\\|;\\)")
+             (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
+             (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
+             (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
+             (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
+             (91 . ".\\(?:]\\)")
+             (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
+             (94 . ".\\(?:=\\)")
+             (119 . ".\\(?:ww\\)")
+             (123 . ".\\(?:-\\)")
+             (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
+             (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
+      (dolist (char-regexp alist)
+        (set-char-table-range composition-function-table (car char-regexp)
+                              `([,(cdr char-regexp) 0 font-shape-gstring]))))))
 
 (leaf which-key
   :doc "Display available keybindings in popup"
@@ -1440,7 +1499,7 @@ respectively."
 (leaf vertico
   :ensure t
   :require t
-  :custom ((vertico-count . 20)
+  :custom ((vertico-count . 10)
            (vertico-cycle . t))
   :global-minor-mode t savehist-mode)
 

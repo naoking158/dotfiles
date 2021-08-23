@@ -57,6 +57,7 @@ yabai -m rule --add app="^Audio MIDI Setup$" manage=off
 yabai -m rule --add app="^Finder$" manage=off
 yabai -m rule --add app="^Calender$" manage=off
 yabai -m rule --add app="^System Preferences$" manage=off
+yabai -m rule --add app="^Music$" manage=off
 
 # sticky system preferences
 yabai -m rule --add app="^Digital Colou?r Meter$" sticky=on
