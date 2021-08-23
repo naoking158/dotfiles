@@ -42,7 +42,7 @@
 																		(height . 67)
 																		(line-spacing . 4)
 																		(vertical-scroll-bars)
-																		(menu-bar-lines . 0)
+																		;; (menu-bar-lines . 0)
 																		(tool-bar-lines . 0))
 																	initial-frame-alist))
 
