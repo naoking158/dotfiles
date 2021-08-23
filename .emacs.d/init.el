@@ -337,10 +337,17 @@
 
 (leaf *frame-transparency
   :preface
+<<<<<<< HEAD
   (defun set-alpha (alpha-num)
     "set frame parameter 'alpha"
     (interactive "nAlpha: ")
     (set-frame-parameter nil 'alpha (cons alpha-num '(90))))
+=======
+  (defun change-transparency (alpha-num)
+    "Sets the transparency of the frame window. 0=transparent/100=opaque"
+    (interactive "nTransparency Value 0 - 100 opaque:")
+    (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5))))
+>>>>>>> dev
   :config
   (set-frame-parameter nil 'alpha '(90 85)))
 
