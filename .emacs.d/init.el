@@ -316,33 +316,33 @@
     (display-time)))
 
 (leaf global-visual-line-mode
-    :tag "builtin"
-    :global-minor-mode t)
+      :tag "builtin"
+      :global-minor-mode t)
 
-  (leaf hl-line
-    :doc "highlight the current line"
-    :tag "builtin"
-    :require t
-    :global-minor-mode t
-    :config
-    ;;; hl-lineを無効にするメジャーモードを指定する
-    (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
-    (defun global-hl-line-timer-function ()
-      (unless (memq major-mode global-hl-line-timer-exclude-modes)
-        (global-hl-line-unhighlight-all)
-        (let ((global-hl-line-mode t))
-          (global-hl-line-highlight))))
-    (setq global-hl-line-timer
-          (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
+    (leaf hl-line
+      :doc "highlight the current line"
+      :tag "builtin"
+      :require t
+      :global-minor-mode t
+      :config
+      ;;; hl-lineを無効にするメジャーモードを指定する
+      (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
+      (defun global-hl-line-timer-function ()
+        (unless (memq major-mode global-hl-line-timer-exclude-modes)
+          (global-hl-line-unhighlight-all)
+          (let ((global-hl-line-mode t))
+            (global-hl-line-highlight))))
+      (setq global-hl-line-timer
+            (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
 
 (leaf *frame-transparency
-  :defun set-font
+  :defun my/set-font
   :preface
   (defun change-transparency (alpha-num)
     "Sets the transparency of the frame window. 0=transparent/100=opaque"
     (interactive "nTransparency Value 0 - 100 opaque:")
     (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5)))
-    (set-font)
+    (my/set-font)
     :config
     (set-frame-parameter nil 'alpha '(90 85))))
 
@@ -515,6 +515,7 @@
 
 (leaf modus-themes
   :ensure t
+  :hook (modus-themes-toggle-hook . my/set-org-headline-face)
   :init
   ;; Add all your customizations prior to loading the themes
   (setq modus-themes-italic-constructs t
@@ -568,9 +569,9 @@
 
 (leaf *font
   :when window-system
-  :hook (after-init-hook . (lambda () (set-font)))
+  :hook (after-init-hook . my/set-font)
   :preface
-  (defun set-font ()
+  (defun my/set-font ()
     (interactive)
     ;; This is for Emacs28.
     (setq-default text-scale-remap-header-line t)
@@ -890,19 +891,22 @@
   :url "https://github.com/emacs-lsp/lsp-pyright"
   :ensure t
   :preface
-  (defun lsp-pyright-setup-when-conda ()
+  (defun my/lsp-pyright-setup-when-conda ()
     (setq-local lsp-pyright-venv-path python-shell-virtualenv-root)
     (lsp-restart-workspace))
+
+  (defun my/python-basic-config ()
+    (setq indent-tabs-mode nil
+          python-indent 4
+          tab-width 4)
+    (require 'lsp-pyright)
+    (lsp-deferred))
+
   :hook
-  ((conda-postactivate-hook . (lambda () (lsp-pyright-setup-when-conda)))
-   (conda-postdeactivate-hook . (lambda () (lsp-pyright-setup-when-conda)))
-   (python-mode-hook . (lambda ()
-                         (setq
-                          indent-tabs-mode nil
-                          python-indent 4
-                          tab-width 4)
-                         (require 'lsp-pyright)
-                         (lsp-deferred))))
+  ((conda-postactivate-hook . my/lsp-pyright-setup-when-conda)
+   (conda-postdeactivate-hook . my/lsp-pyright-setup-when-conda)
+   (python-mode-hook . my/python-basic-config))
+
   :config
   (when (not window-system)
     (defadvice python-shell-completion-at-point (around fix-company-bug activate)
@@ -1157,8 +1161,7 @@ respectively."
   (leaf yatemplate
     :ensure t
     :after yasnippet
-    :hook (after-init-hook . (lambda ()
-                               (yatemplate-fill-alist)))))
+    :hook (after-init-hook . yatemplate-fill-alist)))
 
 (leaf google-translate
   :ensure t
@@ -1294,6 +1297,7 @@ respectively."
     :ensure t
     :custom
     (company-org-block-edit-style . 'auto) ;; 'auto, 'prompt, or 'inline
+    :preface
     :hook ((org-mode-hook . (lambda ()
                               (setq-local company-backends
                                           '(company-org-block
@@ -1602,9 +1606,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :ensure org-plus-contrib
   :require ob-async org-tempo  ;; need for org-template
   :mode "\\.org\\'"
-  :hook (org-mode-hook . my-org-mode-hook)
+  :hook (org-mode-hook . my/org-mode-hook)
   :preface
-  (defun my-org-mode-hook ()
+  (defun my/org-mode-hook ()
     (add-hook 'completion-at-point-functions
               'pcomplete-completions-at-point nil t))
   :custom
@@ -1656,21 +1660,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                      ("mt" . "todo")
                                      ("ms" . "summary"))))
   :config
-  ;; Increase the size of various headings
-  (set-face-attribute 'org-document-title nil
-                      :font "Iosevka Aile" :weight 'bold :height 1.6)
-
-  ;; (create-fontset-from-fontset-spec
-  ;;  "-*-Iosevka Aile-normal-normal-normal-*-*-*-*-*-*-*-fontset-myoutline, ascii:-*-Iosevka Aile-normal-normal-normal-*-140-*-*-*-p-0-iso10646-1, latin:-*-Iosevka Aile-normal-normal-normal-*-140-*-*-*-p-0-iso10646-1, unicode:-*-Noto Sans CJK JP-normal-normal-normal-*-140-*-*-*-p-0-iso10646-1" t)
-  ;; (create-fontset-from-fontset-spec
-  ;;  "-*-*-normal-normal-normal-*-*-*-*-*-*-*-fontset-myoutline, ascii:-*-Iosevka Aile-normal-normal-normal-*-140-*-*-*-p-0-iso10646-1, latin:-*-Iosevka Aile-normal-normal-normal-*-140-*-*-*-p-0-iso10646-1, unicode:-*-Noto Sans CJK JP-normal-normal-normal-*-140-*-*-*-p-0-iso10646-1" t)
-
-
-  ;; (create-fontset-from-fontset-spec
-  ;;    "-apple-monaco-medium-r-normal--14-*-*-*-*-*-fontset-monaco,
-  ;; ascii:-apple-monaco-medium-r-normal--14-140-75-75-m-140-mac-roman,
-  ;; latin-iso8859-1:-apple-monaco-medium-r-normal--14-140-75-75-m-140-mac-roman")
-
   (create-fontset-from-ascii-font "Iosevka Aile-14"
                                   nil
                                   "myoutline")
@@ -1678,26 +1667,29 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                     "Noto Sans CJK JP-14"
                     nil 'append)
 
-  ;; (set-face-attribute 'org-level-1 nil :font "fontset-myoutline" :weight 'normal :slant 'normal :height 1.6)
-  ;; (set-face-attribute 'org-level-2 nil :font "fontset-myoutline" :weight 'normal :slant 'normal :height 1.4)
-
-  (set-face-attribute 'org-level-1 nil
-                      :font "fontset-myoutline"
-                      :weight 'bold
-                      :slant 'normal
-                      :height 1.5)
-  (dolist (face '((org-level-2 . 1.4)
-                  (org-level-3 . 1.3)
-                  (org-level-4 . 1.2)
-                  (org-level-5 . 1.1)
-                  (org-level-6 . 1.1)
-                  (org-level-7 . 1.1)
-                  (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil
+  (defun my/set-org-headline-face ()
+    ;; Increase the size of various headings
+    (interactive)
+    (set-face-attribute 'org-document-title nil
+                        :font "Iosevka Aile" :weight 'bold :height 1.6)
+    (set-face-attribute 'org-level-1 nil
                         :font "fontset-myoutline"
-                        :weight 'normal
+                        :weight 'bold
                         :slant 'normal
-                        :height (cdr face)))
+                        :height 1.35)
+    (dolist (face '((org-level-2 . 1.3)
+                    (org-level-3 . 1.2)
+                    (org-level-4 . 1.15)
+                    (org-level-5 . 1.1)
+                    (org-level-6 . 1.1)
+                    (org-level-7 . 1.1)
+                    (org-level-8 . 1.1)))
+      (set-face-attribute (car face) nil
+                          :font "fontset-myoutline"
+                          :weight 'normal
+                          :slant 'normal
+                          :height (cdr face))))
+  (my/set-org-headline-face)
 
   ;; Make sure org-indent face is available
   (require 'org-indent)
@@ -1785,7 +1777,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     "Visit each parent task and change NEXT states to TODO"
     (org-todo "NEXT"))
 
-  (defun org-agenda-cache (&optional regenerate)
+  (defun my/org-agenda-cache (&optional regenerate)
     "Show agenda buffer without updating if it exists"
     (interactive "P")
     (if (or regenerate (null (get-buffer "*Org Agenda*")))
@@ -2003,7 +1995,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :disabled t
   :ensure t
   :custom (org-pomodoro-start-sound-p . t)
-  :hook ((org-clock-in-hook org-clock-out-hook) . (lambda () (org-pomodoro)))
+  :hook ((org-clock-in-hook org-clock-out-hook) . org-pomodoro)
   :config (add-to-list 'frame-title-format '(:eval org-pomodoro-mode-line)))
 
 (leaf org-present
@@ -2459,7 +2451,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :tag "builtin"
   :require t
   :bind ("C-x C-c" . server-edit)
-  :hook (after-init-hook . (lambda () (server-start))))
+  :hook (after-init-hook . server-start))
 
 ;; (defun my/load-theme (appearance)
 ;;   "Load theme, taking current system APPEARANCE into consideration."
@@ -2481,15 +2473,17 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf tree-sitter
   :ensure t tree-sitter-langs
   :require tree-sitter-langs
+  :preface
+  (defun my/highlight-python-docstrings ()
+    (add-function
+     :before-until (local 'tree-sitter-hl-face-mapping-function)
+     (lambda (capture-name)
+       (pcase capture-name
+         ("doc" 'font-lock-comment-face)))))
+
   :hook ((python-mode-hook . tree-sitter-hl-mode)
          ;; Highlight Python docstrings with a different face.
-         (python-mode-hook . (lambda ()
-                               (add-function
-                                :before-until
-                                (local 'tree-sitter-hl-face-mapping-function)
-                                (lambda (capture-name)
-                                  (pcase capture-name
-                                    ("doc" 'font-lock-comment-face))))))))
+         (python-mode-hook . my/highlight-python-docstrings)))
 
 (leaf solaire-mode
   :ensure t

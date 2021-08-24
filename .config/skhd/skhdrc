@@ -36,15 +36,18 @@ hyper - 0 : yabai -m space --balance
 # make floating window fill screen
 cmd + alt - f     : yabai -m window --grid 1:1:0:0:1:1
 
-# make floating window fill left-half of screen
+# make floating window fill half of screen
 ctrl + alt - left   : yabai -m window --grid 1:2:0:0:1:1
-
-# make floating window fill left-half of screen
 ctrl + alt - right   : yabai -m window --grid 1:2:1:0:1:1
 
-# move floating window
-# shift + ctrl - a : yabai -m window --move rel:-20:0
-# shift + ctrl - s : yabai -m window --move rel:0:20
+# make floating window fill one thirds of screen
+ctrl + alt - a   : yabai -m window --grid 1:3:0:0:1:1
+ctrl + alt - c   : yabai -m window --grid 1:3:1:0:1:1
+ctrl + alt - s   : yabai -m window --grid 1:3:2:0:1:1
+
+# make floating window fill two thirds of screen
+ctrl + alt + shift - a   : yabai -m window --grid 1:3:0:0:2:1
+ctrl + alt + shift - s   : yabai -m window --grid 1:3:1:0:2:1
 
 # toggle window zoom
 # alt - d : yabai -m window --toggle zoom-parent
