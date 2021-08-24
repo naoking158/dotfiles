@@ -316,24 +316,24 @@
     (display-time)))
 
 (leaf global-visual-line-mode
-  :tag "builtin"
-  :global-minor-mode t)
+      :tag "builtin"
+      :global-minor-mode t)
 
-(leaf hl-line
-  :doc "highlight the current line"
-  :tag "builtin"
-  :require t
-  :global-minor-mode t
-  :config
-  ;;; hl-lineを無効にするメジャーモードを指定する
-  (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
-  (defun global-hl-line-timer-function ()
-    (unless (memq major-mode global-hl-line-timer-exclude-modes)
-      (global-hl-line-unhighlight-all)
-      (let ((global-hl-line-mode t))
-        (global-hl-line-highlight))))
-  (setq global-hl-line-timer
-        (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
+    (leaf hl-line
+      :doc "highlight the current line"
+      :tag "builtin"
+      :require t
+      :global-minor-mode t
+      :config
+      ;;; hl-lineを無効にするメジャーモードを指定する
+      (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
+      (defun global-hl-line-timer-function ()
+        (unless (memq major-mode global-hl-line-timer-exclude-modes)
+          (global-hl-line-unhighlight-all)
+          (let ((global-hl-line-mode t))
+            (global-hl-line-highlight))))
+      (setq global-hl-line-timer
+            (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
 
 (leaf *frame-transparency
   :defun my/set-font
@@ -342,9 +342,9 @@
     "Sets the transparency of the frame window. 0=transparent/100=opaque"
     (interactive "nTransparency Value 0 - 100 opaque:")
     (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5)))
-    (my/set-font))
-  :config
-  (set-frame-parameter nil 'alpha '(90 85)))
+    (my/set-font)
+    :config
+    (set-frame-parameter nil 'alpha '(90 85))))
 
 (leaf nord-theme
   :disabled t
