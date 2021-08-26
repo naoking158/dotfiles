@@ -211,57 +211,57 @@ I don't want a bunch of transient files showing up as untracked in the Git repo 
 The location is managed by [[https://github.com/emacscollective/no-littering][no-littering]].
 
 #+begin_src emacs-lisp
-	
-	(leaf *keep-clean
-		:config
-		;; Use no-littering to automatically set common paths to the new user-emacs-directory
-		(leaf no-littering
-			:ensure t
-			:leaf-defer nil
-			:config
-			;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
-	
-			(setq user-emacs-directory (expand-file-name "~/.cache/emacs/")
-						url-history-file (expand-file-name "url/history" user-emacs-directory))
-			(setq no-littering-etc-directory
-						(expand-file-name "etc/" user-emacs-directory))
-			(setq no-littering-var-directory
-						(expand-file-name "var/" user-emacs-directory)))
-	
-		;; Keep customization settings in a temporary file
-		(leaf cus-edit
-			:doc "tools for customizing Emacs and Lisp packages"
-			:tag "builtin" "faces" "help"
-			:config
-			(setq custom-file
-						(if (boundp 'server-socket-dir)
-								(expand-file-name "custom.el" server-socket-dir)
-							(expand-file-name
-							 (format "emacs-custom-%s.el" (user-uid))
-							 temporary-file-directory)))
-			(load custom-file t)
-			)
-	
-		(leaf recentf
-			:require no-littering
-			:custom ((recentf-exclude . `(".recentf"
-																		"bookmarks"
-																		"org-recent-headings.dat"
-																		"^/tmp\\.*"
-																		"^/private\\.*"
-																		"/TAGS$"
-																		,no-littering-var-directory
-																		,no-littering-etc-directory))
-							 (recentf-save-file . "~/.emacs.d/.recentf")
-							 (recentf-max-saved-items . 1000)
-							 (recentf-auto-cleanup . 'never))
-			:global-minor-mode t)
-	
-		(leaf *auto-save
-			:config
-			(setq auto-save-file-name-transforms
-				`((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
-	
+  
+  (leaf *keep-clean
+    :config
+    ;; Use no-littering to automatically set common paths to the new user-emacs-directory
+    (leaf no-littering
+      :ensure t
+      :leaf-defer nil
+      :config
+      ;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
+  
+      (setq user-emacs-directory (expand-file-name "~/.cache/emacs/")
+            url-history-file (expand-file-name "url/history" user-emacs-directory))
+      (setq no-littering-etc-directory
+            (expand-file-name "etc/" user-emacs-directory))
+      (setq no-littering-var-directory
+            (expand-file-name "var/" user-emacs-directory)))
+  
+    ;; Keep customization settings in a temporary file
+    (leaf cus-edit
+      :doc "tools for customizing Emacs and Lisp packages"
+      :tag "builtin" "faces" "help"
+      :config
+      (setq custom-file
+            (if (boundp 'server-socket-dir)
+                (expand-file-name "custom.el" server-socket-dir)
+              (expand-file-name
+               (format "emacs-custom-%s.el" (user-uid))
+               temporary-file-directory)))
+      (load custom-file t)
+      )
+  
+    (leaf recentf
+      :require no-littering
+      :custom ((recentf-exclude . `(".recentf"
+                                    "bookmarks"
+                                    "org-recent-headings.dat"
+                                    "^/tmp\\.*"
+                                    "^/private\\.*"
+                                    "/TAGS$"
+                                    ,no-littering-var-directory
+                                    ,no-littering-etc-directory))
+               (recentf-save-file . "~/.emacs.d/.recentf")
+               (recentf-max-saved-items . 1000)
+               (recentf-auto-cleanup . 'never))
+      :global-minor-mode t)
+  
+    (leaf *auto-save
+      :config
+      (setq auto-save-file-name-transforms
+        `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
+  
 #+end_src
 
 * General Configuration
@@ -502,11 +502,11 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :END:
 
 #+begin_src emacs-lisp
-      
+  
       (leaf global-visual-line-mode
         :tag "builtin"
         :global-minor-mode t)
-      
+  
       (leaf hl-line
         :doc "highlight the current line"
         :tag "builtin"

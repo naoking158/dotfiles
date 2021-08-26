@@ -87,54 +87,54 @@
         (key-chord-define-global "x5" '"\C-x52")))))
 
 (leaf *keep-clean
-	:config
-	;; Use no-littering to automatically set common paths to the new user-emacs-directory
-	(leaf no-littering
-		:ensure t
-		:leaf-defer nil
-		:config
-		;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
+  :config
+  ;; Use no-littering to automatically set common paths to the new user-emacs-directory
+  (leaf no-littering
+    :ensure t
+    :leaf-defer nil
+    :config
+    ;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
 
-		(setq user-emacs-directory (expand-file-name "~/.cache/emacs/")
-					url-history-file (expand-file-name "url/history" user-emacs-directory))
-		(setq no-littering-etc-directory
-					(expand-file-name "etc/" user-emacs-directory))
-		(setq no-littering-var-directory
-					(expand-file-name "var/" user-emacs-directory)))
+    (setq user-emacs-directory (expand-file-name "~/.cache/emacs/")
+          url-history-file (expand-file-name "url/history" user-emacs-directory))
+    (setq no-littering-etc-directory
+          (expand-file-name "etc/" user-emacs-directory))
+    (setq no-littering-var-directory
+          (expand-file-name "var/" user-emacs-directory)))
 
-	;; Keep customization settings in a temporary file
-	(leaf cus-edit
-		:doc "tools for customizing Emacs and Lisp packages"
-		:tag "builtin" "faces" "help"
-		:config
-		(setq custom-file
-					(if (boundp 'server-socket-dir)
-							(expand-file-name "custom.el" server-socket-dir)
-						(expand-file-name
-						 (format "emacs-custom-%s.el" (user-uid))
-						 temporary-file-directory)))
-		(load custom-file t)
-		)
+  ;; Keep customization settings in a temporary file
+  (leaf cus-edit
+    :doc "tools for customizing Emacs and Lisp packages"
+    :tag "builtin" "faces" "help"
+    :config
+    (setq custom-file
+          (if (boundp 'server-socket-dir)
+              (expand-file-name "custom.el" server-socket-dir)
+            (expand-file-name
+             (format "emacs-custom-%s.el" (user-uid))
+             temporary-file-directory)))
+    (load custom-file t)
+    )
 
-	(leaf recentf
-		:require no-littering
-		:custom ((recentf-exclude . `(".recentf"
-																	"bookmarks"
-																	"org-recent-headings.dat"
-																	"^/tmp\\.*"
-																	"^/private\\.*"
-																	"/TAGS$"
-																	,no-littering-var-directory
-																	,no-littering-etc-directory))
-						 (recentf-save-file . "~/.emacs.d/.recentf")
-						 (recentf-max-saved-items . 1000)
-						 (recentf-auto-cleanup . 'never))
-		:global-minor-mode t)
+  (leaf recentf
+    :require no-littering
+    :custom ((recentf-exclude . `(".recentf"
+                                  "bookmarks"
+                                  "org-recent-headings.dat"
+                                  "^/tmp\\.*"
+                                  "^/private\\.*"
+                                  "/TAGS$"
+                                  ,no-littering-var-directory
+                                  ,no-littering-etc-directory))
+             (recentf-save-file . "~/.emacs.d/.recentf")
+             (recentf-max-saved-items . 1000)
+             (recentf-auto-cleanup . 'never))
+    :global-minor-mode t)
 
-	(leaf *auto-save
-		:config
-		(setq auto-save-file-name-transforms
-			`((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
+  (leaf *auto-save
+    :config
+    (setq auto-save-file-name-transforms
+      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
 
 (leaf *general-configrations
   :config
@@ -2212,18 +2212,13 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :url "https://github.com/org-roam/org-roam"
   :after org
   :ensure t
+  ;; This is necessary for variables to be initialized correctly.
+  :require t
   :bind* (("C-c n l" . org-roam-buffer-toggle)
           ("C-c n f" . org-roam-node-find)
           ("C-c n g" . org-roam-graph)
           ("C-c n i" . org-roam-node-insert)
-          ("C-c n c" . org-roam-capture)
-          ;; Dailies
-          ("C-c n j" . org-roam-dailies-capture-today)
-          ("C-c d d" . org-roam-dailies-find-directory)
-          ("C-c d t" . org-roam-dailies-goto-today)
-          ("C-c d n" . org-roam-dailies-goto-tomorrow)
-          ("C-c d y" . org-roam-dailies-goto-yesterday))
-  :require t  ;; This is necessary for variables to be initialized correctly.
+          ("C-c n c" . org-roam-capture))
   :custom
   `((org-roam-v2-ack . t)
     (org-roam-directory . ,(file-truename "~/org/braindump/"))
@@ -2248,6 +2243,14 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                           "#+title: ${title}#+date: %U\n")
        :unnarrowed t))))
   :config
+  (leaf org-roam-dailies
+    :require t
+    :bind-keymap ("C-c n d" . org-roam-dailies-map)
+    :bind
+    (:org-roam-dailies-map
+     ("Y" . org-roam-dailies-capture-yesterday)
+     ("T" . org-roam-dailies-capture-tomorrow)))
+
   ;; for org-roam-buffer-toggle
   ;; Recommendation in the official manual
   (add-to-list 'display-buffer-alist
