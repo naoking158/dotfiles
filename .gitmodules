@@ -7,3 +7,6 @@
 [submodule ".tmux/plugins/tpm"]
 	path = .tmux/plugins/tpm
 	url = https://github.com/tmux-plugins/tpm
+[submodule ".emacs.d/elisp/ddskk-posframe"]
+	path = .emacs.d/elisp/ddskk-posframe
+	url = https://github.com/conao3/ddskk-posframe.el.git

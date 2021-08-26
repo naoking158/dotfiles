@@ -2489,4 +2489,29 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :ensure t
   :global-minor-mode solaire-global-mode)
 
+(leaf skk
+  :ensure ddskk
+  :bind (("C-M-j" . skk-undo-kakutei))
+  :custom ((skk-server-host . "localhost")
+           (skk-server-prtnum . 1178)
+           (skk-server-report-response . t)
+           (default-input-method . "japanese-skk")
+           (skk-byte-compile-init-file . t)
+           (skk-preload . t)
+           (skk-isearch-mode-enable . 'always)
+           (skk-tut-file . "~/src/github.com/skk-dev/ddskk/etc/SKK.tut")
+           (skk-kutouten-type . 'en)
+           (skk-show-inline . 'vertical)
+           (skk-inline-show-face . nil)
+           (skk-egg-like-newline . t)  ;; skk-kakutei by RET
+           (skk-auto-okuri-process . t)
+           (skk-auto-insert-paren . t)
+           (skk-use-auto-enclose-pair-of-region . t))
+  ;; :config
+  ;; (leaf ddskk-posframe
+  ;;   :load-path "~/.emacs.d/elisp/ddskk-posframe/"
+  ;;   :require nil
+  ;;   :custom (ddskk-posframe-mode . t))
+  )
+
 (provide 'init)
