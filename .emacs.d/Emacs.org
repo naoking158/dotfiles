@@ -2919,18 +2919,13 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :url "https://github.com/org-roam/org-roam"
     :after org
     :ensure t
+    ;; This is necessary for variables to be initialized correctly.
+    :require t
     :bind* (("C-c n l" . org-roam-buffer-toggle)
             ("C-c n f" . org-roam-node-find)
             ("C-c n g" . org-roam-graph)
             ("C-c n i" . org-roam-node-insert)
-            ("C-c n c" . org-roam-capture)
-            ;; Dailies
-            ("C-c n j" . org-roam-dailies-capture-today)
-            ("C-c d d" . org-roam-dailies-find-directory)
-            ("C-c d t" . org-roam-dailies-goto-today)
-            ("C-c d n" . org-roam-dailies-goto-tomorrow)
-            ("C-c d y" . org-roam-dailies-goto-yesterday))
-    :require t  ;; This is necessary for variables to be initialized correctly.
+            ("C-c n c" . org-roam-capture))
     :custom
     `((org-roam-v2-ack . t)
       (org-roam-directory . ,(file-truename "~/org/braindump/"))
@@ -2955,6 +2950,14 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                             "#+title: ${title}#+date: %U\n")
          :unnarrowed t))))
     :config
+    (leaf org-roam-dailies
+      :require t
+      :bind-keymap ("C-c n d" . org-roam-dailies-map)
+      :bind
+      (:org-roam-dailies-map
+       ("Y" . org-roam-dailies-capture-yesterday)
+       ("T" . org-roam-dailies-capture-tomorrow)))
+  
     ;; for org-roam-buffer-toggle
     ;; Recommendation in the official manual
     (add-to-list 'display-buffer-alist
