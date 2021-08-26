@@ -87,54 +87,54 @@
         (key-chord-define-global "x5" '"\C-x52")))))
 
 (leaf *keep-clean
-	:config
-	;; Use no-littering to automatically set common paths to the new user-emacs-directory
-	(leaf no-littering
-		:ensure t
-		:leaf-defer nil
-		:config
-		;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
+  :config
+  ;; Use no-littering to automatically set common paths to the new user-emacs-directory
+  (leaf no-littering
+    :ensure t
+    :leaf-defer nil
+    :config
+    ;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
 
-		(setq user-emacs-directory (expand-file-name "~/.cache/emacs/")
-					url-history-file (expand-file-name "url/history" user-emacs-directory))
-		(setq no-littering-etc-directory
-					(expand-file-name "etc/" user-emacs-directory))
-		(setq no-littering-var-directory
-					(expand-file-name "var/" user-emacs-directory)))
+    (setq user-emacs-directory (expand-file-name "~/.cache/emacs/")
+          url-history-file (expand-file-name "url/history" user-emacs-directory))
+    (setq no-littering-etc-directory
+          (expand-file-name "etc/" user-emacs-directory))
+    (setq no-littering-var-directory
+          (expand-file-name "var/" user-emacs-directory)))
 
-	;; Keep customization settings in a temporary file
-	(leaf cus-edit
-		:doc "tools for customizing Emacs and Lisp packages"
-		:tag "builtin" "faces" "help"
-		:config
-		(setq custom-file
-					(if (boundp 'server-socket-dir)
-							(expand-file-name "custom.el" server-socket-dir)
-						(expand-file-name
-						 (format "emacs-custom-%s.el" (user-uid))
-						 temporary-file-directory)))
-		(load custom-file t)
-		)
+  ;; Keep customization settings in a temporary file
+  (leaf cus-edit
+    :doc "tools for customizing Emacs and Lisp packages"
+    :tag "builtin" "faces" "help"
+    :config
+    (setq custom-file
+          (if (boundp 'server-socket-dir)
+              (expand-file-name "custom.el" server-socket-dir)
+            (expand-file-name
+             (format "emacs-custom-%s.el" (user-uid))
+             temporary-file-directory)))
+    (load custom-file t)
+    )
 
-	(leaf recentf
-		:require no-littering
-		:custom ((recentf-exclude . `(".recentf"
-																	"bookmarks"
-																	"org-recent-headings.dat"
-																	"^/tmp\\.*"
-																	"^/private\\.*"
-																	"/TAGS$"
-																	,no-littering-var-directory
-																	,no-littering-etc-directory))
-						 (recentf-save-file . "~/.emacs.d/.recentf")
-						 (recentf-max-saved-items . 1000)
-						 (recentf-auto-cleanup . 'never))
-		:global-minor-mode t)
+  (leaf recentf
+    :require no-littering
+    :custom ((recentf-exclude . `(".recentf"
+                                  "bookmarks"
+                                  "org-recent-headings.dat"
+                                  "^/tmp\\.*"
+                                  "^/private\\.*"
+                                  "/TAGS$"
+                                  ,no-littering-var-directory
+                                  ,no-littering-etc-directory))
+             (recentf-save-file . "~/.emacs.d/.recentf")
+             (recentf-max-saved-items . 1000)
+             (recentf-auto-cleanup . 'never))
+    :global-minor-mode t)
 
-	(leaf *auto-save
-		:config
-		(setq auto-save-file-name-transforms
-			`((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
+  (leaf *auto-save
+    :config
+    (setq auto-save-file-name-transforms
+      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
 
 (leaf *general-configrations
   :config
@@ -342,9 +342,80 @@
     "Sets the transparency of the frame window. 0=transparent/100=opaque"
     (interactive "nTransparency Value 0 - 100 opaque:")
     (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5)))
-    (my/set-font)
-    :config
-    (set-frame-parameter nil 'alpha '(90 85))))
+    (my/set-font))
+  :config
+  (set-frame-parameter nil 'alpha '(90 85)))
+
+(leaf font
+  :when window-system
+  :hook (after-init-hook . my/set-font)
+  :preface
+  ;; This is for Emacs28.
+  (setq-default text-scale-remap-header-line t)
+
+  (defun my/set-font (&optional weight)
+    (interactive)
+    (let ((font-size 14)
+          (weight (if weight weight
+                    'light)))
+
+      ;; ascii
+      (set-face-attribute 'default nil
+                          :font "JetBrains Mono"
+                          :height (* font-size 10)
+                          :weight weight)
+
+      ;; Set the fixed pitch face
+      (set-face-attribute 'fixed-pitch nil
+                          :font "JetBrains Mono"
+                          :height (* font-size 10)
+                          :weight weight)
+
+      ;; Set the variable pitch face
+      (set-face-attribute 'variable-pitch nil
+                          :font "Iosevka Aile"
+                          :height (* font-size 10)
+                          :weight weight)
+
+      ;; japanese
+      ;; (set-fontset-font t 'unicode
+      ;;                   "Noto Serif CJK JP-14"
+      ;;                   nil 'append))
+      (set-fontset-font t 'unicode
+                        (font-spec
+                         :family "Noto Sans CJK JP" 
+                         :height (* font-size 10))
+                        nil 'append))
+
+    ;; Ligature for Fira Code or JetBrains Mono
+    (let ((alist
+           '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
+             (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
+             (36 . ".\\(?:>\\)")
+             (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
+             (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
+             (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
+             (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
+             (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
+             (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
+             (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
+             (48 . ".\\(?:x[a-zA-Z]\\)")
+             (58 . ".\\(?:::\\|[:=]\\)")
+             (59 . ".\\(?:;;\\|;\\)")
+             (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
+             (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
+             (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
+             (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
+             (91 . ".\\(?:]\\)")
+             (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
+             (94 . ".\\(?:=\\)")
+             (119 . ".\\(?:ww\\)")
+             (123 . ".\\(?:-\\)")
+             (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
+             (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
+      (dolist (char-regexp alist)
+        (set-char-table-range composition-function-table (car char-regexp)
+                              `([,(cdr char-regexp) 0 font-shape-gstring]))))))
 
 (leaf nord-theme
   :disabled t
@@ -515,129 +586,58 @@
 
 (leaf modus-themes
   :ensure t
-  :hook (modus-themes-toggle-hook . my/set-org-headline-face)
-  :init
-  ;; Add all your customizations prior to loading the themes
-  (setq modus-themes-italic-constructs t
-        modus-themes-bold-constructs t
-        modus-themes-region '(bg-only no-extend)
-        modus-themes-org-blocks 'gray-background
-        modus-themes-subtle-line-numbers t
-        modus-themes-variable-pitch-headings t
-        modus-themes-variable-pitch-ui t
-        modus-themes-fringes nil
-        modus-themes-prompts '(intense gray)
-        modus-themes-completions 'opinionated
-        modus-themes-paren-match '(bold intense underline)
+  :after org
+  :hook (after-init-hook . modus-themes-load-vivendi)
+  :advice (:after modus-themes-toggle my/reload-face)
+  :preface
+  (defun my/set-font-weight (&optional weight)
+    (interactive)
+    (let ((weight (if weight weight 'light)))
+      (set-face-attribute 'default nil :weight weight)
+      (set-face-attribute 'fixed-pitch nil :weight weight)
+      (set-face-attribute 'variable-pitch nil :weight weight)))
 
-        modus-themes-org-agenda ; this is an alist: read the manual or its doc string
-        '((header-block . (variable-pitch scale-title))
-          (header-date . (grayscale workaholic bold-today))
-          (scheduled . uniform)
-          (habit . traffic-light-deuteranopia))
+  (defun my/reload-face ()
+    (pcase (modus-themes--current-theme)
+      ('modus-operandi (my/set-font-weight 'normal))
+      ('modus-vivendi (my/set-font-weight 'light)))
+    (my/set-org-headline-face))
 
-        ;; modus-themes-scale-headings t
-        ;; modus-themes-scale-1 1.1
-        ;; modus-themes-scale-2 1.2
-        ;; modus-themes-scale-3 1.3
-        ;; modus-themes-scale-4 1.4
-        ;; modus-themes-scale-title 1.33
-        )
-
+  :custom
+  ((modus-themes-bold-constructs . t)
+   (modus-themes-region . '(bg-only no-extend))
+   (modus-themes-org-blocks . 'gray-background)
+   (modus-themes-subtle-line-numbers . t)
+   (modus-themes-variable-pitch-headings . t)
+   (modus-themes-variable-pitch-ui . t)
+   (modus-themes-fringes . nil)
+   (modus-themes-prompts . '(intense gray))
+   (modus-themes-completions . 'opinionated)
+   (modus-themes-paren-match . '(bold intense underline))
+   ;; this is an alist: read the manual or its doc string
+   (modus-themes-org-agenda quote 
+                            '((header-block . (variable-pitch scale-title))
+                              (header-date . (grayscale workaholic bold-today))
+                              (scheduled . uniform)
+                              (habit . traffic-light-deuteranopia))))
+  :config
   ;; Load the theme files before enabling a theme
   (modus-themes-load-themes)
-  :config
   ;; (modus-themes-load-operandi) ;; light
-  (modus-themes-load-vivendi)  ;; dark
 
   (leaf moody
     :ensure t
+    :custom (x-underline-at-descent-line . t)
     :config
-    (setq x-underline-at-descent-line t)
-    (column-number-mode 1)
+    (column-number-mode)
     (moody-replace-mode-line-buffer-identification)
     (moody-replace-vc-mode))
 
   (leaf minions
     :ensure t
-    :config
-    (setq minions-mode-line-lighter ";"
-          minions-direct (list 'defining-kbd-macro
-                               'flymake-mode))
-    (minions-mode 1))
-  )
-
-(leaf *font
-  :when window-system
-  :hook (after-init-hook . my/set-font)
-  :preface
-  (defun my/set-font ()
-    (interactive)
-    ;; This is for Emacs28.
-    (setq-default text-scale-remap-header-line t)
-
-    (let ((font-size 14))
-      ;; ascii
-      (set-face-attribute 'default nil
-                          :font "JetBrains Mono"
-                          :weight 'semi-light
-                          :height (* font-size 10)
-                          :foreground "white")      
-
-      ;; Set the fixed pitch face
-      (set-face-attribute 'fixed-pitch nil
-                          :font "JetBrains Mono"
-                          :weight 'semi-light
-                          :height (* font-size 10)
-                          :foreground "white")
-
-      ;; Set the variable pitch face
-      (set-face-attribute 'variable-pitch nil
-                          :font "Iosevka Aile"
-                          :height (* font-size 10)
-                          :weight 'semi-light
-                          :foreground "white")
-
-      ;; japanese
-      ;; (set-fontset-font t 'unicode
-      ;;                   "Noto Serif CJK JP-14"
-      ;;                   nil 'append))
-      (set-fontset-font t 'unicode
-                        (font-spec
-                         :family "Noto Sans CJK JP" 
-                         :height (* font-size 10)
-                         :foreground "white")
-                        nil 'append))
-
-    ;; Ligature for Fira Code or JetBrains Mono
-    (let ((alist
-           '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
-             (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
-             (36 . ".\\(?:>\\)")
-             (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
-             (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
-             (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
-             (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
-             (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
-             (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
-             (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
-             (48 . ".\\(?:x[a-zA-Z]\\)")
-             (58 . ".\\(?:::\\|[:=]\\)")
-             (59 . ".\\(?:;;\\|;\\)")
-             (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
-             (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
-             (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
-             (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
-             (91 . ".\\(?:]\\)")
-             (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
-             (94 . ".\\(?:=\\)")
-             (119 . ".\\(?:ww\\)")
-             (123 . ".\\(?:-\\)")
-             (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
-             (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
-      (dolist (char-regexp alist)
-        (set-char-table-range composition-function-table (car char-regexp)
-                              `([,(cdr char-regexp) 0 font-shape-gstring]))))))
+    :custom ((minions-mode-line-lighter . ";")
+             (minions-direct . '(defining-kbd-macro flymake-mode)))
+    :global-minor-mode t))
 
 (leaf which-key
   :doc "Display available keybindings in popup"
@@ -2212,18 +2212,13 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :url "https://github.com/org-roam/org-roam"
   :after org
   :ensure t
+  ;; This is necessary for variables to be initialized correctly.
+  :require t
   :bind* (("C-c n l" . org-roam-buffer-toggle)
           ("C-c n f" . org-roam-node-find)
           ("C-c n g" . org-roam-graph)
           ("C-c n i" . org-roam-node-insert)
-          ("C-c n c" . org-roam-capture)
-          ;; Dailies
-          ("C-c n j" . org-roam-dailies-capture-today)
-          ("C-c d d" . org-roam-dailies-find-directory)
-          ("C-c d t" . org-roam-dailies-goto-today)
-          ("C-c d n" . org-roam-dailies-goto-tomorrow)
-          ("C-c d y" . org-roam-dailies-goto-yesterday))
-  :require t  ;; This is necessary for variables to be initialized correctly.
+          ("C-c n c" . org-roam-capture))
   :custom
   `((org-roam-v2-ack . t)
     (org-roam-directory . ,(file-truename "~/org/braindump/"))
@@ -2248,6 +2243,14 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                           "#+title: ${title}#+date: %U\n")
        :unnarrowed t))))
   :config
+  (leaf org-roam-dailies
+    :require t
+    :bind-keymap ("C-c n d" . org-roam-dailies-map)
+    :bind
+    (:org-roam-dailies-map
+     ("Y" . org-roam-dailies-capture-yesterday)
+     ("T" . org-roam-dailies-capture-tomorrow)))
+
   ;; for org-roam-buffer-toggle
   ;; Recommendation in the official manual
   (add-to-list 'display-buffer-alist
@@ -2488,5 +2491,30 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf solaire-mode
   :ensure t
   :global-minor-mode solaire-global-mode)
+
+(leaf skk
+  :ensure ddskk
+  :bind (("C-M-j" . skk-undo-kakutei))
+  :custom ((skk-server-host . "localhost")
+           (skk-server-prtnum . 1178)
+           (skk-server-report-response . t)
+           (default-input-method . "japanese-skk")
+           (skk-byte-compile-init-file . t)
+           (skk-preload . t)
+           (skk-isearch-mode-enable . 'always)
+           (skk-tut-file . "~/src/github.com/skk-dev/ddskk/etc/SKK.tut")
+           (skk-kutouten-type . 'en)
+           (skk-show-inline . 'vertical)
+           (skk-inline-show-face . nil)
+           (skk-egg-like-newline . t)  ;; skk-kakutei by RET
+           (skk-auto-okuri-process . t)
+           (skk-auto-insert-paren . t)
+           (skk-use-auto-enclose-pair-of-region . t))
+  ;; :config
+  ;; (leaf ddskk-posframe
+  ;;   :load-path "~/.emacs.d/elisp/ddskk-posframe/"
+  ;;   :require nil
+  ;;   :custom (ddskk-posframe-mode . t))
+  )
 
 (provide 'init)
