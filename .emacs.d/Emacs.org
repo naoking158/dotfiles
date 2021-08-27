@@ -3448,6 +3448,46 @@ While browsing, remember the following:
   
 #+end_src
 
+** Dap Mode
+:PROPERTIES:
+:ID:       7C106EE5-EF79-4A6E-8A9E-82AF6D404543
+:END:
+
+#+begin_src emacs-lisp
+  
+  (leaf dap-mode
+    :ensure t
+    :require t dap-python
+    :after exec-path-from-shell
+    :custom (;; (dap-python-debugger . 'debugpy)
+             ;; (dap-python-executable . path-to-venv-python)
+             (dap-auto-configure-features . '(sessions locals tooltip))
+             ;; (lsp-enable-dap-auto-configure . nil)
+             )
+    :hook
+    ((dap-stopped-hook . (lambda (arg) (call-interactively #'dap-hydra)))
+     (python-mode-hook . dap-mode)
+     (python-mode-hook . dap-ui-mode)
+     (python-mode-hook . dap-tooltip-mode)))
+  
+#+end_src
+
+*** Get Started
+- =dap-debug=: Select a template to execute
+- =dap-debug-last=: Run the most recent template
+- =dap-debug-recent=: Select a recent template to run
+- =dap-disconnect=: Disconnect from the debugging session (output buffer retained)
+- =dap-delete-session=: Delete the current session (output buffer will be deleted)
+- =dap-delete-all-sessions=: Clean up all debugging sessions
+
+*** Breakpoints
+- =dap-breakpoint-toggle=: Toggle a breakpoint on the current line
+- =dap-breakpoint-delete-all=: Delete all breakpoints in the workspace
+- =dap-breakpoint-condition=: Set condition for breakpoint
+- =dap-breakpoint-log-message=: Set hit condition, number of hits before breakpoint stops.
+- =dap-breakpoint-log-message=: Set log message for breakpoint (interpolate expressions with {})
+- =dap-ui-breakpoints=: Show breakpoints panel
+
 * Footer
 :PROPERTIES:
 :ID:       B2B50080-95ED-4DEC-B99E-B120D1A08233

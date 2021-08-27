@@ -2538,4 +2538,19 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   ;;   :custom (ddskk-posframe-mode . t))
   )
 
+(leaf dap-mode
+  :ensure t
+  :require t dap-python
+  :after exec-path-from-shell
+  :custom (;; (dap-python-debugger . 'debugpy)
+           ;; (dap-python-executable . path-to-venv-python)
+           (dap-auto-configure-features . '(sessions locals tooltip))
+           ;; (lsp-enable-dap-auto-configure . nil)
+           )
+  :hook
+  ((dap-stopped-hook . (lambda (arg) (call-interactively #'dap-hydra)))
+   (python-mode-hook . dap-mode)
+   (python-mode-hook . dap-ui-mode)
+   (python-mode-hook . dap-tooltip-mode)))
+
 (provide 'init)
