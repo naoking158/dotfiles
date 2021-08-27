@@ -728,7 +728,9 @@
   ;;   :ensure t)
   )
 
-(leaf crux :ensure t)
+(leaf crux
+  :ensure t
+  :bind (("C-S-k" . crux-top-join-line)))
 
 (leaf neotree
   :ensure t all-the-icons

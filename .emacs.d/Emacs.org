@@ -977,9 +977,11 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :END:
 
 #+begin_src emacs-lisp
-    
-    (leaf crux :ensure t)
-    
+  
+  (leaf crux
+    :ensure t
+    :bind (("C-S-k" . crux-top-join-line)))
+
 #+end_src
 
 #+RESULTS:
