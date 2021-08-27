@@ -477,14 +477,14 @@
                                                    :foreground ,nano-color-faded)))))))
 
 (leaf doom-themes
-  :disabled t
+  :disabled nil
   :doc "an opinionated pack of modern color-themes"
   :req "emacs-25.1" "cl-lib-0.5"
   :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
   :url "https://github.com/hlissner/emacs-doom-theme"
   :ensure t neotree all-the-icons
   :require neotree all-the-icons
-  :custom ((doom-themes-enable-italic . t)
+  :custom ((doom-themes-enable-italic . nil)
            (doom-themes-enable-bold . t))
   :config
   ;; (load-theme 'doom-one t)
@@ -493,8 +493,24 @@
   ;; (load-theme 'doom-material t)
   (doom-themes-neotree-config)
   (doom-themes-org-config)
+  (doom-themes-treemacs-config)
+
+  (leaf moody
+    :ensure t
+    :custom (x-underline-at-descent-line . t)
+    :config
+    (column-number-mode)
+    (moody-replace-mode-line-buffer-identification)
+    (moody-replace-vc-mode))
+
+  (leaf minions
+    :ensure t
+    :custom ((minions-mode-line-lighter . ";")
+             (minions-direct . '(defining-kbd-macro flymake-mode)))
+    :global-minor-mode t)
 
   (leaf nano-modeline
+    :disabled t
     :load-path "~/.emacs.d/elisp/nano-emacs/"
     :require t nano-base-colors nano-colors nano-faces nano-theme
     :config
@@ -588,9 +604,10 @@
 
 
 (leaf modus-themes
+  :disabled t
   :ensure t
   :after org
-  :hook (after-init-hook . modus-themes-load-vivendi)
+  :leaf-defer nil
   :advice (:after modus-themes-toggle my/reload-face)
   :preface
   (defun my/set-font-weight (&optional weight)
@@ -627,6 +644,7 @@
   ;; Load the theme files before enabling a theme
   (modus-themes-load-themes)
   ;; (modus-themes-load-operandi) ;; light
+  (modus-themes-load-vivendi)
 
   (leaf moody
     :ensure t
