@@ -179,6 +179,7 @@
     :tag "environment" "unix"
     :url "https://github.com/purcell/exec-path-from-shell"
     :ensure t
+    :leaf-defer nil
     :when (memq window-system '(mac ns x))
     :custom ((exec-path-from-shell-check-startup-files)
              (exec-path-from-shell-variables . '("PATH" "PYTHONPATH")))
@@ -199,7 +200,8 @@
 
     (let ((path-to-venv (expand-file-name "envs/torch" path-to-miniconda)))
       (when (file-exists-p path-to-venv)
-        (setq path-to-venv-python (expand-file-name "bin/python" path-to-venv))
+        (setq path-to-venv-python
+              (expand-file-name "bin/python" path-to-venv))
         (custom-set-variables
          '(org-babel-python-command path-to-venv-python)))))
 
@@ -316,35 +318,36 @@
     (display-time)))
 
 (leaf global-visual-line-mode
-      :tag "builtin"
-      :global-minor-mode t)
+  :tag "builtin"
+  :global-minor-mode t)
 
-    (leaf hl-line
-      :doc "highlight the current line"
-      :tag "builtin"
-      :require t
-      :global-minor-mode t
-      :config
+(leaf hl-line
+  :doc "highlight the current line"
+  :tag "builtin"
+  :require t
+  :global-minor-mode t
+  :config
       ;;; hl-lineを無効にするメジャーモードを指定する
-      (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
-      (defun global-hl-line-timer-function ()
-        (unless (memq major-mode global-hl-line-timer-exclude-modes)
-          (global-hl-line-unhighlight-all)
-          (let ((global-hl-line-mode t))
-            (global-hl-line-highlight))))
-      (setq global-hl-line-timer
-            (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
+  (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
+  (defun global-hl-line-timer-function ()
+    (unless (memq major-mode global-hl-line-timer-exclude-modes)
+      (global-hl-line-unhighlight-all)
+      (let ((global-hl-line-mode t))
+        (global-hl-line-highlight))))
+  (setq global-hl-line-timer
+        (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
 
 (leaf *frame-transparency
-  :defun my/set-font
   :preface
-  (defun change-transparency (alpha-num)
+  (defun my/change-transparency (&optional alpha-num)
     "Sets the transparency of the frame window. 0=transparent/100=opaque"
-    (interactive "nTransparency Value 0 - 100 opaque:")
-    (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5)))
-    (my/set-font))
+    (interactive)
+    (let ((alpha-num (if alpha-num alpha-num
+                       (read-number "Transparency Value 0 - 100 opaque:"))))
+      (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5)))
+      (add-to-list 'default-frame-alist `(alpha . (,alpha-num . ,(- alpha-num 5))))))
   :config
-  (set-frame-parameter nil 'alpha '(90 85)))
+  (my/change-transparency 95))
 
 (leaf font
   :when window-system
