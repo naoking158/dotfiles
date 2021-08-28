@@ -356,3 +356,9 @@ if [ "$INSIDE_EMACS" = 'vterm' ]
         tput clear;
     end
 end
+
+
+# check existence and initialize of zoxide command 
+if type -q zoxide
+		zoxide init fish | source
+end
