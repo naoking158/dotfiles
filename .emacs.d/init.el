@@ -179,6 +179,7 @@
     :tag "environment" "unix"
     :url "https://github.com/purcell/exec-path-from-shell"
     :ensure t
+    :leaf-defer nil
     :when (memq window-system '(mac ns x))
     :custom ((exec-path-from-shell-check-startup-files)
              (exec-path-from-shell-variables . '("PATH" "PYTHONPATH")))
@@ -199,7 +200,8 @@
 
     (let ((path-to-venv (expand-file-name "envs/torch" path-to-miniconda)))
       (when (file-exists-p path-to-venv)
-        (setq path-to-venv-python (expand-file-name "bin/python" path-to-venv))
+        (setq path-to-venv-python
+              (expand-file-name "bin/python" path-to-venv))
         (custom-set-variables
          '(org-babel-python-command path-to-venv-python)))))
 
@@ -316,35 +318,36 @@
     (display-time)))
 
 (leaf global-visual-line-mode
-      :tag "builtin"
-      :global-minor-mode t)
+  :tag "builtin"
+  :global-minor-mode t)
 
-    (leaf hl-line
-      :doc "highlight the current line"
-      :tag "builtin"
-      :require t
-      :global-minor-mode t
-      :config
+(leaf hl-line
+  :doc "highlight the current line"
+  :tag "builtin"
+  :require t
+  :global-minor-mode t
+  :config
       ;;; hl-lineを無効にするメジャーモードを指定する
-      (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
-      (defun global-hl-line-timer-function ()
-        (unless (memq major-mode global-hl-line-timer-exclude-modes)
-          (global-hl-line-unhighlight-all)
-          (let ((global-hl-line-mode t))
-            (global-hl-line-highlight))))
-      (setq global-hl-line-timer
-            (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
+  (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
+  (defun global-hl-line-timer-function ()
+    (unless (memq major-mode global-hl-line-timer-exclude-modes)
+      (global-hl-line-unhighlight-all)
+      (let ((global-hl-line-mode t))
+        (global-hl-line-highlight))))
+  (setq global-hl-line-timer
+        (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
 
 (leaf *frame-transparency
-  :defun my/set-font
   :preface
-  (defun change-transparency (alpha-num)
+  (defun my/change-transparency (&optional alpha-num)
     "Sets the transparency of the frame window. 0=transparent/100=opaque"
-    (interactive "nTransparency Value 0 - 100 opaque:")
-    (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5)))
-    (my/set-font))
+    (interactive)
+    (let ((alpha-num (if alpha-num alpha-num
+                       (read-number "Transparency Value 0 - 100 opaque:"))))
+      (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5)))
+      (add-to-list 'default-frame-alist `(alpha . (,alpha-num . ,(- alpha-num 5))))))
   :config
-  (set-frame-parameter nil 'alpha '(90 85)))
+  (my/change-transparency 95))
 
 (leaf font
   :when window-system
@@ -474,14 +477,14 @@
                                                    :foreground ,nano-color-faded)))))))
 
 (leaf doom-themes
-  :disabled t
+  :disabled nil
   :doc "an opinionated pack of modern color-themes"
   :req "emacs-25.1" "cl-lib-0.5"
   :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
   :url "https://github.com/hlissner/emacs-doom-theme"
   :ensure t neotree all-the-icons
   :require neotree all-the-icons
-  :custom ((doom-themes-enable-italic . t)
+  :custom ((doom-themes-enable-italic . nil)
            (doom-themes-enable-bold . t))
   :config
   ;; (load-theme 'doom-one t)
@@ -490,8 +493,24 @@
   ;; (load-theme 'doom-material t)
   (doom-themes-neotree-config)
   (doom-themes-org-config)
+  (doom-themes-treemacs-config)
+
+  (leaf moody
+    :ensure t
+    :custom (x-underline-at-descent-line . t)
+    :config
+    (column-number-mode)
+    (moody-replace-mode-line-buffer-identification)
+    (moody-replace-vc-mode))
+
+  (leaf minions
+    :ensure t
+    :custom ((minions-mode-line-lighter . ";")
+             (minions-direct . '(defining-kbd-macro flymake-mode)))
+    :global-minor-mode t)
 
   (leaf nano-modeline
+    :disabled t
     :load-path "~/.emacs.d/elisp/nano-emacs/"
     :require t nano-base-colors nano-colors nano-faces nano-theme
     :config
@@ -585,9 +604,10 @@
 
 
 (leaf modus-themes
+  :disabled t
   :ensure t
   :after org
-  :hook (after-init-hook . modus-themes-load-vivendi)
+  :leaf-defer nil
   :advice (:after modus-themes-toggle my/reload-face)
   :preface
   (defun my/set-font-weight (&optional weight)
@@ -624,6 +644,7 @@
   ;; Load the theme files before enabling a theme
   (modus-themes-load-themes)
   ;; (modus-themes-load-operandi) ;; light
+  (modus-themes-load-vivendi)
 
   (leaf moody
     :ensure t
@@ -707,7 +728,9 @@
   ;;   :ensure t)
   )
 
-(leaf crux :ensure t)
+(leaf crux
+  :ensure t
+  :bind (("C-S-k" . crux-top-join-line)))
 
 (leaf neotree
   :ensure t all-the-icons
@@ -2516,5 +2539,20 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   ;;   :require nil
   ;;   :custom (ddskk-posframe-mode . t))
   )
+
+(leaf dap-mode
+  :ensure t
+  :require t dap-python
+  :after exec-path-from-shell
+  :custom (;; (dap-python-debugger . 'debugpy)
+           ;; (dap-python-executable . path-to-venv-python)
+           (dap-auto-configure-features . '(sessions locals tooltip))
+           ;; (lsp-enable-dap-auto-configure . nil)
+           )
+  :hook
+  ((dap-stopped-hook . (lambda (arg) (call-interactively #'dap-hydra)))
+   (python-mode-hook . dap-mode)
+   (python-mode-hook . dap-ui-mode)
+   (python-mode-hook . dap-tooltip-mode)))
 
 (provide 'init)
