@@ -74,6 +74,10 @@ if test -e $G_REPO/research/neptune_api_token
     set -xg NEPTUNE_API_TOKEN (cat $G_REPO/research/neptune_api_token)
 end
 
+if test -e /usr/lib/w3m/w3mimagedisplay
+		set PATH /usr/lib/w3m/w3mimagedisplay $PATH
+end
+
 if test (uname -s) = "Darwin"
     # Homebrew
     set -xg HOMEBREW_EDITOR "/usr/local/bin/emacs -q -nw"
