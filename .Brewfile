@@ -7,6 +7,7 @@ tap "homebrew/core"
 tap "homebrew/services"
 tap "koekeishiya/formulae"
 tap "mongodb/brew"
+tap "railwaycat/emacsmacport"
 tap "rcmdnk/rcmdnkpac"
 tap "sal0max/nikon"
 tap "sanemat/font"
@@ -78,6 +79,7 @@ brew "pngpaste"
 brew "qt"
 brew "poppler"
 brew "proselint"
+brew "python@3.8"
 brew "rbenv"
 brew "rename"
 brew "ripgrep"
@@ -92,16 +94,23 @@ brew "w3m"
 brew "wxpython"
 brew "zeromq"
 brew "zlib"
+brew "zoxide"
 brew "carlocab/personal/unrar"
 brew "koekeishiya/formulae/skhd"
 brew "koekeishiya/formulae/yabai"
 brew "mongodb/brew/mongodb-community"
+brew "railwaycat/emacsmacport/emacs-mac", link: false
 brew "rcmdnk/rcmdnkpac/rcmdnk-trash"
 cask "alacritty"
 cask "alfred"
+cask "aquaskk"
 cask "deepl"
+cask "evernote"
+cask "font-hackgen-nerd"
 cask "font-iosevka-aile"
+cask "font-noto-sans"
 cask "font-noto-sans-cjk-jp"
+cask "font-noto-serif"
 cask "font-noto-serif-cjk-jp"
 cask "fontforge"
 cask "google-backup-and-sync"
@@ -110,6 +119,7 @@ cask "google-japanese-ime"
 cask "grammarly"
 cask "karabiner-elements"
 cask "mactex"
+cask "microsoft-auto-update"
 cask "microsoft-office"
 cask "nikon-webcam-utility"
 cask "openvpn-connect"
@@ -117,15 +127,22 @@ cask "skim"
 cask "slack"
 cask "spotify"
 cask "tunnelblick"
+cask "vagrant"
+cask "virtualbox"
+cask "xquartz"
 mas "1Blocker", id: 1365531024
 mas "1Password 7", id: 1333542190
 mas "AdBlock", id: 1402042596
+mas "AmorphousDiskMark", id: 1168254295
 mas "Be Focused Pro", id: 961632517
+mas "Cinebench", id: 1438772273
 mas "Copied", id: 1026349850
+mas "Disk Speed Test", id: 425264550
 mas "GoodNotes", id: 1444383602
 mas "Keynote", id: 409183694
 mas "Kindle", id: 405399194
 mas "LINE", id: 539883307
+mas "MagicanLite", id: 515798947
 mas "Magnet", id: 441258766
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541

@@ -184,26 +184,7 @@
     :custom ((exec-path-from-shell-check-startup-files)
              (exec-path-from-shell-variables . '("PATH" "PYTHONPATH")))
     :config
-    (exec-path-from-shell-initialize)
-
-    (defun my/string-trim-final-newline (string)
-      (let ((len (length string)))
-        (cond
-         ((and (> len 0) (eql (aref string (- len 1)) ?\n))
-          (substring string 0 (- len 1)))
-         (t string))))
-
-    (setq path-to-miniconda
-          (my/string-trim-final-newline
-           (shell-command-to-string
-            "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
-
-    (let ((path-to-venv (expand-file-name "envs/torch" path-to-miniconda)))
-      (when (file-exists-p path-to-venv)
-        (setq path-to-venv-python
-              (expand-file-name "bin/python" path-to-venv))
-        (custom-set-variables
-         '(org-babel-python-command path-to-venv-python)))))
+    (exec-path-from-shell-initialize))
 
   (leaf eldoc
     :doc "Show function arglist or variable docstring in echo area"
@@ -496,6 +477,7 @@
   (doom-themes-treemacs-config)
 
   (leaf moody
+    :when window-system
     :ensure t
     :custom (x-underline-at-descent-line . t)
     :config
@@ -560,14 +542,8 @@
                 (propertize right 'face `(:inherit nano-face-header-default
                                                    :foreground ,nano-color-faded))))))
 
-  (leaf minions
-    :disabled t
-    :ensure t
-    :after doom-modeline
-    :hook (doom-modeline-mode . minions-mode))
-
   (leaf doom-modeline
-    :disabled t
+    :when (not window-system)
     :doc "A minimal and modern mode-line"
     :req "emacs-25.1" "all-the-icons-2.2.0" "shrink-path-0.2.0" "dash-2.11.0"
     :tag "mode-line" "faces" "emacs>=25.1"
@@ -592,15 +568,16 @@
     (setq inhibit-compacting-font-caches t)
     (column-number-mode 1)
 
-    (leaf hide-mode-line
-      :disabled t
-      :doc "minor mode that hides/masks your modeline"
-      :req "emacs-24.4"
-      :tag "mode-line" "frames" "emacs>=24.4"
-      :url "https://github.com/hlissner/emacs-hide-mode-line"
-      :ensure t
-      :hook
-      ((neotree-mode imenu-list-minor-mode minimap-mode) . hide-mode-line-mode))))
+    ;; (leaf hide-mode-line
+    ;;   :disabled t
+    ;;   :doc "minor mode that hides/masks your modeline"
+    ;;   :req "emacs-24.4"
+    ;;   :tag "mode-line" "frames" "emacs>=24.4"
+    ;;   :url "https://github.com/hlissner/emacs-hide-mode-line"
+    ;;   :ensure t
+    ;;   :hook
+    ;;   ((neotree-mode imenu-list-minor-mode minimap-mode) . hide-mode-line-mode))
+    ))
 
 
 (leaf modus-themes
@@ -899,8 +876,27 @@
     :url "http://github.com/necaris/conda.el"
     :ensure t
     :require t
-    :commands conda-env-activate
+    :preface
+    (defun my/string-trim-final-newline (string)
+      (let ((len (length string)))
+        (cond
+         ((and (> len 0) (eql (aref string (- len 1)) ?\n))
+          (substring string 0 (- len 1)))
+         (t string))))
 
+    (setq path-to-miniconda
+          (my/string-trim-final-newline
+           (shell-command-to-string
+            "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
+
+    (let ((path-to-venv (expand-file-name "envs/torch" path-to-miniconda)))
+      (when (file-exists-p path-to-venv)
+        (setq path-to-venv-python
+              (expand-file-name "bin/python" path-to-venv))
+        (custom-set-variables
+         '(org-babel-python-command path-to-venv-python))))
+
+    :commands conda-env-activate
     :custom ((conda-anaconda-home . path-to-miniconda)
              (conda-env-home-directory . path-to-miniconda))
     :hook ((after-init-hook . (lambda ()
@@ -1683,36 +1679,38 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                      ("mt" . "todo")
                                      ("ms" . "summary"))))
   :config
-  (create-fontset-from-ascii-font "Iosevka Aile-14"
-                                  nil
-                                  "myoutline")
-  (set-fontset-font "fontset-myoutline" 'unicode
-                    "Noto Sans CJK JP-14"
-                    nil 'append)
 
-  (defun my/set-org-headline-face ()
-    ;; Increase the size of various headings
-    (interactive)
-    (set-face-attribute 'org-document-title nil
-                        :font "Iosevka Aile" :weight 'bold :height 1.6)
-    (set-face-attribute 'org-level-1 nil
-                        :font "fontset-myoutline"
-                        :weight 'bold
-                        :slant 'normal
-                        :height 1.35)
-    (dolist (face '((org-level-2 . 1.3)
-                    (org-level-3 . 1.2)
-                    (org-level-4 . 1.15)
-                    (org-level-5 . 1.1)
-                    (org-level-6 . 1.1)
-                    (org-level-7 . 1.1)
-                    (org-level-8 . 1.1)))
-      (set-face-attribute (car face) nil
+  (when window-system
+    (create-fontset-from-ascii-font "Iosevka Aile-14"
+                                    nil
+                                    "myoutline")
+    (set-fontset-font "fontset-myoutline" 'unicode
+                      "Noto Sans CJK JP-14"
+                      nil 'append)
+
+    (defun my/set-org-headline-face ()
+      ;; Increase the size of various headings
+      (interactive)
+      (set-face-attribute 'org-document-title nil
+                          :font "Iosevka Aile" :weight 'bold :height 1.6)
+      (set-face-attribute 'org-level-1 nil
                           :font "fontset-myoutline"
-                          :weight 'normal
+                          :weight 'bold
                           :slant 'normal
-                          :height (cdr face))))
-  (my/set-org-headline-face)
+                          :height 1.35)
+      (dolist (face '((org-level-2 . 1.3)
+                      (org-level-3 . 1.2)
+                      (org-level-4 . 1.15)
+                      (org-level-5 . 1.1)
+                      (org-level-6 . 1.1)
+                      (org-level-7 . 1.1)
+                      (org-level-8 . 1.1)))
+        (set-face-attribute (car face) nil
+                            :font "fontset-myoutline"
+                            :weight 'normal
+                            :slant 'normal
+                            :height (cdr face))))
+    (my/set-org-headline-face))
 
   ;; Make sure org-indent face is available
   (require 'org-indent)

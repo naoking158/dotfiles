@@ -74,6 +74,10 @@ if test -e $G_REPO/research/neptune_api_token
     set -xg NEPTUNE_API_TOKEN (cat $G_REPO/research/neptune_api_token)
 end
 
+if test -e /usr/lib/w3m/w3mimagedisplay
+		set PATH /usr/lib/w3m/w3mimagedisplay $PATH
+end
+
 if test (uname -s) = "Darwin"
     # Homebrew
     set -xg HOMEBREW_EDITOR "/usr/local/bin/emacs -q -nw"
@@ -355,4 +359,10 @@ if [ "$INSIDE_EMACS" = 'vterm' ]
         vterm_printf "51;Evterm-clear-scrollback";
         tput clear;
     end
+end
+
+
+# check existence and initialize of zoxide command 
+if type -q zoxide
+		zoxide init fish | source
 end
