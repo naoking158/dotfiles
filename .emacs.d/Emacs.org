@@ -273,6 +273,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :PROPERTIES:
 :ID:       F4A50035-4AB2-4522-B5A1-BD084961259A
 :END:
+
 #+begin_src emacs-lisp
   
   (leaf *general-configrations
@@ -380,6 +381,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :PROPERTIES:
 :ID:       AE3048B3-2584-49C4-86FB-DEF38673A935
 :END:
+
 #+begin_src emacs-lisp
   
   (leaf autorevert
