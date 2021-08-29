@@ -70,8 +70,8 @@ set -xg G_REPO $HOME/src/github.com/naoking158
 if test -e $G_REPO
     set -xg PYTHONPATH $G_REPO $PYTHONPATH
 end
-if test -e $G_REPO/research/neptune_api_token
-    set -xg NEPTUNE_API_TOKEN (cat $G_REPO/research/neptune_api_token)
+if test -e $G_REPO/envs/neptune_api_token
+    set -xg NEPTUNE_API_TOKEN (cat $G_REPO/envs/neptune_api_token)
 end
 
 if test -e /usr/lib/w3m/w3mimagedisplay
