@@ -2581,7 +2581,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                   (user-full-name					. "naoki@bbo.cs.tsukuba.ac.jp")
                   (smtpmail-smtp-server		. "smtp.gmail.com")
                   (smtpmail-smtp-service	. 465)
-                  (smtpmail-stream-type		. 'ssl)
+                  (smtpmail-stream-type		. ssl)
                   (mu4e-drafts-folder			. "/BBO/[Gmail]/Drafts")
                   (mu4e-sent-folder				. "/BBO/[Gmail]/Sent Mail")
                   (mu4e-refile-folder			. "/BBO/[Gmail]/All Mail")
@@ -2598,7 +2598,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                   (user-full-name					. "nok.skmt.snow@gmail.com")
                   (smtpmail-smtp-server		. "smtp.gmail.com")
                   (smtpmail-smtp-service	. 465)
-                  (smtpmail-stream-type		. 'ssl)
+                  (smtpmail-stream-type		. ssl)
                   (mu4e-drafts-folder			. "/Private/[Gmail]/Drafts")
                   (mu4e-sent-folder				. "/Private/[Gmail]/Sent Mail")
                   (mu4e-refile-folder			. "/Private/[Gmail]/All Mail")
@@ -2613,7 +2613,34 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
           (:maildir "/Private/[Gmail]/Inbox"	:key ?p)
           ))
 
+  (setq mu4e-bookmarks
+        '(( :name  "Unread messages"
+            :query "flag:unread AND NOT flag:trashed"
+            :key ?u)
+          ( :name "Today's messages"
+            :query "date:today..now"
+            :key ?t)
+          ( :name "Last 7 days"
+            :query "date:7d..now"
+            :hide-unread t
+            :key ?w)
+          ( :name "Flagged massages"
+            :query "flag:flagged"
+            :key ?f)))
+
+  (add-to-list 'mu4e-marks
+               '(tag
+                 :char       "g"
+                 :prompt     "gtag"
+                 :ask-target (lambda ()
+                               (completing-read "What tag do you want to add?:"
+                                                '("Pinned" "starred")))
+                 :action      (lambda (docid msg target)
+                                (mu4e-action-retag-message msg (concat "+" target)))))
+  (mu4e~headers-defun-mark-for tag)
+
   :preface
+
   (defun my/org-capture-mu4e ()
     (interactive)
     "Capture a TODO item via email."
@@ -2716,7 +2743,6 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
 
 
 (leaf mu4e-views
-  :disabled t
   :ensure t
   :after mu4e
   :bind (mu4e-headers-mode-map
@@ -2724,12 +2750,10 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
          ("v" . mu4e-views-mu4e-select-view-msg-method) ;; select viewing method
          ("M-n" . mu4e-views-cursor-msg-view-window-down) ;; from headers window scroll the email view
          ("M-p" . mu4e-views-cursor-msg-view-window-up) ;; from headers window scroll the email view
-         ("f" . mu4e-views-toggle-auto-view-selected-message) ;; toggle opening messages automatically when moving in the headers view
-         ("i" . mu4e-views-mu4e-view-as-nonblocked-html) ;; show currently selected email with all remote content
          )
   :config
   (setq mu4e-views-default-view-method "dispatcher") ;; make xwidgets default
-  (mu4e-views-mu4e-use-view-msg-method "dispatcher") ;; select the default
+  (mu4e-views-mu4e-use-view-msg-method "text") ;; select the default
   (setq mu4e-views-next-previous-message-behaviour 'stick-to-current-window) ;; when pressing n and p stay in the current window
   (setq mu4e-views-auto-view-selected-message t)  ;; automatically open messages when moving in the headers view
   (setq mu4e-views-dispatcher-predicate-view-map
