@@ -1761,7 +1761,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf org-agenda
   :after org
   :require t org-habit org-capture
-  :bind* (("C-c C-a" . org-agenda-cache)
+  :bind* (("C-c C-a" . my/org-agenda-cache)
           ("C-c C-m" . jethro/org-inbox-capture))
   :bind (org-agenda-mode-map
          ("i" . org-agenda-clock-in)
