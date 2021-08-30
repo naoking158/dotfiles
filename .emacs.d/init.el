@@ -399,66 +399,22 @@
              (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
       (dolist (char-regexp alist)
         (set-char-table-range composition-function-table (car char-regexp)
-                              `([,(cdr char-regexp) 0 font-shape-gstring]))))))
+                              `([,(cdr char-regexp) 0 font-shape-gstring])))))
 
-(leaf nord-theme
-  :disabled t
-  :ensure t
-  :config
-  (load-theme 'nord t)
+  (defun my/set-font-weight (&optional weight)
+    (interactive)
+    (let ((weight (if weight weight 'light)))
+      (set-face-attribute 'default nil :weight weight)
+      (set-face-attribute 'fixed-pitch nil :weight weight)
+      (set-face-attribute 'variable-pitch nil :weight weight)))
 
-  (leaf nano-modeline
-    :load-path "~/.emacs.d/elisp/nano-emacs/"
-    :require t nano-base-colors nano-colors nano-faces nano-theme
-    :config
-    (nano-faces)
-    (nano-modeline)
-    (nano-theme--mode-line)
-    (nano-theme--hl-line)
-    :advice (:override nano-modeline-compose my/nano-modeline-compose)
-    :preface
-    (defun my/nano-modeline-compose (status name primary secondary)
-      "Compose a string with provided information"
-      (let* ((char-width    (window-font-width nil 'header-line))
-             (window        (get-buffer-window (current-buffer)))
-             (space-up       +0.15)
-             (space-down     -0.20)
-             (prefix (cond ((string= status "RO")
-                            (propertize (if (window-dedicated-p)" -- " " RO ")
-                                        'face 'nano-face-header-popout))
-                           ((string= status "**")
-                            (propertize (if (window-dedicated-p)" -- " " ** ")
-                                        'face 'nano-face-header-critical))
-                           ((string= status "RW")
-                            (propertize (if (window-dedicated-p)" -- " " RW ")
-                                        'face 'nano-face-header-faded))
-                           (t (propertize status 'face 'nano-face-header-popout))))
-             (left (concat
-                    (propertize " "  'face 'nano-face-header-default
-                                'display `(raise ,space-up))
-                    (propertize name 'face 'nano-face-header-strong)
-                    (propertize " "  'face 'nano-face-header-default
-                                'display `(raise ,space-down))
-                    (propertize primary 'face 'nano-face-header-default)
-                    (propertize "  " 'face 'nano-face-header-default)
-                    (propertize secondary
-                                'face
-                                `(:inherit nano-face-header-default
-                                           :foreground ,nano-color-faded))))
-             (right "")
-             (available-width (- (window-total-width) 
-                                 (length prefix) (length left) (length right)
-                                 (/ (window-right-divider-width) char-width)))
-             (available-width (max 1 available-width)))
-        (concat prefix
-                left
-                (propertize (make-string available-width ?\ )
-                            'face 'nano-face-header-default)
-                (propertize right 'face `(:inherit nano-face-header-default
-                                                   :foreground ,nano-color-faded)))))))
+  (defun my/reload-font-face (&optional weight)
+    (interactive)
+    (let ((weight (if weight weight 'light)))
+      (my/set-font-weight weight)
+      (my/set-org-headline-face))))
 
 (leaf doom-themes
-  :disabled nil
   :doc "an opinionated pack of modern color-themes"
   :req "emacs-25.1" "cl-lib-0.5"
   :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
@@ -468,79 +424,87 @@
   :custom ((doom-themes-enable-italic . nil)
            (doom-themes-enable-bold . t))
   :config
-  ;; (load-theme 'doom-one t)
-  (load-theme 'doom-nord t)
-  ;; (load-theme 'doom-badger t)
-  ;; (load-theme 'doom-material t)
-  (doom-themes-neotree-config)
-  (doom-themes-org-config)
-  (doom-themes-treemacs-config)
+  (defun my/load-doom-theme (&optional theme)
+    (interactive)		
+    (let ((theme
+           (if theme theme
+             (intern (completing-read "Choose a theme:"
+                                      '(doom-nord doom-solarized-light))))))
+      (mapc #'disable-theme custom-enabled-themes)
+      (load-theme theme t)
+      (if (member "light" (split-string (symbol-name theme) "-"))
+          (my/reload-font-face 'normal)
+        (my/reload-font-face 'light)))
+    (doom-themes-neotree-config)
+    (doom-themes-org-config)
+    (doom-themes-treemacs-config)))
+
+(leaf modus-themes
+  :ensure t
+  :after org
+  :leaf-defer nil
+  :advice ((:after modus-themes-load-vivendi
+                   (lambda () (my/reload-font-face 'light)))
+           (:after modus-themes-load-operandi
+                   (lambda () (my/reload-font-face 'normal))))
+
+  :custom
+  ((modus-themes-bold-constructs . t)
+   (modus-themes-region . '(bg-only no-extend))
+   (modus-themes-org-blocks . 'gray-background)
+   (modus-themes-subtle-line-numbers . t)
+   (modus-themes-variable-pitch-headings . t)
+   (modus-themes-variable-pitch-ui . t)
+   (modus-themes-fringes . nil)
+   (modus-themes-prompts . '(intense gray))
+   (modus-themes-completions . 'opinionated)
+   (modus-themes-paren-match . '(bold intense underline))
+   ;; this is an alist: read the manual or its doc string
+   (modus-themes-org-agenda quote 
+                            '((header-block . (variable-pitch scale-title))
+                              (header-date . (grayscale workaholic bold-today))
+                              (scheduled . uniform)
+                              (habit . traffic-light-deuteranopia))))
+  :config
+  (defun my/load-modus-theme (&optional theme)
+    (interactive)
+    (modus-themes-load-themes)
+    (let ((theme (if theme theme
+                   (intern (completing-read "Choose one:"
+                                            '(modus-light
+                                              modus-dark))))))
+      (mapc #'disable-theme custom-enabled-themes)
+      (pcase theme
+        ('modus-dark (modus-themes-load-vivendi))
+        ('modus-light (modus-themes-load-operandi))))))
+
+
+(leaf themes
+  :hook (after-init-hook . (lambda () (my/reload-theme 'doom-nord)))
+  :preface
+  (defun my/reload-theme (&optional theme)
+    (interactive)
+    (let ((theme
+           (if theme theme
+             (intern (completing-read "Choose one:"
+                                      '(doom-nord
+                                        doom-solarized-light
+                                        modus-light
+                                        modus-dark))))))
+      (pcase (car (split-string (symbol-name theme) "-"))
+        ("doom" (my/load-doom-theme theme))
+        ("modus" (my/load-modus-theme theme))))) 
+  :config
+  (column-number-mode)
+  (setq inhibit-compacting-font-caches t)
 
   (leaf moody
     :when window-system
     :ensure t
     :custom (x-underline-at-descent-line . t)
     :config
-    (column-number-mode)
     (moody-replace-mode-line-buffer-identification)
     (moody-replace-vc-mode))
-
-  (leaf minions
-    :ensure t
-    :custom ((minions-mode-line-lighter . ";")
-             (minions-direct . '(defining-kbd-macro flymake-mode)))
-    :global-minor-mode t)
-
-  (leaf nano-modeline
-    :disabled t
-    :load-path "~/.emacs.d/elisp/nano-emacs/"
-    :require t nano-base-colors nano-colors nano-faces nano-theme
-    :config
-    (nano-faces)
-    (nano-modeline)
-    (nano-theme--mode-line)
-    (nano-theme--hl-line)
-    :advice (:override nano-modeline-compose my/nano-modeline-compose)
-    :preface
-    (defun my/nano-modeline-compose (status name primary secondary)
-      "Compose a string with provided information"
-      (let* ((char-width    (window-font-width nil 'header-line))
-             (window        (get-buffer-window (current-buffer)))
-             (space-up       +0.15)
-             (space-down     -0.20)
-             (prefix (cond ((string= status "RO")
-                            (propertize (if (window-dedicated-p)" -- " " RO ")
-                                        'face 'nano-face-header-popout))
-                           ((string= status "**")
-                            (propertize (if (window-dedicated-p)" -- " " ** ")
-                                        'face 'nano-face-header-critical))
-                           ((string= status "RW")
-                            (propertize (if (window-dedicated-p)" -- " " RW ")
-                                        'face 'nano-face-header-faded))
-                           (t (propertize status 'face 'nano-face-header-popout))))
-             (left (concat
-                    (propertize " "  'face 'nano-face-header-default
-                                'display `(raise ,space-up))
-                    (propertize name 'face 'nano-face-header-strong)
-                    (propertize " "  'face 'nano-face-header-default
-                                'display `(raise ,space-down))
-                    (propertize primary 'face 'nano-face-header-default)
-                    (propertize "  " 'face 'nano-face-header-default)
-                    (propertize secondary
-                                'face
-                                `(:inherit nano-face-header-default
-                                           :foreground ,nano-color-faded))))
-             (right "")
-             (available-width (- (window-total-width) 
-                                 (length prefix) (length left) (length right)
-                                 (/ (window-right-divider-width) char-width)))
-             (available-width (max 1 available-width)))
-        (concat prefix
-                left
-                (propertize (make-string available-width ?\ )
-                            'face 'nano-face-header-default)
-                (propertize right 'face `(:inherit nano-face-header-default
-                                                   :foreground ,nano-color-faded))))))
 
   (leaf doom-modeline
     :when (not window-system)
@@ -563,73 +527,7 @@
              (doom-modeline-bar-width . 7)
              (doom-modeline-lsp . t)
              (doom-modeline-github . nil)
-             (doom-modeline-persp-name . nil))
-    :config
-    (setq inhibit-compacting-font-caches t)
-    (column-number-mode 1)
-
-    ;; (leaf hide-mode-line
-    ;;   :disabled t
-    ;;   :doc "minor mode that hides/masks your modeline"
-    ;;   :req "emacs-24.4"
-    ;;   :tag "mode-line" "frames" "emacs>=24.4"
-    ;;   :url "https://github.com/hlissner/emacs-hide-mode-line"
-    ;;   :ensure t
-    ;;   :hook
-    ;;   ((neotree-mode imenu-list-minor-mode minimap-mode) . hide-mode-line-mode))
-    ))
-
-
-(leaf modus-themes
-  :disabled t
-  :ensure t
-  :after org
-  :leaf-defer nil
-  :advice (:after modus-themes-toggle my/reload-face)
-  :preface
-  (defun my/set-font-weight (&optional weight)
-    (interactive)
-    (let ((weight (if weight weight 'light)))
-      (set-face-attribute 'default nil :weight weight)
-      (set-face-attribute 'fixed-pitch nil :weight weight)
-      (set-face-attribute 'variable-pitch nil :weight weight)))
-
-  (defun my/reload-face ()
-    (pcase (modus-themes--current-theme)
-      ('modus-operandi (my/set-font-weight 'normal))
-      ('modus-vivendi (my/set-font-weight 'light)))
-    (my/set-org-headline-face))
-
-  :custom
-  ((modus-themes-bold-constructs . t)
-   (modus-themes-region . '(bg-only no-extend))
-   (modus-themes-org-blocks . 'gray-background)
-   (modus-themes-subtle-line-numbers . t)
-   (modus-themes-variable-pitch-headings . t)
-   (modus-themes-variable-pitch-ui . t)
-   (modus-themes-fringes . nil)
-   (modus-themes-prompts . '(intense gray))
-   (modus-themes-completions . 'opinionated)
-   (modus-themes-paren-match . '(bold intense underline))
-   ;; this is an alist: read the manual or its doc string
-   (modus-themes-org-agenda quote 
-                            '((header-block . (variable-pitch scale-title))
-                              (header-date . (grayscale workaholic bold-today))
-                              (scheduled . uniform)
-                              (habit . traffic-light-deuteranopia))))
-  :config
-  ;; Load the theme files before enabling a theme
-  (modus-themes-load-themes)
-  ;; (modus-themes-load-operandi) ;; light
-  (modus-themes-load-vivendi)
-
-  (leaf moody
-    :ensure t
-    :custom (x-underline-at-descent-line . t)
-    :config
-    (column-number-mode)
-    (moody-replace-mode-line-buffer-identification)
-    (moody-replace-vc-mode))
+             (doom-modeline-persp-name . nil)))
 
   (leaf minions
     :ensure t
@@ -2653,7 +2551,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                  :hide-unread t
                  :key ?w)
           (:name "Flagged massages"
-                 :query "flag:flagged"
+                 :query "flag:flagged AND NOT flag:trashed"
                  :key ?f)))
 
   (add-to-list 'mu4e-marks
