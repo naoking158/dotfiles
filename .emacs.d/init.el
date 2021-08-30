@@ -480,6 +480,7 @@
 
 
 (leaf themes
+  :leaf-defer nil
   :hook (after-init-hook . (lambda () (my/reload-theme 'doom-nord)))
   :preface
   (defun my/reload-theme (&optional theme)
@@ -2413,6 +2414,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf skk
   :ensure ddskk
+  :leaf-defer nil
   :bind (("C-M-j" . skk-undo-kakutei))
   :custom ((skk-server-host . "localhost")
            (skk-server-prtnum . 1178)
@@ -2434,7 +2436,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   ;;   :load-path "~/.emacs.d/elisp/ddskk-posframe/"
   ;;   :require nil
   ;;   :custom (ddskk-posframe-mode . t))
-  )
+  :config
+  (skk-mode 1))
 
 (leaf dap-mode
   :ensure t
@@ -2532,11 +2535,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
   (setq mu4e-maildir-shortcuts
         '((:maildir "/BBO/[Gmail]/All Mail"		:key ?a)
-          (:maildir "/BBO/[Gmail]/Inbox"			:key ?i)
+          (:maildir "/BBO/Inbox"							:key ?i)
           (:maildir "/BBO/[Gmail]/Drafts"			:key ?d)
           (:maildir "/BBO/[Gmail]/Sent Mail"	:key ?s)
           (:maildir "/BBO/[Gmail]/Trash"			:key ?t)
-          (:maildir "/Private/[Gmail]/Inbox"	:key ?p)
+          (:maildir "/Private/Inbox"					:key ?p)
           ))
 
   (setq mu4e-bookmarks
@@ -2552,7 +2555,13 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                  :key ?w)
           (:name "Flagged massages"
                  :query "flag:flagged AND NOT flag:trashed"
-                 :key ?f)))
+                 :key ?f)
+          (:name "All Inbox"
+                 :query "(maildir:/BBO/Inbox OR maildir:/Private/Inbox OR maildir:/University/Inbox) AND NOT flag:trashed"
+                 :key ?i)
+          (:name "All massages"
+                 :query "NOT flag:trashed AND NOT flag:draft AND NOT flag:sent"
+                 :key ?a)))
 
   (add-to-list 'mu4e-marks
                '(tag
