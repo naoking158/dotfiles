@@ -572,7 +572,8 @@
     :bind ("M-=" . transient-dwim-dispatch)))
 
 (leaf dired
-  :require dired-x dired-collapse
+  :ensure dired-collapse
+  :require dired-x
   :hook (dired-mode-hook . (lambda ()
                              (dired-collapse-mode 1)
                              (dired-omit-mode)

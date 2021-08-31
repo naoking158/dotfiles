@@ -810,7 +810,8 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 #+begin_src emacs-lisp
   
   (leaf dired
-    :require dired-x dired-collapse
+    :ensure dired-collapse
+    :require dired-x
     :hook (dired-mode-hook . (lambda ()
                                (dired-collapse-mode 1)
                                (dired-omit-mode)
