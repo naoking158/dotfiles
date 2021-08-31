@@ -108,14 +108,18 @@ end
 function rm
     argparse -n mycmdname f/force -- $argv
     or return
+		set TRASH $HOME/.myTrash
 
     if set -lq _flag_f
         /bin/rm -rf $argv
     else
-        if ! test -e $HOME/.myTrash
-            mkdir $HOME/.myTrash
+        if ! test -e $TRASH
+            mkdir $TRASH
         end
-        mv -i $argv $HOME/.myTrash/
+				if test -e $TRASH/$argv
+						mv $TRASH/$argv $TRASH/$argv-(date +%Y%m%d%I%M%S)
+        end
+				mv -i $argv $HOME/.myTrash/
         echo "They are moved to $HOME/.myTrash"
     end
 end
