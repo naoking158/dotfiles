@@ -2424,15 +2424,18 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (skk-egg-like-newline . t)  ;; skk-kakutei by RET
            (skk-auto-okuri-process . t)
            (skk-auto-insert-paren . t)
-           (skk-use-auto-enclose-pair-of-region . t))
+           (skk-use-auto-enclose-pair-of-region . t)
+           (skk-inline-show-face . '( :foreground "#ECEFF4"
+                                      :background "#4C566A"
+                                      :inherit 'normal)))
   :config
+  (skk-mode 1)
+  (context-skk-mode 1)
+
   (leaf ddskk-posframe
     :load-path "~/.emacs.d/elisp/ddskk-posframe/"
-    :require nil
-    :custom (ddskk-posframe-mode . t))
-
-  (skk-mode 1)
-  (context-skk-mode 1))
+    :require t
+    :custom (ddskk-posframe-mode . t)))
 
 (leaf dap-mode
   :ensure t
