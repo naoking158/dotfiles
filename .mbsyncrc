@@ -1,0 +1,84 @@
+# ================================================================
+# naoki@bbo.cs.tsukuba.ac.jp
+# ================================================================
+
+IMAPAccount bbo
+Host imap.gmail.com
+User naoki@bbo.cs.tsukuba.ac.jp
+PassCmd "cat ~/src/github.com/naoking158/envs/.bbo-mail-pw"
+Port 993
+SSLType IMAPS
+AuthMechs PLAIN
+# CertificateFile /etc/ssl/certs/ca-certificates.crt
+
+IMAPStore bbo-remote
+Account bbo
+
+MaildirStore bbo-local
+Subfolders Verbatim
+Path ~/Mail/BBO/
+Inbox ~/Mail/BBO/Inbox
+
+Channel bbo
+Far :bbo-remote:
+Near :bbo-local:
+Patterns INBOX *Gmail* ![Gmail]/Spam
+# Patterns "Inbox" "Starred" "Sent" "Drafts" "Trash" "Important" "Spam"
+Create Both
+SyncState *
+
+
+# ================================================================
+# nok.skmt.snow@gmail.com
+# ================================================================
+
+IMAPAccount private
+Host imap.gmail.com
+User nok.skmt.snow@gmail.com
+PassCmd "cat ~/src/github.com/naoking158/envs/.nok-mail-pw"
+Port 993
+SSLType IMAPS
+AuthMechs PLAIN
+
+IMAPStore private-remote
+Account private
+
+MaildirStore private-local
+Subfolders Verbatim
+Path ~/Mail/Private/
+Inbox ~/Mail/Private/Inbox
+
+Channel private
+Far :private-remote:
+Near :private-local:
+Patterns INBOX *Gmail* ![Gmail]/Spam
+Create Both
+SyncState *
+
+
+# ================================================================
+# s1930160@u.tsukuba.ac.jp
+# ================================================================
+
+IMAPAccount univ
+Host outlook.office365.com
+User s1930160@s.tsukuba.ac.jp
+PassCmd "cat ~/src/github.com/naoking158/envs/.s19-mail-pw"
+Port 993
+SSLType IMAPS
+AuthMechs PLAIN
+
+IMAPStore univ-remote
+Account univ
+
+MaildirStore univ-local
+Subfolders Verbatim
+Path ~/Mail/University/
+Inbox ~/Mail/University/Inbox
+
+Channel univ
+Far :univ-remote:
+Near :univ-local:
+Patterns *
+Create Both
+SyncState *

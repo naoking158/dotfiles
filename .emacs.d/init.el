@@ -399,66 +399,22 @@
              (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
       (dolist (char-regexp alist)
         (set-char-table-range composition-function-table (car char-regexp)
-                              `([,(cdr char-regexp) 0 font-shape-gstring]))))))
+                              `([,(cdr char-regexp) 0 font-shape-gstring])))))
 
-(leaf nord-theme
-  :disabled t
-  :ensure t
-  :config
-  (load-theme 'nord t)
+  (defun my/set-font-weight (&optional weight)
+    (interactive)
+    (let ((weight (if weight weight 'light)))
+      (set-face-attribute 'default nil :weight weight)
+      (set-face-attribute 'fixed-pitch nil :weight weight)
+      (set-face-attribute 'variable-pitch nil :weight weight)))
 
-  (leaf nano-modeline
-    :load-path "~/.emacs.d/elisp/nano-emacs/"
-    :require t nano-base-colors nano-colors nano-faces nano-theme
-    :config
-    (nano-faces)
-    (nano-modeline)
-    (nano-theme--mode-line)
-    (nano-theme--hl-line)
-    :advice (:override nano-modeline-compose my/nano-modeline-compose)
-    :preface
-    (defun my/nano-modeline-compose (status name primary secondary)
-      "Compose a string with provided information"
-      (let* ((char-width    (window-font-width nil 'header-line))
-             (window        (get-buffer-window (current-buffer)))
-             (space-up       +0.15)
-             (space-down     -0.20)
-             (prefix (cond ((string= status "RO")
-                            (propertize (if (window-dedicated-p)" -- " " RO ")
-                                        'face 'nano-face-header-popout))
-                           ((string= status "**")
-                            (propertize (if (window-dedicated-p)" -- " " ** ")
-                                        'face 'nano-face-header-critical))
-                           ((string= status "RW")
-                            (propertize (if (window-dedicated-p)" -- " " RW ")
-                                        'face 'nano-face-header-faded))
-                           (t (propertize status 'face 'nano-face-header-popout))))
-             (left (concat
-                    (propertize " "  'face 'nano-face-header-default
-                                'display `(raise ,space-up))
-                    (propertize name 'face 'nano-face-header-strong)
-                    (propertize " "  'face 'nano-face-header-default
-                                'display `(raise ,space-down))
-                    (propertize primary 'face 'nano-face-header-default)
-                    (propertize "  " 'face 'nano-face-header-default)
-                    (propertize secondary
-                                'face
-                                `(:inherit nano-face-header-default
-                                           :foreground ,nano-color-faded))))
-             (right "")
-             (available-width (- (window-total-width) 
-                                 (length prefix) (length left) (length right)
-                                 (/ (window-right-divider-width) char-width)))
-             (available-width (max 1 available-width)))
-        (concat prefix
-                left
-                (propertize (make-string available-width ?\ )
-                            'face 'nano-face-header-default)
-                (propertize right 'face `(:inherit nano-face-header-default
-                                                   :foreground ,nano-color-faded)))))))
+  (defun my/reload-font-face (&optional weight)
+    (interactive)
+    (let ((weight (if weight weight 'light)))
+      (my/set-font-weight weight)
+      (my/set-org-headline-face))))
 
 (leaf doom-themes
-  :disabled nil
   :doc "an opinionated pack of modern color-themes"
   :req "emacs-25.1" "cl-lib-0.5"
   :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
@@ -468,79 +424,88 @@
   :custom ((doom-themes-enable-italic . nil)
            (doom-themes-enable-bold . t))
   :config
-  ;; (load-theme 'doom-one t)
-  (load-theme 'doom-nord t)
-  ;; (load-theme 'doom-badger t)
-  ;; (load-theme 'doom-material t)
-  (doom-themes-neotree-config)
-  (doom-themes-org-config)
-  (doom-themes-treemacs-config)
+  (defun my/load-doom-theme (&optional theme)
+    (interactive)		
+    (let ((theme
+           (if theme theme
+             (intern (completing-read "Choose a theme:"
+                                      '(doom-nord doom-solarized-light))))))
+      (mapc #'disable-theme custom-enabled-themes)
+      (load-theme theme t)
+      (if (member "light" (split-string (symbol-name theme) "-"))
+          (my/reload-font-face 'normal)
+        (my/reload-font-face 'light)))
+    (doom-themes-neotree-config)
+    (doom-themes-org-config)
+    (doom-themes-treemacs-config)))
+
+(leaf modus-themes
+  :ensure t
+  :after org
+  :leaf-defer nil
+  :advice ((:after modus-themes-load-vivendi
+                   (lambda () (my/reload-font-face 'light)))
+           (:after modus-themes-load-operandi
+                   (lambda () (my/reload-font-face 'normal))))
+
+  :custom
+  ((modus-themes-bold-constructs . t)
+   (modus-themes-region . '(bg-only no-extend))
+   (modus-themes-org-blocks . 'gray-background)
+   (modus-themes-subtle-line-numbers . t)
+   (modus-themes-variable-pitch-headings . t)
+   (modus-themes-variable-pitch-ui . t)
+   (modus-themes-fringes . nil)
+   (modus-themes-prompts . '(intense gray))
+   (modus-themes-completions . 'opinionated)
+   (modus-themes-paren-match . '(bold intense underline))
+   ;; this is an alist: read the manual or its doc string
+   (modus-themes-org-agenda quote 
+                            '((header-block . (variable-pitch scale-title))
+                              (header-date . (grayscale workaholic bold-today))
+                              (scheduled . uniform)
+                              (habit . traffic-light-deuteranopia))))
+  :config
+  (defun my/load-modus-theme (&optional theme)
+    (interactive)
+    (modus-themes-load-themes)
+    (let ((theme (if theme theme
+                   (intern (completing-read "Choose one:"
+                                            '(modus-light
+                                              modus-dark))))))
+      (mapc #'disable-theme custom-enabled-themes)
+      (pcase theme
+        ('modus-dark (modus-themes-load-vivendi))
+        ('modus-light (modus-themes-load-operandi))))))
+
+
+(leaf themes
+  :leaf-defer nil
+  :hook (after-init-hook . (lambda () (my/reload-theme 'doom-nord)))
+  :preface
+  (defun my/reload-theme (&optional theme)
+    (interactive)
+    (let ((theme
+           (if theme theme
+             (intern (completing-read "Choose one:"
+                                      '(doom-nord
+                                        doom-solarized-light
+                                        modus-light
+                                        modus-dark))))))
+      (pcase (car (split-string (symbol-name theme) "-"))
+        ("doom" (my/load-doom-theme theme))
+        ("modus" (my/load-modus-theme theme))))) 
+  :config
+  (column-number-mode)
+  (setq inhibit-compacting-font-caches t)
 
   (leaf moody
     :when window-system
     :ensure t
     :custom (x-underline-at-descent-line . t)
     :config
-    (column-number-mode)
     (moody-replace-mode-line-buffer-identification)
     (moody-replace-vc-mode))
-
-  (leaf minions
-    :ensure t
-    :custom ((minions-mode-line-lighter . ";")
-             (minions-direct . '(defining-kbd-macro flymake-mode)))
-    :global-minor-mode t)
-
-  (leaf nano-modeline
-    :disabled t
-    :load-path "~/.emacs.d/elisp/nano-emacs/"
-    :require t nano-base-colors nano-colors nano-faces nano-theme
-    :config
-    (nano-faces)
-    (nano-modeline)
-    (nano-theme--mode-line)
-    (nano-theme--hl-line)
-    :advice (:override nano-modeline-compose my/nano-modeline-compose)
-    :preface
-    (defun my/nano-modeline-compose (status name primary secondary)
-      "Compose a string with provided information"
-      (let* ((char-width    (window-font-width nil 'header-line))
-             (window        (get-buffer-window (current-buffer)))
-             (space-up       +0.15)
-             (space-down     -0.20)
-             (prefix (cond ((string= status "RO")
-                            (propertize (if (window-dedicated-p)" -- " " RO ")
-                                        'face 'nano-face-header-popout))
-                           ((string= status "**")
-                            (propertize (if (window-dedicated-p)" -- " " ** ")
-                                        'face 'nano-face-header-critical))
-                           ((string= status "RW")
-                            (propertize (if (window-dedicated-p)" -- " " RW ")
-                                        'face 'nano-face-header-faded))
-                           (t (propertize status 'face 'nano-face-header-popout))))
-             (left (concat
-                    (propertize " "  'face 'nano-face-header-default
-                                'display `(raise ,space-up))
-                    (propertize name 'face 'nano-face-header-strong)
-                    (propertize " "  'face 'nano-face-header-default
-                                'display `(raise ,space-down))
-                    (propertize primary 'face 'nano-face-header-default)
-                    (propertize "  " 'face 'nano-face-header-default)
-                    (propertize secondary
-                                'face
-                                `(:inherit nano-face-header-default
-                                           :foreground ,nano-color-faded))))
-             (right "")
-             (available-width (- (window-total-width) 
-                                 (length prefix) (length left) (length right)
-                                 (/ (window-right-divider-width) char-width)))
-             (available-width (max 1 available-width)))
-        (concat prefix
-                left
-                (propertize (make-string available-width ?\ )
-                            'face 'nano-face-header-default)
-                (propertize right 'face `(:inherit nano-face-header-default
-                                                   :foreground ,nano-color-faded))))))
 
   (leaf doom-modeline
     :when (not window-system)
@@ -563,73 +528,7 @@
              (doom-modeline-bar-width . 7)
              (doom-modeline-lsp . t)
              (doom-modeline-github . nil)
-             (doom-modeline-persp-name . nil))
-    :config
-    (setq inhibit-compacting-font-caches t)
-    (column-number-mode 1)
-
-    ;; (leaf hide-mode-line
-    ;;   :disabled t
-    ;;   :doc "minor mode that hides/masks your modeline"
-    ;;   :req "emacs-24.4"
-    ;;   :tag "mode-line" "frames" "emacs>=24.4"
-    ;;   :url "https://github.com/hlissner/emacs-hide-mode-line"
-    ;;   :ensure t
-    ;;   :hook
-    ;;   ((neotree-mode imenu-list-minor-mode minimap-mode) . hide-mode-line-mode))
-    ))
-
-
-(leaf modus-themes
-  :disabled t
-  :ensure t
-  :after org
-  :leaf-defer nil
-  :advice (:after modus-themes-toggle my/reload-face)
-  :preface
-  (defun my/set-font-weight (&optional weight)
-    (interactive)
-    (let ((weight (if weight weight 'light)))
-      (set-face-attribute 'default nil :weight weight)
-      (set-face-attribute 'fixed-pitch nil :weight weight)
-      (set-face-attribute 'variable-pitch nil :weight weight)))
-
-  (defun my/reload-face ()
-    (pcase (modus-themes--current-theme)
-      ('modus-operandi (my/set-font-weight 'normal))
-      ('modus-vivendi (my/set-font-weight 'light)))
-    (my/set-org-headline-face))
-
-  :custom
-  ((modus-themes-bold-constructs . t)
-   (modus-themes-region . '(bg-only no-extend))
-   (modus-themes-org-blocks . 'gray-background)
-   (modus-themes-subtle-line-numbers . t)
-   (modus-themes-variable-pitch-headings . t)
-   (modus-themes-variable-pitch-ui . t)
-   (modus-themes-fringes . nil)
-   (modus-themes-prompts . '(intense gray))
-   (modus-themes-completions . 'opinionated)
-   (modus-themes-paren-match . '(bold intense underline))
-   ;; this is an alist: read the manual or its doc string
-   (modus-themes-org-agenda quote 
-                            '((header-block . (variable-pitch scale-title))
-                              (header-date . (grayscale workaholic bold-today))
-                              (scheduled . uniform)
-                              (habit . traffic-light-deuteranopia))))
-  :config
-  ;; Load the theme files before enabling a theme
-  (modus-themes-load-themes)
-  ;; (modus-themes-load-operandi) ;; light
-  (modus-themes-load-vivendi)
-
-  (leaf moody
-    :ensure t
-    :custom (x-underline-at-descent-line . t)
-    :config
-    (column-number-mode)
-    (moody-replace-mode-line-buffer-identification)
-    (moody-replace-vc-mode))
+             (doom-modeline-persp-name . nil)))
 
   (leaf minions
     :ensure t
@@ -673,37 +572,19 @@
     :bind ("M-=" . transient-dwim-dispatch)))
 
 (leaf dired
-  :commands (dired dired-jump)
-  :config
-  (setq dired-listing-switches "-agho --group-directories-first"
-        dired-omit-files "^\\.[^.].*"
-        dired-omit-verbose nil
-        dired-hide-details-hide-symlink-targets nil
-        delete-by-moving-to-trash t)
-
-  (autoload 'dired-omit-mode "dired-x")
-
-  (add-hook 'dired-load-hook
-            (lambda ()
-              (interactive)
-              (dired-collapse)))
-
-  (add-hook 'dired-mode-hook
-            (lambda ()
-              (interactive)
-              (dired-omit-mode 1)
-              (dired-hide-details-mode 1)
-              (hl-line-mode 1)))
-
-  ;; (leaf dired-single
-  ;;   :ensure t)
-
-  ;; (leaf dired-ranger
-  ;;   :ensure t)
-
-  ;; (leaf dired-collapse
-  ;;   :ensure t)
-  )
+  :require dired-x dired-collapse
+  :hook (dired-mode-hook . (lambda ()
+                             (dired-collapse-mode 1)
+                             (dired-omit-mode)
+                             (dired-hide-details-mode 1)))
+  :bind (dired-mode-map
+         ("o" . dired-display-file))
+  :custom ((dired-listing-switches . "-agho --group-directories-first")
+           (dired-omit-files . "^\\.[^.].*")
+           (dired-omit-verbose . nil)
+           (dired-hide-details-hide-symlink-targets . nil)
+           (delete-by-moving-to-trash . t)
+           (dired-dwim-target . t)))
 
 (leaf crux
   :ensure t
@@ -769,7 +650,7 @@
   :ensure t
   :commands lsp
   :init
-  (when window-system
+  (when (bound-and-true-p corfu-mode)
     ;; This option need to avoid starting company-mode
     (custom-set-variables '(lsp-completion-provider :none)))
   :custom `((lsp-keymap-prefix . "s-l")        
@@ -1289,7 +1170,7 @@ respectively."
   :doc "Modular text completion framework"
   :tag "matching" "convenience" "abbrev" "emacs>=24.3"
   :url "http://company-mode.github.io/"
-  :when (not window-system)
+  ;; :when (not window-system)
   :ensure t
   :blackout t
   :leaf-defer nil
@@ -1487,7 +1368,9 @@ respectively."
    consult-ripgrep consult-git-grep consult-grep
    consult-bookmark consult-recent-file consult-xref
    consult--source-file consult--source-project-file consult--source-bookmark
-   :preview-key (kbd "C-S-p"))
+   ;; :preview-key (kbd "C-S-p")
+   :preview-key (list :debounce 0.5 (kbd "M-."))
+   )
 
   (leaf consult-ghq
     :after consult
@@ -1527,6 +1410,7 @@ respectively."
   :global-minor-mode t savehist-mode)
 
 (leaf corfu
+  :disabled t
   :when window-system
   :ensure t
   :require t
@@ -1761,7 +1645,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf org-agenda
   :after org
   :require t org-habit org-capture
-  :bind* (("C-c C-a" . org-agenda-cache)
+  :bind* (("C-c C-a" . my/org-agenda-cache)
           ("C-c C-m" . jethro/org-inbox-capture))
   :bind (org-agenda-mode-map
          ("i" . org-agenda-clock-in)
@@ -2515,6 +2399,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf skk
   :ensure ddskk
+  :leaf-defer nil
   :bind (("C-M-j" . skk-undo-kakutei))
   :custom ((skk-server-host . "localhost")
            (skk-server-prtnum . 1178)
@@ -2536,7 +2421,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   ;;   :load-path "~/.emacs.d/elisp/ddskk-posframe/"
   ;;   :require nil
   ;;   :custom (ddskk-posframe-mode . t))
-  )
+  :config
+  (skk-mode 1)
+  (context-skk-mode 1))
 
 (leaf dap-mode
   :ensure t
@@ -2552,5 +2439,276 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (python-mode-hook . dap-mode)
    (python-mode-hook . dap-ui-mode)
    (python-mode-hook . dap-tooltip-mode)))
+
+(leaf mu4e
+  :when window-system
+  :load-path "/usr/local/Cellar/mu/1.6.5/share/emacs/site-lisp/mu/mu4e/"
+  :require t
+  :hook (mu4e-headers-mode-hook . (lambda () (visual-line-mode -1)))
+  :config
+  (set-variable 'read-mail-command 'mu4e)
+  (setq mail-user-agent 'mu4e-user-agent
+
+        message-send-mail-function 'smtpmail-send-it
+
+        ;; Make sure plain text mails flow correctly for recipients
+        mu4e-compose-format-flowed t
+
+        ;; This is set to 't' to avoid mail syncing issues when using mbsync
+        mu4e-change-filenames-when-moving t
+
+        ;; Refresh mail using isync every 10 minutes
+        mu4e-update-interval (* 10 60)
+        mu4e-get-mail-command "mbsync -a"
+        mu4e-maildir "~/Mail"
+        mu4e-attachment-dir "~/Mail/Downloads"
+        mu4e-completing-read-function 'completing-read
+        mu4e-headers-precise-alignment t
+        mu4e-use-fancy-chars t)
+
+  (setq mu4e-contexts
+        (list
+         ;; Work account
+         (make-mu4e-context
+          :name "Work"
+          :match-func
+          (lambda (msg)
+            (when msg
+              (string-prefix-p "/BBO" (mu4e-message-field msg :maildir))))
+          :vars '((user-mail-address			. "naoki@bbo.cs.tsukuba.ac.jp")
+                  (user-full-name					. "naoki@bbo.cs.tsukuba.ac.jp")
+                  (smtpmail-smtp-server		. "smtp.gmail.com")
+                  (smtpmail-smtp-service	. 465)
+                  (smtpmail-stream-type		. ssl)
+                  (mu4e-drafts-folder			. "/BBO/[Gmail]/Drafts")
+                  (mu4e-sent-folder				. "/BBO/[Gmail]/Sent Mail")
+                  (mu4e-refile-folder			. "/BBO/[Gmail]/All Mail")
+                  (mu4e-trash-folder			. "/BBO/[Gmail]/Trash")))
+
+         ;; Private account
+         (make-mu4e-context
+          :name "Private"
+          :match-func
+          (lambda (msg)
+            (when msg
+              (string-prefix-p "/Private" (mu4e-message-field msg :maildir))))
+          :vars '((user-mail-address			. "nok.skmt.snow@gmail.com")
+                  (user-full-name					. "nok.skmt.snow@gmail.com")
+                  (smtpmail-smtp-server		. "smtp.gmail.com")
+                  (smtpmail-smtp-service	. 465)
+                  (smtpmail-stream-type		. ssl)
+                  (mu4e-drafts-folder			. "/Private/[Gmail]/Drafts")
+                  (mu4e-sent-folder				. "/Private/[Gmail]/Sent Mail")
+                  (mu4e-refile-folder			. "/Private/[Gmail]/All Mail")
+                  (mu4e-trash-folder			. "/Private/[Gmail]/Trash")))
+
+         ;; University account
+         (make-mu4e-context
+          :name "University"
+          :match-func
+          (lambda (msg)
+            (when msg
+              (string-prefix-p "/University" (mu4e-message-field msg :maildir))))
+          :vars '((user-mail-address			. "s1930160@s.tsukuba.ac.jp")
+                  (user-full-name					. "s1930160@s.tsukuba.ac.jp")
+                  (smtpmail-smtp-server		. "smtp.office365.com")
+                  (smtpmail-smtp-service	. 587)
+                  (smtpmail-stream-type		. starttls)
+                  (mu4e-drafts-folder			. "/University/Drafts")
+                  (mu4e-sent-folder				. "/University/Sent Items")
+                  (mu4e-refile-folder			. "/University/Archive")
+                  (mu4e-trash-folder			. "/University/Deleted Items")
+                  ))))
+
+  (setq mu4e-maildir-shortcuts
+        '((:maildir "/BBO/[Gmail]/All Mail"		:key ?a)
+          (:maildir "/BBO/Inbox"							:key ?i)
+          (:maildir "/BBO/[Gmail]/Drafts"			:key ?d)
+          (:maildir "/BBO/[Gmail]/Sent Mail"	:key ?s)
+          (:maildir "/BBO/[Gmail]/Trash"			:key ?t)
+          (:maildir "/Private/Inbox"					:key ?p)
+          ))
+
+  (setq mu4e-bookmarks
+        '((:name  "Unread messages"
+                  :query "flag:unread AND NOT flag:trashed"
+                  :key ?u)
+          (:name "Today's messages"
+                 :query "date:today..now"
+                 :key ?t)
+          (:name "Last 7 days"
+                 :query "date:7d..now"
+                 :hide-unread t
+                 :key ?w)
+          (:name "Flagged massages"
+                 :query "flag:flagged AND NOT flag:trashed"
+                 :key ?f)
+          (:name "All Inbox"
+                 :query "(maildir:/BBO/Inbox OR maildir:/Private/Inbox OR maildir:/University/Inbox) AND NOT flag:trashed"
+                 :key ?i)
+          (:name "All massages"
+                 :query "NOT flag:trashed AND NOT flag:draft AND NOT flag:sent"
+                 :key ?a)))
+
+  (add-to-list 'mu4e-marks
+               '(tag
+                 :char       "g"
+                 :prompt     "gtag"
+                 :ask-target (lambda ()
+                               (completing-read "What tag do you want to add?:"
+                                                '("Pinned" "starred")))
+                 :action      (lambda (docid msg target)
+                                (mu4e-action-retag-message msg (concat "+" target)))))
+  (mu4e~headers-defun-mark-for tag)
+
+  :advice
+  (:around mu4e~headers-flags-str (lambda (f &rest args)
+                                    (let* ((mu4e-use-fancy-chars nil))
+                                        (apply f args))))
+  ;; (:around mu4e~headers-flags-str (lambda (f &rest args)
+  ;;                                   (prog2
+  ;;                                       (setq mu4e-use-fancy-chars nil)
+  ;;                                       (apply f args)
+  ;;                                     (setq mu4e-use-fancy-chars t)))
+  ;;          )
+  :preface
+  ;; (defun my/mu4e~headers-flags-str (func &rest args)
+  ;; 	(setq mu4e-use-fancy-chars nil)
+  ;; 	(apply func args)
+  ;; 	(setq mu4e-use-fancy-chars t))
+
+  (defun my/org-capture-mu4e ()
+    (interactive)
+    "Capture a TODO item via email."
+    (org-capture nil "o"))
+
+  (add-to-list 'org-capture-templates
+               `("o" "TODO respond to email" entry 
+                 (file ,(concat jethro/org-agenda-directory "inbox.org"))
+                 "* TODO %^{Description}\n%A\n%?\n"))
+
+  :bind
+  (mu4e-headers-mode-map
+   ("{" . mu4e-headers-query-prev)      ; differs from built-in
+   ("}" . mu4e-headers-query-next)      ; differs from built-in
+   ("o" . my/org-capture-mu4e)          ; differs from built-in
+
+   ("A" . mu4e-headers-mark-for-action) ; differs from built-in
+
+   ("`" . mu4e-update-mail-and-index)   ; differs from built-in
+   ("|" . mu4e-view-pipe)               ; does not seem to be built in any longer
+   ("." . hydra-mu4e-headers/body))
+
+  :hydra
+  (hydra-mu4e-headers
+   (:color blue :hint nil)
+   "
+ ^General^   | ^Search^           | _!_: read    | _#_: deferred  | ^Switches^
+-^^----------+-^^-----------------| _?_: unread  | _%_: pattern   |-^^------------------
+_n_: next    | _s_: search        | _r_: refile  | _&_: custom    | _O_: sorting
+_p_: prev    | _S_: edit prev qry | _u_: unmk    | _+_: flag      | _P_: threading
+_]_: n unred | _/_: narrow search | _U_: unmk *  | _-_: unflag    | _Q_: full-search
+_[_: p unred | _b_: search bkmk   | _d_: trash   | _T_: thr       | _V_: skip dups 
+_y_: sw view | _B_: edit bkmk     | _D_: delete  | _t_: subthr    | _W_: include-related
+_R_: reply   | _{_: previous qry  | _m_: move    |-^^-------------+-^^------------------ 
+_C_: compose | _}_: next query    | _a_: action  | _|_: thru shl  | _`_: update, reindex
+_F_: forward | _C-+_: show more   | _A_: mk4actn | _H_: help      | _;_: context-switch
+_o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2maildir "
+
+   ;; general
+   ("n" mu4e-headers-next)
+   ("p" mu4e-headers-previous)
+   ("[" mu4e-select-next-unread)
+   ("]" mu4e-select-previous-unread)
+   ("y" mu4e-select-other-view)
+   ("R" mu4e-compose-reply)
+   ("C" mu4e-compose-new)
+   ("F" mu4e-compose-forward)
+   ("o" my/org-capture-mu4e)                  ; differs from built-in
+
+   ;; search
+   ("s" mu4e-headers-search)
+   ("S" mu4e-headers-search-edit)
+   ("/" mu4e-headers-search-narrow)
+   ("b" mu4e-headers-search-bookmark)
+   ("B" mu4e-headers-search-bookmark-edit)
+   ("{" mu4e-headers-query-prev)              ; differs from built-in
+   ("}" mu4e-headers-query-next)              ; differs from built-in
+   ("C-+" mu4e-headers-split-view-grow)
+   ("C--" mu4e-headers-split-view-shrink)
+
+   ;; mark stuff 
+   ("!" mu4e-headers-mark-for-read)
+   ("?" mu4e-headers-mark-for-unread)
+   ("r" mu4e-headers-mark-for-refile)
+   ("u" mu4e-headers-mark-for-unmark)
+   ("U" mu4e-mark-unmark-all)
+   ("d" mu4e-headers-mark-for-trash)
+   ("D" mu4e-headers-mark-for-delete)
+   ("m" mu4e-headers-mark-for-move)
+   ("a" mu4e-headers-action)                  ; not really a mark per-se
+   ("A" mu4e-headers-mark-for-action)         ; differs from built-in
+   ("*" mu4e-headers-mark-for-something)
+
+   ("#" mu4e-mark-resolve-deferred-marks)
+   ("%" mu4e-headers-mark-pattern)
+   ("&" mu4e-headers-mark-custom)
+   ("+" mu4e-headers-mark-for-flag)
+   ("-" mu4e-headers-mark-for-unflag)
+   ("t" mu4e-headers-mark-subthread)
+   ("T" mu4e-headers-mark-thread)
+
+   ;; miscellany
+   ("q" mu4e~headers-quit-buffer)
+   ("H" mu4e-display-manual)
+   ("|" mu4e-view-pipe)                       ; does not seem built-in any longer
+
+   ;; switches
+   ("O" mu4e-headers-change-sorting)
+   ("P" mu4e-headers-toggle-threading)
+   ("Q" mu4e-headers-toggle-full-search)
+   ("V" mu4e-headers-toggle-skip-duplicates)
+   ("W" mu4e-headers-toggle-include-related)
+
+   ;; more miscellany
+   ("`" mu4e-update-mail-and-index)           ; differs from built-in
+   (";" mu4e-context-switch)  
+   ("j" mu4e~headers-jump-to-maildir)
+
+   ("." nil)))
+
+
+(leaf mu4e-views
+  :ensure t
+  :after mu4e
+  :bind (mu4e-headers-mode-map
+         :package mu4e
+         ("v" . mu4e-views-mu4e-select-view-msg-method) ;; select viewing method
+         ("M-n" . mu4e-views-cursor-msg-view-window-down) ;; from headers window scroll the email view
+         ("M-p" . mu4e-views-cursor-msg-view-window-up) ;; from headers window scroll the email view
+         )
+  :config
+  (setq mu4e-views-default-view-method "dispatcher") ;; make xwidgets default
+  (mu4e-views-mu4e-use-view-msg-method "text") ;; select the default
+  (setq mu4e-views-next-previous-message-behaviour 'stick-to-current-window) ;; when pressing n and p stay in the current window
+  (setq mu4e-views-auto-view-selected-message t)  ;; automatically open messages when moving in the headers view
+  (setq mu4e-views-dispatcher-predicate-view-map
+        `((,(lambda (msg) (mu4e-message-field msg :body-html)) . "html")
+          (,(lambda (msg) (ignore msg) t) . "text"))))
+
+(leaf org-msg
+  :ensure t
+  :after mu4e
+  :config
+  (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
+        ;; org-msg-startup "hidestars indent inlineimages"
+        org-msg-recipient-names '(("naoki@bbo.cs.tsukuba.ac.jp" . "Naoki Sakamoto")
+                                  ("nok.skmt.snow@gmail.com" . "Naoki Sakamoto"))
+        ;; org-msg-greeting-name-limit 3
+        org-msg-default-alternatives '((new		. (text html))
+                                       (reply-to-html	. (text html))
+                                       (reply-to-text	. (text)))
+        org-msg-convert-citation t)
+  (org-msg-mode))
 
 (provide 'init)
