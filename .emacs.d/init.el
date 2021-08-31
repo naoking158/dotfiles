@@ -572,37 +572,19 @@
     :bind ("M-=" . transient-dwim-dispatch)))
 
 (leaf dired
-  :commands (dired dired-jump)
-  :config
-  (setq dired-listing-switches "-agho --group-directories-first"
-        dired-omit-files "^\\.[^.].*"
-        dired-omit-verbose nil
-        dired-hide-details-hide-symlink-targets nil
-        delete-by-moving-to-trash t)
-
-  (autoload 'dired-omit-mode "dired-x")
-
-  (add-hook 'dired-load-hook
-            (lambda ()
-              (interactive)
-              (dired-collapse)))
-
-  (add-hook 'dired-mode-hook
-            (lambda ()
-              (interactive)
-              (dired-omit-mode 1)
-              (dired-hide-details-mode 1)
-              (hl-line-mode 1)))
-
-  ;; (leaf dired-single
-  ;;   :ensure t)
-
-  ;; (leaf dired-ranger
-  ;;   :ensure t)
-
-  ;; (leaf dired-collapse
-  ;;   :ensure t)
-  )
+  :require dired-x dired-collapse
+  :hook (dired-mode-hook . (lambda ()
+                             (dired-collapse-mode 1)
+                             (dired-omit-mode)
+                             (dired-hide-details-mode 1)))
+  :bind (dired-mode-map
+         ("o" . dired-display-file))
+  :custom ((dired-listing-switches . "-agho --group-directories-first")
+           (dired-omit-files . "^\\.[^.].*")
+           (dired-omit-verbose . nil)
+           (dired-hide-details-hide-symlink-targets . nil)
+           (delete-by-moving-to-trash . t)
+           (dired-dwim-target . t)))
 
 (leaf crux
   :ensure t
@@ -668,7 +650,7 @@
   :ensure t
   :commands lsp
   :init
-  (when window-system
+  (when (bound-and-true-p corfu-mode)
     ;; This option need to avoid starting company-mode
     (custom-set-variables '(lsp-completion-provider :none)))
   :custom `((lsp-keymap-prefix . "s-l")        
@@ -1188,7 +1170,7 @@ respectively."
   :doc "Modular text completion framework"
   :tag "matching" "convenience" "abbrev" "emacs>=24.3"
   :url "http://company-mode.github.io/"
-  :when (not window-system)
+  ;; :when (not window-system)
   :ensure t
   :blackout t
   :leaf-defer nil
@@ -1386,7 +1368,9 @@ respectively."
    consult-ripgrep consult-git-grep consult-grep
    consult-bookmark consult-recent-file consult-xref
    consult--source-file consult--source-project-file consult--source-bookmark
-   :preview-key (kbd "C-S-p"))
+   ;; :preview-key (kbd "C-S-p")
+   :preview-key (list :debounce 0.5 (kbd "M-."))
+   )
 
   (leaf consult-ghq
     :after consult
@@ -1426,6 +1410,7 @@ respectively."
   :global-minor-mode t savehist-mode)
 
 (leaf corfu
+  :disabled t
   :when window-system
   :ensure t
   :require t
@@ -2437,7 +2422,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   ;;   :require nil
   ;;   :custom (ddskk-posframe-mode . t))
   :config
-  (skk-mode 1))
+  (skk-mode 1)
+  (context-skk-mode 1))
 
 (leaf dap-mode
   :ensure t
@@ -2475,6 +2461,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
         mu4e-update-interval (* 10 60)
         mu4e-get-mail-command "mbsync -a"
         mu4e-maildir "~/Mail"
+        mu4e-attachment-dir "~/Mail/Downloads"
         mu4e-completing-read-function 'completing-read
         mu4e-headers-precise-alignment t
         mu4e-use-fancy-chars t)
