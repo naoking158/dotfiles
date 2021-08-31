@@ -2542,7 +2542,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
           ))
 
   (setq mu4e-bookmarks
-        '((:name  "Unread messages"
+        '((:name "All Inbox"
+                 :query "(maildir:/BBO/Inbox OR maildir:/Private/Inbox OR maildir:/University/Inbox) AND NOT flag:trashed"
+                 :key ?i)
+          (:name  "Unread messages"
                   :query "flag:unread AND NOT flag:trashed"
                   :key ?u)
           (:name "Today's messages"
@@ -2555,9 +2558,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
           (:name "Flagged massages"
                  :query "flag:flagged AND NOT flag:trashed"
                  :key ?f)
-          (:name "All Inbox"
-                 :query "(maildir:/BBO/Inbox OR maildir:/Private/Inbox OR maildir:/University/Inbox) AND NOT flag:trashed"
-                 :key ?i)
           (:name "All massages"
                  :query "NOT flag:trashed AND NOT flag:draft AND NOT flag:sent"
                  :key ?a)))
