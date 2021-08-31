@@ -105,21 +105,30 @@ end
 ################################################################
 # Functions
 ################################################################
-function rm
-    argparse -n mycmdname f/force -- $argv
-    or return
+function _rm
 		set TRASH $HOME/.myTrash
+
+		if test -e $TRASH/$argv
+				mv $TRASH/$argv $TRASH/$argv-(date +%Y%m%d%I%M%S)
+    end
+    mv -i $argv $HOME/.myTrash/
+end
+
+function rm
+		argparse -n mycmdname f/force -- $argv
+    or return
 
     if set -lq _flag_f
         /bin/rm -rf $argv
     else
+				set TRASH $HOME/.myTrash
         if ! test -e $TRASH
             mkdir $TRASH
         end
-				if test -e $TRASH/$argv
-						mv $TRASH/$argv $TRASH/$argv-(date +%Y%m%d%I%M%S)
+
+				for arg in $argv
+            _rm $arg
         end
-				mv -i $argv $HOME/.myTrash/
         echo "They are moved to $HOME/.myTrash"
     end
 end
