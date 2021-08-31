@@ -1383,7 +1383,15 @@ respectively."
     :after lsp-mode
     :ensure t
     :bind (lsp-mode-map
-           ([remap xref-find-apropos] . consult-lsp-symbols))))
+           ([remap xref-find-apropos] . consult-lsp-symbols)))
+
+  (leaf consult-tramp
+    :load-path "~/.emacs.d/elisp/consult-tramp/"
+    :require t
+    :custom ((tramp-default-method . "ssh"))
+    :config
+    (tramp-set-completion-function "ssh"
+                                   '((tramp-parse-sconfig "~/.ssh/config")))))
 
 (leaf orderless
   :ensure t
@@ -2417,12 +2425,12 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (skk-auto-okuri-process . t)
            (skk-auto-insert-paren . t)
            (skk-use-auto-enclose-pair-of-region . t))
-  ;; :config
-  ;; (leaf ddskk-posframe
-  ;;   :load-path "~/.emacs.d/elisp/ddskk-posframe/"
-  ;;   :require nil
-  ;;   :custom (ddskk-posframe-mode . t))
   :config
+  (leaf ddskk-posframe
+    :load-path "~/.emacs.d/elisp/ddskk-posframe/"
+    :require nil
+    :custom (ddskk-posframe-mode . t))
+
   (skk-mode 1)
   (context-skk-mode 1))
 
