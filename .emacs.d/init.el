@@ -332,7 +332,9 @@
 
 (leaf font
   :when window-system
+  :leaf-defer nil
   :hook (after-init-hook . my/set-font)
+  :advice (:after load-theme my/set-font-weight-after-load-theme)
   :preface
   ;; This is for Emacs28.
   (setq-default text-scale-remap-header-line t)
@@ -403,16 +405,17 @@
 
   (defun my/set-font-weight (&optional weight)
     (interactive)
-    (let ((weight (if weight weight 'light)))
+    (let ((weight (if weight weight
+                    (intern (completing-read
+                             '(light normal bold))))))
       (set-face-attribute 'default nil :weight weight)
       (set-face-attribute 'fixed-pitch nil :weight weight)
       (set-face-attribute 'variable-pitch nil :weight weight)))
 
-  (defun my/reload-font-face (&optional weight)
-    (interactive)
-    (let ((weight (if weight weight 'light)))
-      (my/set-font-weight weight)
-      (my/set-org-headline-face))))
+  (defun my/set-font-weight-after-load-theme (&rest args)
+    (if (string-match "\\(light\\|operandi\\)" (symbol-name (car args)))
+        (my/set-font-weight 'normal)
+      (my/set-font-weight 'light))))
 
 (leaf doom-themes
   :doc "an opinionated pack of modern color-themes"
@@ -432,24 +435,13 @@
              (intern  ;; convert string to symbol
               (completing-read "Choose a theme:"
                                '(doom-nord doom-solarized-light))))))
-      (mapc #'disable-theme custom-enabled-themes)
-      (load-theme theme t)
-      (if (string-match "light" (symbol-name theme))
-          (my/reload-font-face 'normal)
-        (my/reload-font-face 'light)))
+      (load-theme theme t))
     (doom-themes-neotree-config)
     (doom-themes-org-config)
     (doom-themes-treemacs-config)))
 
 (leaf modus-themes
   :ensure t
-  :after org
-  :leaf-defer nil
-  :advice ((:after modus-themes-load-vivendi
-                   (lambda () (my/reload-font-face 'light)))
-           (:after modus-themes-load-operandi
-                   (lambda () (my/reload-font-face 'normal))))
-
   :custom
   ((modus-themes-bold-constructs . t)
    (modus-themes-region . '(bg-only no-extend))
@@ -466,8 +458,7 @@
                             '((header-block . (variable-pitch scale-title))
                               (header-date . (grayscale workaholic bold-today))
                               (scheduled . uniform)
-                              (habit . traffic-light-deuteranopia)))
-   )
+                              (habit . traffic-light-deuteranopia))))
   :config
   (defun my/load-modus-theme (&optional theme)
     (interactive)
@@ -476,7 +467,6 @@
                    (intern (completing-read "Choose one:"
                                             '(modus-light
                                               modus-dark))))))
-      (mapc #'disable-theme custom-enabled-themes)
       (pcase theme
         ('modus-dark (modus-themes-load-vivendi))
         ('modus-light (modus-themes-load-operandi))))))
@@ -485,13 +475,15 @@
 (leaf themes
   :leaf-defer nil
   :hook (after-init-hook . (lambda () (my/load-theme 'doom-nord)))
+  :advice (:before load-theme (lambda (&rest arg)
+                                (mapc #'disable-theme custom-enabled-themes)))
   :preface
-  (setq my/configured-themes '(doom-nord
-                               doom-solarized-light
-                               modus-light
-                               modus-dark))
+  (setq my/theme-list '(doom-nord
+                        doom-solarized-light
+                        modus-light
+                        modus-dark))
 
-  (defun my/load-theme-func-of (sym-theme)
+  (defun my/load-theme-func-for (sym-theme)
     (let* ((str-theme (symbol-name sym-theme)))
       (cond
        ((string-match "doom" str-theme) #'my/load-doom-theme)
@@ -505,8 +497,8 @@
     (interactive)
     (let* ((sym-theme (if sym-theme sym-theme
                         (intern (completing-read "Choose one:"
-                                                 my/configured-themes))))
-           (my-load-theme (my/load-theme-func-of sym-theme)))
+                                                 my/theme-list))))
+           (my-load-theme (my/load-theme-func-for sym-theme)))
       (funcall my-load-theme sym-theme)))
 
   :config
@@ -517,13 +509,16 @@
     :when window-system
     :ensure t
     :custom (x-underline-at-descent-line . t)
-    :config
-    (moody-replace-mode-line-buffer-identification)
-    (moody-replace-vc-mode)
+    :leaf-defer nil
     ;; hide marks ``---'',
     ;;     which is part of ``U:---'' on the left side of the mode line
-    (dolist (mode '(mode-line-client mode-line-modified mode-line-remote))
-      (moody-replace-element mode "")))
+    :hook (after-init-hook . (lambda () (dolist (mode '(mode-line-client
+                                                        mode-line-modified
+                                                        mode-line-remote))
+                                          (moody-replace-element mode ""))))
+    :config
+    (moody-replace-mode-line-buffer-identification)
+    (moody-replace-vc-mode))
 
   (leaf doom-modeline
     :when (not window-system)
@@ -1189,7 +1184,7 @@ respectively."
   :doc "Modular text completion framework"
   :tag "matching" "convenience" "abbrev" "emacs>=24.3"
   :url "http://company-mode.github.io/"
-  ;; :when (not window-system)
+  :when (not window-system)
   :ensure t
   :blackout t
   :leaf-defer nil
@@ -1438,7 +1433,6 @@ respectively."
   :global-minor-mode t savehist-mode)
 
 (leaf corfu
-  :disabled t
   :when window-system
   :ensure t
   :require t
@@ -1446,10 +1440,11 @@ respectively."
   ;; Optional customizations
   :custom
   ((corfu-auto-prefix . 2)
-   (corfu-auto-delay . 0.1)
+   (corfu-auto-delay . 0.4)
    (corfu-cycle . t)
    (corfu-auto . t)
    (corfu-quit-no-match . t)
+   (corfu-quit-at-boundary . t)
 
    ;; Enable indentation+completion using the TAB key.
    ;; `completion-at-point' is often bound to M-TAB.
@@ -1538,10 +1533,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :require ob-async org-tempo  ;; need for org-template
   :mode "\\.org\\'"
   :hook (org-mode-hook . my/org-mode-hook)
-  :preface
-  (defun my/org-mode-hook ()
-    (add-hook 'completion-at-point-functions
-              'pcomplete-completions-at-point nil t))
+  :advice (:after load-theme my/set-org-headline-face)
   :custom
   ((org-directory . "~/org/")
    (org-ellipsis . " ▼ ")
@@ -1589,7 +1581,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                      ("mq" . "question")
                                      ("mt" . "todo")
                                      ("ms" . "summary"))))
-  :config
+
+  :preface
+  (defun my/org-mode-hook ()
+    (add-hook 'completion-at-point-functions
+              'pcomplete-completions-at-point nil t))
 
   (when window-system
     (create-fontset-from-ascii-font "Iosevka Aile-14"
@@ -1599,7 +1595,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                       "Noto Sans CJK JP-14"
                       nil 'append)
 
-    (defun my/set-org-headline-face ()
+    (defun my/set-org-headline-face (&rest sym-theme)
       ;; Increase the size of various headings
       (interactive)
       (set-face-attribute 'org-document-title nil
@@ -1621,48 +1617,38 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                             :weight 'normal
                             :slant 'normal
                             :height (cdr face))))
-    (my/set-org-headline-face))
 
-  ;; Make sure org-indent face is available
-  (require 'org-indent)
+    ;; Make sure org-indent face is available
+    (require 'org-indent)
 
-  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
-  (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-indent t :inherit '(org-hide fixed-pitch))
-  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+    ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+    (set-face-attribute 'org-block nil						:inherit 'fixed-pitch :foreground nil)
+    (set-face-attribute 'org-table nil						:inherit 'fixed-pitch)
+    (set-face-attribute 'org-formula nil					:inherit 'fixed-pitch)
+    (set-face-attribute 'org-code nil							:inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-indent t							:inherit '(org-hide fixed-pitch))
+    (set-face-attribute 'org-verbatim nil					:inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-special-keyword nil	:inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-meta-line nil				:inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-checkbox nil					:inherit 'fixed-pitch)
 
-  ;; Get rid of the background on column views
-  (set-face-attribute 'org-column nil :background nil)
-  (set-face-attribute 'org-column-title nil :background nil)
+    ;; Get rid of the background on column views
+    (set-face-attribute 'org-column nil :background nil)
+    (set-face-attribute 'org-column-title nil :background nil)
 
-  ;; (custom-theme-set-faces
-  ;;  'user
-  ;;  '(org-block ((t (:inherit fixed-pitch))))
-  ;;  '(org-code ((t (:inherit (shadow fixed-pitch)))))
-  ;;  '(org-agenda-current-time ((t (:foreground "chartreuse"))))
-  ;;  '(org-agenda-done ((t (:foreground "gray" :weight book))))
-  ;;  '(org-scheduled-today ((t (:foreground "orange" :weight book))))
-  ;;  '(org-agenda-date ((t (:foreground "forest green" :height 1.1))))
-  ;;  '(org-agenda-date-today ((t (:foreground "#98be65" :height 1.1)))))
+    (setq org-format-latex-options
+          '( :foreground default
+             :background default
+             :scale 1.7
+             :html-foreground "Black"
+             :html-background "Transparent"
+             :html-scale 1.0
+             :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
 
-  (setq org-format-latex-options
-        '(:foreground default
-                      :background default
-                      :scale 1.7
-                      :html-foreground "Black"
-                      :html-background "Transparent"
-                      :html-scale 1.0
-                      :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
+    (when (fboundp 'mac-toggle-input-method)
+      (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii)))
 
-  (when (fboundp 'mac-toggle-input-method)
-    (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii))
-
+  :config
   (leaf ob-async :ensure t)
 
   (leaf org-fragtog
@@ -2558,21 +2544,12 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   (mu4e~headers-defun-mark-for tag)
 
   :advice
+  ;; disable fancy characters only for flags
   (:around mu4e~headers-flags-str (lambda (f &rest args)
                                     (let* ((mu4e-use-fancy-chars nil))
                                         (apply f args))))
-  ;; (:around mu4e~headers-flags-str (lambda (f &rest args)
-  ;;                                   (prog2
-  ;;                                       (setq mu4e-use-fancy-chars nil)
-  ;;                                       (apply f args)
-  ;;                                     (setq mu4e-use-fancy-chars t)))
-  ;;          )
-  :preface
-  ;; (defun my/mu4e~headers-flags-str (func &rest args)
-  ;; 	(setq mu4e-use-fancy-chars nil)
-  ;; 	(apply func args)
-  ;; 	(setq mu4e-use-fancy-chars t))
 
+  :preface
   (defun my/org-capture-mu4e ()
     (interactive)
     "Capture a TODO item via email."
