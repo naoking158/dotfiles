@@ -3166,32 +3166,6 @@ It's nice to have a table of contents section for long literate configuration fi
 #+end_src
 
 * Trial Packages
-** Draft
-:PROPERTIES:
-:ID:       F596F5FA-E627-47C9-9010-22508E9EEAC2
-:END:
-
-#+begin_src emacs-lisp
-  
-  ;; (defun my/load-theme (appearance)
-  ;;   "Load theme, taking current system APPEARANCE into consideration."
-  ;;   (mapc #'disable-theme custom-enabled-themes)
-  ;;   (pcase appearance
-  ;;     ('light (load-theme 'tango t))
-  ;;     ('dark (load-theme 'tango-dark t))))
-  
-  ;; (add-hook 'ns-system-appearance-change-functions #'my/load-theme)
-  
-  
-  
-  ;; (leaf cl-lib
-  ;;   :doc "Common Lisp extensions for Emacs"
-  ;;   :tag "builtin"
-  ;;   :added "2021-02-06"
-  ;;   :leaf-defer t)
-  
-#+end_src
-
 ** Web Browser with emacs-w3m
 :PROPERTIES:
 :ID:       9A644B4B-58DA-42CC-9B82-A891A204FA05
@@ -3539,7 +3513,7 @@ While browsing, remember the following:
       (org-capture nil "o"))
   
     (add-to-list 'org-capture-templates
-                 `("o" "TODO respond to email" entry 
+                 `("o" "respond to email" entry 
                    (file ,(concat jethro/org-agenda-directory "inbox.org"))
                    "* TODO %^{Description}\n%A\n%?\n"))
   

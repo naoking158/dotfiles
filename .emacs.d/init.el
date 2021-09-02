@@ -2579,7 +2579,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (org-capture nil "o"))
 
   (add-to-list 'org-capture-templates
-               `("o" "TODO respond to email" entry 
+               `("o" "respond to email" entry 
                  (file ,(concat jethro/org-agenda-directory "inbox.org"))
                  "* TODO %^{Description}\n%A\n%?\n"))
 
