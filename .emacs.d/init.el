@@ -1572,8 +1572,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (lazy-count-prefix-format . " (%s/%s) ")
    (isearch-yank-on-move . 'shift)
    (isearch-allow-scroll . 'unlimited)
-   (org-show-notification-handler . '(lambda (msg)
-                                       (timed-notification nil msg)))
+   (org-show-notification-handler . nil)
    (org-structure-template-alist . '(("sh" . "src shell")
                                      ("c" . "center")
                                      ("C" . "comment")
@@ -1685,7 +1684,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
          (org-clock-in-hook . jethro/set-todo-state-next)
          (org-clock-in-hook . (lambda ()
                                 (add-to-list 'frame-title-format
-                                             '(:eval org-mode-line-string) t))))
+                                             '(:eval org-mode-line-string) t)))
+         (org-capture-after-finalize-hook . (lambda ()
+                                              (setq org-agenda-files
+                                                    (directory-files-recursively
+                                                     org-directory "\\.org$")))))
   :custom
   `((org-agenda-window-setup . 'other-window)
     (org-agenda-block-separator . nil)
@@ -1796,30 +1799,13 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (org-agenda-bulk-mark-regexp "inbox:")
     (jethro/bulk-process-entries))
 
-  ;; (defun ladicle/get-today-diary ()
-  ;;   (concat private-directory
-  ;;           (format-time-string "diary/%Y/%m/%Y-%m-%d.org" (current-time))))
-  ;; (defun ladicle/get-yesterday-diary ()
-  ;;   (concat private-directory
-  ;;           (format-time-string "diary/%Y/%m/%Y-%m-%d.org"
-  ;;                               (time-add (current-time) (* -24 3600)))))
-  ;; (defun ladicle/get-diary-from-cal ()
-  ;;   (concat private-directory
-  ;;           (format-time-string
-  ;;            "diary/%Y/%m/%Y-%m-%d.org"
-  ;;            (apply 'encode-time (parse-time-string
-  ;;                                 (concat (org-read-date) " 00:00"))))))
-
-  ;; (defun ladicle/open-org-file (fname)
-  ;;   (switch-to-buffer (find-file-noselect fname)))
-
   (defun ladicle/org-clock-out-and-save-when-exit ()
     "Save buffers and stop clocking when kill emacs."
     (ignore-errors (org-clock-out) t)
     (save-some-buffers t))
 
   :defvar (org-capture-templates)
-  :defer-config
+  :config
   (setq
    jethro/org-agenda-directory (file-truename "~/org/gtd/")
    org-agenda-files (directory-files-recursively org-directory "\\.org$")
@@ -1844,6 +1830,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    org-agenda-bulk-custom-functions `((,jethro/org-agenda-bulk-process-key
                                        jethro/org-agenda-process-inbox-item)))
 
+  (add-to-list 'org-capture-templates
+               `("i" "inbox" entry
+                 (file ,(concat jethro/org-agenda-directory "inbox.org"))
+                 "* TODO %?"))
+
   (defun jethro/org-archive-done-tasks ()
     "Archive all done tasks."
     (interactive)
@@ -1864,6 +1855,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
             (when (member (org-get-todo-state) org-todo-keywords-1)
               (setq has-subtask t))))
         (and is-a-task has-subtask))))
+
   (defun jethro/skip-projects ()
     "Skip trees that are projects"
     (save-restriction
@@ -1879,8 +1871,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
   (setq org-agenda-custom-commands
         `(("a" "Agenda"
-           ;; ((org-agenda-prefix-format
-           ;;   '((agenda . " %i %-12:c%?- t % s % e"))))
            ((agenda ""
                     ((org-agenda-span 'week)
                      (org-deadline-warning-days 365)
@@ -1917,11 +1907,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                                 "next.org")))
                    (org-agenda-skip-function '(org-agenda-skip-entry-if
                                                'deadline))))))))
-
-  (add-to-list 'org-capture-templates
-               `("i" "inbox" entry
-                 (file ,(concat jethro/org-agenda-directory "inbox.org"))
-                 "* TODO %?"))
   )
 
 (leaf org-pomodoro
