@@ -2320,23 +2320,20 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
              (TeX-parse-self . t)
              (TeX-source-correlate-method . 'synctex)
              (TeX-source-correlate-start-server . t)
+             (TeX-source-correlate-mode . t)
              (TeX-PDF-mode . t))
+
     :preface
     (defun my/latex-mode-hook nil
-      (add-to-list 'TeX-command-list
-                   '("ja"
-                     "sh ~/drive/lab/latextemplate/ja_latex.sh '%s'"
-                     TeX-run-command t nil))
-      (add-to-list 'TeX-command-list
-                   '("en"
-                     "sh ~/drive/lab/latextemplate/en_latex.sh '%s'"
-                     TeX-run-command t nil))
-      (add-to-list 'TeX-command-list
-                   '("pdfview" "open '%s.pdf' "
-                     TeX-run-command t nil))
-      (add-to-list 'TeX-command-list
-                   '("Displayline" "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b"
-                     TeX-run-command t nil))))
+      (let ((opts "latexmk -synctex=1 -interaction=nonstopmode -pvc -f "))
+        (dolist (command-alist
+                 `(("ja-uptex" . ,(concat opts "%s.tex"))
+                   ("en-pdflatex" . ,(concat opts "-e $bibtex=q/bibtex/ -pdf %s.tex"))
+                   ("pdfview" . "open %s.pdf")
+                   ("Displayline" . "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b")))
+          (add-to-list 'TeX-command-list `(,(car command-alist)
+                                           ,(cdr command-alist)
+                                           TeX-run-command t nil))))))
 
   (leaf latex-extra
     :doc "Adds several useful functionalities to LaTeX-mode."
@@ -2373,23 +2370,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :require t
   :bind ("C-x C-c" . server-edit)
   :hook (after-init-hook . server-start))
-
-;; (defun my/load-theme (appearance)
-;;   "Load theme, taking current system APPEARANCE into consideration."
-;;   (mapc #'disable-theme custom-enabled-themes)
-;;   (pcase appearance
-;;     ('light (load-theme 'tango t))
-;;     ('dark (load-theme 'tango-dark t))))
-
-;; (add-hook 'ns-system-appearance-change-functions #'my/load-theme)
-
-
-
-;; (leaf cl-lib
-;;   :doc "Common Lisp extensions for Emacs"
-;;   :tag "builtin"
-;;   :added "2021-02-06"
-;;   :leaf-defer t)
 
 (leaf tree-sitter
   :ensure t tree-sitter-langs
