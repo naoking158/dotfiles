@@ -419,6 +419,7 @@
   :req "emacs-25.1" "cl-lib-0.5"
   :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
   :url "https://github.com/hlissner/emacs-doom-theme"
+  :leaf-defer nil
   :ensure t neotree all-the-icons
   :require neotree all-the-icons
   :custom ((doom-themes-enable-italic . nil)
@@ -428,11 +429,12 @@
     (interactive)		
     (let ((theme
            (if theme theme
-             (intern (completing-read "Choose a theme:"
-                                      '(doom-nord doom-solarized-light))))))
+             (intern  ;; convert string to symbol
+              (completing-read "Choose a theme:"
+                               '(doom-nord doom-solarized-light))))))
       (mapc #'disable-theme custom-enabled-themes)
       (load-theme theme t)
-      (if (member "light" (split-string (symbol-name theme) "-"))
+      (if (string-match "light" (symbol-name theme))
           (my/reload-font-face 'normal)
         (my/reload-font-face 'light)))
     (doom-themes-neotree-config)
@@ -464,7 +466,8 @@
                             '((header-block . (variable-pitch scale-title))
                               (header-date . (grayscale workaholic bold-today))
                               (scheduled . uniform)
-                              (habit . traffic-light-deuteranopia))))
+                              (habit . traffic-light-deuteranopia)))
+   )
   :config
   (defun my/load-modus-theme (&optional theme)
     (interactive)
@@ -481,20 +484,31 @@
 
 (leaf themes
   :leaf-defer nil
-  :hook (after-init-hook . (lambda () (my/reload-theme 'doom-nord)))
+  :hook (after-init-hook . (lambda () (my/load-theme 'doom-nord)))
   :preface
-  (defun my/reload-theme (&optional theme)
+  (setq my/configured-themes '(doom-nord
+                               doom-solarized-light
+                               modus-light
+                               modus-dark))
+
+  (defun my/load-theme-func-of (sym-theme)
+    (let* ((str-theme (symbol-name sym-theme)))
+      (cond
+       ((string-match "doom" str-theme) #'my/load-doom-theme)
+       ((string-match "modus" str-theme) #'my/load-modus-theme)
+       (t #'(lambda (arg)
+              (message "The theme ``%s'' is not implemented." arg)
+              (message "Check the argument of ``my/load-theme''.")
+              nil)))))
+
+  (defun my/load-theme (&optional sym-theme)
     (interactive)
-    (let ((theme
-           (if theme theme
-             (intern (completing-read "Choose one:"
-                                      '(doom-nord
-                                        doom-solarized-light
-                                        modus-light
-                                        modus-dark))))))
-      (pcase (car (split-string (symbol-name theme) "-"))
-        ("doom" (my/load-doom-theme theme))
-        ("modus" (my/load-modus-theme theme))))) 
+    (let* ((sym-theme (if sym-theme sym-theme
+                        (intern (completing-read "Choose one:"
+                                                 my/configured-themes))))
+           (my-load-theme (my/load-theme-func-of sym-theme)))
+      (funcall my-load-theme sym-theme)))
+
   :config
   (column-number-mode)
   (setq inhibit-compacting-font-caches t)
@@ -505,7 +519,11 @@
     :custom (x-underline-at-descent-line . t)
     :config
     (moody-replace-mode-line-buffer-identification)
-    (moody-replace-vc-mode))
+    (moody-replace-vc-mode)
+    ;; hide marks ``---'',
+    ;;     which is part of ``U:---'' on the left side of the mode line
+    (dolist (mode '(mode-line-client mode-line-modified mode-line-remote))
+      (moody-replace-element mode "")))
 
   (leaf doom-modeline
     :when (not window-system)
@@ -572,7 +590,8 @@
     :bind ("M-=" . transient-dwim-dispatch)))
 
 (leaf dired
-  :require dired-x dired-collapse
+  :ensure dired-collapse
+  :require dired-x
   :hook (dired-mode-hook . (lambda ()
                              (dired-collapse-mode 1)
                              (dired-omit-mode)
@@ -1201,7 +1220,7 @@ respectively."
     :hook ((org-mode-hook . (lambda ()
                               (setq-local company-backends
                                           '(company-org-block
-                                            company-tabnine
+                                            ;; company-tabnine
                                             company-semantic
                                             company-capf
                                             company-dabbrev))
@@ -1256,6 +1275,7 @@ respectively."
                           company-backends))))
 
   (leaf company-tabnine
+    :disabled t
     :doc "Completion backends using NLP model GPT-2"
     :ensure t
     :config (add-to-list 'company-backends #'company-tabnine)))
@@ -1382,7 +1402,15 @@ respectively."
     :after lsp-mode
     :ensure t
     :bind (lsp-mode-map
-           ([remap xref-find-apropos] . consult-lsp-symbols))))
+           ([remap xref-find-apropos] . consult-lsp-symbols)))
+
+  (leaf consult-tramp
+    :load-path "~/.emacs.d/elisp/consult-tramp/"
+    :require t
+    :custom ((tramp-default-method . "ssh"))
+    :config
+    (tramp-set-completion-function "ssh"
+                                   '((tramp-parse-sconfig "~/.ssh/config")))))
 
 (leaf orderless
   :ensure t
@@ -1544,8 +1572,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (lazy-count-prefix-format . " (%s/%s) ")
    (isearch-yank-on-move . 'shift)
    (isearch-allow-scroll . 'unlimited)
-   (org-show-notification-handler . '(lambda (msg)
-                                       (timed-notification nil msg)))
+   (org-show-notification-handler . nil)
    (org-structure-template-alist . '(("sh" . "src shell")
                                      ("c" . "center")
                                      ("C" . "comment")
@@ -1657,7 +1684,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
          (org-clock-in-hook . jethro/set-todo-state-next)
          (org-clock-in-hook . (lambda ()
                                 (add-to-list 'frame-title-format
-                                             '(:eval org-mode-line-string) t))))
+                                             '(:eval org-mode-line-string) t)))
+         (org-capture-after-finalize-hook . (lambda ()
+                                              (setq org-agenda-files
+                                                    (directory-files-recursively
+                                                     org-directory "\\.org$")))))
   :custom
   `((org-agenda-window-setup . 'other-window)
     (org-agenda-block-separator . nil)
@@ -1768,30 +1799,13 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (org-agenda-bulk-mark-regexp "inbox:")
     (jethro/bulk-process-entries))
 
-  ;; (defun ladicle/get-today-diary ()
-  ;;   (concat private-directory
-  ;;           (format-time-string "diary/%Y/%m/%Y-%m-%d.org" (current-time))))
-  ;; (defun ladicle/get-yesterday-diary ()
-  ;;   (concat private-directory
-  ;;           (format-time-string "diary/%Y/%m/%Y-%m-%d.org"
-  ;;                               (time-add (current-time) (* -24 3600)))))
-  ;; (defun ladicle/get-diary-from-cal ()
-  ;;   (concat private-directory
-  ;;           (format-time-string
-  ;;            "diary/%Y/%m/%Y-%m-%d.org"
-  ;;            (apply 'encode-time (parse-time-string
-  ;;                                 (concat (org-read-date) " 00:00"))))))
-
-  ;; (defun ladicle/open-org-file (fname)
-  ;;   (switch-to-buffer (find-file-noselect fname)))
-
   (defun ladicle/org-clock-out-and-save-when-exit ()
     "Save buffers and stop clocking when kill emacs."
     (ignore-errors (org-clock-out) t)
     (save-some-buffers t))
 
   :defvar (org-capture-templates)
-  :defer-config
+  :config
   (setq
    jethro/org-agenda-directory (file-truename "~/org/gtd/")
    org-agenda-files (directory-files-recursively org-directory "\\.org$")
@@ -1816,6 +1830,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    org-agenda-bulk-custom-functions `((,jethro/org-agenda-bulk-process-key
                                        jethro/org-agenda-process-inbox-item)))
 
+  (add-to-list 'org-capture-templates
+               `("i" "inbox" entry
+                 (file ,(concat jethro/org-agenda-directory "inbox.org"))
+                 "* TODO %?"))
+
   (defun jethro/org-archive-done-tasks ()
     "Archive all done tasks."
     (interactive)
@@ -1836,6 +1855,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
             (when (member (org-get-todo-state) org-todo-keywords-1)
               (setq has-subtask t))))
         (and is-a-task has-subtask))))
+
   (defun jethro/skip-projects ()
     "Skip trees that are projects"
     (save-restriction
@@ -1851,8 +1871,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
   (setq org-agenda-custom-commands
         `(("a" "Agenda"
-           ;; ((org-agenda-prefix-format
-           ;;   '((agenda . " %i %-12:c%?- t % s % e"))))
            ((agenda ""
                     ((org-agenda-span 'week)
                      (org-deadline-warning-days 365)
@@ -1889,11 +1907,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                                 "next.org")))
                    (org-agenda-skip-function '(org-agenda-skip-entry-if
                                                'deadline))))))))
-
-  (add-to-list 'org-capture-templates
-               `("i" "inbox" entry
-                 (file ,(concat jethro/org-agenda-directory "inbox.org"))
-                 "* TODO %?"))
   )
 
 (leaf org-pomodoro
@@ -2307,23 +2320,20 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
              (TeX-parse-self . t)
              (TeX-source-correlate-method . 'synctex)
              (TeX-source-correlate-start-server . t)
+             (TeX-source-correlate-mode . t)
              (TeX-PDF-mode . t))
+
     :preface
     (defun my/latex-mode-hook nil
-      (add-to-list 'TeX-command-list
-                   '("ja"
-                     "sh ~/drive/lab/latextemplate/ja_latex.sh '%s'"
-                     TeX-run-command t nil))
-      (add-to-list 'TeX-command-list
-                   '("en"
-                     "sh ~/drive/lab/latextemplate/en_latex.sh '%s'"
-                     TeX-run-command t nil))
-      (add-to-list 'TeX-command-list
-                   '("pdfview" "open '%s.pdf' "
-                     TeX-run-command t nil))
-      (add-to-list 'TeX-command-list
-                   '("Displayline" "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b"
-                     TeX-run-command t nil))))
+      (let ((opts "latexmk -synctex=1 -interaction=nonstopmode -pvc -f "))
+        (dolist (command-alist
+                 `(("ja-uptex" . ,(concat opts "%s.tex"))
+                   ("en-pdflatex" . ,(concat opts "-e $bibtex=q/bibtex/ -pdf %s.tex"))
+                   ("pdfview" . "open %s.pdf")
+                   ("Displayline" . "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b")))
+          (add-to-list 'TeX-command-list `(,(car command-alist)
+                                           ,(cdr command-alist)
+                                           TeX-run-command t nil))))))
 
   (leaf latex-extra
     :doc "Adds several useful functionalities to LaTeX-mode."
@@ -2360,23 +2370,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :require t
   :bind ("C-x C-c" . server-edit)
   :hook (after-init-hook . server-start))
-
-;; (defun my/load-theme (appearance)
-;;   "Load theme, taking current system APPEARANCE into consideration."
-;;   (mapc #'disable-theme custom-enabled-themes)
-;;   (pcase appearance
-;;     ('light (load-theme 'tango t))
-;;     ('dark (load-theme 'tango-dark t))))
-
-;; (add-hook 'ns-system-appearance-change-functions #'my/load-theme)
-
-
-
-;; (leaf cl-lib
-;;   :doc "Common Lisp extensions for Emacs"
-;;   :tag "builtin"
-;;   :added "2021-02-06"
-;;   :leaf-defer t)
 
 (leaf tree-sitter
   :ensure t tree-sitter-langs
@@ -2415,15 +2408,18 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (skk-egg-like-newline . t)  ;; skk-kakutei by RET
            (skk-auto-okuri-process . t)
            (skk-auto-insert-paren . t)
-           (skk-use-auto-enclose-pair-of-region . t))
-  ;; :config
-  ;; (leaf ddskk-posframe
-  ;;   :load-path "~/.emacs.d/elisp/ddskk-posframe/"
-  ;;   :require nil
-  ;;   :custom (ddskk-posframe-mode . t))
+           (skk-use-auto-enclose-pair-of-region . t)
+           (skk-inline-show-face . '( :foreground "#ECEFF4"
+                                      :background "#4C566A"
+                                      :inherit 'normal)))
   :config
   (skk-mode 1)
-  (context-skk-mode 1))
+  (context-skk-mode 1)
+
+  (leaf ddskk-posframe
+    :load-path "~/.emacs.d/elisp/ddskk-posframe/"
+    :require t
+    :custom (ddskk-posframe-mode . t)))
 
 (leaf dap-mode
   :ensure t
@@ -2530,7 +2526,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
           ))
 
   (setq mu4e-bookmarks
-        '((:name  "Unread messages"
+        '((:name "All Inbox"
+                 :query "(maildir:/BBO/Inbox OR maildir:/Private/Inbox OR maildir:/University/Inbox) AND NOT flag:trashed"
+                 :key ?i)
+          (:name  "Unread messages"
                   :query "flag:unread AND NOT flag:trashed"
                   :key ?u)
           (:name "Today's messages"
@@ -2543,9 +2542,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
           (:name "Flagged massages"
                  :query "flag:flagged AND NOT flag:trashed"
                  :key ?f)
-          (:name "All Inbox"
-                 :query "(maildir:/BBO/Inbox OR maildir:/Private/Inbox OR maildir:/University/Inbox) AND NOT flag:trashed"
-                 :key ?i)
           (:name "All massages"
                  :query "NOT flag:trashed AND NOT flag:draft AND NOT flag:sent"
                  :key ?a)))
@@ -2583,7 +2579,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (org-capture nil "o"))
 
   (add-to-list 'org-capture-templates
-               `("o" "TODO respond to email" entry 
+               `("o" "respond to email" entry 
                  (file ,(concat jethro/org-agenda-directory "inbox.org"))
                  "* TODO %^{Description}\n%A\n%?\n"))
 
