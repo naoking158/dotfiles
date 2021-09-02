@@ -1220,7 +1220,7 @@ respectively."
     :hook ((org-mode-hook . (lambda ()
                               (setq-local company-backends
                                           '(company-org-block
-                                            company-tabnine
+                                            ;; company-tabnine
                                             company-semantic
                                             company-capf
                                             company-dabbrev))
@@ -1275,6 +1275,7 @@ respectively."
                           company-backends))))
 
   (leaf company-tabnine
+    :disabled t
     :doc "Completion backends using NLP model GPT-2"
     :ensure t
     :config (add-to-list 'company-backends #'company-tabnine)))

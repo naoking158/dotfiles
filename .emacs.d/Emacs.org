@@ -762,6 +762,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
       :custom ((minions-mode-line-lighter . ";")
                (minions-direct . '(defining-kbd-macro flymake-mode)))
       :global-minor-mode t))
+  
 #+end_src
 
 * Keyboard Bindings
@@ -1723,7 +1724,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
       :hook ((org-mode-hook . (lambda ()
                                 (setq-local company-backends
                                             '(company-org-block
-                                              company-tabnine
+                                              ;; company-tabnine
                                               company-semantic
                                               company-capf
                                               company-dabbrev))
@@ -1778,6 +1779,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                             company-backends))))
   
     (leaf company-tabnine
+      :disabled t
       :doc "Completion backends using NLP model GPT-2"
       :ensure t
       :config (add-to-list 'company-backends #'company-tabnine)))
