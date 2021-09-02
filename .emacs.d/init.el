@@ -419,6 +419,7 @@
   :req "emacs-25.1" "cl-lib-0.5"
   :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
   :url "https://github.com/hlissner/emacs-doom-theme"
+  :leaf-defer nil
   :ensure t neotree all-the-icons
   :require neotree all-the-icons
   :custom ((doom-themes-enable-italic . nil)
@@ -428,11 +429,12 @@
     (interactive)		
     (let ((theme
            (if theme theme
-             (intern (completing-read "Choose a theme:"
-                                      '(doom-nord doom-solarized-light))))))
+             (intern  ;; convert string to symbol
+              (completing-read "Choose a theme:"
+                               '(doom-nord doom-solarized-light))))))
       (mapc #'disable-theme custom-enabled-themes)
       (load-theme theme t)
-      (if (member "light" (split-string (symbol-name theme) "-"))
+      (if (string-match "light" (symbol-name theme))
           (my/reload-font-face 'normal)
         (my/reload-font-face 'light)))
     (doom-themes-neotree-config)
@@ -464,7 +466,8 @@
                             '((header-block . (variable-pitch scale-title))
                               (header-date . (grayscale workaholic bold-today))
                               (scheduled . uniform)
-                              (habit . traffic-light-deuteranopia))))
+                              (habit . traffic-light-deuteranopia)))
+   )
   :config
   (defun my/load-modus-theme (&optional theme)
     (interactive)
@@ -481,20 +484,31 @@
 
 (leaf themes
   :leaf-defer nil
-  :hook (after-init-hook . (lambda () (my/reload-theme 'doom-nord)))
+  :hook (after-init-hook . (lambda () (my/load-theme 'doom-nord)))
   :preface
-  (defun my/reload-theme (&optional theme)
+  (setq my/configured-themes '(doom-nord
+                               doom-solarized-light
+                               modus-light
+                               modus-dark))
+
+  (defun my/load-theme-func-of (sym-theme)
+    (let* ((str-theme (symbol-name sym-theme)))
+      (cond
+       ((string-match "doom" str-theme) #'my/load-doom-theme)
+       ((string-match "modus" str-theme) #'my/load-modus-theme)
+       (t #'(lambda (arg)
+              (message "The theme ``%s'' is not implemented." arg)
+              (message "Check the argument of ``my/load-theme''.")
+              nil)))))
+
+  (defun my/load-theme (&optional sym-theme)
     (interactive)
-    (let ((theme
-           (if theme theme
-             (intern (completing-read "Choose one:"
-                                      '(doom-nord
-                                        doom-solarized-light
-                                        modus-light
-                                        modus-dark))))))
-      (pcase (car (split-string (symbol-name theme) "-"))
-        ("doom" (my/load-doom-theme theme))
-        ("modus" (my/load-modus-theme theme))))) 
+    (let* ((sym-theme (if sym-theme sym-theme
+                        (intern (completing-read "Choose one:"
+                                                 my/configured-themes))))
+           (my-load-theme (my/load-theme-func-of sym-theme)))
+      (funcall my-load-theme sym-theme)))
+
   :config
   (column-number-mode)
   (setq inhibit-compacting-font-caches t)
@@ -505,7 +519,11 @@
     :custom (x-underline-at-descent-line . t)
     :config
     (moody-replace-mode-line-buffer-identification)
-    (moody-replace-vc-mode))
+    (moody-replace-vc-mode)
+    ;; hide marks ``---'',
+    ;;     which is part of ``U:---'' on the left side of the mode line
+    (dolist (mode '(mode-line-client mode-line-modified mode-line-remote))
+      (moody-replace-element mode "")))
 
   (leaf doom-modeline
     :when (not window-system)
