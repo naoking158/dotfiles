@@ -194,18 +194,17 @@
 
 (leaf change-system-configuration
   :leaf-defer nil
-  :custom (default-frame-alist . '((inhibit-double-buffering . t)
-                                   (ns-transparent-titlebar . t)))
   :bind (("M-o" . finder-current-dir-open)
          ("s-w" . kill-buffer)
          ("s-q" . save-buffers-kill-emacs)
          ("s-v" . yank)
-         ("s-c" . copy-region-as-kill))
+         ("s-c" . kill-ring-save))
   :preface
   (defun finder-current-dir-open nil
     (interactive)
     (shell-command "open ."))
   :config
+  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
   (leaf mac
     :doc "implementation of gui terminal on macos"
     :doc "each symbol can be `control', `meta', `alt', `hyper', or `super'"
@@ -302,21 +301,21 @@
   :tag "builtin"
   :global-minor-mode t)
 
-(leaf hl-line
-  :doc "highlight the current line"
-  :tag "builtin"
-  :require t
-  :global-minor-mode t
-  :config
-      ;;; hl-lineを無効にするメジャーモードを指定する
-  (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
-  (defun global-hl-line-timer-function ()
-    (unless (memq major-mode global-hl-line-timer-exclude-modes)
-      (global-hl-line-unhighlight-all)
-      (let ((global-hl-line-mode t))
-        (global-hl-line-highlight))))
-  (setq global-hl-line-timer
-        (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
+;; (leaf hl-line
+;;   :doc "highlight the current line"
+;;   :tag "builtin"
+;;   :require t
+;;   :global-minor-mode t
+;;   :config
+;;       ;;; hl-lineを無効にするメジャーモードを指定する
+;;   (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
+;;   (defun global-hl-line-timer-function ()
+;;     (unless (memq major-mode global-hl-line-timer-exclude-modes)
+;;       (global-hl-line-unhighlight-all)
+;;       (let ((global-hl-line-mode t))
+;;         (global-hl-line-highlight))))
+;;   (setq global-hl-line-timer
+;;         (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
 
 (leaf *frame-transparency
   :preface
@@ -336,7 +335,6 @@
   :hook (after-init-hook . my/set-font)
   :advice (:after load-theme my/set-font-weight-after-load-theme)
   :preface
-  ;; This is for Emacs28.
   (setq-default text-scale-remap-header-line t)
 
   (defun my/set-font (&optional weight)
@@ -364,9 +362,6 @@
                           :weight weight)
 
       ;; japanese
-      ;; (set-fontset-font t 'unicode
-      ;;                   "Noto Serif CJK JP-14"
-      ;;                   nil 'append))
       (set-fontset-font t 'unicode
                         (font-spec
                          :family "Noto Sans CJK JP" 
