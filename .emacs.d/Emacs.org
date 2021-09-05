@@ -683,22 +683,48 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
           ('modus-light (modus-themes-load-operandi))))))
   
   
+  (leaf bespoke-themes
+    :load-path "~/.emacs.d/elisp/bespoke-theme/"
+    :require t bespoke-theme bespoke-modeline
+    :custom (;; Set header line
+             (bespoke-set-mode-line . 'footer)
+             ;; Set mode-line cleaner
+             (bespoke-set-mode-line-cleaner . nil)
+             ;; Set use of italics
+             (bespoke-set-italic-comments . nil)
+             (bespoke-set-italic-keywords . nil)
+             ;; Set initial theme variant
+             (bespoke-set-theme . 'dark))
+    :preface
+    (defun my/load-bespoke-theme (&optional theme)
+      (let ((theme
+             (if theme theme
+               (intern  ;; convert string to symbol
+                (completing-read "Choose a theme:"
+                                 '(bespoke/dark-theme bespoke/light-theme))))))
+        (funcall theme))))
+  
+  
   (leaf themes
     :leaf-defer nil
-    :hook (after-init-hook . (lambda () (my/load-theme 'doom-nord)))
+    ;; :hook (after-init-hook . (lambda () (my/load-theme 'doom-nord)))
+    :hook (after-init-hook . (lambda () (my/load-theme 'bespoke/dark-theme)))
     :advice (:before load-theme (lambda (&rest arg)
                                   (mapc #'disable-theme custom-enabled-themes)))
     :preface
     (setq my/theme-list '(doom-nord
                           doom-solarized-light
                           modus-light
-                          modus-dark))
+                          modus-dark
+                          bespoke/dark-theme
+                          bespoke/light-theme))
   
     (defun my/load-theme-func-for (sym-theme)
       (let* ((str-theme (symbol-name sym-theme)))
         (cond
          ((string-match "doom" str-theme) #'my/load-doom-theme)
          ((string-match "modus" str-theme) #'my/load-modus-theme)
+         ((string-match "bespoke" str-theme) #'my/load-bespoke-theme)
          (t #'(lambda (arg)
                 (message "The theme ``%s'' is not implemented." arg)
                 (message "Check the argument of ``my/load-theme''.")
