@@ -2405,14 +2405,16 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :ensure ddskk
   :leaf-defer nil
   :bind (("C-M-j" . skk-undo-kakutei))
-  :custom ((skk-server-host . "localhost")
+  :global-minor-mode t context-skk-mode
+  :custom ((default-input-method . "japanese-skk")
+           (skk-tut-file . "~/src/github.com/skk-dev/ddskk/etc/SKK.tut")
+           (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
+           (skk-server-host . "localhost")
            (skk-server-prtnum . 1178)
            (skk-server-report-response . t)
-           (default-input-method . "japanese-skk")
            (skk-byte-compile-init-file . t)
            (skk-preload . t)
            (skk-isearch-mode-enable . 'always)
-           (skk-tut-file . "~/src/github.com/skk-dev/ddskk/etc/SKK.tut")
            (skk-kutouten-type . 'en)
            (skk-show-inline . 'vertical)
            (skk-inline-show-face . nil)
