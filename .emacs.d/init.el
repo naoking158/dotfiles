@@ -2710,4 +2710,60 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
         org-msg-convert-citation t)
   (org-msg-mode))
 
+(leaf xwwp
+  :ensure t
+  :custom (browse-url-browser-function . 'xwidget-webkit-browse-url)
+  :bind (("C-c s" . xwwp)
+         (xwidget-webkit-mode-map
+         ("v" . xwwp-follow-link)
+         ([remap kill-ring-save] . xwidget-webkit-copy-selection-as-kill)
+         ([remap xwidget-webkit-browse-url] . xwwp)))
+  :advice (:override xwwp-browse-url-other-window
+                     my/xwwp-browse-url-other-window)
+  :preface
+  (defun my/xwwp-browse-url-other-window (url &optional new-session)
+    "Ask xwidget-webkit to browse URL.
+NEW-SESSION specifies whether to create a new xwidget-webkit session.
+Interactively, URL defaults to the string looking like a url around point."
+    (interactive (progn
+                   (require 'browse-url)
+                   (browse-url-interactive-arg "xwidget-webkit URL: "
+                                               ;;(xwidget-webkit-current-url)
+                                               )))
+    (or (featurep 'xwidget-internal)
+        (user-error "Your Emacs was not compiled with xwidgets support"))
+    (when (stringp url)
+      (if new-session
+          (xwidget-webkit-new-session url)
+        (progn (xwidget-webkit-goto-url url)
+               (switch-to-buffer (xwidget-buffer
+                                  (xwidget-webkit-current-session))))))))
+
+;; (leaf webkit
+;;   :load-path "~/.emacs.d/elisp/emacs-webkit/"
+;;   :require t webkit-ace webkit-dark)
+
+(leaf pdf-tools
+  :ensure t
+  :hook ((TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
+         (pdf-view-mode-hook . (lambda () (set-buffer-multibyte t))))
+  :custom (pdf-view-display-size . 'fit-width)
+  :init
+  (pdf-tools-install)
+  :config
+  (leaf pdf-annot
+    :require t
+    :after pdf-tools
+    :custom `(pdf-annot-minor-mode-map-prefix . ,(kbd "a"))
+    ;; :bind-keymap (pdf-view-mode-map
+    ;;               ("a" . pdf-annot-minor-mode-map))
+    :bind
+    (:pdf-annot-minor-mode-map
+     ("d" . pdf-annot-delete)
+     ("h". pdf-annot-add-highlight-markup-annotation)
+     ("s" . pdf-annot-add-strikeout-markup-annotation)
+     ("u" . pdf-annot-add-underline-markup-annotation))))
+
+(leaf command-log-mode :ensure t)
+
 (provide 'init)
