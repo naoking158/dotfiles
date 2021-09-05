@@ -1713,7 +1713,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (org-agenda-current-time-string . "← now")
     (org-agenda-time-grid quote ;; Format is changed from 9.1
                           ((daily today require-timed)
-                           (0800 1100 1500 1900 2100 2400)
+                           (0700 1200 1700 2200)
                            "-"
                            "────────────────"))
     (org-columns-default-format
@@ -2423,10 +2423,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (skk-inline-show-face . '( :foreground "#ECEFF4"
                                       :background "#4C566A"
                                       :inherit 'normal)))
-  :config
-  (skk-mode 1)
-  (context-skk-mode 1)
 
+  :config
   (leaf ddskk-posframe
     :load-path "~/.emacs.d/elisp/ddskk-posframe/"
     :require t
@@ -2572,7 +2570,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   ;; disable fancy characters only for flags
   (:around mu4e~headers-flags-str (lambda (f &rest args)
                                     (let* ((mu4e-use-fancy-chars nil))
-                                        (apply f args))))
+                                      (apply f args))))
 
   :preface
   (defun my/org-capture-mu4e ()
@@ -2586,16 +2584,17 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                  "* TODO %^{Description}\n%A\n%?\n"))
 
   :bind
-  (mu4e-headers-mode-map
-   ("{" . mu4e-headers-query-prev)      ; differs from built-in
-   ("}" . mu4e-headers-query-next)      ; differs from built-in
-   ("o" . my/org-capture-mu4e)          ; differs from built-in
+  ((mu4e-main-mode-map ("q" . quit-window))
+   (mu4e-headers-mode-map
+    ("{" . mu4e-headers-query-prev)      ; differs from built-in
+    ("}" . mu4e-headers-query-next)      ; differs from built-in
+    ("o" . my/org-capture-mu4e)          ; differs from built-in
 
-   ("A" . mu4e-headers-mark-for-action) ; differs from built-in
+    ("A" . mu4e-headers-mark-for-action) ; differs from built-in
 
-   ("`" . mu4e-update-mail-and-index)   ; differs from built-in
-   ("|" . mu4e-view-pipe)               ; does not seem to be built in any longer
-   ("." . hydra-mu4e-headers/body))
+    ("`" . mu4e-update-mail-and-index)   ; differs from built-in
+    ("|" . mu4e-view-pipe)               ; does not seem to be built in any longer
+    ("." . hydra-mu4e-headers/body)))
 
   :hydra
   (hydra-mu4e-headers
