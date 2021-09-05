@@ -408,9 +408,13 @@
       (set-face-attribute 'variable-pitch nil :weight weight)))
 
   (defun my/set-font-weight-after-load-theme (&rest args)
-    (if (string-match "\\(light\\|operandi\\)" (symbol-name (car args)))
-        (my/set-font-weight 'normal)
-      (my/set-font-weight 'light))))
+    (let* ((str-theme (symbol-name (car args)))
+           (weight (cond
+                    ((string-match "\\(light\\|operandi\\)" str-theme) 'normal)
+                    ((and (string-match "bespoke" str-theme)
+                          (eq 'light bespoke-set-theme)) 'normal)
+                    (t 'light))))
+      (my/set-font-weight weight))))
 
 (leaf doom-themes
   :doc "an opinionated pack of modern color-themes"
@@ -424,7 +428,6 @@
            (doom-themes-enable-bold . t))
   :config
   (defun my/load-doom-theme (&optional theme)
-    (interactive)		
     (let ((theme
            (if theme theme
              (intern  ;; convert string to symbol
@@ -456,7 +459,6 @@
                               (habit . traffic-light-deuteranopia))))
   :config
   (defun my/load-modus-theme (&optional theme)
-    (interactive)
     (modus-themes-load-themes)
     (let ((theme (if theme theme
                    (intern (completing-read "Choose one:"
@@ -501,6 +503,7 @@
   (setq inhibit-compacting-font-caches t)
 
   (leaf moody
+    :disabled t
     :when window-system
     :ensure t
     :custom (x-underline-at-descent-line . t)
@@ -539,6 +542,7 @@
              (doom-modeline-persp-name . nil)))
 
   (leaf minions
+    :disabled t
     :ensure t
     :custom ((minions-mode-line-lighter . ";")
              (minions-direct . '(defining-kbd-macro flymake-mode)))
@@ -1528,7 +1532,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :require ob-async org-tempo  ;; need for org-template
   :mode "\\.org\\'"
   :hook (org-mode-hook . my/org-mode-hook)
-  :advice (:after load-theme my/set-org-headline-face)
+  :advice (:after load-theme my/set-org-face)
   :custom
   ((org-directory . "~/org/")
    (org-ellipsis . " ▼ ")
@@ -1583,6 +1587,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
               'pcomplete-completions-at-point nil t))
 
   (when window-system
+    ;; Make sure org-indent face is available
+    (require 'org-indent)
+
     (create-fontset-from-ascii-font "Iosevka Aile-14"
                                     nil
                                     "myoutline")
@@ -1590,7 +1597,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                       "Noto Sans CJK JP-14"
                       nil 'append)
 
-    (defun my/set-org-headline-face (&rest sym-theme)
+    (defun my/set-org-face (&rest sym-theme)
       ;; Increase the size of various headings
       (interactive)
       (set-face-attribute 'org-document-title nil
@@ -1611,25 +1618,22 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                             :font "fontset-myoutline"
                             :weight 'normal
                             :slant 'normal
-                            :height (cdr face))))
+                            :height (cdr face)))
 
-    ;; Make sure org-indent face is available
-    (require 'org-indent)
+      ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+      (set-face-attribute 'org-block nil						:inherit 'fixed-pitch :foreground nil)
+      (set-face-attribute 'org-table nil						:inherit 'fixed-pitch)
+      (set-face-attribute 'org-formula nil					:inherit 'fixed-pitch)
+      (set-face-attribute 'org-code nil							:inherit '(shadow fixed-pitch))
+      (set-face-attribute 'org-indent t							:inherit '(org-hide fixed-pitch))
+      (set-face-attribute 'org-verbatim nil					:inherit '(shadow fixed-pitch))
+      (set-face-attribute 'org-special-keyword nil	:inherit '(font-lock-comment-face fixed-pitch))
+      (set-face-attribute 'org-meta-line nil				:inherit '(font-lock-comment-face fixed-pitch))
+      (set-face-attribute 'org-checkbox nil					:inherit 'fixed-pitch)
 
-    ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-    (set-face-attribute 'org-block nil						:inherit 'fixed-pitch :foreground nil)
-    (set-face-attribute 'org-table nil						:inherit 'fixed-pitch)
-    (set-face-attribute 'org-formula nil					:inherit 'fixed-pitch)
-    (set-face-attribute 'org-code nil							:inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-indent t							:inherit '(org-hide fixed-pitch))
-    (set-face-attribute 'org-verbatim nil					:inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-special-keyword nil	:inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-meta-line nil				:inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-checkbox nil					:inherit 'fixed-pitch)
-
-    ;; Get rid of the background on column views
-    (set-face-attribute 'org-column nil :background nil)
-    (set-face-attribute 'org-column-title nil :background nil)
+      ;; Get rid of the background on column views
+      (set-face-attribute 'org-column nil :background nil)
+      (set-face-attribute 'org-column-title nil :background nil))
 
     (setq org-format-latex-options
           '( :foreground default
