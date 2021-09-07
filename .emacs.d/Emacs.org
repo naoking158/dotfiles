@@ -604,8 +604,8 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
     (defun my/set-font-weight (&optional weight)
       (interactive)
       (let ((weight (if weight weight
-                      (intern (completing-read
-                               '(light normal bold))))))
+                      (intern (completing-read "Choose weight:"
+                                               '(light normal bold))))))
         (set-face-attribute 'default nil :weight weight)
         (set-face-attribute 'fixed-pitch nil :weight weight)
         (set-face-attribute 'variable-pitch nil :weight weight)))
@@ -888,8 +888,6 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 
 #+end_src
 
-#+RESULTS:
-: crux
 
 ** NeoTree
 :PROPERTIES:
@@ -3713,12 +3711,10 @@ While browsing, remember the following:
       :require t
       :after pdf-tools
       :custom `(pdf-annot-minor-mode-map-prefix . ,(kbd "a"))
-      ;; :bind-keymap (pdf-view-mode-map
-      ;;               ("a" . pdf-annot-minor-mode-map))
       :bind
       (:pdf-annot-minor-mode-map
        ("d" . pdf-annot-delete)
-       ("h". pdf-annot-add-highlight-markup-annotation)
+       ("h" . pdf-annot-add-highlight-markup-annotation)
        ("s" . pdf-annot-add-strikeout-markup-annotation)
        ("u" . pdf-annot-add-underline-markup-annotation))))
 #+end_src
@@ -3730,6 +3726,26 @@ While browsing, remember the following:
 
 #+begin_src emacs-lisp
   (leaf command-log-mode :ensure t)
+#+end_src
+
+* Draft
+:PROPERTIES:
+:ID:       3BCFD2E4-6A48-4ACF-994B-E7E5F889251C
+:END:
+
+** Change font face on titlebar according to theme appearance 
+:PROPERTIES:
+:ID:       D52CA322-A83B-4FB1-AB1B-4945AA6F6489
+:END:
+#+begin_src emacs-lisp
+  (defun my/update-ns-appearance (sym-theme &rest args)
+    (let* ((str-theme (symbol-name sym-theme))
+           (appearance (if (string-match "\\(light\\|operandi\\)" str-theme)
+                           'light
+                         'dark)))
+      (dolist (elm default-frame-alist)
+        (when (eq 'ns-appearance (car elm)) (delete elm default-frame-alist)))
+      (add-to-list 'default-frame-alist `(ns-appearance . ,appearance))))
 #+end_src
 
 * Footer

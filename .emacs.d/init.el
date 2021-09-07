@@ -401,8 +401,8 @@
   (defun my/set-font-weight (&optional weight)
     (interactive)
     (let ((weight (if weight weight
-                    (intern (completing-read
-                             '(light normal bold))))))
+                    (intern (completing-read "Choose weight:"
+                                             '(light normal bold))))))
       (set-face-attribute 'default nil :weight weight)
       (set-face-attribute 'fixed-pitch nil :weight weight)
       (set-face-attribute 'variable-pitch nil :weight weight)))
@@ -2756,15 +2756,22 @@ Interactively, URL defaults to the string looking like a url around point."
     :require t
     :after pdf-tools
     :custom `(pdf-annot-minor-mode-map-prefix . ,(kbd "a"))
-    ;; :bind-keymap (pdf-view-mode-map
-    ;;               ("a" . pdf-annot-minor-mode-map))
     :bind
     (:pdf-annot-minor-mode-map
      ("d" . pdf-annot-delete)
-     ("h". pdf-annot-add-highlight-markup-annotation)
+     ("h" . pdf-annot-add-highlight-markup-annotation)
      ("s" . pdf-annot-add-strikeout-markup-annotation)
      ("u" . pdf-annot-add-underline-markup-annotation))))
 
 (leaf command-log-mode :ensure t)
+
+(defun my/update-ns-appearance (sym-theme &rest args)
+  (let* ((str-theme (symbol-name sym-theme))
+         (appearance (if (string-match "\\(light\\|operandi\\)" str-theme)
+                         'light
+                       'dark)))
+    (dolist (elm default-frame-alist)
+      (when (eq 'ns-appearance (car elm)) (delete elm default-frame-alist)))
+    (add-to-list 'default-frame-alist `(ns-appearance . ,appearance))))
 
 (provide 'init)
