@@ -3308,6 +3308,7 @@ While browsing, remember the following:
 #+begin_src emacs-lisp
   
   (leaf skk
+    :disabled t
     :ensure ddskk
     :leaf-defer nil
     :bind (("C-M-j" . skk-undo-kakutei))

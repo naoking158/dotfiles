@@ -2402,6 +2402,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :global-minor-mode solaire-global-mode)
 
 (leaf skk
+  :disabled t
   :ensure ddskk
   :leaf-defer nil
   :bind (("C-M-j" . skk-undo-kakutei))
