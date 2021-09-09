@@ -702,7 +702,8 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                (intern  ;; convert string to symbol
                 (completing-read "Choose a theme:"
                                  '(bespoke/dark-theme bespoke/light-theme))))))
-        (funcall theme))))
+        (funcall theme))
+      (bespoke-modeline-org-agenda-mode)))
   
   
   (leaf themes
@@ -2870,7 +2871,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
       (org-id-link-to-org-use-id . t)
       (org-roam-capture-templates
        quote
-       (("l" "lit" plain "%?"
+       (("l" "lit" plain
          (file "~/org/braindump/preferences/LiteratureTemplate.org")
          :if-new (file+head "lit/${slug}.org"
                             "#+title: ${title}\n#+date: %U\n#+filetags: Literature")
@@ -2900,7 +2901,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                    (direction . right)
                    (window-width . 0.33)
                    (window-height . fit-window-to-buffer)))
-    (org-roam-setup))
+    (org-roam-db-autosync-mode))
 #+end_src
 
 ** Bullets

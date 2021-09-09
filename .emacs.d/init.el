@@ -488,7 +488,8 @@
              (intern  ;; convert string to symbol
               (completing-read "Choose a theme:"
                                '(bespoke/dark-theme bespoke/light-theme))))))
-      (funcall theme))))
+      (funcall theme))
+    (bespoke-modeline-org-agenda-mode)))
 
 
 (leaf themes
@@ -2158,7 +2159,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (org-id-link-to-org-use-id . t)
     (org-roam-capture-templates
      quote
-     (("l" "lit" plain "%?"
+     (("l" "lit" plain
        (file "~/org/braindump/preferences/LiteratureTemplate.org")
        :if-new (file+head "lit/${slug}.org"
                           "#+title: ${title}\n#+date: %U\n#+filetags: Literature")
@@ -2188,7 +2189,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                  (direction . right)
                  (window-width . 0.33)
                  (window-height . fit-window-to-buffer)))
-  (org-roam-setup))
+  (org-roam-db-autosync-mode))
 
 (leaf org-bullets
   :disabled t
