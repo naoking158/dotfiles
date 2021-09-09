@@ -1376,8 +1376,7 @@ respectively."
   :ensure t
   :require t
   :commands consult-customize
-  :chord (("gl" . consult-goto-line)
-          ("fk" . consult-recentf))
+  :chord ("gl" . consult-goto-line)
   :bind (([remap switch-to-buffer] . consult-buffer) ; C-x b
          ([remap yank-pop] . consult-yank-pop)       ; M-y
          ([remap goto-line] . consult-goto-line)     ; M-g g

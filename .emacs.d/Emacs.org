@@ -1923,8 +1923,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :ensure t
     :require t
     :commands consult-customize
-    :chord (("gl" . consult-goto-line)
-            ("fk" . consult-recentf))
+    :chord ("gl" . consult-goto-line)
     :bind (([remap switch-to-buffer] . consult-buffer) ; C-x b
            ([remap yank-pop] . consult-yank-pop)       ; M-y
            ([remap goto-line] . consult-goto-line)     ; M-g g
@@ -1979,7 +1978,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
       :config
       (tramp-set-completion-function "ssh"
                                      '((tramp-parse-sconfig "~/.ssh/config")))))
-
+  
 #+end_src
 
 ** Improved Candidate Filtering with Orderless
