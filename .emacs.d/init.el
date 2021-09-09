@@ -1817,6 +1817,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (save-some-buffers t))
 
   :defvar (org-capture-templates)
+  :advice (:before org-agenda-redo-all
+                   (lambda (&rest args)
+                     (setq org-agenda-files
+                           (directory-files-recursively org-directory
+                                                        "\\.org$"))))
   :config
   (setq
    jethro/org-agenda-directory (file-truename "~/org/gtd/")
