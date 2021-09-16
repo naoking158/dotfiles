@@ -332,14 +332,15 @@
 (leaf font
   :when window-system
   :leaf-defer nil
-  :hook (after-init-hook . my/set-font)
+  :hook (after-init-hook . (lambda () (my/set-font 14)))
   :advice (:after load-theme my/set-font-weight-after-load-theme)
   :preface
   (setq-default text-scale-remap-header-line t)
 
-  (defun my/set-font (&optional weight)
+  (defun my/set-font (&optional font-size weight)
     (interactive)
-    (let ((font-size 14)
+    (let ((font-size (if font-size font-size
+                       (read-number "Fontsize: " 14)))
           (weight (if weight weight
                     'light)))
 
@@ -472,15 +473,12 @@
 (leaf bespoke-themes
   :load-path "~/.emacs.d/elisp/bespoke-theme/"
   :require t bespoke-theme bespoke-modeline
-  :custom (;; Set header line
-           (bespoke-set-mode-line . 'footer)
-           ;; Set mode-line cleaner
-           (bespoke-set-mode-line-cleaner . nil)
-           ;; Set use of italics
-           (bespoke-set-italic-comments . nil)
+  :custom ((bespoke-set-mode-line . 'footer)      ;; Set header line
+           (bespoke-set-mode-line-cleaner . nil)  ;; Set mode-line cleaner
+           (bespoke-set-italic-comments . nil)    ;; Set use of italics
            (bespoke-set-italic-keywords . nil)
-           ;; Set initial theme variant
-           (bespoke-set-theme . 'dark))
+           (bespoke-set-theme . 'dark)           ;; Set initial theme variant
+           (bespoke-set-mode-line-size . 1))
   :preface
   (defun my/load-bespoke-theme (&optional theme)
     (let ((theme
@@ -489,14 +487,19 @@
               (completing-read "Choose a theme:"
                                '(bespoke/dark-theme bespoke/light-theme))))))
       (funcall theme))
+
+    (custom-theme-set-faces
+       `user
+       `(org-agenda-clocking ((t :foreground ,bespoke-salient)))
+       `(org-agenda-done ((t :foreground ,bespoke-faded :strike-through nil))))
+
     (bespoke-modeline-org-agenda-mode)))
 
 
 (leaf themes
   :leaf-defer nil
-  ;; :hook (after-init-hook . (lambda () (my/load-theme 'doom-nord)))
   :hook (after-init-hook . (lambda () (my/load-theme 'bespoke/dark-theme)))
-  :advice (:before load-theme (lambda (&rest arg)
+  :advice (:before load-theme (lambda (&rest args)
                                 (mapc #'disable-theme custom-enabled-themes)))
   :preface
   (setq my/theme-list '(doom-nord
@@ -546,6 +549,7 @@
     (moody-replace-vc-mode))
 
   (leaf doom-modeline
+    :disabled t
     :when (not window-system)
     :doc "A minimal and modern mode-line"
     :req "emacs-25.1" "all-the-icons-2.2.0" "shrink-path-0.2.0" "dash-2.11.0"
