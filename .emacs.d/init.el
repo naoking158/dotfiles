@@ -194,18 +194,17 @@
 
 (leaf change-system-configuration
   :leaf-defer nil
-  :custom (default-frame-alist . '((inhibit-double-buffering . t)
-                                   (ns-transparent-titlebar . t)))
   :bind (("M-o" . finder-current-dir-open)
          ("s-w" . kill-buffer)
          ("s-q" . save-buffers-kill-emacs)
          ("s-v" . yank)
-         ("s-c" . copy-region-as-kill))
+         ("s-c" . kill-ring-save))
   :preface
   (defun finder-current-dir-open nil
     (interactive)
     (shell-command "open ."))
   :config
+  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
   (leaf mac
     :doc "implementation of gui terminal on macos"
     :doc "each symbol can be `control', `meta', `alt', `hyper', or `super'"
@@ -302,21 +301,21 @@
   :tag "builtin"
   :global-minor-mode t)
 
-(leaf hl-line
-  :doc "highlight the current line"
-  :tag "builtin"
-  :require t
-  :global-minor-mode t
-  :config
-      ;;; hl-lineを無効にするメジャーモードを指定する
-  (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
-  (defun global-hl-line-timer-function ()
-    (unless (memq major-mode global-hl-line-timer-exclude-modes)
-      (global-hl-line-unhighlight-all)
-      (let ((global-hl-line-mode t))
-        (global-hl-line-highlight))))
-  (setq global-hl-line-timer
-        (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
+;; (leaf hl-line
+;;   :doc "highlight the current line"
+;;   :tag "builtin"
+;;   :require t
+;;   :global-minor-mode t
+;;   :config
+;;       ;;; hl-lineを無効にするメジャーモードを指定する
+;;   (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
+;;   (defun global-hl-line-timer-function ()
+;;     (unless (memq major-mode global-hl-line-timer-exclude-modes)
+;;       (global-hl-line-unhighlight-all)
+;;       (let ((global-hl-line-mode t))
+;;         (global-hl-line-highlight))))
+;;   (setq global-hl-line-timer
+;;         (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
 
 (leaf *frame-transparency
   :preface
@@ -332,39 +331,33 @@
 
 (leaf font
   :when window-system
-  :hook (after-init-hook . my/set-font)
+  :leaf-defer nil
+  :hook (after-init-hook . (lambda () (my/set-font 14)))
+  :advice (:after load-theme my/set-font-weight-after-load-theme)
   :preface
-  ;; This is for Emacs28.
   (setq-default text-scale-remap-header-line t)
 
-  (defun my/set-font (&optional weight)
+  (defun my/set-font (&optional font-size)
     (interactive)
-    (let ((font-size 14)
-          (weight (if weight weight
-                    'light)))
+    (let ((font-size (if font-size font-size
+                       (read-number "Fontsize: " 14))))
 
       ;; ascii
       (set-face-attribute 'default nil
                           :font "JetBrains Mono"
-                          :height (* font-size 10)
-                          :weight weight)
+                          :height (* font-size 10))
 
       ;; Set the fixed pitch face
       (set-face-attribute 'fixed-pitch nil
                           :font "JetBrains Mono"
-                          :height (* font-size 10)
-                          :weight weight)
+                          :height (* font-size 10))
 
       ;; Set the variable pitch face
       (set-face-attribute 'variable-pitch nil
                           :font "Iosevka Aile"
-                          :height (* font-size 10)
-                          :weight weight)
+                          :height (* font-size 10))
 
       ;; japanese
-      ;; (set-fontset-font t 'unicode
-      ;;                   "Noto Serif CJK JP-14"
-      ;;                   nil 'append))
       (set-fontset-font t 'unicode
                         (font-spec
                          :family "Noto Sans CJK JP" 
@@ -403,16 +396,21 @@
 
   (defun my/set-font-weight (&optional weight)
     (interactive)
-    (let ((weight (if weight weight 'light)))
+    (let ((weight (if weight weight
+                    (intern (completing-read "Choose weight:"
+                                             '(light normal bold))))))
       (set-face-attribute 'default nil :weight weight)
       (set-face-attribute 'fixed-pitch nil :weight weight)
       (set-face-attribute 'variable-pitch nil :weight weight)))
 
-  (defun my/reload-font-face (&optional weight)
-    (interactive)
-    (let ((weight (if weight weight 'light)))
-      (my/set-font-weight weight)
-      (my/set-org-headline-face))))
+  (defun my/set-font-weight-after-load-theme (&rest args)
+    (let* ((str-theme (symbol-name (car args)))
+           (weight (cond
+                    ((string-match "\\(light\\|operandi\\)" str-theme) 'normal)
+                    ((and (string-match "bespoke" str-theme)
+                          (eq 'light bespoke-set-theme)) 'normal)
+                    (t 'light))))
+      (my/set-font-weight weight))))
 
 (leaf doom-themes
   :doc "an opinionated pack of modern color-themes"
@@ -425,31 +423,14 @@
   :custom ((doom-themes-enable-italic . nil)
            (doom-themes-enable-bold . t))
   :config
-  (defun my/load-doom-theme (&optional theme)
-    (interactive)		
-    (let ((theme
-           (if theme theme
-             (intern  ;; convert string to symbol
-              (completing-read "Choose a theme:"
-                               '(doom-nord doom-solarized-light))))))
-      (mapc #'disable-theme custom-enabled-themes)
-      (load-theme theme t)
-      (if (string-match "light" (symbol-name theme))
-          (my/reload-font-face 'normal)
-        (my/reload-font-face 'light)))
+  (defun my/load-doom-theme (sym-theme)
+    (load-theme sym-theme t)
     (doom-themes-neotree-config)
     (doom-themes-org-config)
     (doom-themes-treemacs-config)))
 
 (leaf modus-themes
   :ensure t
-  :after org
-  :leaf-defer nil
-  :advice ((:after modus-themes-load-vivendi
-                   (lambda () (my/reload-font-face 'light)))
-           (:after modus-themes-load-operandi
-                   (lambda () (my/reload-font-face 'normal))))
-
   :custom
   ((modus-themes-bold-constructs . t)
    (modus-themes-region . '(bg-only no-extend))
@@ -466,66 +447,88 @@
                             '((header-block . (variable-pitch scale-title))
                               (header-date . (grayscale workaholic bold-today))
                               (scheduled . uniform)
-                              (habit . traffic-light-deuteranopia)))
-   )
+                              (habit . traffic-light-deuteranopia))))
   :config
-  (defun my/load-modus-theme (&optional theme)
-    (interactive)
+  (defun my/load-modus-theme (sym-theme)
     (modus-themes-load-themes)
-    (let ((theme (if theme theme
-                   (intern (completing-read "Choose one:"
-                                            '(modus-light
-                                              modus-dark))))))
-      (mapc #'disable-theme custom-enabled-themes)
-      (pcase theme
-        ('modus-dark (modus-themes-load-vivendi))
-        ('modus-light (modus-themes-load-operandi))))))
+    (pcase sym-theme
+      ('modus-dark (modus-themes-load-vivendi))
+      ('modus-light (modus-themes-load-operandi)))))
+
+
+(leaf bespoke-themes
+  :load-path "~/.emacs.d/elisp/bespoke-theme/"
+  :require t bespoke-theme bespoke-modeline
+  :custom ((bespoke-set-mode-line . 'footer)      ;; Set header line
+           (bespoke-set-mode-line-cleaner . nil)  ;; Set mode-line cleaner
+           (bespoke-set-italic-comments . nil)    ;; Set use of italics
+           (bespoke-set-italic-keywords . nil)
+           ;; (bespoke-set-theme . 'dark)
+           ;; Set initial theme variant
+           (bespoke-set-mode-line-size . 1))
+  :preface
+  (defun my/load-bespoke-theme (sym-theme)
+    (funcall sym-theme)
+    (custom-theme-set-faces
+       `user
+       `(org-agenda-clocking ((t :foreground ,bespoke-salient)))
+       `(org-agenda-done ((t :foreground ,bespoke-faded :strike-through nil))))
+    (bespoke-modeline-org-agenda-mode)))
 
 
 (leaf themes
   :leaf-defer nil
-  :hook (after-init-hook . (lambda () (my/load-theme 'doom-nord)))
+  :hook (after-init-hook . (lambda () (my/load-theme 'bespoke/dark-theme)))
+  :advice (:before load-theme (lambda (&rest args)
+                                (mapc #'disable-theme custom-enabled-themes)))
   :preface
-  (setq my/configured-themes '(doom-nord
-                               doom-solarized-light
-                               modus-light
-                               modus-dark))
+  (setq my/theme-list '(doom-nord
+                        doom-solarized-light
+                        modus-light
+                        modus-dark
+                        bespoke/dark-theme
+                        bespoke/light-theme))
 
-  (defun my/load-theme-func-of (sym-theme)
+  (defun my/load-theme-func-for (sym-theme)
     (let* ((str-theme (symbol-name sym-theme)))
       (cond
        ((string-match "doom" str-theme) #'my/load-doom-theme)
        ((string-match "modus" str-theme) #'my/load-modus-theme)
+       ((string-match "bespoke" str-theme) #'my/load-bespoke-theme)
        (t #'(lambda (arg)
               (message "The theme ``%s'' is not implemented." arg)
               (message "Check the argument of ``my/load-theme''.")
               nil)))))
 
-  (defun my/load-theme (&optional sym-theme)
-    (interactive)
-    (let* ((sym-theme (if sym-theme sym-theme
-                        (intern (completing-read "Choose one:"
-                                                 my/configured-themes))))
-           (my-load-theme (my/load-theme-func-of sym-theme)))
-      (funcall my-load-theme sym-theme)))
+  (defun my/load-theme (sym-theme)
+    (interactive
+     (list
+      (intern (completing-read "Choose one:" my/theme-list))))
+    (setq my-load-theme-func (my/load-theme-func-for sym-theme))
+    (funcall my-load-theme-func sym-theme))
 
   :config
   (column-number-mode)
   (setq inhibit-compacting-font-caches t)
 
   (leaf moody
+    :disabled t
     :when window-system
     :ensure t
     :custom (x-underline-at-descent-line . t)
-    :config
-    (moody-replace-mode-line-buffer-identification)
-    (moody-replace-vc-mode)
+    :leaf-defer nil
     ;; hide marks ``---'',
     ;;     which is part of ``U:---'' on the left side of the mode line
-    (dolist (mode '(mode-line-client mode-line-modified mode-line-remote))
-      (moody-replace-element mode "")))
+    :hook (after-init-hook . (lambda () (dolist (mode '(mode-line-client
+                                                        mode-line-modified
+                                                        mode-line-remote))
+                                          (moody-replace-element mode ""))))
+    :config
+    (moody-replace-mode-line-buffer-identification)
+    (moody-replace-vc-mode))
 
   (leaf doom-modeline
+    :disabled t
     :when (not window-system)
     :doc "A minimal and modern mode-line"
     :req "emacs-25.1" "all-the-icons-2.2.0" "shrink-path-0.2.0" "dash-2.11.0"
@@ -549,6 +552,7 @@
              (doom-modeline-persp-name . nil)))
 
   (leaf minions
+    :disabled t
     :ensure t
     :custom ((minions-mode-line-lighter . ";")
              (minions-direct . '(defining-kbd-macro flymake-mode)))
@@ -1189,7 +1193,7 @@ respectively."
   :doc "Modular text completion framework"
   :tag "matching" "convenience" "abbrev" "emacs>=24.3"
   :url "http://company-mode.github.io/"
-  ;; :when (not window-system)
+  :when (not window-system)
   :ensure t
   :blackout t
   :leaf-defer nil
@@ -1355,8 +1359,7 @@ respectively."
   :ensure t
   :require t
   :commands consult-customize
-  :chord (("gl" . consult-goto-line)
-          ("fk" . consult-recentf))
+  :chord ("gl" . consult-goto-line)
   :bind (([remap switch-to-buffer] . consult-buffer) ; C-x b
          ([remap yank-pop] . consult-yank-pop)       ; M-y
          ([remap goto-line] . consult-goto-line)     ; M-g g
@@ -1438,7 +1441,6 @@ respectively."
   :global-minor-mode t savehist-mode)
 
 (leaf corfu
-  :disabled t
   :when window-system
   :ensure t
   :require t
@@ -1446,10 +1448,11 @@ respectively."
   ;; Optional customizations
   :custom
   ((corfu-auto-prefix . 2)
-   (corfu-auto-delay . 0.1)
+   (corfu-auto-delay . 0.4)
    (corfu-cycle . t)
    (corfu-auto . t)
    (corfu-quit-no-match . t)
+   (corfu-quit-at-boundary . t)
 
    ;; Enable indentation+completion using the TAB key.
    ;; `completion-at-point' is often bound to M-TAB.
@@ -1534,14 +1537,12 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf org
   :doc "Export Framework for Org Mode"
   :tag "builtin"
-  :ensure org-plus-contrib
+  ;; :ensure org-plus-contrib
+  :ensure t
   :require ob-async org-tempo  ;; need for org-template
   :mode "\\.org\\'"
   :hook (org-mode-hook . my/org-mode-hook)
-  :preface
-  (defun my/org-mode-hook ()
-    (add-hook 'completion-at-point-functions
-              'pcomplete-completions-at-point nil t))
+  :advice (:after load-theme my/set-org-face)
   :custom
   ((org-directory . "~/org/")
    (org-ellipsis . " ▼ ")
@@ -1589,9 +1590,16 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                      ("mq" . "question")
                                      ("mt" . "todo")
                                      ("ms" . "summary"))))
-  :config
+
+  :preface
+  (defun my/org-mode-hook ()
+    (add-hook 'completion-at-point-functions
+              'pcomplete-completions-at-point nil t))
 
   (when window-system
+    ;; Make sure org-indent face is available
+    (require 'org-indent)
+
     (create-fontset-from-ascii-font "Iosevka Aile-14"
                                     nil
                                     "myoutline")
@@ -1599,7 +1607,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                       "Noto Sans CJK JP-14"
                       nil 'append)
 
-    (defun my/set-org-headline-face ()
+    (defun my/set-org-face (&rest sym-theme)
       ;; Increase the size of various headings
       (interactive)
       (set-face-attribute 'org-document-title nil
@@ -1620,49 +1628,36 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                             :font "fontset-myoutline"
                             :weight 'normal
                             :slant 'normal
-                            :height (cdr face))))
-    (my/set-org-headline-face))
+                            :height (cdr face)))
 
-  ;; Make sure org-indent face is available
-  (require 'org-indent)
+      ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+      (set-face-attribute 'org-block nil						:inherit 'fixed-pitch :foreground nil)
+      (set-face-attribute 'org-table nil						:inherit 'fixed-pitch)
+      (set-face-attribute 'org-formula nil					:inherit 'fixed-pitch)
+      (set-face-attribute 'org-code nil							:inherit '(shadow fixed-pitch))
+      (set-face-attribute 'org-indent t							:inherit '(org-hide fixed-pitch))
+      (set-face-attribute 'org-verbatim nil					:inherit '(shadow fixed-pitch))
+      (set-face-attribute 'org-special-keyword nil	:inherit '(font-lock-comment-face fixed-pitch))
+      (set-face-attribute 'org-meta-line nil				:inherit '(font-lock-comment-face fixed-pitch))
+      (set-face-attribute 'org-checkbox nil					:inherit 'fixed-pitch)
 
-  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
-  (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-indent t :inherit '(org-hide fixed-pitch))
-  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+      ;; Get rid of the background on column views
+      (set-face-attribute 'org-column nil :background nil)
+      (set-face-attribute 'org-column-title nil :background nil))
 
-  ;; Get rid of the background on column views
-  (set-face-attribute 'org-column nil :background nil)
-  (set-face-attribute 'org-column-title nil :background nil)
+    (setq org-format-latex-options
+          '( :foreground default
+             :background default
+             :scale 1.7
+             :html-foreground "Black"
+             :html-background "Transparent"
+             :html-scale 1.0
+             :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
 
-  ;; (custom-theme-set-faces
-  ;;  'user
-  ;;  '(org-block ((t (:inherit fixed-pitch))))
-  ;;  '(org-code ((t (:inherit (shadow fixed-pitch)))))
-  ;;  '(org-agenda-current-time ((t (:foreground "chartreuse"))))
-  ;;  '(org-agenda-done ((t (:foreground "gray" :weight book))))
-  ;;  '(org-scheduled-today ((t (:foreground "orange" :weight book))))
-  ;;  '(org-agenda-date ((t (:foreground "forest green" :height 1.1))))
-  ;;  '(org-agenda-date-today ((t (:foreground "#98be65" :height 1.1)))))
+    (when (fboundp 'mac-toggle-input-method)
+      (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii)))
 
-  (setq org-format-latex-options
-        '(:foreground default
-                      :background default
-                      :scale 1.7
-                      :html-foreground "Black"
-                      :html-background "Transparent"
-                      :html-scale 1.0
-                      :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
-
-  (when (fboundp 'mac-toggle-input-method)
-    (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii))
-
+  :config
   (leaf ob-async :ensure t)
 
   (leaf org-fragtog
@@ -1702,7 +1697,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (org-agenda-current-time-string . "← now")
     (org-agenda-time-grid quote ;; Format is changed from 9.1
                           ((daily today require-timed)
-                           (0800 1100 1500 1900 2100 2400)
+                           (0700 1200 1700 2200)
                            "-"
                            "────────────────"))
     (org-columns-default-format
@@ -1805,6 +1800,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (save-some-buffers t))
 
   :defvar (org-capture-templates)
+  :advice (:before org-agenda-redo-all
+                   (lambda (&rest args)
+                     (setq org-agenda-files
+                           (directory-files-recursively org-directory
+                                                        "\\.org$"))))
   :config
   (setq
    jethro/org-agenda-directory (file-truename "~/org/gtd/")
@@ -2147,19 +2147,24 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (org-id-link-to-org-use-id . t)
     (org-roam-capture-templates
      quote
-     (("l" "lit" plain "%?"
+     (("c" "concept" plain "%?"
+       :if-new (file+head "concepts/${slug}.org"
+                          "#+title: ${title}\n#+date: %U")
+       :unnarrowed t)
+      ("l" "lit" plain
        (file "~/org/braindump/preferences/LiteratureTemplate.org")
        :if-new (file+head "lit/${slug}.org"
                           "#+title: ${title}\n#+date: %U\n#+filetags: Literature")
        :unnarrowed t)
-      ("c" "concept" plain "%?"
-       :if-new (file+head "concepts/${slug}.org"
-                          "#+title: ${title}\n#+date: %U")
+      ("m" "Meeting" plain "%?"
+       :if-new (file+head "work/${slug}.org"
+                          "#+title: ${title}\n#+filetags: Meeting\n#+options: toc:nil")
        :unnarrowed t)
       ("p" "private" plain "%?"
        :if-new (file+head "private/${slug}.org"
-                          "#+title: ${title}#+date: %U\n")
-       :unnarrowed t))))
+                          "#+title: ${title}\n#+date: %U\n")
+       :unnarrowed t)
+      )))
   :config
   (leaf org-roam-dailies
     :require t
@@ -2177,7 +2182,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                  (direction . right)
                  (window-width . 0.33)
                  (window-height . fit-window-to-buffer)))
-  (org-roam-setup))
+  (org-roam-db-autosync-mode))
 
 (leaf org-bullets
   :disabled t
@@ -2391,17 +2396,20 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :global-minor-mode solaire-global-mode)
 
 (leaf skk
+  :disabled t
   :ensure ddskk
   :leaf-defer nil
   :bind (("C-M-j" . skk-undo-kakutei))
-  :custom ((skk-server-host . "localhost")
+  :global-minor-mode t context-skk-mode
+  :custom ((default-input-method . "japanese-skk")
+           (skk-tut-file . "~/src/github.com/skk-dev/ddskk/etc/SKK.tut")
+           (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
+           (skk-server-host . "localhost")
            (skk-server-prtnum . 1178)
            (skk-server-report-response . t)
-           (default-input-method . "japanese-skk")
            (skk-byte-compile-init-file . t)
            (skk-preload . t)
            (skk-isearch-mode-enable . 'always)
-           (skk-tut-file . "~/src/github.com/skk-dev/ddskk/etc/SKK.tut")
            (skk-kutouten-type . 'en)
            (skk-show-inline . 'vertical)
            (skk-inline-show-face . nil)
@@ -2412,10 +2420,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (skk-inline-show-face . '( :foreground "#ECEFF4"
                                       :background "#4C566A"
                                       :inherit 'normal)))
-  :config
-  (skk-mode 1)
-  (context-skk-mode 1)
 
+  :config
   (leaf ddskk-posframe
     :load-path "~/.emacs.d/elisp/ddskk-posframe/"
     :require t
@@ -2472,7 +2478,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
             (when msg
               (string-prefix-p "/BBO" (mu4e-message-field msg :maildir))))
           :vars '((user-mail-address			. "naoki@bbo.cs.tsukuba.ac.jp")
-                  (user-full-name					. "naoki@bbo.cs.tsukuba.ac.jp")
+                  (user-full-name					. "Naoki Sakamoto")
                   (smtpmail-smtp-server		. "smtp.gmail.com")
                   (smtpmail-smtp-service	. 465)
                   (smtpmail-stream-type		. ssl)
@@ -2489,7 +2495,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
             (when msg
               (string-prefix-p "/Private" (mu4e-message-field msg :maildir))))
           :vars '((user-mail-address			. "nok.skmt.snow@gmail.com")
-                  (user-full-name					. "nok.skmt.snow@gmail.com")
+                  (user-full-name					. "Naoki Sakamoto")
                   (smtpmail-smtp-server		. "smtp.gmail.com")
                   (smtpmail-smtp-service	. 465)
                   (smtpmail-stream-type		. ssl)
@@ -2506,7 +2512,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
             (when msg
               (string-prefix-p "/University" (mu4e-message-field msg :maildir))))
           :vars '((user-mail-address			. "s1930160@s.tsukuba.ac.jp")
-                  (user-full-name					. "s1930160@s.tsukuba.ac.jp")
+                  (user-full-name					. "Naoki Sakamoto")
                   (smtpmail-smtp-server		. "smtp.office365.com")
                   (smtpmail-smtp-service	. 587)
                   (smtpmail-stream-type		. starttls)
@@ -2558,21 +2564,12 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   (mu4e~headers-defun-mark-for tag)
 
   :advice
+  ;; disable fancy characters only for flags
   (:around mu4e~headers-flags-str (lambda (f &rest args)
                                     (let* ((mu4e-use-fancy-chars nil))
-                                        (apply f args))))
-  ;; (:around mu4e~headers-flags-str (lambda (f &rest args)
-  ;;                                   (prog2
-  ;;                                       (setq mu4e-use-fancy-chars nil)
-  ;;                                       (apply f args)
-  ;;                                     (setq mu4e-use-fancy-chars t)))
-  ;;          )
-  :preface
-  ;; (defun my/mu4e~headers-flags-str (func &rest args)
-  ;; 	(setq mu4e-use-fancy-chars nil)
-  ;; 	(apply func args)
-  ;; 	(setq mu4e-use-fancy-chars t))
+                                      (apply f args))))
 
+  :preface
   (defun my/org-capture-mu4e ()
     (interactive)
     "Capture a TODO item via email."
@@ -2584,16 +2581,17 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                  "* TODO %^{Description}\n%A\n%?\n"))
 
   :bind
-  (mu4e-headers-mode-map
-   ("{" . mu4e-headers-query-prev)      ; differs from built-in
-   ("}" . mu4e-headers-query-next)      ; differs from built-in
-   ("o" . my/org-capture-mu4e)          ; differs from built-in
+  ((mu4e-main-mode-map ("q" . quit-window))
+   (mu4e-headers-mode-map
+    ("{" . mu4e-headers-query-prev)      ; differs from built-in
+    ("}" . mu4e-headers-query-next)      ; differs from built-in
+    ("o" . my/org-capture-mu4e)          ; differs from built-in
 
-   ("A" . mu4e-headers-mark-for-action) ; differs from built-in
+    ("A" . mu4e-headers-mark-for-action) ; differs from built-in
 
-   ("`" . mu4e-update-mail-and-index)   ; differs from built-in
-   ("|" . mu4e-view-pipe)               ; does not seem to be built in any longer
-   ("." . hydra-mu4e-headers/body))
+    ("`" . mu4e-update-mail-and-index)   ; differs from built-in
+    ("|" . mu4e-view-pipe)               ; does not seem to be built in any longer
+    ("." . hydra-mu4e-headers/body)))
 
   :hydra
   (hydra-mu4e-headers
@@ -2706,5 +2704,68 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
                                        (reply-to-text	. (text)))
         org-msg-convert-citation t)
   (org-msg-mode))
+
+(leaf xwwp
+  :ensure t
+  :custom (browse-url-browser-function . 'xwidget-webkit-browse-url)
+  :bind (("C-c s" . xwwp)
+         (xwidget-webkit-mode-map
+         ("v" . xwwp-follow-link)
+         ([remap kill-ring-save] . xwidget-webkit-copy-selection-as-kill)
+         ([remap xwidget-webkit-browse-url] . xwwp)))
+  :advice (:override xwwp-browse-url-other-window
+                     my/xwwp-browse-url-other-window)
+  :preface
+  (defun my/xwwp-browse-url-other-window (url &optional new-session)
+    "Ask xwidget-webkit to browse URL.
+NEW-SESSION specifies whether to create a new xwidget-webkit session.
+Interactively, URL defaults to the string looking like a url around point."
+    (interactive (progn
+                   (require 'browse-url)
+                   (browse-url-interactive-arg "xwidget-webkit URL: "
+                                               ;;(xwidget-webkit-current-url)
+                                               )))
+    (or (featurep 'xwidget-internal)
+        (user-error "Your Emacs was not compiled with xwidgets support"))
+    (when (stringp url)
+      (if new-session
+          (xwidget-webkit-new-session url)
+        (progn (xwidget-webkit-goto-url url)
+               (switch-to-buffer (xwidget-buffer
+                                  (xwidget-webkit-current-session))))))))
+
+;; (leaf webkit
+;;   :load-path "~/.emacs.d/elisp/emacs-webkit/"
+;;   :require t webkit-ace webkit-dark)
+
+(leaf pdf-tools
+  :ensure t
+  :hook ((TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
+         (pdf-view-mode-hook . (lambda () (set-buffer-multibyte t))))
+  :custom (pdf-view-display-size . 'fit-width)
+  :init
+  (pdf-tools-install)
+  :config
+  (leaf pdf-annot
+    :require t
+    :after pdf-tools
+    :custom `(pdf-annot-minor-mode-map-prefix . ,(kbd "a"))
+    :bind
+    (:pdf-annot-minor-mode-map
+     ("d" . pdf-annot-delete)
+     ("h" . pdf-annot-add-highlight-markup-annotation)
+     ("s" . pdf-annot-add-strikeout-markup-annotation)
+     ("u" . pdf-annot-add-underline-markup-annotation))))
+
+(leaf command-log-mode :ensure t)
+
+(defun my/update-ns-appearance (sym-theme &rest args)
+  (let* ((str-theme (symbol-name sym-theme))
+         (appearance (if (string-match "\\(light\\|operandi\\)" str-theme)
+                         'light
+                       'dark)))
+    (dolist (elm default-frame-alist)
+      (when (eq 'ns-appearance (car elm)) (delete elm default-frame-alist)))
+    (add-to-list 'default-frame-alist `(ns-appearance . ,appearance))))
 
 (provide 'init)

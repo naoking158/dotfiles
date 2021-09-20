@@ -10,3 +10,9 @@
 [submodule ".emacs.d/elisp/ddskk-posframe"]
 	path = .emacs.d/elisp/ddskk-posframe
 	url = https://github.com/conao3/ddskk-posframe.el.git
+[submodule ".emacs.d/elisp/bespoke-theme"]
+	path = .emacs.d/elisp/bespoke-theme
+	url = https://github.com/mclear-tools/bespoke-themes.git
+[submodule "bespoke-theme"]
+	path = .emacs.d/elisp/bespoke-theme
+	url = https://github.com/mclear-tools/bespoke-themes.git
