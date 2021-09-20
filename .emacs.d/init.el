@@ -337,30 +337,25 @@
   :preface
   (setq-default text-scale-remap-header-line t)
 
-  (defun my/set-font (&optional font-size weight)
+  (defun my/set-font (&optional font-size)
     (interactive)
     (let ((font-size (if font-size font-size
-                       (read-number "Fontsize: " 14)))
-          (weight (if weight weight
-                    'light)))
+                       (read-number "Fontsize: " 14))))
 
       ;; ascii
       (set-face-attribute 'default nil
                           :font "JetBrains Mono"
-                          :height (* font-size 10)
-                          :weight weight)
+                          :height (* font-size 10))
 
       ;; Set the fixed pitch face
       (set-face-attribute 'fixed-pitch nil
                           :font "JetBrains Mono"
-                          :height (* font-size 10)
-                          :weight weight)
+                          :height (* font-size 10))
 
       ;; Set the variable pitch face
       (set-face-attribute 'variable-pitch nil
                           :font "Iosevka Aile"
-                          :height (* font-size 10)
-                          :weight weight)
+                          :height (* font-size 10))
 
       ;; japanese
       (set-fontset-font t 'unicode
@@ -428,13 +423,8 @@
   :custom ((doom-themes-enable-italic . nil)
            (doom-themes-enable-bold . t))
   :config
-  (defun my/load-doom-theme (&optional theme)
-    (let ((theme
-           (if theme theme
-             (intern  ;; convert string to symbol
-              (completing-read "Choose a theme:"
-                               '(doom-nord doom-solarized-light))))))
-      (load-theme theme t))
+  (defun my/load-doom-theme (sym-theme)
+    (load-theme sym-theme t)
     (doom-themes-neotree-config)
     (doom-themes-org-config)
     (doom-themes-treemacs-config)))
@@ -459,15 +449,11 @@
                               (scheduled . uniform)
                               (habit . traffic-light-deuteranopia))))
   :config
-  (defun my/load-modus-theme (&optional theme)
+  (defun my/load-modus-theme (sym-theme)
     (modus-themes-load-themes)
-    (let ((theme (if theme theme
-                   (intern (completing-read "Choose one:"
-                                            '(modus-light
-                                              modus-dark))))))
-      (pcase theme
-        ('modus-dark (modus-themes-load-vivendi))
-        ('modus-light (modus-themes-load-operandi))))))
+    (pcase sym-theme
+      ('modus-dark (modus-themes-load-vivendi))
+      ('modus-light (modus-themes-load-operandi)))))
 
 
 (leaf bespoke-themes
@@ -477,22 +463,16 @@
            (bespoke-set-mode-line-cleaner . nil)  ;; Set mode-line cleaner
            (bespoke-set-italic-comments . nil)    ;; Set use of italics
            (bespoke-set-italic-keywords . nil)
-           (bespoke-set-theme . 'dark)           ;; Set initial theme variant
+           ;; (bespoke-set-theme . 'dark)
+           ;; Set initial theme variant
            (bespoke-set-mode-line-size . 1))
   :preface
-  (defun my/load-bespoke-theme (&optional theme)
-    (let ((theme
-           (if theme theme
-             (intern  ;; convert string to symbol
-              (completing-read "Choose a theme:"
-                               '(bespoke/dark-theme bespoke/light-theme))))))
-      (funcall theme))
-
+  (defun my/load-bespoke-theme (sym-theme)
+    (funcall sym-theme)
     (custom-theme-set-faces
        `user
        `(org-agenda-clocking ((t :foreground ,bespoke-salient)))
        `(org-agenda-done ((t :foreground ,bespoke-faded :strike-through nil))))
-
     (bespoke-modeline-org-agenda-mode)))
 
 
@@ -520,13 +500,12 @@
               (message "Check the argument of ``my/load-theme''.")
               nil)))))
 
-  (defun my/load-theme (&optional sym-theme)
-    (interactive)
-    (let* ((sym-theme (if sym-theme sym-theme
-                        (intern (completing-read "Choose one:"
-                                                 my/theme-list))))
-           (my-load-theme (my/load-theme-func-for sym-theme)))
-      (funcall my-load-theme sym-theme)))
+  (defun my/load-theme (sym-theme)
+    (interactive
+     (list
+      (intern (completing-read "Choose one:" my/theme-list))))
+    (setq my-load-theme-func (my/load-theme-func-for sym-theme))
+    (funcall my-load-theme-func sym-theme))
 
   :config
   (column-number-mode)
@@ -1558,7 +1537,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf org
   :doc "Export Framework for Org Mode"
   :tag "builtin"
-  :ensure org-plus-contrib
+  ;; :ensure org-plus-contrib
+  :ensure t
   :require ob-async org-tempo  ;; need for org-template
   :mode "\\.org\\'"
   :hook (org-mode-hook . my/org-mode-hook)
@@ -2167,19 +2147,24 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (org-id-link-to-org-use-id . t)
     (org-roam-capture-templates
      quote
-     (("l" "lit" plain
+     (("c" "concept" plain "%?"
+       :if-new (file+head "concepts/${slug}.org"
+                          "#+title: ${title}\n#+date: %U")
+       :unnarrowed t)
+      ("l" "lit" plain
        (file "~/org/braindump/preferences/LiteratureTemplate.org")
        :if-new (file+head "lit/${slug}.org"
                           "#+title: ${title}\n#+date: %U\n#+filetags: Literature")
        :unnarrowed t)
-      ("c" "concept" plain "%?"
-       :if-new (file+head "concepts/${slug}.org"
-                          "#+title: ${title}\n#+date: %U")
+      ("m" "Meeting" plain "%?"
+       :if-new (file+head "work/${slug}.org"
+                          "#+title: ${title}\n#+filetags: Meeting\n#+options: toc:nil")
        :unnarrowed t)
       ("p" "private" plain "%?"
        :if-new (file+head "private/${slug}.org"
-                          "#+title: ${title}#+date: %U\n")
-       :unnarrowed t))))
+                          "#+title: ${title}\n#+date: %U\n")
+       :unnarrowed t)
+      )))
   :config
   (leaf org-roam-dailies
     :require t
@@ -2493,7 +2478,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
             (when msg
               (string-prefix-p "/BBO" (mu4e-message-field msg :maildir))))
           :vars '((user-mail-address			. "naoki@bbo.cs.tsukuba.ac.jp")
-                  (user-full-name					. "naoki@bbo.cs.tsukuba.ac.jp")
+                  (user-full-name					. "Naoki Sakamoto")
                   (smtpmail-smtp-server		. "smtp.gmail.com")
                   (smtpmail-smtp-service	. 465)
                   (smtpmail-stream-type		. ssl)
@@ -2510,7 +2495,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
             (when msg
               (string-prefix-p "/Private" (mu4e-message-field msg :maildir))))
           :vars '((user-mail-address			. "nok.skmt.snow@gmail.com")
-                  (user-full-name					. "nok.skmt.snow@gmail.com")
+                  (user-full-name					. "Naoki Sakamoto")
                   (smtpmail-smtp-server		. "smtp.gmail.com")
                   (smtpmail-smtp-service	. 465)
                   (smtpmail-stream-type		. ssl)
@@ -2527,7 +2512,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
             (when msg
               (string-prefix-p "/University" (mu4e-message-field msg :maildir))))
           :vars '((user-mail-address			. "s1930160@s.tsukuba.ac.jp")
-                  (user-full-name					. "s1930160@s.tsukuba.ac.jp")
+                  (user-full-name					. "Naoki Sakamoto")
                   (smtpmail-smtp-server		. "smtp.office365.com")
                   (smtpmail-smtp-service	. 587)
                   (smtpmail-stream-type		. starttls)
