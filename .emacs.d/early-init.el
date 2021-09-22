@@ -32,10 +32,10 @@
 			user-login-name "naoking158"
 			package-native-compile t)
 (native-compile-async "~/.emacs.d/elisp/" 'recursively)
-(if (eq system-type 'darwin)
-    (setq shell-file-name "/usr/local/bin/fish")
-  (setq shell-file-name "/usr/bin/fish"))  
-
+(dolist (item (split-string
+							 (shell-command-to-string "which fish") "\n"))
+	(when (string-match "/usr/" item)
+		(setq shell-file-name item)))
 
 ;; GUI
 (setq initial-frame-alist (append '((top . 25)

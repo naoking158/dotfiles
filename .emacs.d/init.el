@@ -9,7 +9,7 @@
 ;; this enables this running method
 ;;   emacs -q -l ~/.debug.emacs.d/{{pkg}}/init.el
 
-(setq exec-profile nil)
+(setq exec-profile t)
 
 (when exec-profile
   (defvar setup-tracker--level 0)
@@ -2442,9 +2442,19 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (python-mode-hook . dap-ui-mode)
    (python-mode-hook . dap-tooltip-mode)))
 
+(setq path-to-mu
+      (cond
+       ((file-exists-p
+         "/usr/local/Cellar/mu/1.6.5/share/emacs/site-lisp/mu/mu4e/")
+        "/usr/local/Cellar/mu/1.6.5/share/emacs/site-lisp/mu/mu4e/")
+       ((file-exists-p
+         "/usr/share/emacs/site-lisp/mu4e")
+        "/usr/share/emacs/site-lisp/mu4e")
+       (t nil)))
+
 (leaf mu4e
-  :when window-system
-  :load-path "/usr/local/Cellar/mu/1.6.5/share/emacs/site-lisp/mu/mu4e/"
+  :when path-to-mu
+  :load-path path-to-mu
   :require t
   :hook (mu4e-headers-mode-hook . (lambda () (visual-line-mode -1)))
   :config
