@@ -891,7 +891,7 @@
                                             '("[^\000-\377]+"))))))
 
 (leaf highlight-indent-guides
-  :diminish
+  :blackout
   :doc "Minor mode to highlight indentation"
   :req "emacs-24.1"
   :url "https://github.com/DarthFennec/highlight-indent-guides"
@@ -1530,7 +1530,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf gcmh
   :ensure t
-  :diminish t
+  :blackout
   :custom (gcmh-verbose . t)
   :hook after-init-hook)
 
@@ -1539,7 +1539,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :tag "builtin"
   ;; :ensure org-plus-contrib
   :ensure t
-  :require ob-async org-tempo  ;; need for org-template
+  :require org-tempo  ;; need for org-template
   :mode "\\.org\\'"
   :hook (org-mode-hook . my/org-mode-hook)
   :advice (:after load-theme my/set-org-face)
@@ -2396,7 +2396,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :global-minor-mode solaire-global-mode)
 
 (leaf skk
-  :disabled t
   :ensure ddskk
   :leaf-defer nil
   :bind (("C-M-j" . skk-undo-kakutei))
@@ -2415,8 +2414,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (skk-inline-show-face . nil)
            (skk-egg-like-newline . t)  ;; skk-kakutei by RET
            (skk-auto-okuri-process . t)
+           (skk-henkan-strict-okuri-precedence . t)
            (skk-auto-insert-paren . t)
            (skk-use-auto-enclose-pair-of-region . t)
+           (skk-sticky-key . ";")
+           (skk-dcomp-activate . t)
            (skk-inline-show-face . '( :foreground "#ECEFF4"
                                       :background "#4C566A"
                                       :inherit 'normal)))

@@ -1262,7 +1262,7 @@ Only in Neotree Buffer:
 
 #+begin_src emacs-lisp
   (leaf highlight-indent-guides
-    :diminish
+    :blackout
     :doc "Minor mode to highlight indentation"
     :req "emacs-24.1"
     :url "https://github.com/DarthFennec/highlight-indent-guides"
@@ -2157,7 +2157,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 #+begin_src emacs-lisp
   (leaf gcmh
     :ensure t
-    :diminish t
+    :blackout
     :custom (gcmh-verbose . t)
     :hook after-init-hook)
 #+end_src
@@ -2174,7 +2174,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :tag "builtin"
     ;; :ensure org-plus-contrib
     :ensure t
-    :require ob-async org-tempo  ;; need for org-template
+    :require org-tempo  ;; need for org-template
     :mode "\\.org\\'"
     :hook (org-mode-hook . my/org-mode-hook)
     :advice (:after load-theme my/set-org-face)
@@ -3298,9 +3298,8 @@ While browsing, remember the following:
 :END:
 
 #+begin_src emacs-lisp
-  
+
   (leaf skk
-    :disabled t
     :ensure ddskk
     :leaf-defer nil
     :bind (("C-M-j" . skk-undo-kakutei))
@@ -3319,18 +3318,21 @@ While browsing, remember the following:
              (skk-inline-show-face . nil)
              (skk-egg-like-newline . t)  ;; skk-kakutei by RET
              (skk-auto-okuri-process . t)
+             (skk-henkan-strict-okuri-precedence . t)
              (skk-auto-insert-paren . t)
              (skk-use-auto-enclose-pair-of-region . t)
+             (skk-sticky-key . ";")
+             (skk-dcomp-activate . t)
              (skk-inline-show-face . '( :foreground "#ECEFF4"
                                         :background "#4C566A"
                                         :inherit 'normal)))
-  
+
     :config
     (leaf ddskk-posframe
       :load-path "~/.emacs.d/elisp/ddskk-posframe/"
       :require t
       :custom (ddskk-posframe-mode . t)))
-  
+
 #+end_src
 
 ** Dap Mode
