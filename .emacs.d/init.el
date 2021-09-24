@@ -2783,6 +2783,11 @@ Interactively, URL defaults to the string looking like a url around point."
   ;; Set the default number of workspaces
   (setq exwm-workspace-number 5)
 
+  ;; Set the screen resolution
+  (require 'exwm-randr)
+  (exwm-randr-enable)
+  (start-process-shell-command "xrandr" nil "xrandr --output HDMI-A-0 --primary --mode 3440x1440 --pos 3840x720 --rotate normal --output HDMI-A-1 --mode 3840x2160 --pos 0x0 --rotate normal --output DisplayPort-0 --off --output DisplayPort-1 --off")
+
   ;; These keys should always pass through to Emacs
   (setq exwm-input-prefix-keys
     '(?\C-x
