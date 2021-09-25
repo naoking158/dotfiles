@@ -2772,8 +2772,10 @@ Interactively, URL defaults to the string looking like a url around point."
 (leaf command-log-mode :ensure t)
 
 (leaf exwm
-  :ensure t
+  :disabled t
+  :ensure t  
   :when (eq 'pgtk window-system)
+  :leaf-defer nil
   ;; When window "class" updates, use it to set the buffer name
   :hook (exwm-update-class-hook . my/exwm-update-class)
   :preface
