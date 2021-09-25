@@ -54,6 +54,11 @@ set -xg localhome /Users/$USER
 set -xg HOST gateway.mdl.cs.tsukuba.ac.jp    # Host Name for GIP
 set -xg MDL ssh-user@$HOST
 
+set -xg OS (uname -r)
+set -xg SYSTEM (uname -s)
+set -xg IS_MANJARO (string match '*MANJARO' $OS)
+set -xg IS_MAC (string match 'Darwin' $SYSTEM)
+
 ################################################################
 # PATH
 ################################################################
@@ -357,7 +362,7 @@ function ja_latex
 end
 
 set MINICONDA (find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1) 
-if test -e $MINICONDA
+if test -n "$MINICONDA"
     eval $MINICONDA/condabin/conda "shell.fish" "hook" $argv | source
 end
 
@@ -383,4 +388,8 @@ if type -q zoxide
 end
 
 # opam configuration
-source /home/naoki/.opam/opam-init/init.fish > /dev/null 2> /dev/null; or true
+# source /home/naoki/.opam/opam-init/init.fish > /dev/null 2> /dev/null; or true
+
+if test -n "$IS_MANJARO"
+		export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+end
