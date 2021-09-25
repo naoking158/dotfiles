@@ -10,8 +10,9 @@
 
 ## dotfiles
 !/.Brewfile
-!/.mbsyncrc
 !/.dir_colors
+!/.latexmkrc
+!/.mbsyncrc
 !/.tmux.conf
 !/.tmux/
 !/.tmux/plugins/
