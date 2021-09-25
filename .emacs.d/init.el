@@ -891,7 +891,7 @@
                                             '("[^\000-\377]+"))))))
 
 (leaf highlight-indent-guides
-  :diminish
+  :blackout
   :doc "Minor mode to highlight indentation"
   :req "emacs-24.1"
   :url "https://github.com/DarthFennec/highlight-indent-guides"
@@ -1530,7 +1530,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf gcmh
   :ensure t
-  :diminish t
+  :blackout
   :custom (gcmh-verbose . t)
   :hook after-init-hook)
 
@@ -1539,7 +1539,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :tag "builtin"
   ;; :ensure org-plus-contrib
   :ensure t
-  :require ob-async org-tempo  ;; need for org-template
+  :require org-tempo  ;; need for org-template
   :mode "\\.org\\'"
   :hook (org-mode-hook . my/org-mode-hook)
   :advice (:after load-theme my/set-org-face)
@@ -2396,7 +2396,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :global-minor-mode solaire-global-mode)
 
 (leaf skk
-  :disabled t
   :ensure ddskk
   :leaf-defer nil
   :bind (("C-M-j" . skk-undo-kakutei))
@@ -2415,8 +2414,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (skk-inline-show-face . nil)
            (skk-egg-like-newline . t)  ;; skk-kakutei by RET
            (skk-auto-okuri-process . t)
+           (skk-henkan-strict-okuri-precedence . t)
            (skk-auto-insert-paren . t)
            (skk-use-auto-enclose-pair-of-region . t)
+           (skk-sticky-key . ";")
+           (skk-dcomp-activate . t)
            (skk-inline-show-face . '( :foreground "#ECEFF4"
                                       :background "#4C566A"
                                       :inherit 'normal)))
@@ -2768,6 +2770,71 @@ Interactively, URL defaults to the string looking like a url around point."
      ("u" . pdf-annot-add-underline-markup-annotation))))
 
 (leaf command-log-mode :ensure t)
+
+(leaf exwm
+  :disabled t
+  :ensure t  
+  :when (eq 'pgtk window-system)
+  :leaf-defer nil
+  ;; When window "class" updates, use it to set the buffer name
+  :hook (exwm-update-class-hook . my/exwm-update-class)
+  :preface
+  (defun my/exwm-update-class ()
+    (exwm-workspace-rename-buffer exwm-class-name))
+  :config
+  ;; Set the default number of workspaces
+  (setq exwm-workspace-number 5)
+
+  ;; Set the screen resolution
+  (require 'exwm-randr)
+  (exwm-randr-enable)
+  (start-process-shell-command "xrandr" nil "xrandr --output HDMI-A-0 --primary --mode 3440x1440 --pos 3840x720 --rotate normal --output HDMI-A-1 --mode 3840x2160 --pos 0x0 --rotate normal --output DisplayPort-0 --off --output DisplayPort-1 --off")
+
+  ;; These keys should always pass through to Emacs
+  (setq exwm-input-prefix-keys
+    '(?\C-x
+      ?\C-u
+      ?\C-h
+      ?\M-x
+      ?\M-`
+      ?\M-&
+      ?\M-:
+      ?\C-\M-j  ;; Buffer list
+      ?\C-\ ))  ;; Ctrl+Space
+
+  ;; Ctrl+Q will enable the next key to be sent directly
+  (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
+
+  ;; Set up global key bindings.  These always work, no matter the input state!
+  ;; Keep in mind that changing this list after EXWM initializes has no effect.
+  (setq exwm-input-global-keys
+        `(
+          ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
+          ([?\s-r] . exwm-reset)
+
+          ;; Move between windows
+          ([s-left] . windmove-left)
+          ([s-right] . windmove-right)
+          ([s-up] . windmove-up)
+          ([s-down] . windmove-down)
+
+          ;; Launch applications via shell command
+          ([?\s-&] . (lambda (command)
+                       (interactive (list (read-shell-command "$ ")))
+                       (start-process-shell-command command nil command)))
+
+          ;; Switch workspace
+          ([?\s-w] . exwm-workspace-switch)
+
+          ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
+          ,@(mapcar (lambda (i)
+                      `(,(kbd (format "s-%d" i)) .
+                        (lambda ()
+                          (interactive)
+                          (exwm-workspace-switch-create ,i))))
+                    (number-sequence 0 9))))
+
+  (exwm-enable))
 
 (defun my/update-ns-appearance (sym-theme &rest args)
   (let* ((str-theme (symbol-name sym-theme))
