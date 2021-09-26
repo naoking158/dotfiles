@@ -57,6 +57,7 @@
 ## Linux
 !/.config/.i3/
 !/.config/.i3/**
+!/.config/mimeapps.list
 !/.config/polybar/
 !/.config/polybar/**
 
