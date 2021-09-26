@@ -254,43 +254,75 @@ function mdlrsyncfrom
 end
 
 function backup_homedir
-    set basedir /Volumes/NSSD/backup
+		echo \n"+ ---------------------------------------------------------------- +"
+		echo "+ -------- Backup procedure is started!!!"
+		echo "+ ---------------------------------------------------------------- +"\n
 
-    echo \n"/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/"
-    echo "+ Set location where the HOME dirs will be backup. +"
-    echo "/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/"
-    echo \n"The HOME dirs will now be backup into this location:"\n
-    echo "$basedir"\n
+		if test -n "$IS_MAC"
+        set basedir /Volumes/NSSD/backup/Mac
+		else if test -n "$IS_MANJARO"
+				set basedir /Volumes/NSSD/backup/Manjaro
+		else
+				set basedir /Volumes/NSSD/backup/$OS
+    end
+
+		set backup_dirs $HOME/Downloads $HOME/src $HOME/.dotfiles $HOME/drive
+
+    echo "+ -------- These dirs will be backup:"
+		echo \n"$backup_dirs"\n
+		read -p '
+        echo "  - Press ENTER to confirm the location"
+        echo "  - Or specify differents location below"
+        echo "    (e.g., $HOME/foo $HOME/bar)"\n
+				echo "Backup dirs: "
+        ' -S backup_location
+		if test -n "$backup_location"
+        set backup_dirs $backup_location
+    end
+
+		echo \n"+ -------- Backup destination is: "
+    echo \n"$basedir"\n
     read -p '
         echo "  - Press ENTER to confirm the location"
         echo "  - Or specify differents location below"
         echo "    (e.g., /Volumes/otherHDD/otherDir)"\n
         echo "Backup into: "
         ' -S input_location
-
-    if test -n $input_location
+    if test -n "$input_location"
         set basedir $input_location
     end
-
-    set latestbackup (find $basedir -maxdepth 2 -type d -name 'backup-*' | sort | tail -n 1)
+		
     set path_to_backupdir $basedir/backup-(date +%Y%m%d-%H%M%S)
-
-    if test -z $latestbackup
-        echo "No latest backup is in $basedir"\n
-        set mes "Conduct full backup? [y/N/test] "
-    else
-        echo "Latest backup is found in $latestbackup"\n
-        set mes "Conduct incremental backup to $path_to_backupdir? [y/N/test] "
+		if test -e "$basedir"
+				set latestbackup (find $basedir -maxdepth 2 -type d -name 'backup-*' | sort | tail -n 1)
     end
 
-    read -P $mes -l confirm
+    if test -n "$latestbackup"
+				echo \n"+ -------- Latest backup is found in $latestbackup"
+        echo \n"Execute incremental backup to: "
+		else
+        echo \n"+ -------- No latest backup is in $basedir"
+        echo \n"Execute full backup to: "
+    end
+    echo \n"$path_to_backupdir"
 
+		echo \n"+ ---------------------------------------------------------------- +"
+		echo "+ -------- Final confirmation"
+		echo "+ ---------------------------------------------------------------- +"\n
+		read -p '
+    echo " [yes]  : Proceed"
+    echo " [no]   : Cancel"
+    echo " [test] : Dry run"
+		echo \n"Choose one: "
+    ' -S confirm
+    
     switch $confirm
-        case Y y
-            rsync -avh --link-dest=$latestbackup $HOME/ $path_to_backupdir
+        case 'yes'
+						mkdir -p $path_to_backupdir
+            rsync -avh --link-dest=$latestbackup $backup_dirs $path_to_backupdir
         case 'test'
-            rsync -avh --dry-run --stats --link-dest=$latestbackup $HOME/ $path_to_backupdir
-        case '' N n
+            rsync -avh --dry-run --stats --link-dest=$latestbackup $backup_dirs $path_to_backupdir
+        case '' 'no'
             command echo \n"Backup is canceled."
     end
 end
