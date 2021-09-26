@@ -531,89 +531,90 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :END:
 
 #+begin_src emacs-lisp
-  
-  (leaf font
-    :when window-system
-    :leaf-defer nil
-    :hook (after-init-hook . (lambda () (my/set-font 14)))
-    :advice (:after load-theme my/set-font-weight-after-load-theme)
-    :preface
-    (setq-default text-scale-remap-header-line t)
-  
-    (defun my/set-font (&optional font-size)
-      (interactive)
-      (let ((font-size (if font-size font-size
-                         (read-number "Fontsize: " 14))))
-  
-        ;; ascii
-        (set-face-attribute 'default nil
-                            :font "JetBrains Mono"
-                            :height (* font-size 10))
-  
-        ;; Set the fixed pitch face
-        (set-face-attribute 'fixed-pitch nil
-                            :font "JetBrains Mono"
-                            :height (* font-size 10))
-  
-        ;; Set the variable pitch face
-        (set-face-attribute 'variable-pitch nil
-                            :font "Iosevka Aile"
-                            :height (* font-size 10))
-  
-        ;; japanese
-        (set-fontset-font t 'unicode
-                          (font-spec
-                           :family "Noto Sans CJK JP" 
-                           :height (* font-size 10))
-                          nil 'append))
-  
-      ;; Ligature for Fira Code or JetBrains Mono
-      (let ((alist
-             '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
-               (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
-               (36 . ".\\(?:>\\)")
-               (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
-               (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
-               (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
-               (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
-               (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
-               (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
-               (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
-               (48 . ".\\(?:x[a-zA-Z]\\)")
-               (58 . ".\\(?:::\\|[:=]\\)")
-               (59 . ".\\(?:;;\\|;\\)")
-               (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
-               (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
-               (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
-               (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
-               (91 . ".\\(?:]\\)")
-               (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
-               (94 . ".\\(?:=\\)")
-               (119 . ".\\(?:ww\\)")
-               (123 . ".\\(?:-\\)")
-               (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
-               (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
-        (dolist (char-regexp alist)
-          (set-char-table-range composition-function-table (car char-regexp)
-                                `([,(cdr char-regexp) 0 font-shape-gstring])))))
-  
-    (defun my/set-font-weight (&optional weight)
-      (interactive)
-      (let ((weight (if weight weight
-                      (intern (completing-read "Choose weight:"
-                                               '(light normal bold))))))
-        (set-face-attribute 'default nil :weight weight)
-        (set-face-attribute 'fixed-pitch nil :weight weight)
-        (set-face-attribute 'variable-pitch nil :weight weight)))
-  
-    (defun my/set-font-weight-after-load-theme (&rest args)
-      (let* ((str-theme (symbol-name (car args)))
-             (weight (cond
-                      ((string-match "\\(light\\|operandi\\)" str-theme) 'normal)
-                      ((and (string-match "bespoke" str-theme)
-                            (eq 'light bespoke-set-theme)) 'normal)
-                      (t 'light))))
-        (my/set-font-weight weight))))
+
+	(leaf font
+		:when window-system
+		:leaf-defer nil
+		:hook (after-init-hook . (lambda () (my/set-font 14)))
+		:advice (:after load-theme my/set-font-weight-after-load-theme)
+		:preface
+		(setq-default text-scale-remap-header-line t)
+
+		(defun my/set-font (&optional font-size)
+			(interactive)
+			(let ((font-size (if font-size font-size
+												 (read-number "Fontsize: " 14))))
+
+				;; ascii
+				(set-face-attribute 'default nil
+														:font "JetBrains Mono"
+														:height (* font-size 10))
+
+				;; Set the fixed pitch face
+				(set-face-attribute 'fixed-pitch nil
+														:font "JetBrains Mono"
+														:height (* font-size 10))
+
+				;; Set the variable pitch face
+				(set-face-attribute 'variable-pitch nil
+														:font "Iosevka Aile"
+														:height (* font-size 10))
+
+				;; japanese
+				(set-fontset-font t 'unicode
+													(font-spec
+													 :family "Noto Sans CJK JP"
+													 :height (* font-size 10))
+													nil 'append)
+				(set-fontset-font nil '(#x1F000 . #x1FAFF) "Noto Color Emoji"))
+
+			;; Ligature for Fira Code or JetBrains Mono
+			(let ((alist
+						 '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
+							 (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
+							 (36 . ".\\(?:>\\)")
+							 (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
+							 (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
+							 (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
+							 (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
+							 (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
+							 (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
+							 (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
+							 (48 . ".\\(?:x[a-zA-Z]\\)")
+							 (58 . ".\\(?:::\\|[:=]\\)")
+							 (59 . ".\\(?:;;\\|;\\)")
+							 (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
+							 (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
+							 (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
+							 (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
+							 (91 . ".\\(?:]\\)")
+							 (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
+							 (94 . ".\\(?:=\\)")
+							 (119 . ".\\(?:ww\\)")
+							 (123 . ".\\(?:-\\)")
+							 (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
+							 (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
+				(dolist (char-regexp alist)
+					(set-char-table-range composition-function-table (car char-regexp)
+																`([,(cdr char-regexp) 0 font-shape-gstring])))))
+
+		(defun my/set-font-weight (&optional weight)
+			(interactive)
+			(let ((weight (if weight weight
+											(intern (completing-read "Choose weight:"
+																							 '(light normal bold))))))
+				(set-face-attribute 'default nil :weight weight)
+				(set-face-attribute 'fixed-pitch nil :weight weight)
+				(set-face-attribute 'variable-pitch nil :weight weight)))
+
+		(defun my/set-font-weight-after-load-theme (&rest args)
+			(let* ((str-theme (symbol-name (car args)))
+						 (weight (cond
+											((string-match "\\(light\\|operandi\\)" str-theme) 'normal)
+											((and (string-match "bespoke" str-theme)
+														(eq 'light bespoke-set-theme)) 'normal)
+											(t 'light))))
+				(my/set-font-weight weight))))
 #+end_src
 
 #+RESULTS:
@@ -2164,144 +2165,142 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 
 * Org Mode
 ** Org Configuration
-:PROPERTIES:
-:ID:       D58073B1-A580-4070-82B4-063E2CBD8324
-:END:
+	 :PROPERTIES:
+	 :ID:       702a5da5-bea0-40e1-805c-f950b76d4012
+	 :END:
 
-#+begin_src emacs-lisp
-  (leaf org
-    :doc "Export Framework for Org Mode"
-    :tag "builtin"
-    ;; :ensure org-plus-contrib
-    :ensure t
-    :require org-tempo  ;; need for org-template
-    :mode "\\.org\\'"
-    :hook (org-mode-hook . my/org-mode-hook)
-    :advice (:after load-theme my/set-org-face)
-    :custom
-    ((org-directory . "~/org/")
-     (org-ellipsis . " ▼ ")
-  
-     (org-hide-emphasis-markers . t)
-     (org-src-window-setup . 'current-window)
-     (org-fontify-quote-and-verse-blocks . t)
-     (org-hide-block-startup . nil)
-     (org-startup-folded . 'content)
-  
-     (org-adapt-indentation . t)
-     (org-indent-indentation-per-level . 1)
-     (org-startup-indented . t)
-     (org-use-speed-commands . t)
-     (org-enforce-todo-dependencies . t)
-     (org-log-done . t)
-     (org-return-follows-link . t)
-     (org-highlight-latex-and-related . '(latex script entities))
-     (org-babel-load-languages . '((emacs-lisp . t)
-                                   (python . t)
-                                   (latex . t)
-                                   (shell . t)))
-     (org-confirm-babel-evaluate . nil)
-     (org-catch-invisible-edits . 'show)
-     (org-preview-latex-image-directory . "~/tmp/ltximg/")
-     (search-whitespace-regexp . ".*?")
-     (isearch-lazy-count . t)
-     (lazy-count-prefix-format . " (%s/%s) ")
-     (isearch-yank-on-move . 'shift)
-     (isearch-allow-scroll . 'unlimited)
-     (org-show-notification-handler . nil)
-     (org-structure-template-alist . '(("sh" . "src shell")
-                                       ("c" . "center")
-                                       ("C" . "comment")
-                                       ("el" . "src emacs-lisp")
-                                       ("E" . "export")
-                                       ("ht" . "export html")
-                                       ("tex" . "export latex")
-                                       ("q" . "quote")
-                                       ("s" . "src")
-                                       ("py" . "src python :session py :async")
-                                       ("d" . "definition")
-                                       ("t" . "theorem")
-                                       ("mc" . "quoting")
-                                       ("mq" . "question")
-                                       ("mt" . "todo")
-                                       ("ms" . "summary"))))
-  
-    :preface
-    (defun my/org-mode-hook ()
-      (add-hook 'completion-at-point-functions
-                'pcomplete-completions-at-point nil t))
-  
-    (when window-system
-      ;; Make sure org-indent face is available
-      (require 'org-indent)
-  
-      (create-fontset-from-ascii-font "Iosevka Aile-14"
-                                      nil
-                                      "myoutline")
-      (set-fontset-font "fontset-myoutline" 'unicode
-                        "Noto Sans CJK JP-14"
-                        nil 'append)
-  
-      (defun my/set-org-face (&rest sym-theme)
-        ;; Increase the size of various headings
-        (interactive)
-        (set-face-attribute 'org-document-title nil
-                            :font "Iosevka Aile" :weight 'bold :height 1.6)
-        (set-face-attribute 'org-level-1 nil
-                            :font "fontset-myoutline"
-                            :weight 'bold
-                            :slant 'normal
-                            :height 1.35)
-        (dolist (face '((org-level-2 . 1.3)
-                        (org-level-3 . 1.2)
-                        (org-level-4 . 1.15)
-                        (org-level-5 . 1.1)
-                        (org-level-6 . 1.1)
-                        (org-level-7 . 1.1)
-                        (org-level-8 . 1.1)))
-          (set-face-attribute (car face) nil
-                              :font "fontset-myoutline"
-                              :weight 'normal
-                              :slant 'normal
-                              :height (cdr face)))
-  
-        ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-        (set-face-attribute 'org-block nil						:inherit 'fixed-pitch :foreground nil)
-        (set-face-attribute 'org-table nil						:inherit 'fixed-pitch)
-        (set-face-attribute 'org-formula nil					:inherit 'fixed-pitch)
-        (set-face-attribute 'org-code nil							:inherit '(shadow fixed-pitch))
-        (set-face-attribute 'org-indent t							:inherit '(org-hide fixed-pitch))
-        (set-face-attribute 'org-verbatim nil					:inherit '(shadow fixed-pitch))
-        (set-face-attribute 'org-special-keyword nil	:inherit '(font-lock-comment-face fixed-pitch))
-        (set-face-attribute 'org-meta-line nil				:inherit '(font-lock-comment-face fixed-pitch))
-        (set-face-attribute 'org-checkbox nil					:inherit 'fixed-pitch)
-  
-        ;; Get rid of the background on column views
-        (set-face-attribute 'org-column nil :background nil)
-        (set-face-attribute 'org-column-title nil :background nil))
-  
-      (setq org-format-latex-options
-            '( :foreground default
-               :background default
-               :scale 1.7
-               :html-foreground "Black"
-               :html-background "Transparent"
-               :html-scale 1.0
-               :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
-  
-      (when (fboundp 'mac-toggle-input-method)
-        (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii)))
-  
-    :config
-    (leaf ob-async :ensure t)
-  
-    (leaf org-fragtog
-      :ensure t
-      :hook (org-mode-hook . org-fragtog-mode)))
-#+end_src
+ #+begin_src emacs-lisp
+	 (leaf org
+		 :doc "Export Framework for Org Mode"
+		 :tag "builtin"
+		 ;; :ensure org-plus-contrib
+		 :ensure t
+		 :after jupyter
+		 :require org-tempo  ;; need for org-template
+		 :mode "\\.org\\'"
+		 :hook (org-mode-hook . my/org-mode-hook)
+		 :advice (:after load-theme my/set-org-face)
+		 :custom
+		 ((org-directory . "~/org/")
+			(org-ellipsis . " ▼ ")
 
-#+RESULTS:
-: org
+			(org-hide-emphasis-markers . t)
+			(org-src-window-setup . 'current-window)
+			(org-fontify-quote-and-verse-blocks . t)
+			(org-hide-block-startup . nil)
+			(org-startup-folded . 'content)
+
+			(org-adapt-indentation . t)
+			(org-indent-indentation-per-level . 1)
+			(org-startup-indented . t)
+			(org-use-speed-commands . t)
+			(org-enforce-todo-dependencies . t)
+			(org-log-done . t)
+			(org-return-follows-link . t)
+			(org-highlight-latex-and-related . '(latex script entities))
+			(org-babel-load-languages . '((emacs-lisp . t)
+																		(python . t)
+																		(jupyter . t)
+																		(latex . t)
+																		(shell . t)))
+			(org-confirm-babel-evaluate . nil)
+			(org-catch-invisible-edits . 'show)
+			(org-preview-latex-image-directory . "~/tmp/ltximg/")
+			(search-whitespace-regexp . ".*?")
+			(isearch-lazy-count . t)
+			(lazy-count-prefix-format . " (%s/%s) ")
+			(isearch-yank-on-move . 'shift)
+			(isearch-allow-scroll . 'unlimited)
+			(org-show-notification-handler . nil)
+			(org-structure-template-alist . '(("sh" . "src shell")
+																				("c" . "center")
+																				("C" . "comment")
+																				("el" . "src emacs-lisp")
+																				("E" . "export")
+																				("ht" . "export html")
+																				("tex" . "export latex")
+																				("q" . "quote")
+																				("s" . "src")
+																				("py" . "src python :session py :async yes")
+																				("jp" . "src jupyter-python :session py :async yes")
+																				("d" . "definition")
+																				("t" . "theorem")
+																				("mc" . "quoting")
+																				("mq" . "question")
+																				("mt" . "todo")
+																				("ms" . "summary"))))
+
+		 :preface
+		 (defun my/org-mode-hook ()
+			 (add-hook 'completion-at-point-functions
+								 'pcomplete-completions-at-point nil t))
+
+		 (when window-system
+			 ;; Make sure org-indent face is available
+			 (require 'org-indent)
+
+			 (create-fontset-from-ascii-font "Iosevka Aile-14"
+																			 nil
+																			 "myoutline")
+			 (set-fontset-font "fontset-myoutline" 'unicode
+												 "Noto Sans CJK JP-14"
+												 nil 'append)
+
+			 (defun my/set-org-face (&rest sym-theme)
+				 ;; Increase the size of various headings
+				 (interactive)
+				 (set-face-attribute 'org-document-title nil
+														 :font "Iosevka Aile" :weight 'bold :height 1.6)
+				 (set-face-attribute 'org-level-1 nil
+														 :font "fontset-myoutline"
+														 :weight 'bold
+														 :slant 'normal
+														 :height 1.35)
+				 (dolist (face '((org-level-2 . 1.3)
+												 (org-level-3 . 1.2)
+												 (org-level-4 . 1.15)
+												 (org-level-5 . 1.1)
+												 (org-level-6 . 1.1)
+												 (org-level-7 . 1.1)
+												 (org-level-8 . 1.1)))
+					 (set-face-attribute (car face) nil
+															 :font "fontset-myoutline"
+															 :weight 'normal
+															 :slant 'normal
+															 :height (cdr face)))
+
+				 ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+				 (set-face-attribute 'org-block nil						:inherit 'fixed-pitch :foreground nil)
+				 (set-face-attribute 'org-table nil						:inherit 'fixed-pitch)
+				 (set-face-attribute 'org-formula nil					:inherit 'fixed-pitch)
+				 (set-face-attribute 'org-code nil							:inherit '(shadow fixed-pitch))
+				 (set-face-attribute 'org-indent t							:inherit '(org-hide fixed-pitch))
+				 (set-face-attribute 'org-verbatim nil					:inherit '(shadow fixed-pitch))
+				 (set-face-attribute 'org-special-keyword nil	:inherit '(font-lock-comment-face fixed-pitch))
+				 (set-face-attribute 'org-meta-line nil				:inherit '(font-lock-comment-face fixed-pitch))
+				 (set-face-attribute 'org-checkbox nil					:inherit 'fixed-pitch)
+
+				 ;; Get rid of the background on column views
+				 (set-face-attribute 'org-column nil :background nil)
+				 (set-face-attribute 'org-column-title nil :background nil))
+
+			 (setq org-format-latex-options
+						 '( :foreground default
+								:background default
+								:scale 1.7
+								:html-foreground "Black"
+								:html-background "Transparent"
+								:html-scale 1.0
+								:matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
+
+			 (when (fboundp 'mac-toggle-input-method)
+				 (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii)))
+
+		 :config
+		 (leaf org-fragtog
+			 :ensure t
+			 :hook (org-mode-hook . org-fragtog-mode)))
+ #+end_src
 
 ** Org Agenda
 :PROPERTIES:
@@ -3841,7 +3840,7 @@ While browsing, remember the following:
             ([s-down] . windmove-down)
 
             ;; Launch applications via shell command
-            ([?\s-&] . (lambda (command)
+            ([?\C-&] . (lambda (command)
                          (interactive (list (read-shell-command "$ ")))
                          (start-process-shell-command command nil command)))
 
@@ -3859,6 +3858,20 @@ While browsing, remember the following:
     (exwm-enable))
 #+end_src
 
+** Emacs Jupyter
+:PROPERTIES:
+:ID:       4f42d25d-a7e3-4a7b-9a39-975f1d79631c
+:END:
+
+- Disabling native compilation is for avoid the issue: https://github.com/nnicandro/emacs-jupyter/issues/297#issuecomment-778924175
+
+:PROPERTIES:
+:ID:       63281654-074e-4602-b527-36a5afc3c770
+:END:
+#+begin_src emacs-lisp
+  (setq comp-deferred-compilation-deny-list (list "jupyter"))
+  (leaf jupyter :ensure t)
+#+end_src
 
 * Draft
 :PROPERTIES:
