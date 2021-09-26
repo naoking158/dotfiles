@@ -2718,6 +2718,7 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
   (org-msg-mode))
 
 (leaf xwwp
+  :when (eq 'darwin window-system)
   :ensure t
   :custom (browse-url-browser-function . 'xwidget-webkit-browse-url)
   :bind (("C-c s" . xwwp)
@@ -2746,9 +2747,63 @@ Interactively, URL defaults to the string looking like a url around point."
                (switch-to-buffer (xwidget-buffer
                                   (xwidget-webkit-current-session))))))))
 
-;; (leaf webkit
-;;   :load-path "~/.emacs.d/elisp/emacs-webkit/"
-;;   :require t webkit-ace webkit-dark)
+(leaf webkit
+  :when (eq 'pgtk window-system)
+  :load-path "~/.emacs.d/elisp/emacs-webkit/"
+  :require t webkit-ace webkit-dark
+  ;; :init
+  ;; ;; This must be set before webkit.el is loaded so certain hooks aren't installed
+  ;; (setq webkit-own-window t)
+  :bind ("C-c s" . webkit)
+  :config
+  ;; If you don't care so much about privacy and want to give your data to google
+  (setq webkit-search-prefix "https://google.com/search?q=") 
+
+  ;; Specify a different set of characters use in the link hints
+  ;; For example the following are more convienent if you use dvorak
+  (setq webkit-ace-chars "asdfjkl;")
+
+  ;; If you want history saved in a different place or
+  ;; Set to `nil' to if you don't want history saved to file (will stay in memory)
+  (setq webkit-history-file
+        (expand-file-name "webkit-history" no-littering-etc-directory))
+
+  ;; If you want cookies saved in a different place or
+  ;; Set to `nil' to if you don't want cookies saved
+  (setq webkit-cookie-file
+        (expand-file-name "cookies" no-littering-etc-directory)) 
+
+  ;; Set webkit as the default browse-url browser
+  (setq browse-url-browser-function 'webkit-browse-url)
+
+  ;; Force webkit to always open a new session instead of reusing a current one
+  (setq webkit-browse-url-force-new t)
+
+  ;; Globally disable javascript
+  ;; (add-hook 'webkit-new-hook #'webkit-enable-javascript)
+
+  ;; Override the "loading:" mode line indicator with an icon from `all-the-icons.el'
+  ;; You could also use a unicode icon like ↺
+  (defun webkit--display-progress (progress)
+    (setq webkit--progress-formatted
+          (if (equal progress 100.0)
+              ""
+            (format "%s%.0f%%  " (all-the-icons-faicon "spinner") progress)))
+    (force-mode-line-update))
+
+  ;; Set action to be taken on a download request. Predefined actions are
+  ;; `webkit-download-default', `webkit-download-save', and `webkit-download-open'
+  ;; where the save function saves to the download directory, the open function
+  ;; opens in a temp buffer and the default function interactively prompts.
+  (setq webkit-download-action-alist '(("\\.pdf\\'" . webkit-download-open)
+                                       ("\\.png\\'" . webkit-download-save)
+                                       (".*" . webkit-download-default)))
+
+  ;; Globally use a proxy
+  ;; (add-hook 'webkit-new-hook (lambda () (webkit-set-proxy "socks://localhost:8000")))
+
+  ;; Globally use the simple dark mode
+  (setq webkit-dark-mode t))
 
 (leaf pdf-tools
   :ensure t
