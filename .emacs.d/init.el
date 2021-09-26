@@ -1534,136 +1534,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :custom (gcmh-verbose . t)
   :hook after-init-hook)
 
-(leaf org
-  :doc "Export Framework for Org Mode"
-  :tag "builtin"
-  ;; :ensure org-plus-contrib
-  :ensure t
-  :require org-tempo  ;; need for org-template
-  :mode "\\.org\\'"
-  :hook (org-mode-hook . my/org-mode-hook)
-  :advice (:after load-theme my/set-org-face)
-  :custom
-  ((org-directory . "~/org/")
-   (org-ellipsis . " ▼ ")
-
-   (org-hide-emphasis-markers . t)
-   (org-src-window-setup . 'current-window)
-   (org-fontify-quote-and-verse-blocks . t)
-   (org-hide-block-startup . nil)
-   (org-startup-folded . 'content)
-
-   (org-adapt-indentation . t)
-   (org-indent-indentation-per-level . 1)
-   (org-startup-indented . t)
-   (org-use-speed-commands . t)
-   (org-enforce-todo-dependencies . t)
-   (org-log-done . t)
-   (org-return-follows-link . t)
-   (org-highlight-latex-and-related . '(latex script entities))
-   (org-babel-load-languages . '((emacs-lisp . t)
-                                 (python . t)
-                                 (latex . t)
-                                 (shell . t)))
-   (org-confirm-babel-evaluate . nil)
-   (org-catch-invisible-edits . 'show)
-   (org-preview-latex-image-directory . "~/tmp/ltximg/")
-   (search-whitespace-regexp . ".*?")
-   (isearch-lazy-count . t)
-   (lazy-count-prefix-format . " (%s/%s) ")
-   (isearch-yank-on-move . 'shift)
-   (isearch-allow-scroll . 'unlimited)
-   (org-show-notification-handler . nil)
-   (org-structure-template-alist . '(("sh" . "src shell")
-                                     ("c" . "center")
-                                     ("C" . "comment")
-                                     ("el" . "src emacs-lisp")
-                                     ("E" . "export")
-                                     ("ht" . "export html")
-                                     ("tex" . "export latex")
-                                     ("q" . "quote")
-                                     ("s" . "src")
-                                     ("py" . "src python :session py :async")
-                                     ("d" . "definition")
-                                     ("t" . "theorem")
-                                     ("mc" . "quoting")
-                                     ("mq" . "question")
-                                     ("mt" . "todo")
-                                     ("ms" . "summary"))))
-
-  :preface
-  (defun my/org-mode-hook ()
-    (add-hook 'completion-at-point-functions
-              'pcomplete-completions-at-point nil t))
-
-  (when window-system
-    ;; Make sure org-indent face is available
-    (require 'org-indent)
-
-    (create-fontset-from-ascii-font "Iosevka Aile-14"
-                                    nil
-                                    "myoutline")
-    (set-fontset-font "fontset-myoutline" 'unicode
-                      "Noto Sans CJK JP-14"
-                      nil 'append)
-
-    (defun my/set-org-face (&rest sym-theme)
-      ;; Increase the size of various headings
-      (interactive)
-      (set-face-attribute 'org-document-title nil
-                          :font "Iosevka Aile" :weight 'bold :height 1.6)
-      (set-face-attribute 'org-level-1 nil
-                          :font "fontset-myoutline"
-                          :weight 'bold
-                          :slant 'normal
-                          :height 1.35)
-      (dolist (face '((org-level-2 . 1.3)
-                      (org-level-3 . 1.2)
-                      (org-level-4 . 1.15)
-                      (org-level-5 . 1.1)
-                      (org-level-6 . 1.1)
-                      (org-level-7 . 1.1)
-                      (org-level-8 . 1.1)))
-        (set-face-attribute (car face) nil
-                            :font "fontset-myoutline"
-                            :weight 'normal
-                            :slant 'normal
-                            :height (cdr face)))
-
-      ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-      (set-face-attribute 'org-block nil						:inherit 'fixed-pitch :foreground nil)
-      (set-face-attribute 'org-table nil						:inherit 'fixed-pitch)
-      (set-face-attribute 'org-formula nil					:inherit 'fixed-pitch)
-      (set-face-attribute 'org-code nil							:inherit '(shadow fixed-pitch))
-      (set-face-attribute 'org-indent t							:inherit '(org-hide fixed-pitch))
-      (set-face-attribute 'org-verbatim nil					:inherit '(shadow fixed-pitch))
-      (set-face-attribute 'org-special-keyword nil	:inherit '(font-lock-comment-face fixed-pitch))
-      (set-face-attribute 'org-meta-line nil				:inherit '(font-lock-comment-face fixed-pitch))
-      (set-face-attribute 'org-checkbox nil					:inherit 'fixed-pitch)
-
-      ;; Get rid of the background on column views
-      (set-face-attribute 'org-column nil :background nil)
-      (set-face-attribute 'org-column-title nil :background nil))
-
-    (setq org-format-latex-options
-          '( :foreground default
-             :background default
-             :scale 1.7
-             :html-foreground "Black"
-             :html-background "Transparent"
-             :html-scale 1.0
-             :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
-
-    (when (fboundp 'mac-toggle-input-method)
-      (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii)))
-
-  :config
-  (leaf ob-async :ensure t)
-
-  (leaf org-fragtog
-    :ensure t
-    :hook (org-mode-hook . org-fragtog-mode)))
-
 (leaf org-agenda
   :after org
   :require t org-habit org-capture
@@ -2874,7 +2744,7 @@ Interactively, URL defaults to the string looking like a url around point."
           ([s-down] . windmove-down)
 
           ;; Launch applications via shell command
-          ([?\s-&] . (lambda (command)
+          ([?\C-&] . (lambda (command)
                        (interactive (list (read-shell-command "$ ")))
                        (start-process-shell-command command nil command)))
 
@@ -2890,6 +2760,9 @@ Interactively, URL defaults to the string looking like a url around point."
                     (number-sequence 0 9))))
 
   (exwm-enable))
+
+(setq comp-deferred-compilation-deny-list (list "jupyter"))
+(leaf jupyter :ensure t)
 
 (defun my/update-ns-appearance (sym-theme &rest args)
   (let* ((str-theme (symbol-name sym-theme))

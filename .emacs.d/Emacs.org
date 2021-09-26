@@ -2163,7 +2163,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 #+end_src
 
 * Org Mode
-** Org Configuration
+** COMMENT Org Configuration
 :PROPERTIES:
 :ID:       D58073B1-A580-4070-82B4-063E2CBD8324
 :END:
@@ -2181,13 +2181,13 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :custom
     ((org-directory . "~/org/")
      (org-ellipsis . " ▼ ")
-  
+
      (org-hide-emphasis-markers . t)
      (org-src-window-setup . 'current-window)
      (org-fontify-quote-and-verse-blocks . t)
      (org-hide-block-startup . nil)
      (org-startup-folded . 'content)
-  
+
      (org-adapt-indentation . t)
      (org-indent-indentation-per-level . 1)
      (org-startup-indented . t)
@@ -2198,6 +2198,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
      (org-highlight-latex-and-related . '(latex script entities))
      (org-babel-load-languages . '((emacs-lisp . t)
                                    (python . t)
+                                   (jupyter . t)
                                    (latex . t)
                                    (shell . t)))
      (org-confirm-babel-evaluate . nil)
@@ -2218,30 +2219,31 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                                        ("tex" . "export latex")
                                        ("q" . "quote")
                                        ("s" . "src")
-                                       ("py" . "src python :session py :async")
+                                       ("py" . "src python :session py :async yes")
+                                       ("jp" . "src jupyter-python :session py :async yes")
                                        ("d" . "definition")
                                        ("t" . "theorem")
                                        ("mc" . "quoting")
                                        ("mq" . "question")
                                        ("mt" . "todo")
                                        ("ms" . "summary"))))
-  
+
     :preface
     (defun my/org-mode-hook ()
       (add-hook 'completion-at-point-functions
                 'pcomplete-completions-at-point nil t))
-  
+
     (when window-system
       ;; Make sure org-indent face is available
       (require 'org-indent)
-  
+
       (create-fontset-from-ascii-font "Iosevka Aile-14"
                                       nil
                                       "myoutline")
       (set-fontset-font "fontset-myoutline" 'unicode
                         "Noto Sans CJK JP-14"
                         nil 'append)
-  
+
       (defun my/set-org-face (&rest sym-theme)
         ;; Increase the size of various headings
         (interactive)
@@ -2264,7 +2266,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                               :weight 'normal
                               :slant 'normal
                               :height (cdr face)))
-  
+
         ;; Ensure that anything that should be fixed-pitch in Org files appears that way
         (set-face-attribute 'org-block nil						:inherit 'fixed-pitch :foreground nil)
         (set-face-attribute 'org-table nil						:inherit 'fixed-pitch)
@@ -2275,11 +2277,11 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
         (set-face-attribute 'org-special-keyword nil	:inherit '(font-lock-comment-face fixed-pitch))
         (set-face-attribute 'org-meta-line nil				:inherit '(font-lock-comment-face fixed-pitch))
         (set-face-attribute 'org-checkbox nil					:inherit 'fixed-pitch)
-  
+
         ;; Get rid of the background on column views
         (set-face-attribute 'org-column nil :background nil)
         (set-face-attribute 'org-column-title nil :background nil))
-  
+
       (setq org-format-latex-options
             '( :foreground default
                :background default
@@ -2288,13 +2290,11 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                :html-background "Transparent"
                :html-scale 1.0
                :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
-  
+
       (when (fboundp 'mac-toggle-input-method)
         (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii)))
-  
+
     :config
-    (leaf ob-async :ensure t)
-  
     (leaf org-fragtog
       :ensure t
       :hook (org-mode-hook . org-fragtog-mode)))
@@ -3841,7 +3841,7 @@ While browsing, remember the following:
             ([s-down] . windmove-down)
 
             ;; Launch applications via shell command
-            ([?\s-&] . (lambda (command)
+            ([?\C-&] . (lambda (command)
                          (interactive (list (read-shell-command "$ ")))
                          (start-process-shell-command command nil command)))
 
@@ -3859,6 +3859,20 @@ While browsing, remember the following:
     (exwm-enable))
 #+end_src
 
+** Emacs Jupyter
+:PROPERTIES:
+:ID:       4f42d25d-a7e3-4a7b-9a39-975f1d79631c
+:END:
+
+- Disabling native compilation is for avoid the issue: https://github.com/nnicandro/emacs-jupyter/issues/297#issuecomment-778924175
+
+:PROPERTIES:
+:ID:       63281654-074e-4602-b527-36a5afc3c770
+:END:
+#+begin_src emacs-lisp
+  (setq comp-deferred-compilation-deny-list (list "jupyter"))
+  (leaf jupyter :ensure t)
+#+end_src
 
 * Draft
 :PROPERTIES:
