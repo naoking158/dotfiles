@@ -110,7 +110,7 @@ This is an ongoing evolution of my original Emacs configuration files, inspired 
 By setting ~exec-profile~ to ~t~, profiling startup time is executed.
 
 #+begin_src emacs-lisp
-  (setq exec-profile t)
+  (setq exec-profile nil)
   
   (when exec-profile
     (defvar setup-tracker--level 0)
@@ -281,7 +281,9 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
     (leaf cus-start
       :doc "define customization properties of builtins"
       :tag "builtin" "internal"
-      :url "http://handlename.hatenablog.jp/entry/2011/12/11/214923"      
+      :url "http://handlename.hatenablog.jp/entry/2011/12/11/214923"
+      :leaf-defer nil
+      :bind ("C-M-h" . delete-region)
       :custom '((fill-column . 82)
                 (tab-width . 2)             
                 (frame-resize-pixelwise . t)
@@ -351,7 +353,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
       (interactive)
       (shell-command "open ."))
     :config
-    (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+    ;; (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
     (leaf mac
       :doc "implementation of gui terminal on macos"
       :doc "each symbol can be `control', `meta', `alt', `hyper', or `super'"
@@ -2705,6 +2707,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :req "emacs-24.4" "org-9.0"
     :url "https://ox-hugo.scripter.co"
     :ensure t
+    :commands org-exports-dispatch
     :after org
     :require t
     :defun (org-set-property)
@@ -3111,7 +3114,9 @@ It's nice to have a table of contents section for long literate configuration fi
                    `(("ja-uptex" . ,(concat opts "%s.tex"))
                      ("en-pdflatex" . ,(concat opts "-e $bibtex=q/bibtex/ -pdf %s.tex"))
                      ("pdfview" . "open %s.pdf")
-                     ("Displayline" . "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b")))
+                     ;; mac ("Displayline" . "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b")
+                     ("Displayline" . "okular --unique %o#src:%n%(dir)./%b")
+                     ))
             (add-to-list 'TeX-command-list `(,(car command-alist)
                                              ,(cdr command-alist)
                                              TeX-run-command t nil))))))
@@ -3262,7 +3267,7 @@ While browsing, remember the following:
   
   (leaf tree-sitter
     :ensure t tree-sitter-langs
-    :require tree-sitter-langs
+    ;; :require tree-sitter-langs
     :preface
     (defun my/highlight-python-docstrings ()
       (add-function
@@ -3270,7 +3275,7 @@ While browsing, remember the following:
        (lambda (capture-name)
          (pcase capture-name
            ("doc" 'font-lock-comment-face)))))
-    
+  
     :hook ((python-mode-hook . tree-sitter-hl-mode)
            ;; Highlight Python docstrings with a different face.
            (python-mode-hook . my/highlight-python-docstrings)))
@@ -3295,14 +3300,13 @@ While browsing, remember the following:
 :END:
 
 #+begin_src emacs-lisp
-
+  
   (leaf skk
     :ensure ddskk
     :leaf-defer nil
     :bind (("C-M-j" . skk-undo-kakutei))
     :global-minor-mode t context-skk-mode
     :custom ((default-input-method . "japanese-skk")
-             (skk-tut-file . "~/src/github.com/skk-dev/ddskk/etc/SKK.tut")
              (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
              (skk-server-host . "localhost")
              (skk-server-prtnum . 1178)
@@ -3323,13 +3327,12 @@ While browsing, remember the following:
              (skk-inline-show-face . '( :foreground "#ECEFF4"
                                         :background "#4C566A"
                                         :inherit 'normal)))
-
+  
     :config
     (leaf ddskk-posframe
       :load-path "~/.emacs.d/elisp/ddskk-posframe/"
       :require t
       :custom (ddskk-posframe-mode . t)))
-
 #+end_src
 
 ** Dap Mode
@@ -3396,7 +3399,6 @@ While browsing, remember the following:
     :config
     (set-variable 'read-mail-command 'mu4e)
     (setq mail-user-agent 'mu4e-user-agent
-  
           message-send-mail-function 'smtpmail-send-it
   
           ;; Make sure plain text mails flow correctly for recipients
@@ -3687,7 +3689,7 @@ While browsing, remember the following:
           (progn (xwidget-webkit-goto-url url)
                  (switch-to-buffer (xwidget-buffer
                                     (xwidget-webkit-current-session))))))))
-
+  
   (leaf webkit
     :when (eq 'pgtk window-system)
     :load-path "~/.emacs.d/elisp/emacs-webkit/"
@@ -3699,30 +3701,30 @@ While browsing, remember the following:
     :config
     ;; If you don't care so much about privacy and want to give your data to google
     (setq webkit-search-prefix "https://google.com/search?q=") 
-
+  
     ;; Specify a different set of characters use in the link hints
     ;; For example the following are more convienent if you use dvorak
     (setq webkit-ace-chars "asdfjkl;")
-
+  
     ;; If you want history saved in a different place or
     ;; Set to `nil' to if you don't want history saved to file (will stay in memory)
     (setq webkit-history-file
           (expand-file-name "webkit-history" no-littering-etc-directory))
-
+  
     ;; If you want cookies saved in a different place or
     ;; Set to `nil' to if you don't want cookies saved
     (setq webkit-cookie-file
           (expand-file-name "cookies" no-littering-etc-directory)) 
-
+  
     ;; Set webkit as the default browse-url browser
     (setq browse-url-browser-function 'webkit-browse-url)
-
+  
     ;; Force webkit to always open a new session instead of reusing a current one
     (setq webkit-browse-url-force-new t)
-
+  
     ;; Globally disable javascript
     ;; (add-hook 'webkit-new-hook #'webkit-enable-javascript)
-
+  
     ;; Override the "loading:" mode line indicator with an icon from `all-the-icons.el'
     ;; You could also use a unicode icon like ↺
     (defun webkit--display-progress (progress)
@@ -3731,7 +3733,7 @@ While browsing, remember the following:
                 ""
               (format "%s%.0f%%  " (all-the-icons-faicon "spinner") progress)))
       (force-mode-line-update))
-
+  
     ;; Set action to be taken on a download request. Predefined actions are
     ;; `webkit-download-default', `webkit-download-save', and `webkit-download-open'
     ;; where the save function saves to the download directory, the open function
@@ -3739,10 +3741,10 @@ While browsing, remember the following:
     (setq webkit-download-action-alist '(("\\.pdf\\'" . webkit-download-open)
                                          ("\\.png\\'" . webkit-download-save)
                                          (".*" . webkit-download-default)))
-
+  
     ;; Globally use a proxy
     ;; (add-hook 'webkit-new-hook (lambda () (webkit-set-proxy "socks://localhost:8000")))
-
+  
     ;; Globally use the simple dark mode
     (setq webkit-dark-mode t))
 #+end_src
@@ -3756,12 +3758,12 @@ While browsing, remember the following:
   
   (leaf pdf-tools
     :ensure t
+    :mode "\\.pdf\\'"
     :hook ((TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
            (pdf-view-mode-hook . (lambda () (set-buffer-multibyte t))))
     :custom (pdf-view-display-size . 'fit-width)
-    :init
-    (pdf-tools-install)
     :config
+    (pdf-tools-install)
     (leaf pdf-annot
       :require t
       :after pdf-tools
