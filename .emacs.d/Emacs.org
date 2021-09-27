@@ -533,91 +533,95 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :END:
 
 #+begin_src emacs-lisp
-	
-	(leaf font
-		:when window-system
-		:leaf-defer nil
-		:hook (after-init-hook . (lambda () (my/set-font 14)))
-		:advice (:after load-theme my/set-font-weight-after-load-theme)
-		:preface
-		(setq-default text-scale-remap-header-line t)
-	
-		(defun my/set-font (&optional font-size)
-			(interactive)
-			(let ((font-size (if font-size font-size
-												 (read-number "Fontsize: " 14))))
-				;; ascii
-				(set-face-attribute 'default nil
-														:font "JetBrains Mono"
-														:height (* font-size 10))
-				
-				;; Set the fixed pitch face
-				(set-face-attribute 'fixed-pitch nil
-														:font "JetBrains Mono"
-														:height (* font-size 10))
-				
-				;; Set the variable pitch face
-				(set-face-attribute 'variable-pitch nil
-														:font "Iosevka Aile"
-														:height (* font-size 10))
-	
-				;; emoji
-				(set-fontset-font nil '(#x1F000 . #x1FAFF) "Noto Color Emoji")
-	
-				;; japanese
-				(set-fontset-font t 'unicode
-													(font-spec
-													 :family "Noto Sans CJK JP"
-													 :height (* font-size 10))
-													nil 'append))
-	
-			;; Ligature for Fira Code or JetBrains Mono
-			(let ((alist
-						 '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
-							 (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
-							 (36 . ".\\(?:>\\)")
-							 (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
-							 (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
-							 (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
-							 (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
-							 (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
-							 (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
-							 (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
-							 (48 . ".\\(?:x[a-zA-Z]\\)")
-							 (58 . ".\\(?:::\\|[:=]\\)")
-							 (59 . ".\\(?:;;\\|;\\)")
-							 (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
-							 (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
-							 (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
-							 (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
-							 (91 . ".\\(?:]\\)")
-							 (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
-							 (94 . ".\\(?:=\\)")
-							 (119 . ".\\(?:ww\\)")
-							 (123 . ".\\(?:-\\)")
-							 (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
-							 (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
-				(dolist (char-regexp alist)
-					(set-char-table-range composition-function-table (car char-regexp)
-																`([,(cdr char-regexp) 0 font-shape-gstring])))))
-	
-		(defun my/set-font-weight (&optional weight)
-			(interactive)
-			(let ((weight (if weight weight
-											(intern (completing-read "Choose weight:"
-																							 '(light normal bold))))))
-				(set-face-attribute 'default nil :weight weight)
-				(set-face-attribute 'fixed-pitch nil :weight weight)
-				(set-face-attribute 'variable-pitch nil :weight weight)))
-	
-		(defun my/set-font-weight-after-load-theme (&rest args)
-			(let* ((str-theme (symbol-name (car args)))
-						 (weight (cond
-											((string-match "\\(light\\|operandi\\)" str-theme) 'normal)
-											((and (string-match "bespoke" str-theme)
-														(eq 'light bespoke-set-theme)) 'normal)
-											(t 'light))))
-				(my/set-font-weight weight))))
+  
+  (leaf font
+    :when window-system
+    :leaf-defer nil
+    :hook (after-init-hook . (lambda () (my/set-font 14)))
+    :advice (:after load-theme my/set-font-weight-after-load-theme)
+    :preface
+    (setq-default text-scale-remap-header-line t)
+  
+    (defun my/set-font (&optional font-size)
+      (interactive)
+      (let ((font-size (if font-size font-size
+                         (read-number "Fontsize: " 14))))
+        ;; ascii
+        (set-face-attribute 'default nil
+                            :font "JetBrains Mono"
+                            :height (* font-size 10))
+  
+        ;; Set the fixed pitch face
+        (set-face-attribute 'fixed-pitch nil
+                            :font "JetBrains Mono"
+                            :height (* font-size 10))
+  
+        ;; Set the variable pitch face
+        (set-face-attribute 'variable-pitch nil
+                            :font "Iosevka Aile"
+                            :height (* font-size 10))
+  
+        ;; emoji
+        (set-fontset-font t '(#x1F000 . #x1FAFF)
+                          (font-spec
+                           :family "Noto Color Emoji"
+                           :height (* font-size 10))
+                          nil 'append)
+  
+        ;; japanese
+        (set-fontset-font t 'unicode
+                          (font-spec
+                           :family "Noto Sans CJK JP"
+                           :height (* font-size 10))
+                          nil 'append))
+  
+      ;; Ligature for Fira Code or JetBrains Mono
+      (let ((alist
+             '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
+               (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
+               (36 . ".\\(?:>\\)")
+               (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
+               (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
+               (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
+               (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
+               (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
+               (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
+               (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
+               (48 . ".\\(?:x[a-zA-Z]\\)")
+               (58 . ".\\(?:::\\|[:=]\\)")
+               (59 . ".\\(?:;;\\|;\\)")
+               (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
+               (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
+               (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
+               (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
+               (91 . ".\\(?:]\\)")
+               (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
+               (94 . ".\\(?:=\\)")
+               (119 . ".\\(?:ww\\)")
+               (123 . ".\\(?:-\\)")
+               (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
+               (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
+        (dolist (char-regexp alist)
+          (set-char-table-range composition-function-table (car char-regexp)
+                                `([,(cdr char-regexp) 0 font-shape-gstring])))))
+  
+    (defun my/set-font-weight (&optional weight)
+      (interactive)
+      (let ((weight (if weight weight
+                      (intern (completing-read "Choose weight:"
+                                               '(light normal bold))))))
+        (set-face-attribute 'default nil :weight weight)
+        (set-face-attribute 'fixed-pitch nil :weight weight)
+        (set-face-attribute 'variable-pitch nil :weight weight)))
+  
+    (defun my/set-font-weight-after-load-theme (&rest args)
+      (let* ((str-theme (symbol-name (car args)))
+             (weight (cond
+                      ((string-match "\\(light\\|operandi\\)" str-theme) 'normal)
+                      ((and (string-match "bespoke" str-theme)
+                            (eq 'light bespoke-set-theme)) 'normal)
+                      (t 'light))))
+        (my/set-font-weight weight))))
 #+end_src
 
 #+RESULTS:
@@ -1977,16 +1981,51 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   
   (leaf orderless
     :ensure t
-    :require t
-    :custom ((completion-styles . '(orderless))
-             (completion-category-defaults . nil)
-             (completion-category-overrides . '((file (styles partial-completion)))))
+    :require t migemo
     :advice (:around company-capf--candidates just-one-face)
+    :custom
+    '((completion-styles . '(orderless))
+      (completion-category-defaults . nil)
+      (completion-category-overrides
+       quote ((file (styles partial-completion))
+              (consult-location (styles orderless-migemo-style))
+              (consult-multi (styles orderless-migemo-style))
+              (unicode-name (styles partial-completion))
+              (command (styles partial-completion)))))
+  
     :preface
     (defun just-one-face (fn &rest args)
       (let ((orderless-match-faces [completions-common-part]))
-        (apply fn args))))
+        (apply fn args)))
   
+    (defun orderless-migemo (component)
+      (let ((pattern (migemo-get-pattern component)))
+        (condition-case nil
+            (progn (string-match-p pattern "") pattern)
+          (invalid-regexp nil))))
+  
+    :config
+    (orderless-define-completion-style orderless-default-style
+      (orderless-matching-styles '(orderless-prefixes)))
+  
+    (orderless-define-completion-style orderless-migemo-style
+      (orderless-matching-styles '(orderless-prefixes
+                                   orderless-literal
+                                   orderless-regexp
+                                   orderless-migemo))))
+  
+  (leaf migemo
+    :ensure t
+    :custom
+    '((migemo-user-dictionary  . nil)
+      (migemo-regex-dictionary . nil)
+      (migemo-coding-system    . 'utf-8)
+      (migemo-dictionary . "/usr/local/share/migemo/utf-8/migemo-dict")
+      (migemo-isearch-enable-p . nil))
+    ;; :init
+    ;; (setq migemo-dictionary )
+    :hook
+    (after-init-hook . migemo-init))
 #+end_src
 
 ** Completion Annotations with Marginalia
@@ -2002,6 +2041,15 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :after vertico
     :global-minor-mode t)
   
+  ;; (leaf marginalia
+  ;;   :ensure t
+  ;;   :require t
+  ;;   :after vertico
+  ;;   :init
+  ;;   (marginalia-mode)
+  ;;   :config
+  ;;   (add-to-list 'marginalia-prompt-categories
+  ;;                '("\\<File\\>" . file)))
 #+end_src
 
 ** Vertical Minibuffer UI and Completion with Vertico

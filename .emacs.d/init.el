@@ -1425,21 +1425,67 @@ respectively."
 
 (leaf orderless
   :ensure t
-  :require t
-  :custom ((completion-styles . '(orderless))
-           (completion-category-defaults . nil)
-           (completion-category-overrides . '((file (styles partial-completion)))))
+  :require t migemo
   :advice (:around company-capf--candidates just-one-face)
+  :custom
+  '((completion-styles . '(orderless))
+    (completion-category-defaults . nil)
+    (completion-category-overrides
+     quote ((file (styles partial-completion))
+            (consult-location (styles orderless-migemo-style))
+            (consult-multi (styles orderless-migemo-style))
+            (unicode-name (styles partial-completion))
+            (command (styles partial-completion)))))
+
   :preface
   (defun just-one-face (fn &rest args)
     (let ((orderless-match-faces [completions-common-part]))
-      (apply fn args))))
+      (apply fn args)))
+
+  (defun orderless-migemo (component)
+    (let ((pattern (migemo-get-pattern component)))
+      (condition-case nil
+          (progn (string-match-p pattern "") pattern)
+        (invalid-regexp nil))))
+
+  :config
+  (orderless-define-completion-style orderless-default-style
+    (orderless-matching-styles '(orderless-prefixes)))
+
+  (orderless-define-completion-style orderless-migemo-style
+    (orderless-matching-styles '(orderless-prefixes
+                                 orderless-literal
+                                 orderless-regexp
+                                 orderless-migemo))))
+
+(leaf migemo
+  :ensure t
+  :custom
+  '((migemo-user-dictionary  . nil)
+    (migemo-regex-dictionary . nil)
+    (migemo-coding-system    . 'utf-8)
+    (migemo-dictionary . "/usr/local/share/migemo/utf-8/migemo-dict")
+    (migemo-isearch-enable-p . nil))
+  ;; :init
+  ;; (setq migemo-dictionary )
+  :hook
+  (after-init-hook . migemo-init))
 
 (leaf marginalia
   :ensure t
   :require t
   :after vertico
   :global-minor-mode t)
+
+;; (leaf marginalia
+;;   :ensure t
+;;   :require t
+;;   :after vertico
+;;   :init
+;;   (marginalia-mode)
+;;   :config
+;;   (add-to-list 'marginalia-prompt-categories
+;;                '("\\<File\\>" . file)))
 
 (leaf vertico
   :ensure t
