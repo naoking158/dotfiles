@@ -31,7 +31,7 @@
 			user-mail-address "naoki@bbo.cs.tsukuba.ac.jp"
 			user-login-name "naoking158"
 			package-native-compile t)
-(native-compile-async "~/.emacs.d/elisp/" 'recursively)
+;; (native-compile-async "~/.emacs.d/elisp/" 'recursively)
 (dolist (item (split-string
 							 (shell-command-to-string "which fish") "\n"))
 	(when (string-match "/usr/" item)

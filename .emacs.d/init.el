@@ -9,6 +9,8 @@
 ;; this enables this running method
 ;;   emacs -q -l ~/.debug.emacs.d/{{pkg}}/init.el
 
+(setq comp-deferred-compilation-deny-list (list "jupyter"))
+
 (setq exec-profile nil)
 
 (when exec-profile
@@ -1423,6 +1425,20 @@ respectively."
     (tramp-set-completion-function "ssh"
                                    '((tramp-parse-sconfig "~/.ssh/config")))))
 
+;; (leaf orderless
+;;   :ensure t
+;;   :require t
+;;   :advice (:around company-capf--candidates just-one-face)
+;;   :custom
+;;   '((completion-styles . '(orderless))
+;;     (completion-category-defaults . nil)
+;;     (completion-category-overrides . ((file (styles partial-completion)))))
+
+;;   :preface
+;;   (defun just-one-face (fn &rest args)
+;;     (let ((orderless-match-faces [completions-common-part]))
+;;       (apply fn args))))
+
 (leaf orderless
   :ensure t
   :require t migemo
@@ -2464,6 +2480,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (skk-preload . t)
            (skk-isearch-mode-enable . 'always)
            (skk-kutouten-type . 'en)
+           (skk-use-auto-kutouten . t)
            (skk-show-inline . 'vertical)
            (skk-inline-show-face . nil)
            (skk-egg-like-newline . t)  ;; skk-kakutei by RET
@@ -2860,12 +2877,14 @@ Interactively, URL defaults to the string looking like a url around point."
 
 (leaf pdf-tools
   :ensure t
-  :mode "\\.pdf\\'"
+  ;; :require t pdf-view pdf-misc pdf-occur pdf-util pdf-annot pdf-info pdf-isearch pdf-history pdf-links
+
+  :mode ("\\.pdf\\'" . pdf-view-mode)
   :hook ((TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
          (pdf-view-mode-hook . (lambda () (set-buffer-multibyte t))))
   :custom (pdf-view-display-size . 'fit-width)
   :config
-  (pdf-tools-install)
+  (pdf-tools-install :no-query)
   (leaf pdf-annot
     :require t
     :after pdf-tools
@@ -2944,19 +2963,9 @@ Interactively, URL defaults to the string looking like a url around point."
 
   (exwm-enable))
 
-(setq comp-deferred-compilation-deny-list (list "jupyter"))
 (leaf jupyter
-  :ensure t
+  :ensure t websocket
   :config
   (add-to-list 'org-babel-load-languages '(jupyter . t)))
-
-(defun my/update-ns-appearance (sym-theme &rest args)
-  (let* ((str-theme (symbol-name sym-theme))
-         (appearance (if (string-match "\\(light\\|operandi\\)" str-theme)
-                         'light
-                       'dark)))
-    (dolist (elm default-frame-alist)
-      (when (eq 'ns-appearance (car elm)) (delete elm default-frame-alist)))
-    (add-to-list 'default-frame-alist `(ns-appearance . ,appearance))))
 
 (provide 'init)
