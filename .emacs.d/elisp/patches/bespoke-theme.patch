@@ -1,28 +1,30 @@
-*** /tmp/ediffiYSQci	2021-09-30 16:28:22.427470230 +0900
---- /tmp/ediffMU8Nmr	2021-09-30 16:28:22.427470230 +0900
+*** /tmp/ediff0zHAHW	2021-09-30 17:23:35.751123909 +0900
+--- /home/naoki/.emacs.d/elisp/bespoke-theme/bespoke-theme.el	2021-09-30 17:20:15.231109474 +0900
 ***************
-*** 231,238 ****
+*** 241,250 ****
   
   (defun bespoke--set-theme-variant ()
     "Set theme colors according to LIGHT or DARK variant"
 !   (setq bespoke-foreground (--l/d "#282b35" "#eceff1"))
 !   (setq bespoke-background (--l/d "#fffef9" "#282b35"))
   
-    (setq bespoke-modeline   (--l/d "#e3e7ef" "#3c4353"))
+!   (setq bespoke-modeline   (--l/d "#e3e7ef" "#3c4353"))
     (setq bespoke-highlight  (--l/d "#dbe1eb" "#444B5c"))
---- 231,240 ----
+    (setq bespoke-inactive   (--l/d "#cbd3e1" "#525868"))
+  
+--- 241,250 ----
   
   (defun bespoke--set-theme-variant ()
     "Set theme colors according to LIGHT or DARK variant"
-!   (setq bespoke-foreground (--l/d "#282b35" "#eeeff8"))
-!   (setq bespoke-background (--l/d "#fffef9" "#1a1c23"))
-!   ;; (setq bespoke-foreground (--l/d "#282b35" "#eceff1"))
-!   ;; (setq bespoke-background (--l/d "#fffef9" "#282b35"))
+! 	(setq bespoke-foreground (--l/d "#282b35" "#eeeff8"))
+! 	(setq bespoke-background (--l/d "#fffef9" "#1a1c23"))
   
-    (setq bespoke-modeline   (--l/d "#e3e7ef" "#3c4353"))
+! 	(setq bespoke-modeline   (--l/d "#e3e7ef" "#3c4353"))
     (setq bespoke-highlight  (--l/d "#dbe1eb" "#444B5c"))
+    (setq bespoke-inactive   (--l/d "#cbd3e1" "#525868"))
+  
 ***************
-*** 784,826 ****
+*** 794,836 ****
   
   
   ;;;;; Mu4e
@@ -66,7 +68,7 @@
   
   ;;;;; Org-agenda
      `(org-agenda-calendar-event                    ((,class :inherit default)))
---- 786,828 ----
+--- 794,836 ----
   
   
   ;;;;; Mu4e
