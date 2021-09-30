@@ -38,18 +38,16 @@
 		(setq shell-file-name item)))
 
 ;; GUI
-(setq initial-frame-alist (append '((top . 25)
-																		(left . 0)
-																		(width . 167)
-																		(height . 67)
-																		(line-spacing . 4)
+(setq default-frame-alist (append '((line-spacing . 4)
 																		(vertical-scroll-bars)
 																		(menu-bar-lines . 0)
-																		(tool-bar-lines . 0))
+																		(tool-bar-lines . 0)
+																		(left-fringe . 10)
+																		(right-fringe . 10))
 																	initial-frame-alist))
 
 ;; (push '(fullscreen . maximized) default-frame-alist)
-(push initial-frame-alist default-frame-alist)
+;; (push initial-frame-alist default-frame-alist)
 (setq inhibit-splash-screen t
 	  frame-inhibit-implied-resize t
 	  byte-compile-warnings '(cl-functions))
