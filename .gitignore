@@ -57,6 +57,8 @@
 ## Linux
 !/.config/i3/
 !/.config/i3/**
+!/.config/manjaro/
+!/.config/manjaro/**
 !/.config/mimeapps.list
 !/.config/polybar/
 !/.config/polybar/**
