@@ -11,6 +11,7 @@ application/xhtml+xml=brave.desktop
 application/x-extension-xhtml=brave.desktop
 application/x-extension-xht=brave.desktop
 application/pdf=okularApplication_pdf.desktop
+x-scheme-handler/msteams=teams-for-linux.desktop
 
 [Added Associations]
 x-scheme-handler/http=brave.desktop;

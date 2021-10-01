@@ -102,6 +102,15 @@ This is an ongoing evolution of my original Emacs configuration files, inspired 
   
 #+end_src
 
+** Compilation deny packages
+:PROPERTIES:
+:ID:       d460c45a-a845-4999-ad46-ab8dabf7e6b8
+:END:
+
+#+begin_src emacs-lisp
+  (setq comp-deferred-compilation-deny-list (list "jupyter"))
+#+end_src
+
 * Startup Performance
 :PROPERTIES:
 :ID:       B395D503-F0B0-4B02-9500-C8056B6E9C6C
@@ -110,7 +119,7 @@ This is an ongoing evolution of my original Emacs configuration files, inspired 
 By setting ~exec-profile~ to ~t~, profiling startup time is executed.
 
 #+begin_src emacs-lisp
-  (setq exec-profile t)
+  (setq exec-profile nil)
   
   (when exec-profile
     (defvar setup-tracker--level 0)
@@ -281,7 +290,9 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
     (leaf cus-start
       :doc "define customization properties of builtins"
       :tag "builtin" "internal"
-      :url "http://handlename.hatenablog.jp/entry/2011/12/11/214923"      
+      :url "http://handlename.hatenablog.jp/entry/2011/12/11/214923"
+      :leaf-defer nil
+      :bind ("C-M-h" . delete-region)
       :custom '((fill-column . 82)
                 (tab-width . 2)             
                 (frame-resize-pixelwise . t)
@@ -351,7 +362,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
       (interactive)
       (shell-command "open ."))
     :config
-    (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+    ;; (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
     (leaf mac
       :doc "implementation of gui terminal on macos"
       :doc "each symbol can be `control', `meta', `alt', `hyper', or `super'"
@@ -531,95 +542,96 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :END:
 
 #+begin_src emacs-lisp
-	
-	(leaf font
-		:when window-system
-		:leaf-defer nil
-		:hook (after-init-hook . (lambda () (my/set-font 14)))
-		:advice (:after load-theme my/set-font-weight-after-load-theme)
-		:preface
-		(setq-default text-scale-remap-header-line t)
-	
-		(defun my/set-font (&optional font-size)
-			(interactive)
-			(let ((font-size (if font-size font-size
-												 (read-number "Fontsize: " 14))))
-				;; ascii
-				(set-face-attribute 'default nil
-														:font "JetBrains Mono"
-														:height (* font-size 10))
-				
-				;; Set the fixed pitch face
-				(set-face-attribute 'fixed-pitch nil
-														:font "JetBrains Mono"
-														:height (* font-size 10))
-				
-				;; Set the variable pitch face
-				(set-face-attribute 'variable-pitch nil
-														:font "Iosevka Aile"
-														:height (* font-size 10))
-	
-				;; emoji
-				(set-fontset-font nil '(#x1F000 . #x1FAFF) "Noto Color Emoji")
-	
-				;; japanese
-				(set-fontset-font t 'unicode
-													(font-spec
-													 :family "Noto Sans CJK JP"
-													 :height (* font-size 10))
-													nil 'append))
-	
-			;; Ligature for Fira Code or JetBrains Mono
-			(let ((alist
-						 '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
-							 (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
-							 (36 . ".\\(?:>\\)")
-							 (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
-							 (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
-							 (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
-							 (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
-							 (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
-							 (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
-							 (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
-							 (48 . ".\\(?:x[a-zA-Z]\\)")
-							 (58 . ".\\(?:::\\|[:=]\\)")
-							 (59 . ".\\(?:;;\\|;\\)")
-							 (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
-							 (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
-							 (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
-							 (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
-							 (91 . ".\\(?:]\\)")
-							 (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
-							 (94 . ".\\(?:=\\)")
-							 (119 . ".\\(?:ww\\)")
-							 (123 . ".\\(?:-\\)")
-							 (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
-							 (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
-				(dolist (char-regexp alist)
-					(set-char-table-range composition-function-table (car char-regexp)
-																`([,(cdr char-regexp) 0 font-shape-gstring])))))
-	
-		(defun my/set-font-weight (&optional weight)
-			(interactive)
-			(let ((weight (if weight weight
-											(intern (completing-read "Choose weight:"
-																							 '(light normal bold))))))
-				(set-face-attribute 'default nil :weight weight)
-				(set-face-attribute 'fixed-pitch nil :weight weight)
-				(set-face-attribute 'variable-pitch nil :weight weight)))
-	
-		(defun my/set-font-weight-after-load-theme (&rest args)
-			(let* ((str-theme (symbol-name (car args)))
-						 (weight (cond
-											((string-match "\\(light\\|operandi\\)" str-theme) 'normal)
-											((and (string-match "bespoke" str-theme)
-														(eq 'light bespoke-set-theme)) 'normal)
-											(t 'light))))
-				(my/set-font-weight weight))))
+  
+  (leaf font
+    :when window-system
+    :leaf-defer nil
+    :hook (after-init-hook . (lambda () (my/set-font 14)))
+    :advice (:after load-theme my/set-font-weight-after-load-theme)
+    :preface
+    (setq-default text-scale-remap-header-line t)
+  
+    (defun my/set-font (&optional font-size)
+      (interactive)
+      (let ((font-size (if font-size font-size
+                         (read-number "Fontsize: " 14))))
+        ;; ascii
+        (set-face-attribute 'default nil
+                            :font "JetBrains Mono"
+                            :height (* font-size 10))
+  
+        ;; Set the fixed pitch face
+        (set-face-attribute 'fixed-pitch nil
+                            :font "JetBrains Mono"
+                            :height (* font-size 10))
+  
+        ;; Set the variable pitch face
+        (set-face-attribute 'variable-pitch nil
+                            :font "Iosevka Aile"
+                            :height (* font-size 10))
+  
+        ;; emoji
+        (set-fontset-font t '(#x1F000 . #x1FAFF)
+                          (font-spec
+                           :family "Noto Color Emoji"
+                           :height (* font-size 10))
+                          nil 'append)
+  
+        ;; japanese
+        (set-fontset-font t 'unicode
+                          (font-spec
+                           :family "Noto Sans CJK JP"
+                           :height (* font-size 10))
+                          nil 'append))
+  
+      ;; Ligature for Fira Code or JetBrains Mono
+      (let ((alist
+             '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
+               (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
+               (36 . ".\\(?:>\\)")
+               (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
+               (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
+               (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
+               (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
+               (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
+               (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
+               (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
+               (48 . ".\\(?:x[a-zA-Z]\\)")
+               (58 . ".\\(?:::\\|[:=]\\)")
+               (59 . ".\\(?:;;\\|;\\)")
+               (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
+               (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
+               (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
+               (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
+               (91 . ".\\(?:]\\)")
+               (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
+               (94 . ".\\(?:=\\)")
+               (119 . ".\\(?:ww\\)")
+               (123 . ".\\(?:-\\)")
+               (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
+               (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
+        (dolist (char-regexp alist)
+          (set-char-table-range composition-function-table (car char-regexp)
+                                `([,(cdr char-regexp) 0 font-shape-gstring])))))
+  
+    (defun my/set-font-weight (&optional weight)
+      (interactive)
+      (let ((weight (if weight weight
+                      (intern (completing-read "Choose weight:"
+                                               '(light normal bold))))))
+        (set-face-attribute 'default nil :weight weight)
+        (set-face-attribute 'fixed-pitch nil :weight weight)
+        (set-face-attribute 'variable-pitch nil :weight weight)))
+  
+    (defun my/set-font-weight-after-load-theme (&rest args)
+      (let* ((str-theme (symbol-name (car args)))
+             (weight (cond
+                      ((string-match "\\(light\\|operandi\\)" str-theme) 'normal)
+                      ((and (string-match "bespoke" str-theme)
+                            (eq 'light bespoke-set-theme)) 'normal)
+                      (t 'light))))
+        (my/set-font-weight weight))))
 #+end_src
-
-#+RESULTS:
-: *font
 
 ** Theme Configuration
 :PROPERTIES:
@@ -1972,19 +1984,67 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 :END:
 
 #+begin_src emacs-lisp
+  ;; (leaf orderless
+  ;;   :ensure t
+  ;;   :require t
+  ;;   :advice (:around company-capf--candidates just-one-face)
+  ;;   :custom
+  ;;   '((completion-styles . '(orderless))
+  ;;     (completion-category-defaults . nil)
+  ;;     (completion-category-overrides . ((file (styles partial-completion)))))
+  
+  ;;   :preface
+  ;;   (defun just-one-face (fn &rest args)
+  ;;     (let ((orderless-match-faces [completions-common-part]))
+  ;;       (apply fn args))))
   
   (leaf orderless
     :ensure t
-    :require t
-    :custom ((completion-styles . '(orderless))
-             (completion-category-defaults . nil)
-             (completion-category-overrides . '((file (styles partial-completion)))))
+    :require t migemo
     :advice (:around company-capf--candidates just-one-face)
+    :custom
+    '((completion-styles . '(orderless))
+      (completion-category-defaults . nil)
+      (completion-category-overrides
+       quote ((file (styles partial-completion))
+              (consult-location (styles orderless-migemo-style))
+              (consult-multi (styles orderless-migemo-style))
+              (unicode-name (styles partial-completion))
+              (command (styles partial-completion)))))
+  
     :preface
     (defun just-one-face (fn &rest args)
       (let ((orderless-match-faces [completions-common-part]))
-        (apply fn args))))
+        (apply fn args)))
   
+    (defun orderless-migemo (component)
+      (let ((pattern (migemo-get-pattern component)))
+        (condition-case nil
+            (progn (string-match-p pattern "") pattern)
+          (invalid-regexp nil))))
+  
+    :config
+    (orderless-define-completion-style orderless-default-style
+      (orderless-matching-styles '(orderless-prefixes)))
+  
+    (orderless-define-completion-style orderless-migemo-style
+      (orderless-matching-styles '(orderless-prefixes
+                                   orderless-literal
+                                   orderless-regexp
+                                   orderless-migemo))))
+  
+  (leaf migemo
+    :ensure t
+    :custom
+    '((migemo-user-dictionary  . nil)
+      (migemo-regex-dictionary . nil)
+      (migemo-coding-system    . 'utf-8)
+      (migemo-dictionary . "/usr/local/share/migemo/utf-8/migemo-dict")
+      (migemo-isearch-enable-p . nil))
+    ;; :init
+    ;; (setq migemo-dictionary )
+    :hook
+    (after-init-hook . migemo-init))
 #+end_src
 
 ** Completion Annotations with Marginalia
@@ -2000,6 +2060,15 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :after vertico
     :global-minor-mode t)
   
+  ;; (leaf marginalia
+  ;;   :ensure t
+  ;;   :require t
+  ;;   :after vertico
+  ;;   :init
+  ;;   (marginalia-mode)
+  ;;   :config
+  ;;   (add-to-list 'marginalia-prompt-categories
+  ;;                '("\\<File\\>" . file)))
 #+end_src
 
 ** Vertical Minibuffer UI and Completion with Vertico
@@ -2267,6 +2336,9 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                                :slant 'normal
                                :height (cdr face)))
    
+         ;; variable pitch
+         (face-remap-add-relative 'default :inherit 'variable-pitch)
+         
          ;; Ensure that anything that should be fixed-pitch in Org files appears that way
          (set-face-attribute 'org-block nil						:inherit 'fixed-pitch :foreground nil)
          (set-face-attribute 'org-table nil						:inherit 'fixed-pitch)
@@ -2705,6 +2777,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :req "emacs-24.4" "org-9.0"
     :url "https://ox-hugo.scripter.co"
     :ensure t
+    :commands org-exports-dispatch
     :after org
     :require t
     :defun (org-set-property)
@@ -3111,7 +3184,9 @@ It's nice to have a table of contents section for long literate configuration fi
                    `(("ja-uptex" . ,(concat opts "%s.tex"))
                      ("en-pdflatex" . ,(concat opts "-e $bibtex=q/bibtex/ -pdf %s.tex"))
                      ("pdfview" . "open %s.pdf")
-                     ("Displayline" . "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b")))
+                     ;; mac ("Displayline" . "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b")
+                     ("Displayline" . "okular --unique %o#src:%n%(dir)./%b")
+                     ))
             (add-to-list 'TeX-command-list `(,(car command-alist)
                                              ,(cdr command-alist)
                                              TeX-run-command t nil))))))
@@ -3262,7 +3337,7 @@ While browsing, remember the following:
   
   (leaf tree-sitter
     :ensure t tree-sitter-langs
-    :require tree-sitter-langs
+    ;; :require tree-sitter-langs
     :preface
     (defun my/highlight-python-docstrings ()
       (add-function
@@ -3270,7 +3345,7 @@ While browsing, remember the following:
        (lambda (capture-name)
          (pcase capture-name
            ("doc" 'font-lock-comment-face)))))
-    
+  
     :hook ((python-mode-hook . tree-sitter-hl-mode)
            ;; Highlight Python docstrings with a different face.
            (python-mode-hook . my/highlight-python-docstrings)))
@@ -3295,14 +3370,13 @@ While browsing, remember the following:
 :END:
 
 #+begin_src emacs-lisp
-
+  
   (leaf skk
     :ensure ddskk
     :leaf-defer nil
     :bind (("C-M-j" . skk-undo-kakutei))
     :global-minor-mode t context-skk-mode
     :custom ((default-input-method . "japanese-skk")
-             (skk-tut-file . "~/src/github.com/skk-dev/ddskk/etc/SKK.tut")
              (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
              (skk-server-host . "localhost")
              (skk-server-prtnum . 1178)
@@ -3311,6 +3385,7 @@ While browsing, remember the following:
              (skk-preload . t)
              (skk-isearch-mode-enable . 'always)
              (skk-kutouten-type . 'en)
+             (skk-use-auto-kutouten . t)
              (skk-show-inline . 'vertical)
              (skk-inline-show-face . nil)
              (skk-egg-like-newline . t)  ;; skk-kakutei by RET
@@ -3323,13 +3398,12 @@ While browsing, remember the following:
              (skk-inline-show-face . '( :foreground "#ECEFF4"
                                         :background "#4C566A"
                                         :inherit 'normal)))
-
+  
     :config
     (leaf ddskk-posframe
       :load-path "~/.emacs.d/elisp/ddskk-posframe/"
       :require t
       :custom (ddskk-posframe-mode . t)))
-
 #+end_src
 
 ** Dap Mode
@@ -3396,7 +3470,6 @@ While browsing, remember the following:
     :config
     (set-variable 'read-mail-command 'mu4e)
     (setq mail-user-agent 'mu4e-user-agent
-  
           message-send-mail-function 'smtpmail-send-it
   
           ;; Make sure plain text mails flow correctly for recipients
@@ -3699,30 +3772,30 @@ While browsing, remember the following:
     :config
     ;; If you don't care so much about privacy and want to give your data to google
     (setq webkit-search-prefix "https://google.com/search?q=") 
-
+  
     ;; Specify a different set of characters use in the link hints
     ;; For example the following are more convienent if you use dvorak
     (setq webkit-ace-chars "asdfjkl;")
-
+  
     ;; If you want history saved in a different place or
     ;; Set to `nil' to if you don't want history saved to file (will stay in memory)
     (setq webkit-history-file
           (expand-file-name "webkit-history" no-littering-etc-directory))
-
+  
     ;; If you want cookies saved in a different place or
     ;; Set to `nil' to if you don't want cookies saved
     (setq webkit-cookie-file
           (expand-file-name "cookies" no-littering-etc-directory)) 
-
+  
     ;; Set webkit as the default browse-url browser
     (setq browse-url-browser-function 'webkit-browse-url)
-
+  
     ;; Force webkit to always open a new session instead of reusing a current one
     (setq webkit-browse-url-force-new t)
-
+  
     ;; Globally disable javascript
     ;; (add-hook 'webkit-new-hook #'webkit-enable-javascript)
-
+  
     ;; Override the "loading:" mode line indicator with an icon from `all-the-icons.el'
     ;; You could also use a unicode icon like ↺
     (defun webkit--display-progress (progress)
@@ -3731,7 +3804,7 @@ While browsing, remember the following:
                 ""
               (format "%s%.0f%%  " (all-the-icons-faicon "spinner") progress)))
       (force-mode-line-update))
-
+  
     ;; Set action to be taken on a download request. Predefined actions are
     ;; `webkit-download-default', `webkit-download-save', and `webkit-download-open'
     ;; where the save function saves to the download directory, the open function
@@ -3739,10 +3812,10 @@ While browsing, remember the following:
     (setq webkit-download-action-alist '(("\\.pdf\\'" . webkit-download-open)
                                          ("\\.png\\'" . webkit-download-save)
                                          (".*" . webkit-download-default)))
-
+  
     ;; Globally use a proxy
     ;; (add-hook 'webkit-new-hook (lambda () (webkit-set-proxy "socks://localhost:8000")))
-
+  
     ;; Globally use the simple dark mode
     (setq webkit-dark-mode t))
 #+end_src
@@ -3753,15 +3826,16 @@ While browsing, remember the following:
 :END:
 
 #+begin_src emacs-lisp
-  
   (leaf pdf-tools
     :ensure t
+    ;; :require t pdf-view pdf-misc pdf-occur pdf-util pdf-annot pdf-info pdf-isearch pdf-history pdf-links
+    
+    :mode ("\\.pdf\\'" . pdf-view-mode)
     :hook ((TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
            (pdf-view-mode-hook . (lambda () (set-buffer-multibyte t))))
     :custom (pdf-view-display-size . 'fit-width)
-    :init
-    (pdf-tools-install)
     :config
+    (pdf-tools-install :no-query)
     (leaf pdf-annot
       :require t
       :after pdf-tools
@@ -3868,32 +3942,12 @@ While browsing, remember the following:
 :ID:       63281654-074e-4602-b527-36a5afc3c770
 :END:
 #+begin_src emacs-lisp
-  (setq comp-deferred-compilation-deny-list (list "jupyter"))
   (leaf jupyter
-    :ensure t
+    :ensure t websocket
     :config
     (add-to-list 'org-babel-load-languages '(jupyter . t)))
 #+end_src
 
-* Draft
-:PROPERTIES:
-:ID:       3BCFD2E4-6A48-4ACF-994B-E7E5F889251C
-:END:
-
-** Change font face on titlebar according to theme appearance 
-:PROPERTIES:
-:ID:       D52CA322-A83B-4FB1-AB1B-4945AA6F6489
-:END:
-#+begin_src emacs-lisp
-  (defun my/update-ns-appearance (sym-theme &rest args)
-    (let* ((str-theme (symbol-name sym-theme))
-           (appearance (if (string-match "\\(light\\|operandi\\)" str-theme)
-                           'light
-                         'dark)))
-      (dolist (elm default-frame-alist)
-        (when (eq 'ns-appearance (car elm)) (delete elm default-frame-alist)))
-      (add-to-list 'default-frame-alist `(ns-appearance . ,appearance))))
-#+end_src
 
 * Footer
 :PROPERTIES:

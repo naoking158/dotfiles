@@ -9,7 +9,9 @@
 ;; this enables this running method
 ;;   emacs -q -l ~/.debug.emacs.d/{{pkg}}/init.el
 
-(setq exec-profile t)
+(setq comp-deferred-compilation-deny-list (list "jupyter"))
+
+(setq exec-profile nil)
 
 (when exec-profile
   (defvar setup-tracker--level 0)
@@ -141,7 +143,9 @@
   (leaf cus-start
     :doc "define customization properties of builtins"
     :tag "builtin" "internal"
-    :url "http://handlename.hatenablog.jp/entry/2011/12/11/214923"      
+    :url "http://handlename.hatenablog.jp/entry/2011/12/11/214923"
+    :leaf-defer nil
+    :bind ("C-M-h" . delete-region)
     :custom '((fill-column . 82)
               (tab-width . 2)             
               (frame-resize-pixelwise . t)
@@ -204,7 +208,7 @@
     (interactive)
     (shell-command "open ."))
   :config
-  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+  ;; (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
   (leaf mac
     :doc "implementation of gui terminal on macos"
     :doc "each symbol can be `control', `meta', `alt', `hyper', or `super'"
@@ -330,89 +334,93 @@
   (my/change-transparency 95))
 
 (leaf font
-	:when window-system
-	:leaf-defer nil
-	:hook (after-init-hook . (lambda () (my/set-font 14)))
-	:advice (:after load-theme my/set-font-weight-after-load-theme)
-	:preface
-	(setq-default text-scale-remap-header-line t)
+  :when window-system
+  :leaf-defer nil
+  :hook (after-init-hook . (lambda () (my/set-font 14)))
+  :advice (:after load-theme my/set-font-weight-after-load-theme)
+  :preface
+  (setq-default text-scale-remap-header-line t)
 
-	(defun my/set-font (&optional font-size)
-		(interactive)
-		(let ((font-size (if font-size font-size
-											 (read-number "Fontsize: " 14))))
-			;; ascii
-			(set-face-attribute 'default nil
-													:font "JetBrains Mono"
-													:height (* font-size 10))
+  (defun my/set-font (&optional font-size)
+    (interactive)
+    (let ((font-size (if font-size font-size
+                       (read-number "Fontsize: " 14))))
+      ;; ascii
+      (set-face-attribute 'default nil
+                          :font "JetBrains Mono"
+                          :height (* font-size 10))
 
-			;; Set the fixed pitch face
-			(set-face-attribute 'fixed-pitch nil
-													:font "JetBrains Mono"
-													:height (* font-size 10))
+      ;; Set the fixed pitch face
+      (set-face-attribute 'fixed-pitch nil
+                          :font "JetBrains Mono"
+                          :height (* font-size 10))
 
-			;; Set the variable pitch face
-			(set-face-attribute 'variable-pitch nil
-													:font "Iosevka Aile"
-													:height (* font-size 10))
+      ;; Set the variable pitch face
+      (set-face-attribute 'variable-pitch nil
+                          :font "Iosevka Aile"
+                          :height (* font-size 10))
 
-			;; emoji
-			(set-fontset-font nil '(#x1F000 . #x1FAFF) "Noto Color Emoji")
+      ;; emoji
+      (set-fontset-font t '(#x1F000 . #x1FAFF)
+                        (font-spec
+                         :family "Noto Color Emoji"
+                         :height (* font-size 10))
+                        nil 'append)
 
-			;; japanese
-			(set-fontset-font t 'unicode
-												(font-spec
-												 :family "Noto Sans CJK JP"
-												 :height (* font-size 10))
-												nil 'append))
+      ;; japanese
+      (set-fontset-font t 'unicode
+                        (font-spec
+                         :family "Noto Sans CJK JP"
+                         :height (* font-size 10))
+                        nil 'append))
 
-		;; Ligature for Fira Code or JetBrains Mono
-		(let ((alist
-					 '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
-						 (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
-						 (36 . ".\\(?:>\\)")
-						 (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
-						 (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
-						 (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
-						 (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
-						 (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
-						 (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
-						 (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
-						 (48 . ".\\(?:x[a-zA-Z]\\)")
-						 (58 . ".\\(?:::\\|[:=]\\)")
-						 (59 . ".\\(?:;;\\|;\\)")
-						 (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
-						 (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
-						 (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
-						 (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
-						 (91 . ".\\(?:]\\)")
-						 (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
-						 (94 . ".\\(?:=\\)")
-						 (119 . ".\\(?:ww\\)")
-						 (123 . ".\\(?:-\\)")
-						 (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
-						 (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
-			(dolist (char-regexp alist)
-				(set-char-table-range composition-function-table (car char-regexp)
-															`([,(cdr char-regexp) 0 font-shape-gstring])))))
+    ;; Ligature for Fira Code or JetBrains Mono
+    (let ((alist
+           '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
+             (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
+             (36 . ".\\(?:>\\)")
+             (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
+             (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
+             (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
+             (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
+             (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
+             (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
+             (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
+             (48 . ".\\(?:x[a-zA-Z]\\)")
+             (58 . ".\\(?:::\\|[:=]\\)")
+             (59 . ".\\(?:;;\\|;\\)")
+             (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
+             (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
+             (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
+             (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
+             (91 . ".\\(?:]\\)")
+             (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
+             (94 . ".\\(?:=\\)")
+             (119 . ".\\(?:ww\\)")
+             (123 . ".\\(?:-\\)")
+             (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
+             (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
+      (dolist (char-regexp alist)
+        (set-char-table-range composition-function-table (car char-regexp)
+                              `([,(cdr char-regexp) 0 font-shape-gstring])))))
 
-	(defun my/set-font-weight (&optional weight)
-		(interactive)
-		(let ((weight (if weight weight
-										(intern (completing-read "Choose weight:"
-																						 '(light normal bold))))))
-			(set-face-attribute 'default nil :weight weight)
-			(set-face-attribute 'fixed-pitch nil :weight weight)
-			(set-face-attribute 'variable-pitch nil :weight weight)))
+  (defun my/set-font-weight (&optional weight)
+    (interactive)
+    (let ((weight (if weight weight
+                    (intern (completing-read "Choose weight:"
+                                             '(light normal bold))))))
+      (set-face-attribute 'default nil :weight weight)
+      (set-face-attribute 'fixed-pitch nil :weight weight)
+      (set-face-attribute 'variable-pitch nil :weight weight)))
 
-	(defun my/set-font-weight-after-load-theme (&rest args)
-		(let* ((str-theme (symbol-name (car args)))
-					 (weight (cond
-										((string-match "\\(light\\|operandi\\)" str-theme) 'normal)
-										((and (string-match "bespoke" str-theme)
-													(eq 'light bespoke-set-theme)) 'normal)
-										(t 'light))))
-			(my/set-font-weight weight))))
+  (defun my/set-font-weight-after-load-theme (&rest args)
+    (let* ((str-theme (symbol-name (car args)))
+           (weight (cond
+                    ((string-match "\\(light\\|operandi\\)" str-theme) 'normal)
+                    ((and (string-match "bespoke" str-theme)
+                          (eq 'light bespoke-set-theme)) 'normal)
+                    (t 'light))))
+      (my/set-font-weight weight))))
 
 (leaf doom-themes
   :doc "an opinionated pack of modern color-themes"
@@ -1417,23 +1425,83 @@ respectively."
     (tramp-set-completion-function "ssh"
                                    '((tramp-parse-sconfig "~/.ssh/config")))))
 
+;; (leaf orderless
+;;   :ensure t
+;;   :require t
+;;   :advice (:around company-capf--candidates just-one-face)
+;;   :custom
+;;   '((completion-styles . '(orderless))
+;;     (completion-category-defaults . nil)
+;;     (completion-category-overrides . ((file (styles partial-completion)))))
+
+;;   :preface
+;;   (defun just-one-face (fn &rest args)
+;;     (let ((orderless-match-faces [completions-common-part]))
+;;       (apply fn args))))
+
 (leaf orderless
   :ensure t
-  :require t
-  :custom ((completion-styles . '(orderless))
-           (completion-category-defaults . nil)
-           (completion-category-overrides . '((file (styles partial-completion)))))
+  :require t migemo
   :advice (:around company-capf--candidates just-one-face)
+  :custom
+  '((completion-styles . '(orderless))
+    (completion-category-defaults . nil)
+    (completion-category-overrides
+     quote ((file (styles partial-completion))
+            (consult-location (styles orderless-migemo-style))
+            (consult-multi (styles orderless-migemo-style))
+            (unicode-name (styles partial-completion))
+            (command (styles partial-completion)))))
+
   :preface
   (defun just-one-face (fn &rest args)
     (let ((orderless-match-faces [completions-common-part]))
-      (apply fn args))))
+      (apply fn args)))
+
+  (defun orderless-migemo (component)
+    (let ((pattern (migemo-get-pattern component)))
+      (condition-case nil
+          (progn (string-match-p pattern "") pattern)
+        (invalid-regexp nil))))
+
+  :config
+  (orderless-define-completion-style orderless-default-style
+    (orderless-matching-styles '(orderless-prefixes)))
+
+  (orderless-define-completion-style orderless-migemo-style
+    (orderless-matching-styles '(orderless-prefixes
+                                 orderless-literal
+                                 orderless-regexp
+                                 orderless-migemo))))
+
+(leaf migemo
+  :ensure t
+  :custom
+  '((migemo-user-dictionary  . nil)
+    (migemo-regex-dictionary . nil)
+    (migemo-coding-system    . 'utf-8)
+    (migemo-dictionary . "/usr/local/share/migemo/utf-8/migemo-dict")
+    (migemo-isearch-enable-p . nil))
+  ;; :init
+  ;; (setq migemo-dictionary )
+  :hook
+  (after-init-hook . migemo-init))
 
 (leaf marginalia
   :ensure t
   :require t
   :after vertico
   :global-minor-mode t)
+
+;; (leaf marginalia
+;;   :ensure t
+;;   :require t
+;;   :after vertico
+;;   :init
+;;   (marginalia-mode)
+;;   :config
+;;   (add-to-list 'marginalia-prompt-categories
+;;                '("\\<File\\>" . file)))
 
 (leaf vertico
   :ensure t
@@ -1631,6 +1699,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                             :weight 'normal
                             :slant 'normal
                             :height (cdr face)))
+
+      ;; variable pitch
+      (face-remap-add-relative 'default :inherit 'variable-pitch)
 
       ;; Ensure that anything that should be fixed-pitch in Org files appears that way
       (set-face-attribute 'org-block nil						:inherit 'fixed-pitch :foreground nil)
@@ -2012,6 +2083,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :req "emacs-24.4" "org-9.0"
   :url "https://ox-hugo.scripter.co"
   :ensure t
+  :commands org-exports-dispatch
   :after org
   :require t
   :defun (org-set-property)
@@ -2335,7 +2407,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                  `(("ja-uptex" . ,(concat opts "%s.tex"))
                    ("en-pdflatex" . ,(concat opts "-e $bibtex=q/bibtex/ -pdf %s.tex"))
                    ("pdfview" . "open %s.pdf")
-                   ("Displayline" . "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b")))
+                   ;; mac ("Displayline" . "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b")
+                   ("Displayline" . "okular --unique %o#src:%n%(dir)./%b")
+                   ))
           (add-to-list 'TeX-command-list `(,(car command-alist)
                                            ,(cdr command-alist)
                                            TeX-run-command t nil))))))
@@ -2378,7 +2452,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf tree-sitter
   :ensure t tree-sitter-langs
-  :require tree-sitter-langs
+  ;; :require tree-sitter-langs
   :preface
   (defun my/highlight-python-docstrings ()
     (add-function
@@ -2401,7 +2475,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :bind (("C-M-j" . skk-undo-kakutei))
   :global-minor-mode t context-skk-mode
   :custom ((default-input-method . "japanese-skk")
-           (skk-tut-file . "~/src/github.com/skk-dev/ddskk/etc/SKK.tut")
            (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
            (skk-server-host . "localhost")
            (skk-server-prtnum . 1178)
@@ -2410,6 +2483,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (skk-preload . t)
            (skk-isearch-mode-enable . 'always)
            (skk-kutouten-type . 'en)
+           (skk-use-auto-kutouten . t)
            (skk-show-inline . 'vertical)
            (skk-inline-show-face . nil)
            (skk-egg-like-newline . t)  ;; skk-kakutei by RET
@@ -2462,7 +2536,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :config
   (set-variable 'read-mail-command 'mu4e)
   (setq mail-user-agent 'mu4e-user-agent
-
         message-send-mail-function 'smtpmail-send-it
 
         ;; Make sure plain text mails flow correctly for recipients
@@ -2807,12 +2880,14 @@ Interactively, URL defaults to the string looking like a url around point."
 
 (leaf pdf-tools
   :ensure t
+  ;; :require t pdf-view pdf-misc pdf-occur pdf-util pdf-annot pdf-info pdf-isearch pdf-history pdf-links
+
+  :mode ("\\.pdf\\'" . pdf-view-mode)
   :hook ((TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
          (pdf-view-mode-hook . (lambda () (set-buffer-multibyte t))))
   :custom (pdf-view-display-size . 'fit-width)
-  :init
-  (pdf-tools-install)
   :config
+  (pdf-tools-install :no-query)
   (leaf pdf-annot
     :require t
     :after pdf-tools
@@ -2891,19 +2966,9 @@ Interactively, URL defaults to the string looking like a url around point."
 
   (exwm-enable))
 
-(setq comp-deferred-compilation-deny-list (list "jupyter"))
 (leaf jupyter
-  :ensure t
+  :ensure t websocket
   :config
   (add-to-list 'org-babel-load-languages '(jupyter . t)))
-
-(defun my/update-ns-appearance (sym-theme &rest args)
-  (let* ((str-theme (symbol-name sym-theme))
-         (appearance (if (string-match "\\(light\\|operandi\\)" str-theme)
-                         'light
-                       'dark)))
-    (dolist (elm default-frame-alist)
-      (when (eq 'ns-appearance (car elm)) (delete elm default-frame-alist)))
-    (add-to-list 'default-frame-alist `(ns-appearance . ,appearance))))
 
 (provide 'init)

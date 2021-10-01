@@ -1,0 +1,37 @@
+*** /tmp/ediffxaBkfH	2021-09-30 17:22:54.891121639 +0900
+--- /home/naoki/.emacs.d/elisp/bespoke-theme/bespoke-modeline.el	2021-09-30 17:21:42.804450178 +0900
+***************
+*** 252,258 ****
+  		                    'display `(raise ,space-down))
+                  (if (derived-mode-p 'deft-mode)
+                      (propertize primary 'face 'match)
+! 	              (propertize primary 'face 'fringe))))
+           (right (concat secondary " "))
+           (available-width (- (window-total-width)
+  			                 (length prefix) (length left) (length right)
+--- 252,276 ----
+  		                    'display `(raise ,space-down))
+                  (if (derived-mode-p 'deft-mode)
+                      (propertize primary 'face 'match)
+! 									(propertize primary 'face 'fringe))
+! 
+! 								(when (and org-mode-line-string
+!  													 (not (or (bespoke-modeline-term-mode-p)
+!  																		(bespoke-modeline-vterm-mode-p)
+!  																		(bespoke-modeline-completion-list-mode-p)
+!  																		(bespoke-modeline-calendar-mode-p)
+!  																		(bespoke-modeline-org-capture-mode-p)
+!  																		(bespoke-modeline-org-agenda-mode-p))))
+!  									(propertize "  "  'face
+!  															(if active (cond ((eq bespoke-set-mode-line 'header)
+!  																								'header-line)
+!  																							 ((eq bespoke-set-mode-line 'footer)
+!  																								'mode-line)
+!  																							 ((eq bespoke-set-mode-line nil)
+!  																								'mode-line))
+!  																'fringe)
+!  															'display `(raise ,space-down))
+!  									(propertize org-mode-line-string 'face 'fringe))))
+           (right (concat secondary " "))
+           (available-width (- (window-total-width)
+  			                 (length prefix) (length left) (length right)
