@@ -1425,56 +1425,58 @@ respectively."
     (tramp-set-completion-function "ssh"
                                    '((tramp-parse-sconfig "~/.ssh/config")))))
 
-;; (leaf orderless
-;;   :ensure t
-;;   :require t
-;;   :advice (:around company-capf--candidates just-one-face)
-;;   :custom
-;;   '((completion-styles . '(orderless))
-;;     (completion-category-defaults . nil)
-;;     (completion-category-overrides . ((file (styles partial-completion)))))
+(if (executable-find "cmigemo")
+    (leaf orderless
+      :ensure t
+      :require t
+      :advice (:around company-capf--candidates just-one-face)
+      :custom
+      '((completion-styles . '(orderless))
+        (completion-category-defaults . nil)
+        (completion-category-overrides . ((file (styles partial-completion)))))
 
-;;   :preface
-;;   (defun just-one-face (fn &rest args)
-;;     (let ((orderless-match-faces [completions-common-part]))
-;;       (apply fn args))))
+      :preface
+      (defun just-one-face (fn &rest args)
+        (let ((orderless-match-faces [completions-common-part]))
+          (apply fn args))))
 
-(leaf orderless
-  :ensure t
-  :require t migemo
-  :advice (:around company-capf--candidates just-one-face)
-  :custom
-  '((completion-styles . '(orderless))
-    (completion-category-defaults . nil)
-    (completion-category-overrides
-     quote ((file (styles partial-completion))
-            (consult-location (styles orderless-migemo-style))
-            (consult-multi (styles orderless-migemo-style))
-            (unicode-name (styles partial-completion))
-            (command (styles partial-completion)))))
+  (leaf orderless
+    :ensure t
+    :require t migemo
+    :advice (:around company-capf--candidates just-one-face)
+    :custom
+    '((completion-styles . '(orderless))
+      (completion-category-defaults . nil)
+      (completion-category-overrides
+       quote ((file (styles partial-completion))
+              (consult-location (styles orderless-migemo-style))
+              (consult-multi (styles orderless-migemo-style))
+              (unicode-name (styles partial-completion))
+              (command (styles partial-completion)))))
 
-  :preface
-  (defun just-one-face (fn &rest args)
-    (let ((orderless-match-faces [completions-common-part]))
-      (apply fn args)))
+    :preface
+    (defun just-one-face (fn &rest args)
+      (let ((orderless-match-faces [completions-common-part]))
+        (apply fn args)))
 
-  (defun orderless-migemo (component)
-    (let ((pattern (migemo-get-pattern component)))
-      (condition-case nil
-          (progn (string-match-p pattern "") pattern)
-        (invalid-regexp nil))))
+    (defun orderless-migemo (component)
+      (let ((pattern (migemo-get-pattern component)))
+        (condition-case nil
+            (progn (string-match-p pattern "") pattern)
+          (invalid-regexp nil))))
 
-  :config
-  (orderless-define-completion-style orderless-default-style
-    (orderless-matching-styles '(orderless-prefixes)))
+    :config
+    (orderless-define-completion-style orderless-default-style
+      (orderless-matching-styles '(orderless-prefixes)))
 
-  (orderless-define-completion-style orderless-migemo-style
-    (orderless-matching-styles '(orderless-prefixes
-                                 orderless-literal
-                                 orderless-regexp
-                                 orderless-migemo))))
+    (orderless-define-completion-style orderless-migemo-style
+      (orderless-matching-styles '(orderless-prefixes
+                                   orderless-literal
+                                   orderless-regexp
+                                   orderless-migemo)))))
 
 (leaf migemo
+  :when (executable-find "cmigemo")
   :ensure t
   :custom
   '((migemo-user-dictionary  . nil)
