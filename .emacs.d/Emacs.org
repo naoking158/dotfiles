@@ -2336,6 +2336,9 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                                :slant 'normal
                                :height (cdr face)))
    
+         ;; variable pitch
+         (face-remap-add-relative 'default :inherit 'variable-pitch)
+         
          ;; Ensure that anything that should be fixed-pitch in Org files appears that way
          (set-face-attribute 'org-block nil						:inherit 'fixed-pitch :foreground nil)
          (set-face-attribute 'org-table nil						:inherit 'fixed-pitch)

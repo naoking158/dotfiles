@@ -2,7 +2,7 @@
 # Please see http://i3wm.org/docs/userguide.html for a complete reference!
 
 # short key repeat
-exec --no-startup-id xset r rate 180 40
+exec xset r rate 180 40
 
 # Autostart Input Method
 exec --no-startup-id fcitx5 -d
