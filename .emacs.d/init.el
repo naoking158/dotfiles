@@ -1425,7 +1425,7 @@ respectively."
     (tramp-set-completion-function "ssh"
                                    '((tramp-parse-sconfig "~/.ssh/config")))))
 
-(if (executable-find "cmigemo")
+(if (not (executable-find "cmigemo"))
     (leaf orderless
       :ensure t
       :require t
