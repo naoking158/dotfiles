@@ -2520,15 +2520,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (python-mode-hook . dap-ui-mode)
    (python-mode-hook . dap-tooltip-mode)))
 
-(setq path-to-mu
-      (cond
-       ((file-exists-p
-         "/usr/local/Cellar/mu/1.6.5/share/emacs/site-lisp/mu/mu4e/")
-        "/usr/local/Cellar/mu/1.6.5/share/emacs/site-lisp/mu/mu4e/")
-       ((file-exists-p
-         "/usr/share/emacs/site-lisp/mu4e")
-        "/usr/share/emacs/site-lisp/mu4e")
-       (t nil)))
+(let* ((parent (if (memq window-system '(darwin ns)) "/usr/local/Cellar/mu/"
+                 "/usr/share/emacs/"))
+       (cmd (concat "find " parent " -type d -name mu4e")))
+  (setq path-to-mu (car (last (split-string (shell-command-to-string cmd))))))
 
 (leaf mu4e
   :when path-to-mu
