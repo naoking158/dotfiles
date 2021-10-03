@@ -1985,7 +1985,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 
 #+begin_src emacs-lisp
   
-  (if (executable-find "cmigemo")
+  (if (not (executable-find "cmigemo"))
       (leaf orderless
         :ensure t
         :require t
