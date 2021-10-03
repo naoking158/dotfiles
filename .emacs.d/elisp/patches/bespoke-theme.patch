@@ -17,7 +17,7 @@
   (defun bespoke--set-theme-variant ()
     "Set theme colors according to LIGHT or DARK variant"
 ! 	(setq bespoke-foreground (--l/d "#282b35" "#eceff8"))
-! 	(setq bespoke-background (--l/d "#fffef9" "#23262"))
+! 	(setq bespoke-background (--l/d "#fffef9" "#23262f"))
   
 ! 	(setq bespoke-modeline   (--l/d "#e3e7ef" "#3c4353"))
     (setq bespoke-highlight  (--l/d "#dbe1eb" "#444B5c"))
