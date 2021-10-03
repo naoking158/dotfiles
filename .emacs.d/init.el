@@ -2234,6 +2234,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
        :if-new (file+head "work/${slug}.org"
                           "#+title: ${title}\n#+filetags: Meeting\n#+options: toc:nil")
        :unnarrowed t)
+      ("w" "Working" plain "%?"
+       :if-new (file+head "work/${slug}.org"
+                          "#+title: ${title}\n#+filetags: Working\n#+options: toc:nil")
+       :unnarrowed t)
       ("p" "private" plain "%?"
        :if-new (file+head "private/${slug}.org"
                           "#+title: ${title}\n#+date: %U\n")
