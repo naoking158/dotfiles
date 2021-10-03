@@ -2791,8 +2791,9 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
         org-msg-convert-citation t)
   (org-msg-mode))
 
-(leaf xwwp
-  :when (eq 'darwin window-system)
+(leaf xwwp  
+  :when (or (<= emacs-major-version 27)
+            (memq window-system '(ns darwin)))
   :ensure t
   :custom (browse-url-browser-function . 'xwidget-webkit-browse-url)
   :bind (("C-c s" . xwwp)
@@ -2822,13 +2823,14 @@ Interactively, URL defaults to the string looking like a url around point."
                                   (xwidget-webkit-current-session))))))))
 
 (leaf webkit
-  :when (eq 'pgtk window-system)
+  :when (and (eq 28 emacs-major-version)
+             (memq window-system '(x pgtk)))
   :load-path "~/.emacs.d/elisp/emacs-webkit/"
   :require t webkit-ace webkit-dark
   ;; :init
   ;; ;; This must be set before webkit.el is loaded so certain hooks aren't installed
   ;; (setq webkit-own-window t)
-  :bind ("C-c s" . webkit)
+  :bind (("C-c s" . webkit))
   :config
   ;; If you don't care so much about privacy and want to give your data to google
   (setq webkit-search-prefix "https://google.com/search?q=") 
@@ -2905,7 +2907,7 @@ Interactively, URL defaults to the string looking like a url around point."
 (leaf exwm
   :disabled t
   :ensure t  
-  :when (eq 'pgtk window-system)
+  :when (eq 'x window-system)
   :leaf-defer nil
   ;; When window "class" updates, use it to set the buffer name
   :hook (exwm-update-class-hook . my/exwm-update-class)
