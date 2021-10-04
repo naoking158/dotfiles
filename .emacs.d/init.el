@@ -1619,6 +1619,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
    (org-hide-emphasis-markers . t)
    (org-src-window-setup . 'current-window)
+   (org-src-fontify-natively . t)
    (org-fontify-quote-and-verse-blocks . t)
    (org-hide-block-startup . nil)
    (org-startup-folded . 'content)
@@ -1702,7 +1703,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
       (face-remap-add-relative 'default :inherit 'variable-pitch)
 
       ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-      (set-face-attribute 'org-block nil						:inherit 'fixed-pitch :foreground nil)
+      (set-face-attribute 'org-block nil						:inherit 'fixed-pitch :foreground nil :background bespoke-subtle)
       (set-face-attribute 'org-table nil						:inherit 'fixed-pitch)
       (set-face-attribute 'org-formula nil					:inherit 'fixed-pitch)
       (set-face-attribute 'org-code nil							:inherit '(shadow fixed-pitch))
