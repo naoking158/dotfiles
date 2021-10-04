@@ -331,7 +331,7 @@ set_from_resource $term_color14    color14
 set_from_resource $term_color15    color15
 
 # Set Display Setting
-exec_always --no-startup-id autorandr --change; sleep 2; nitrogen --restore; LC_ALL=C bash $HOME/.config/polybar/launch.sh; sleep 1; picom -b
+exec_always --no-startup-id autorandr --load home; sleep 2; nitrogen --restore; LC_ALL=C bash $HOME/.config/polybar/launch.sh; sleep 1; picom -b
 
 # hide/unhide i3status bar
 # bindsym $mod+m bar mode toggle
