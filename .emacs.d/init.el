@@ -1613,7 +1613,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :require org-tempo  ;; need for org-template
   :mode "\\.org\\'"
   :hook (org-mode-hook . my/org-mode-hook)
-  :advice (:after load-theme my/set-org-face)
   :custom
   ((org-directory . "~/org/")
    (org-ellipsis . " ▼ ")
@@ -1663,11 +1662,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                      ("mt" . "todo")
                                      ("ms" . "summary"))))
 
+  :defun my/set-org-face
   :preface
-  (defun my/org-mode-hook ()
-    (add-hook 'completion-at-point-functions
-              'pcomplete-completions-at-point nil t))
-
   (when window-system
     ;; Make sure org-indent face is available
     (require 'org-indent)
@@ -1731,6 +1727,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
     (when (fboundp 'mac-toggle-input-method)
       (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii)))
+
+  (defun my/org-mode-hook ()
+    ;; (add-hook 'completion-at-point-functions
+    ;;           'pcomplete-completions-at-point nil t)
+    (my/set-org-face))
 
   :config
   (leaf org-fragtog
