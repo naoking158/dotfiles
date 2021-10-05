@@ -129,7 +129,7 @@
                                   ,no-littering-var-directory
                                   ,no-littering-etc-directory))
              (recentf-save-file . "~/.emacs.d/.recentf")
-             (recentf-max-saved-items . 1000)
+             (recentf-max-saved-items . 2000)
              (recentf-auto-cleanup . 'never))
     :global-minor-mode t)
 
@@ -681,11 +681,14 @@
   :url "https://github.com/MaskRay/ccls/wiki/lsp-mode#find-definitionsreferences"
   :emacs>= 25.1
   :ensure t
-  :commands lsp
-  :init
-  (when (bound-and-true-p corfu-mode)
-    ;; This option need to avoid starting company-mode
-    (custom-set-variables '(lsp-completion-provider :none)))
+  :commands lsp lsp-deferred
+  :hook ((lsp-mode-hook . lsp-enable-which-key-integration)
+         (lsp-managed-mode-hook . lsp-modeline-diagnostics-mode)
+         (lsp-mode-hook . (lambda nil
+                            (when (featurep 'corfu)
+                              ;; This option need to avoid starting company-mode
+                              (custom-set-variables
+                               '(lsp-completion-provider :none))))))
   :custom `((lsp-keymap-prefix . "s-l")        
             ;; (gcmh-low-cons-threshold . ,(* 512 1024 1024))  ;; 512MB
             (read-process-output-max . ,(* 1 1024 1024))  ;; 1MB
@@ -702,9 +705,7 @@
             (lsp-prefer-flymake . t)
             (lsp-completion-enable . t)
             (lsp-enable-indentation . nil)
-            (lsp-restart . 'ignore))
-  :hook ((lsp-mode-hook . lsp-enable-which-key-integration)
-         (lsp-managed-mode-hook . lsp-modeline-diagnostics-mode)))
+            (lsp-restart . 'ignore)))
 
 (leaf lsp-latex
   :doc "lsp-mode client for LaTeX, on texlab"
@@ -1429,21 +1430,22 @@ respectively."
     (leaf orderless
       :ensure t
       :require t
-      :advice (:around company-capf--candidates just-one-face)
+      ;; :advice (:around company-capf--candidates just-one-face)
       :custom
       '((completion-styles . '(orderless))
         (completion-category-defaults . nil)
         (completion-category-overrides . ((file (styles partial-completion)))))
 
-      :preface
-      (defun just-one-face (fn &rest args)
-        (let ((orderless-match-faces [completions-common-part]))
-          (apply fn args))))
+      ;; :preface
+      ;; (defun just-one-face (fn &rest args)
+      ;;   (let ((orderless-match-faces [completions-common-part]))
+      ;;     (apply fn args)))
+      )
 
   (leaf orderless
     :ensure t migemo
     :require t migemo
-    :advice (:around company-capf--candidates just-one-face)
+    ;; :advice (:around company-capf--candidates just-one-face)
     :custom
     '((completion-styles . '(orderless))
       (completion-category-defaults . nil)
@@ -1455,9 +1457,9 @@ respectively."
               (command (styles partial-completion)))))
 
     :preface
-    (defun just-one-face (fn &rest args)
-      (let ((orderless-match-faces [completions-common-part]))
-        (apply fn args)))
+    ;; (defun just-one-face (fn &rest args)
+    ;;   (let ((orderless-match-faces [completions-common-part]))
+    ;;     (apply fn args)))
 
     (defun orderless-migemo (component)
       (let ((pattern (migemo-get-pattern component)))
