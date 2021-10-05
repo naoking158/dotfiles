@@ -1441,7 +1441,7 @@ respectively."
           (apply fn args))))
 
   (leaf orderless
-    :ensure t
+    :ensure t migemo
     :require t migemo
     :advice (:around company-capf--candidates just-one-face)
     :custom
