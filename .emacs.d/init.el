@@ -11,7 +11,7 @@
 
 (setq comp-deferred-compilation-deny-list (list "jupyter"))
 
-(setq exec-profile t)
+(setq exec-profile nil)
 
 (when exec-profile
   (defvar setup-tracker--level 0)
@@ -146,6 +146,7 @@
     :url "http://handlename.hatenablog.jp/entry/2011/12/11/214923"
     :leaf-defer nil
     :bind ("C-M-h" . delete-region)
+    :hook (after-init-hook . (lambda nil (menu-bar-mode -1)))
     :custom '((fill-column . 82)
               (tab-width . 2)             
               (frame-resize-pixelwise . t)

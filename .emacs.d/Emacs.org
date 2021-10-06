@@ -82,6 +82,73 @@ This is an ongoing evolution of my original Emacs configuration files, inspired 
 - [[#footer][Footer]]
 :END:
 
+* Early-Init
+:PROPERTIES:
+:ID:       4A8E2D78-CE01-4769-A784-49956617A4E5
+:END:
+#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
+  ;;; early-init.el --- Early Initialization. -*- lexical-binding: t no-byte-compile: t -*-
+  ;;; Commentary:
+  ;;
+  ;; Emacs 27 introduces early-init.el, which is run before init.el,
+  ;; before package and UI initialization happens.
+  ;;
+  ;;; Code:
+  
+  
+  ;; Speed up startup
+  (defvar default-file-name-handler-alist file-name-handler-alist)
+  (setq file-name-handler-alist nil)
+  (setq gc-cons-threshold most-positive-fixnum)
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              "Restore defalut values after startup."
+              (setq file-name-handler-alist default-file-name-handler-alist
+            gc-cons-threshold (* 1024 1024 1024))))
+  
+  ;; basic
+  (prefer-coding-system 'utf-8)
+  (set-file-name-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-clipboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (set-default 'buffer-file-coding-system 'utf-8)
+  (setq debug-on-error nil
+        init-file-debug t
+        user-full-name "Naoki Sakamoto"
+        user-mail-address "naoki@bbo.cs.tsukuba.ac.jp"
+        user-login-name "naoking158"
+        package-native-compile t)
+  ;; (native-compile-async "~/.emacs.d/elisp/" 'recursively)
+  ;; (dolist (item (split-string
+  ;; 							 (shell-command-to-string "which fish") "\n"))
+  ;; 	(when (string-match "/usr/" item)
+  ;; 		(setq shell-file-name item)))
+  (let ((fish (executable-find "fish")))
+    (when fish (setq shell-file-name fish)))
+  
+  ;; GUI
+  (setq default-frame-alist (append '((line-spacing . 4)
+                                      (vertical-scroll-bars)
+                                      (menu-bar-lines . 0)
+                                      (tool-bar-lines . 0)
+                                      (left-fringe . 10)
+                                      (right-fringe . 10))
+                                    initial-frame-alist))
+  
+  ;; (push '(fullscreen . maximized) default-frame-alist)
+  ;; (push initial-frame-alist default-frame-alist)
+  (setq inhibit-splash-screen t
+        frame-inhibit-implied-resize t
+        byte-compile-warnings '(cl-functions))
+  
+  (provide 'early-init)
+  
+  ;;; early-init.el ends here
+#+end_src
+
+
 * Header
 :PROPERTIES:
 :ID:       875737C6-80FB-4110-B49A-6A330AE8CCB9
@@ -118,30 +185,8 @@ This is an ongoing evolution of my original Emacs configuration files, inspired 
 
 By setting ~exec-profile~ to ~t~, profiling startup time is executed.
 
-mu4e  6223ms
-mu4e-view 5000ms
-dap-mode 567ms
--> lsp-mode 551ms
-org-ref 0ms
-helm-bibtex 
-ol-gnus 135ms
-ox-hugo  664ms
-org-indent 0ms
-org-tempo 480ms
-feather 0ms
-
-conda 510
-
-> > mu4e-view.elc (5330 msec)
-> > > mu4e-view-gnus.elc (5327 msec)
-> > > > gnus-art.elc (5303 msec)
-
-> ox-hugo.elc (709 msec)
-> > ox-blackfriday.elc (658 msec)
-> > > ox-md.elc (648 msec)
-
 #+begin_src emacs-lisp
-  (setq exec-profile t)
+  (setq exec-profile nil)
   
   (when exec-profile
     (defvar setup-tracker--level 0)
@@ -315,6 +360,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
       :url "http://handlename.hatenablog.jp/entry/2011/12/11/214923"
       :leaf-defer nil
       :bind ("C-M-h" . delete-region)
+      :hook (after-init-hook . (lambda nil (menu-bar-mode -1)))
       :custom '((fill-column . 82)
                 (tab-width . 2)             
                 (frame-resize-pixelwise . t)
