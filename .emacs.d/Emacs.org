@@ -82,6 +82,73 @@ This is an ongoing evolution of my original Emacs configuration files, inspired 
 - [[#footer][Footer]]
 :END:
 
+* Early-Init
+:PROPERTIES:
+:ID:       4A8E2D78-CE01-4769-A784-49956617A4E5
+:END:
+#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
+  ;;; early-init.el --- Early Initialization. -*- lexical-binding: t no-byte-compile: t -*-
+  ;;; Commentary:
+  ;;
+  ;; Emacs 27 introduces early-init.el, which is run before init.el,
+  ;; before package and UI initialization happens.
+  ;;
+  ;;; Code:
+  
+  
+  ;; Speed up startup
+  (defvar default-file-name-handler-alist file-name-handler-alist)
+  (setq file-name-handler-alist nil)
+  (setq gc-cons-threshold most-positive-fixnum)
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              "Restore defalut values after startup."
+              (setq file-name-handler-alist default-file-name-handler-alist
+            gc-cons-threshold (* 1024 1024 1024))))
+  
+  ;; basic
+  (prefer-coding-system 'utf-8)
+  (set-file-name-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-clipboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (set-default 'buffer-file-coding-system 'utf-8)
+  (setq debug-on-error nil
+        init-file-debug t
+        user-full-name "Naoki Sakamoto"
+        user-mail-address "naoki@bbo.cs.tsukuba.ac.jp"
+        user-login-name "naoking158"
+        package-native-compile t)
+  ;; (native-compile-async "~/.emacs.d/elisp/" 'recursively)
+  ;; (dolist (item (split-string
+  ;; 							 (shell-command-to-string "which fish") "\n"))
+  ;; 	(when (string-match "/usr/" item)
+  ;; 		(setq shell-file-name item)))
+  (let ((fish (executable-find "fish")))
+    (when fish (setq shell-file-name fish)))
+  
+  ;; GUI
+  (setq default-frame-alist (append '((line-spacing . 4)
+                                      (vertical-scroll-bars)
+                                      (menu-bar-lines . 0)
+                                      (tool-bar-lines . 0)
+                                      (left-fringe . 10)
+                                      (right-fringe . 10))
+                                    initial-frame-alist))
+  
+  ;; (push '(fullscreen . maximized) default-frame-alist)
+  ;; (push initial-frame-alist default-frame-alist)
+  (setq inhibit-splash-screen t
+        frame-inhibit-implied-resize t
+        byte-compile-warnings '(cl-functions))
+  
+  (provide 'early-init)
+  
+  ;;; early-init.el ends here
+#+end_src
+
+
 * Header
 :PROPERTIES:
 :ID:       875737C6-80FB-4110-B49A-6A330AE8CCB9
@@ -293,6 +360,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
       :url "http://handlename.hatenablog.jp/entry/2011/12/11/214923"
       :leaf-defer nil
       :bind ("C-M-h" . delete-region)
+      :hook (after-init-hook . (lambda nil (menu-bar-mode -1)))
       :custom '((fill-column . 82)
                 (tab-width . 2)             
                 (frame-resize-pixelwise . t)
@@ -2248,8 +2316,12 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
    (leaf org
      :doc "Export Framework for Org Mode"
      :tag "builtin"
-     :ensure t ;; org-plus-contrib
-     :require org-tempo  ;; need for org-template
+     :ensure t
+   
+     :require
+     org-tempo   ;; need for org-template
+     org-indent  ;; Make sure org-indent face is available
+   
      :mode "\\.org\\'"
      :hook (org-mode-hook . my/org-mode-hook)
      :custom
@@ -2305,8 +2377,6 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
      :defun my/set-org-face
      :preface
      (when window-system
-       ;; Make sure org-indent face is available
-       (require 'org-indent)
    
        (create-fontset-from-ascii-font "Iosevka Aile-14"
                                        nil
@@ -2386,7 +2456,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 
 #+begin_src emacs-lisp
   (leaf org-agenda
-    :after org
+    ;; :after org
     :require t org-habit org-capture
     :bind* (("C-c C-a" . my/org-agenda-cache)
             ("C-c C-m" . jethro/org-inbox-capture))
@@ -2526,7 +2596,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                        (setq org-agenda-files
                              (directory-files-recursively org-directory
                                                           "\\.org$"))))
-    :config
+    :defer-config
     (setq
      jethro/org-agenda-directory (file-truename "~/org/gtd/")
      org-agenda-files (directory-files-recursively org-directory "\\.org$")
@@ -2784,13 +2854,12 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :req "emacs-24.4" "org-9.0"
     :url "https://ox-hugo.scripter.co"
     :ensure t
-    :commands org-exports-dispatch
-    :after org
     :require t
+    :commands org-exports-dispatch
     :defun (org-set-property)
     :custom ((org-hugo-front-matter-format . "yaml")
              (org-hugo-link-desc-insert-type . t))
-    :config
+    :defer-config
     (defun c/ox-hugo-add-lastmod nil
       "Add `lastmod' property with the current time."
       (interactive)
@@ -2917,7 +2986,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   (leaf org-roam
     :doc "Roam Research replica with Org-mode"
     :url "https://github.com/org-roam/org-roam"
-    :after org
+    ;; :after org
     :ensure t
     ;; This is necessary for variables to be initialized correctly.
     :require t
@@ -2956,8 +3025,8 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
         ("p" "private" plain "%?"
          :if-new (file+head "private/${slug}.org"
                             "#+title: ${title}\n#+date: %U\n")
-         :unnarrowed t)
-        )))
+         :unnarrowed t))))
+    
     :config
     (leaf org-roam-dailies
       :require t
@@ -3427,7 +3496,7 @@ While browsing, remember the following:
   (leaf dap-mode
     :ensure t
     :require t dap-python
-    :after exec-path-from-shell
+    ;; :after exec-path-from-shell
     :custom (;; (dap-python-debugger . 'debugpy)
              ;; (dap-python-executable . path-to-venv-python)
              (dap-auto-configure-features . '(sessions locals tooltip))
@@ -3471,9 +3540,10 @@ While browsing, remember the following:
   (leaf mu4e
     :when path-to-mu
     :load-path path-to-mu
-    :require t
-    :hook (mu4e-headers-mode-hook . (lambda () (visual-line-mode -1)))
-    :config
+    :hook (after-init-hook . (lambda () (require 'mu4e)))
+    ;; :require t
+    ;; :hook (mu4e-headers-mode-hook . (lambda () (visual-line-mode -1)))
+    :defer-config
     (set-variable 'read-mail-command 'mu4e)
     (setq mail-user-agent 'mu4e-user-agent
           message-send-mail-function 'smtpmail-send-it
@@ -3699,14 +3769,13 @@ While browsing, remember the following:
   
   (leaf mu4e-views
     :ensure t
-    :after mu4e
     :bind (mu4e-headers-mode-map
            :package mu4e
            ("v" . mu4e-views-mu4e-select-view-msg-method) ;; select viewing method
            ("M-n" . mu4e-views-cursor-msg-view-window-down) ;; from headers window scroll the email view
            ("M-p" . mu4e-views-cursor-msg-view-window-up) ;; from headers window scroll the email view
            )
-    :config
+    :defer-config
     (setq mu4e-views-default-view-method "dispatcher") ;; make xwidgets default
     (mu4e-views-mu4e-use-view-msg-method "text") ;; select the default
     (setq mu4e-views-next-previous-message-behaviour 'stick-to-current-window) ;; when pressing n and p stay in the current window
@@ -3717,7 +3786,8 @@ While browsing, remember the following:
   
   (leaf org-msg
     :ensure t
-    :after mu4e
+    :commands mu4e-compose-new mu4e-compose-edit mu4e-compose-reply mu4e-compose-forward
+    ;; :after mu4e
     :config
     (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
           ;; org-msg-startup "hidestars indent inlineimages"

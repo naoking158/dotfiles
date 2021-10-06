@@ -146,6 +146,7 @@
     :url "http://handlename.hatenablog.jp/entry/2011/12/11/214923"
     :leaf-defer nil
     :bind ("C-M-h" . delete-region)
+    :hook (after-init-hook . (lambda nil (menu-bar-mode -1)))
     :custom '((fill-column . 82)
               (tab-width . 2)             
               (frame-resize-pixelwise . t)
@@ -1611,8 +1612,12 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf org
   :doc "Export Framework for Org Mode"
   :tag "builtin"
-  :ensure t ;; org-plus-contrib
-  :require org-tempo  ;; need for org-template
+  :ensure t
+
+  :require
+  org-tempo   ;; need for org-template
+  org-indent  ;; Make sure org-indent face is available
+
   :mode "\\.org\\'"
   :hook (org-mode-hook . my/org-mode-hook)
   :custom
@@ -1668,8 +1673,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :defun my/set-org-face
   :preface
   (when window-system
-    ;; Make sure org-indent face is available
-    (require 'org-indent)
 
     (create-fontset-from-ascii-font "Iosevka Aile-14"
                                     nil
@@ -1742,7 +1745,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     :hook (org-mode-hook . org-fragtog-mode)))
 
 (leaf org-agenda
-  :after org
+  ;; :after org
   :require t org-habit org-capture
   :bind* (("C-c C-a" . my/org-agenda-cache)
           ("C-c C-m" . jethro/org-inbox-capture))
@@ -1882,7 +1885,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                      (setq org-agenda-files
                            (directory-files-recursively org-directory
                                                         "\\.org$"))))
-  :config
+  :defer-config
   (setq
    jethro/org-agenda-directory (file-truename "~/org/gtd/")
    org-agenda-files (directory-files-recursively org-directory "\\.org$")
@@ -2089,13 +2092,12 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :req "emacs-24.4" "org-9.0"
   :url "https://ox-hugo.scripter.co"
   :ensure t
-  :commands org-exports-dispatch
-  :after org
   :require t
+  :commands org-exports-dispatch
   :defun (org-set-property)
   :custom ((org-hugo-front-matter-format . "yaml")
            (org-hugo-link-desc-insert-type . t))
-  :config
+  :defer-config
   (defun c/ox-hugo-add-lastmod nil
     "Add `lastmod' property with the current time."
     (interactive)
@@ -2206,7 +2208,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf org-roam
   :doc "Roam Research replica with Org-mode"
   :url "https://github.com/org-roam/org-roam"
-  :after org
+  ;; :after org
   :ensure t
   ;; This is necessary for variables to be initialized correctly.
   :require t
@@ -2245,8 +2247,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
       ("p" "private" plain "%?"
        :if-new (file+head "private/${slug}.org"
                           "#+title: ${title}\n#+date: %U\n")
-       :unnarrowed t)
-      )))
+       :unnarrowed t))))
+
   :config
   (leaf org-roam-dailies
     :require t
@@ -2516,7 +2518,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf dap-mode
   :ensure t
   :require t dap-python
-  :after exec-path-from-shell
+  ;; :after exec-path-from-shell
   :custom (;; (dap-python-debugger . 'debugpy)
            ;; (dap-python-executable . path-to-venv-python)
            (dap-auto-configure-features . '(sessions locals tooltip))
@@ -2536,9 +2538,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf mu4e
   :when path-to-mu
   :load-path path-to-mu
-  :require t
-  :hook (mu4e-headers-mode-hook . (lambda () (visual-line-mode -1)))
-  :config
+  :hook (after-init-hook . (lambda () (require 'mu4e)))
+  ;; :require t
+  ;; :hook (mu4e-headers-mode-hook . (lambda () (visual-line-mode -1)))
+  :defer-config
   (set-variable 'read-mail-command 'mu4e)
   (setq mail-user-agent 'mu4e-user-agent
         message-send-mail-function 'smtpmail-send-it
@@ -2764,14 +2767,13 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
 
 (leaf mu4e-views
   :ensure t
-  :after mu4e
   :bind (mu4e-headers-mode-map
          :package mu4e
          ("v" . mu4e-views-mu4e-select-view-msg-method) ;; select viewing method
          ("M-n" . mu4e-views-cursor-msg-view-window-down) ;; from headers window scroll the email view
          ("M-p" . mu4e-views-cursor-msg-view-window-up) ;; from headers window scroll the email view
          )
-  :config
+  :defer-config
   (setq mu4e-views-default-view-method "dispatcher") ;; make xwidgets default
   (mu4e-views-mu4e-use-view-msg-method "text") ;; select the default
   (setq mu4e-views-next-previous-message-behaviour 'stick-to-current-window) ;; when pressing n and p stay in the current window
@@ -2782,7 +2784,8 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
 
 (leaf org-msg
   :ensure t
-  :after mu4e
+  :commands mu4e-compose-new mu4e-compose-edit mu4e-compose-reply mu4e-compose-forward
+  ;; :after mu4e
   :config
   (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
         ;; org-msg-startup "hidestars indent inlineimages"
