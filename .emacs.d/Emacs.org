@@ -1006,12 +1006,13 @@ Only in Neotree Buffer:
     :ensure t
     :bind ("C-c m" . magit-status)
     :custom ((magit-bury-buffer-function quote magit-mode-quit-window)
-             (magit-buffer-name-format . "%x%M%v: %t%x")
              (magit-refresh-verbose . t)
              (magit-commit-ask-to-stage quote stage)
              (magit-clone-set-remote\.pushDefault . t)
              (magit-clone-default-directory . "~/src/github.com/")
-             (magit-remote-add-set-remote\.pushDefault quote ask)))
+             (magit-remote-add-set-remote\.pushDefault quote ask)
+             (magit-log-margin-show-committer-date . t)
+             (magit-log-margin . '(t "%m/%d/%Y %H:%M " magit-log-margin-width t 12))))
 #+end_src
 
 *** Git Gutter
