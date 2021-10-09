@@ -419,3 +419,8 @@ mode "$mode_display" {
 }
 # Declare here the shortcut to bring the display selection menu
 bindsym $mod+Escape mode "$mode_display"
+
+bindsym Next exec --no-startup-id spt pb -n
+bindsym End exec --no-startup-id spt pb -p
+bindsym KP_Subtract exec --no-startup-id spt pb -t
+
