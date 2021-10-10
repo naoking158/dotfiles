@@ -655,8 +655,8 @@
   :url "https://github.com/emacsorphanage/git-gutter"
   :ensure t
   :bind (("C-x g" . git-gutter)
-         ("C-x p" . git-gutter:previous-hunk)
-         ("C-x n" . git-gutter:next-hunk)
+         ;; ("C-x p" . git-gutter:previous-hunk)
+         ;; ("C-x n" . git-gutter:next-hunk)
          ("C-x t" . git-gutter:toggle))
   :custom
   ((git-gutter:modified-sign . "~")
@@ -668,12 +668,18 @@
    (git-gutter:deleted . '((t (:background "#ff79c6"))))))
 
 (leaf projectile
+  :when (version< emacs-version "28")
   :doc "Manage and navigate projects in Emacs easily"
   :req "emacs-25.1" "pkg-info-0.4"
   :url "https://github.com/bbatsov/projectile"
   :ensure t
   :custom (projectile-enable-caching . t)
   :global-minor-mode t)
+
+
+(leaf project
+  :when (version<= "28" emacs-version)
+  :ensure t)
 
 (leaf lsp-mode
   :doc "LSP mode"

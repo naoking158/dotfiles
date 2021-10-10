@@ -1028,8 +1028,8 @@ Only in Neotree Buffer:
     :url "https://github.com/emacsorphanage/git-gutter"
     :ensure t
     :bind (("C-x g" . git-gutter)
-           ("C-x p" . git-gutter:previous-hunk)
-           ("C-x n" . git-gutter:next-hunk)
+           ;; ("C-x p" . git-gutter:previous-hunk)
+           ;; ("C-x n" . git-gutter:next-hunk)
            ("C-x t" . git-gutter:toggle))
     :custom
     ((git-gutter:modified-sign . "~")
@@ -1042,7 +1042,7 @@ Only in Neotree Buffer:
   
 #+end_src
 
-** Projectile
+** Projects Management
 :PROPERTIES:
 :ID:       B887BCAD-C177-4C2B-8655-1304091A35AF
 :END:
@@ -1050,6 +1050,7 @@ Only in Neotree Buffer:
 #+begin_src emacs-lisp
   
   (leaf projectile
+    :when (version< emacs-version "28")
     :doc "Manage and navigate projects in Emacs easily"
     :req "emacs-25.1" "pkg-info-0.4"
     :url "https://github.com/bbatsov/projectile"
@@ -1057,6 +1058,10 @@ Only in Neotree Buffer:
     :custom (projectile-enable-caching . t)
     :global-minor-mode t)
   
+  
+  (leaf project
+    :when (version<= "28" emacs-version)
+    :ensure t)
 #+end_src
 
 ** Language
