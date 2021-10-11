@@ -2982,6 +2982,10 @@ Interactively, URL defaults to the string looking like a url around point."
 
   (exwm-enable))
 
+(leaf org-protocol :require t)
+
+(leaf applescript-mode :ensure t)
+
 (leaf jupyter
   :ensure t websocket
   :config
