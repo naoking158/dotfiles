@@ -2791,8 +2791,7 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
 
 (leaf org-msg
   :ensure t
-  :commands mu4e-compose-new mu4e-compose-edit mu4e-compose-reply mu4e-compose-forward
-  ;; :after mu4e
+  :after mu4e
   :config
   (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
         ;; org-msg-startup "hidestars indent inlineimages"
@@ -2982,6 +2981,10 @@ Interactively, URL defaults to the string looking like a url around point."
                     (number-sequence 0 9))))
 
   (exwm-enable))
+
+(leaf org-protocol :require t)
+
+(leaf applescript-mode :ensure t)
 
 (leaf jupyter
   :ensure t websocket

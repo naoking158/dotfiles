@@ -3792,8 +3792,7 @@ While browsing, remember the following:
   
   (leaf org-msg
     :ensure t
-    :commands mu4e-compose-new mu4e-compose-edit mu4e-compose-reply mu4e-compose-forward
-    ;; :after mu4e
+    :after mu4e
     :config
     (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
           ;; org-msg-startup "hidestars indent inlineimages"
@@ -4014,6 +4013,67 @@ While browsing, remember the following:
     (exwm-enable))
 #+end_src
 
+** Org-Protocol
+:PROPERTIES:
+:ID:       5E5B1D6F-B15E-441C-BF5B-1928F3F42642
+:END:
+
+- [[https://orgmode.org/worg/org-contrib/org-protocol.html#org1fb51be][Org-protocol Manual]]
+- [[https://www.orgroam.com/manual.html][Org-Roam Manual]]
+
+*** Create *OrgProtocolClient.app*
+:PROPERTIES:
+:ID:       09F79D49-D594-454B-A528-A79013A82DDA
+:END:
+
+- Launch Script Editor
+- Use the following script, paying attention to the path to emacsclient:
+
+#+begin_src applescript
+  on open location this_URL
+      set EC to "/usr/local/bin/emacsclient --no-wait "
+      set filePath to quoted form of this_URL
+      do shell script EC & filePath
+      tell application "Emacs" to activate
+  end open location
+#+end_src
+
+- Save the script in /Applications/OrgProtocolClient.app, changing the script type to “Application”, rather than “Script”.
+- Edit /Applications/OrgProtocolClient.app/Contents/Info.plist, adding the following before the last </dict> tag:
+
+  #+begin_src
+    <key>CFBundleURLTypes</key>
+    <array>
+      <dict>
+        <key>CFBundleURLName</key>
+        <string>org-protocol handler</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>org-protocol</string>
+        </array>
+      </dict>
+    </array>
+  #+end_src
+
+- Save the file, and run the OrgProtocolClient.app to register the protocol.
+
+
+*** Load org-protocol.el
+:PROPERTIES:
+:ID:       AF75B2FA-8080-443F-8A18-0057B66AB79F
+:END:
+
+#+begin_src emacs-lisp
+  (leaf org-protocol :require t)
+#+end_src
+
+** Apple Script Mode
+:PROPERTIES:
+:ID:       1ACA04C2-1F7F-44C5-A32B-CE0283DCA6DB
+:END:
+#+begin_src emacs-lisp
+  (leaf applescript-mode :ensure t)
+#+end_src
 
 ** Emacs Jupyter
 :PROPERTIES:
