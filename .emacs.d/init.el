@@ -655,8 +655,8 @@
   :url "https://github.com/emacsorphanage/git-gutter"
   :ensure t
   :bind (("C-x g" . git-gutter)
-         ("C-x p" . git-gutter:previous-hunk)
-         ("C-x n" . git-gutter:next-hunk)
+         ;; ("C-x p" . git-gutter:previous-hunk)
+         ;; ("C-x n" . git-gutter:next-hunk)
          ("C-x t" . git-gutter:toggle))
   :custom
   ((git-gutter:modified-sign . "~")
@@ -668,12 +668,18 @@
    (git-gutter:deleted . '((t (:background "#ff79c6"))))))
 
 (leaf projectile
+  :when (version< emacs-version "28")
   :doc "Manage and navigate projects in Emacs easily"
   :req "emacs-25.1" "pkg-info-0.4"
   :url "https://github.com/bbatsov/projectile"
   :ensure t
   :custom (projectile-enable-caching . t)
   :global-minor-mode t)
+
+
+(leaf project
+  :when (version<= "28" emacs-version)
+  :ensure t)
 
 (leaf lsp-mode
   :doc "LSP mode"
@@ -1452,11 +1458,12 @@ respectively."
     '((completion-styles . '(orderless))
       (completion-category-defaults . nil)
       (completion-category-overrides
-       quote ((file (styles partial-completion))
+       quote ((file (styles orderless-migemo-style))
               (consult-location (styles orderless-migemo-style))
               (consult-multi (styles orderless-migemo-style))
-              (unicode-name (styles partial-completion))
-              (command (styles partial-completion)))))
+              (unicode-name (styles orderless-migemo-style))
+              (command (styles orderless-default-style))
+              (org-roam-node (styles orderless-migemo-style)))))
 
     :preface
     ;; (defun just-one-face (fn &rest args)
@@ -1471,7 +1478,9 @@ respectively."
 
     :config
     (orderless-define-completion-style orderless-default-style
-      (orderless-matching-styles '(orderless-prefixes)))
+      (orderless-matching-styles '(orderless-prefixes
+                                   orderless-literal
+                                   orderless-regexp)))
 
     (orderless-define-completion-style orderless-migemo-style
       (orderless-matching-styles '(orderless-prefixes
@@ -1482,16 +1491,13 @@ respectively."
 (leaf migemo
   :when (executable-find "cmigemo")
   :ensure t
+  :hook (after-init-hook . migemo-init)
   :custom
   '((migemo-user-dictionary  . nil)
     (migemo-regex-dictionary . nil)
     (migemo-coding-system    . 'utf-8)
     (migemo-dictionary . "/usr/local/share/migemo/utf-8/migemo-dict")
-    (migemo-isearch-enable-p . nil))
-  ;; :init
-  ;; (setq migemo-dictionary )
-  :hook
-  (after-init-hook . migemo-init))
+    (migemo-isearch-enable-p . t)))
 
 (leaf marginalia
   :ensure t
