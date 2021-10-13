@@ -2263,7 +2263,12 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
       ("p" "private" plain "%?"
        :if-new (file+head "private/${slug}.org"
                           "#+title: ${title}\n#+date: %U\n")
-       :unnarrowed t))))
+       :unnarrowed t)
+      ("r" "ref" plain "%?"
+       :if-new (file+head "lit/${slug}.org"
+                          "#+ROAM_KEY: ${ref}\n#+title: ${title}\n#+date: %U\n#+filetags: Literature\n\n${body}")
+       :unnarrowed t)
+      )))
 
   :config
   (leaf org-roam-dailies
@@ -2283,6 +2288,22 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                  (window-width . 0.33)
                  (window-height . fit-window-to-buffer)))
   (org-roam-db-autosync-mode))
+
+
+(leaf org-roam-ui
+  :after org-roam
+  :load-path "~/.emacs.d/elisp/org-roam-ui/"
+  :require t
+  :ensure simple-httpd websocket
+  :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+
+(leaf org-protocol
+  :after org-roam
+  :require t org-roam-protocol)
 
 (leaf org-bullets
   :disabled t
@@ -2310,20 +2331,21 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :after org
   :bind ("C-M-y" . org-insert-clipboard-image)
   :preface
-  (setq paste-cmd (if (memq 'window-system '(darwin ns))
-                      "pngpaste "
-                    "xclip "))
+  ;; (setq paste-cmd (if (memq 'window-system '(darwin ns))
+  ;;                     "pngpaste "
+  ;;                   "xclip "))
   (defun org-insert-clipboard-image ()
     "Generate png file from a clipboard image and insert a link to current buffer."
     (interactive)
     (let* ((filename
-            (concat (file-name-nondirectory (buffer-file-name))
-                    "imgs/"
-                    (format-time-string "%Y%m%d_%H%M%S")
+            (concat "imgs/"
+                    (file-name-nondirectory (buffer-file-name))
+                    (format-time-string "_%Y%m%d_%H%M%S")
                     ".png")))
       (unless (file-exists-p (file-name-directory filename))
         (make-directory (file-name-directory filename)))
-      (shell-command (concat paste-cmd filename))
+      (shell-command (concat "pngpaste " filename))
+      ;; (shell-command (concat paste-cmd filename))
       (if (file-exists-p filename)
           (insert (concat "[[file:" filename "]]")))
       (org-display-inline-images))))
@@ -2331,7 +2353,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf *org-image-size-adjuster
   :hook (org-mode-hook . org-limit-image-size-activate)
   :preface
-  (defcustom org-limit-image-size '(0.8 . 0.25) "Maximum image size") ;; integer or float or (width-int-or-float . height-int-or-float)
+  ;; integer or float or (width-int-or-float . height-int-or-float)
+  (defcustom org-limit-image-size '(0.8 . 0.25) "Maximum image size") 
 
   (defun org-limit-image-size--get-limit-size (width-p)
     (let ((limit-size (if (numberp org-limit-image-size)
@@ -2993,8 +3016,6 @@ Interactively, URL defaults to the string looking like a url around point."
                     (number-sequence 0 9))))
 
   (exwm-enable))
-
-(leaf org-protocol :require t)
 
 (leaf applescript-mode :ensure t)
 

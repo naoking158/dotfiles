@@ -19,3 +19,6 @@
 [submodule ".emacs.d/elisp/emacs-webkit"]
 	path = .emacs.d/elisp/emacs-webkit
 	url = https://github.com/akirakyle/emacs-webkit.git
+[submodule ".emacs.d/elisp/org-roam-ui"]
+	path = .emacs.d/elisp/org-roam-ui
+	url = git@github.com:org-roam/org-roam-ui.git
