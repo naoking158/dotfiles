@@ -1115,6 +1115,11 @@ respectively."
   :config
   (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
 
+(leaf wgrep
+  :ensure t
+  :bind (grep-mode-map
+         ("e" . wgrep-change-to-wgrep-mode)))
+
 (leaf winner
   :doc "Restore old window configurations"
   :tag "builtin"
