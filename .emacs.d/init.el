@@ -1532,18 +1532,18 @@ respectively."
   :global-minor-mode t savehist-mode)
 
 (leaf corfu
-  :when window-system
   :ensure t
   :require t
   :hook (after-init-hook . corfu-global-mode)
   ;; Optional customizations
   :custom
-  ((corfu-auto-prefix . 2)
+  (
+   (corfu-auto-prefix . 2)
    (corfu-auto-delay . 0.4)
    (corfu-cycle . t)
    (corfu-auto . t)
    (corfu-quit-no-match . t)
-   (corfu-quit-at-boundary . t)
+   (corfu-quit-at-boundary . nil)
 
    ;; Enable indentation+completion using the TAB key.
    ;; `completion-at-point' is often bound to M-TAB.
