@@ -404,23 +404,24 @@ mode "$mode_gaps_outer" {
 }
 
 
-## Manual management of external displays
-# Set the shortcuts and what they do
-set $mode_display Ext Screen (a) Main0 Sub1, (s) Main1 Sub0, (d) Disp 0, (f) Disp 1 
-mode "$mode_display" {
-    bindsym a exec --no-startup-id xrandr --output HDMI-A-1 --auto --primary --left-of HDMI-A-0, mode "default"
-		bindsym s exec --no-startup-id xrandr --output HDMI-A-0 --auto --primary --right-of HDMI-A-1, mode "default"
-		bindsym d exec --no-startup-id xrandr --output HDMI-A-1 --auto --off, mode "default"
-		bindsym f exec --no-startup-id xrandr --output HDMI-A-0 --auto --off, mode "default"
+# ## Manual management of external displays
+# # Set the shortcuts and what they do
+# set $mode_display Ext Screen (a) Main0 Sub1, (s) Main1 Sub0, (d) Disp 0, (f) Disp 1 
+# mode "$mode_display" {
+#     bindsym a exec --no-startup-id xrandr --output HDMI-A-1 --auto --primary --left-of HDMI-A-0, mode "default"
+# 		bindsym s exec --no-startup-id xrandr --output HDMI-A-0 --auto --primary --right-of HDMI-A-1, mode "default"
+# 		bindsym d exec --no-startup-id xrandr --output HDMI-A-1 --auto --off, mode "default"
+# 		bindsym f exec --no-startup-id xrandr --output HDMI-A-0 --auto --off, mode "default"
 
-		# back to normal: Enter or Escape
-		bindsym Return mode "default"
-		bindsym Escape mode "default"
-}
-# Declare here the shortcut to bring the display selection menu
-bindsym $mod+Escape mode "$mode_display"
+# 		# back to normal: Enter or Escape
+# 		bindsym Return mode "default"
+# 		bindsym Escape mode "default"
+# }
+# # Declare here the shortcut to bring the display selection menu
+# bindsym $mod+Escape mode "$mode_display"
 
 bindsym Next exec --no-startup-id spt pb -n
 bindsym End exec --no-startup-id spt pb -p
 bindsym KP_Subtract exec --no-startup-id spt pb -t
 
+bindsym $mod+Escape exec --no-startup-id deepin-screenshot
