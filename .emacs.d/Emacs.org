@@ -3216,25 +3216,30 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 :END:
 
 #+begin_src emacs-lisp
+  (setq paste-cmd (cond
+                   ((executable-find "pngpaste")
+                    "pngpaste ")
+                   ((executable-find "xclip")
+                    "xclip -selection clipboard -t image/png -out > ")
+                   (t nil)))
+  
   (leaf *org-insert-clipboard-image
+    :when paste-cmd
     :after org
     :bind ("C-M-y" . org-insert-clipboard-image)
     :preface
-    ;; (setq paste-cmd (if (memq 'window-system '(darwin ns))
-    ;;                     "pngpaste "
-    ;;                   "xclip "))
     (defun org-insert-clipboard-image ()
       "Generate png file from a clipboard image and insert a link to current buffer."
       (interactive)
       (let* ((filename
               (concat "imgs/"
-                      (file-name-nondirectory (buffer-file-name))
+                      (file-name-sans-extension (file-name-nondirectory
+                                                 (buffer-file-name)))
                       (format-time-string "_%Y%m%d_%H%M%S")
                       ".png")))
         (unless (file-exists-p (file-name-directory filename))
           (make-directory (file-name-directory filename)))
-        (shell-command (concat "pngpaste " filename))
-        ;; (shell-command (concat paste-cmd filename))
+        (shell-command (concat paste-cmd filename))
         (if (file-exists-p filename)
             (insert (concat "[[file:" filename "]]")))
         (org-display-inline-images))))

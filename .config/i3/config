@@ -424,4 +424,5 @@ bindsym Next exec --no-startup-id spt pb -n
 bindsym End exec --no-startup-id spt pb -p
 bindsym KP_Subtract exec --no-startup-id spt pb -t
 
-bindsym $mod+Escape exec --no-startup-id deepin-screenshot
+# bindsym $mod+Escape exec --no-startup-id deepin-screenshot
+bindsym $mod+Escape exec --no-startup-id flameshot gui
