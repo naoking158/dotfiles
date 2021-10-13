@@ -1115,6 +1115,11 @@ respectively."
   :config
   (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
 
+(leaf wgrep
+  :ensure t
+  :bind (grep-mode-map
+         ("e" . wgrep-change-to-wgrep-mode)))
+
 (leaf winner
   :doc "Restore old window configurations"
   :tag "builtin"
@@ -1209,6 +1214,7 @@ respectively."
 ;; (setq split-width-threshold nil)
 
 (leaf company
+  :disabled t
   :doc "Modular text completion framework"
   :tag "matching" "convenience" "abbrev" "emacs>=24.3"
   :url "http://company-mode.github.io/"
@@ -1377,7 +1383,6 @@ respectively."
 (leaf consult
   :ensure t
   :require t
-  :commands consult-customize
   :chord ("gl" . consult-goto-line)
   :bind (([remap switch-to-buffer] . consult-buffer) ; C-x b
          ([remap yank-pop] . consult-yank-pop)       ; M-y
@@ -1396,6 +1401,11 @@ respectively."
     (if at-point
         (consult-line (thing-at-point 'symbol))
       (consult-line)))
+  :advice (;; Optionally tweak the register preview window.
+           ;; This adds thin lines, sorting and hides the mode line of the window.
+           (:override register-preview consult-register-window)
+           ;; Optionally replace `completing-read-multiple' with an enhanced version.
+           (:override completing-read-multiple consult-completing-read-multiple))
   :config
   ;; Optionally configure preview. The default value
   ;; is 'any, such that any key triggers the preview.
@@ -1411,8 +1421,7 @@ respectively."
    consult-bookmark consult-recent-file consult-xref
    consult--source-file consult--source-project-file consult--source-bookmark
    ;; :preview-key (kbd "C-S-p")
-   :preview-key (list :debounce 0.5 (kbd "M-."))
-   )
+   :preview-key (list :debounce 0.5 (kbd "M-.")))
 
   (leaf consult-ghq
     :after consult
@@ -1523,18 +1532,18 @@ respectively."
   :global-minor-mode t savehist-mode)
 
 (leaf corfu
-  :when window-system
   :ensure t
   :require t
   :hook (after-init-hook . corfu-global-mode)
   ;; Optional customizations
   :custom
-  ((corfu-auto-prefix . 2)
+  (
+   (corfu-auto-prefix . 2)
    (corfu-auto-delay . 0.4)
    (corfu-cycle . t)
    (corfu-auto . t)
    (corfu-quit-no-match . t)
-   (corfu-quit-at-boundary . t)
+   (corfu-quit-at-boundary . nil)
 
    ;; Enable indentation+completion using the TAB key.
    ;; `completion-at-point' is often bound to M-TAB.
@@ -2301,6 +2310,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :after org
   :bind ("C-M-y" . org-insert-clipboard-image)
   :preface
+  (setq paste-cmd (if (memq 'window-system '(darwin ns))
+                      "pngpaste "
+                    "xclip "))
   (defun org-insert-clipboard-image ()
     "Generate png file from a clipboard image and insert a link to current buffer."
     (interactive)
@@ -2311,7 +2323,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                     ".png")))
       (unless (file-exists-p (file-name-directory filename))
         (make-directory (file-name-directory filename)))
-      (shell-command (concat "pngpaste " filename))
+      (shell-command (concat paste-cmd filename))
       (if (file-exists-p filename)
           (insert (concat "[[file:" filename "]]")))
       (org-display-inline-images))))
