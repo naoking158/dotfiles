@@ -1214,6 +1214,7 @@ respectively."
 ;; (setq split-width-threshold nil)
 
 (leaf company
+  :disabled t
   :doc "Modular text completion framework"
   :tag "matching" "convenience" "abbrev" "emacs>=24.3"
   :url "http://company-mode.github.io/"
@@ -1382,7 +1383,6 @@ respectively."
 (leaf consult
   :ensure t
   :require t
-  :commands consult-customize
   :chord ("gl" . consult-goto-line)
   :bind (([remap switch-to-buffer] . consult-buffer) ; C-x b
          ([remap yank-pop] . consult-yank-pop)       ; M-y
@@ -1401,6 +1401,11 @@ respectively."
     (if at-point
         (consult-line (thing-at-point 'symbol))
       (consult-line)))
+  :advice (;; Optionally tweak the register preview window.
+           ;; This adds thin lines, sorting and hides the mode line of the window.
+           (:override register-preview consult-register-window)
+           ;; Optionally replace `completing-read-multiple' with an enhanced version.
+           (:override completing-read-multiple consult-completing-read-multiple))
   :config
   ;; Optionally configure preview. The default value
   ;; is 'any, such that any key triggers the preview.
@@ -1416,8 +1421,7 @@ respectively."
    consult-bookmark consult-recent-file consult-xref
    consult--source-file consult--source-project-file consult--source-bookmark
    ;; :preview-key (kbd "C-S-p")
-   :preview-key (list :debounce 0.5 (kbd "M-."))
-   )
+   :preview-key (list :debounce 0.5 (kbd "M-.")))
 
   (leaf consult-ghq
     :after consult
