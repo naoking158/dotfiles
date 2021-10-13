@@ -2310,6 +2310,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :after org
   :bind ("C-M-y" . org-insert-clipboard-image)
   :preface
+  (setq paste-cmd (if (memq 'window-system '(darwin ns))
+                      "pngpaste "
+                    "xclip "))
   (defun org-insert-clipboard-image ()
     "Generate png file from a clipboard image and insert a link to current buffer."
     (interactive)
@@ -2320,7 +2323,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                     ".png")))
       (unless (file-exists-p (file-name-directory filename))
         (make-directory (file-name-directory filename)))
-      (shell-command (concat "pngpaste " filename))
+      (shell-command (concat paste-cmd filename))
       (if (file-exists-p filename)
           (insert (concat "[[file:" filename "]]")))
       (org-display-inline-images))))
