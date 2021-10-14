@@ -1389,6 +1389,10 @@ respectively."
   :ensure t
   :require t
   :chord ("gl" . consult-goto-line)
+  :hook
+  ((shell-mode-hook eshell-mode-hook) . (lambda ()
+                                          (setq completion-in-region-function
+                                                #'consult-completion-in-region)))
   :bind (([remap switch-to-buffer] . consult-buffer) ; C-x b
          ([remap yank-pop] . consult-yank-pop)       ; M-y
          ([remap goto-line] . consult-goto-line)     ; M-g g
@@ -1427,6 +1431,14 @@ respectively."
    consult--source-file consult--source-project-file consult--source-bookmark
    ;; :preview-key (kbd "C-S-p")
    :preview-key (list :debounce 0.5 (kbd "M-.")))
+
+  (leaf consult-dir
+  :after consult
+  :ensure t
+  :bind (("C-c d" . consult-dir)
+         (:vertico-map
+          ("C-c d" . consult-dir)
+          ("C-x j" . consult-dir-jump-file))))
 
   (leaf consult-ghq
     :after consult
