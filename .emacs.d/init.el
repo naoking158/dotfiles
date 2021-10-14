@@ -3059,47 +3059,4 @@ Interactively, URL defaults to the string looking like a url around point."
   :config
   (add-to-list 'org-babel-load-languages '(jupyter . t)))
 
-(leaf smudge
-  :ensure t
-  :bind (("C-c p" . smudge-my-playlists)
-         (:smudge-mode-map
-          ("." . hydra-spotify/body)))
-  :preface
-  (setq-local file-dir "~/src/github.com/naoking158/envs"
-              id (shell-command-to-string
-                  (concat "cat "
-                          (expand-file-name ".id_spotify_smudge" file-dir)))
-              secret (shell-command-to-string
-                      (concat "cat "
-                              (expand-file-name ".secret_spotify_smudge" file-dir))))
-  :custom ((smudge-oauth2-client-id . id)
-           (smudge-oauth2-client-secret . secret))
-  :global-minor-mode global-smudge-remote-mode
-  :hydra
-  ;; A hydra for controlling spotify.
-  (hydra-spotify (:hint nil)
-                 "
-^Search^                  ^Control^               ^Manage^
-^^^^^^^^-----------------------------------------------------------------
-_t_: Track               _SPC_: Play/Pause        _+_: Volume up
-_m_: My Playlists        _n_  : Next Track        _-_: Volume down
-_f_: Featured Playlists  _p_  : Previous Track    _x_: Mute
-_u_: User Playlists      _r_  : Repeat            _d_: Device
-^^                       _s_  : Shuffle           _q_: Quit
-"
-                 ("t" smudge-track-search :exit t)
-                 ("m" smudge-my-playlists :exit t)
-                 ("f" smudge-featured-playlists :exit t)
-                 ("u" smudge-user-playlists :exit t)
-                 ("SPC" smudge-controller-toggle-play :exit nil)
-                 ("n" smudge-controller-next-track :exit nil)
-                 ("p" smudge-controller-previous-track :exit nil)
-                 ("r" smudge-controller-toggle-repeat :exit nil)
-                 ("s" smudge-controller-toggle-shuffle :exit nil)
-                 ("+" smudge-controller-volume-up :exit nil)
-                 ("-" smudge-controller-volume-down :exit nil)
-                 ("x" smudge-controller-volume-mute-unmute :exit nil)
-                 ("d" smudge-select-device :exit nil)
-                 ("q" quit-window "quit" :color blue)))
-
 (provide 'init)
