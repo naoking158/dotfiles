@@ -284,6 +284,11 @@
     :ensure t
     :require dashboard-widgets
     :leaf-defer nil
+    :init
+    (custom-set-variables
+     '(dashboard-projects-backend (if (<= emacs-major-version 27)
+                                      'projectile
+                                    'project-el)))
     :custom ((dashboard-items . '((agenda . 5)
                                   (recents . 5)
                                   (projects . 5)
@@ -627,7 +632,7 @@
 (leaf neotree
   :ensure t all-the-icons
   :require all-the-icons
-  :bind ("C-c c" . neotree-show)
+  ;; :bind ("C-c c" . neotree-show)
   :custom ((neo-show-hidden-files . t)
            (neo-smart-open . t)
            (neo-window-fixed-size . nil)
@@ -1384,6 +1389,10 @@ respectively."
   :ensure t
   :require t
   :chord ("gl" . consult-goto-line)
+  :hook
+  ((shell-mode-hook eshell-mode-hook) . (lambda ()
+                                          (setq completion-in-region-function
+                                                #'consult-completion-in-region)))
   :bind (([remap switch-to-buffer] . consult-buffer) ; C-x b
          ([remap yank-pop] . consult-yank-pop)       ; M-y
          ([remap goto-line] . consult-goto-line)     ; M-g g
@@ -1422,6 +1431,14 @@ respectively."
    consult--source-file consult--source-project-file consult--source-bookmark
    ;; :preview-key (kbd "C-S-p")
    :preview-key (list :debounce 0.5 (kbd "M-.")))
+
+  (leaf consult-dir
+  :after consult
+  :ensure t
+  :bind (("C-c d" . consult-dir)
+         (:vertico-map
+          ("C-c d" . consult-dir)
+          ("C-x j" . consult-dir-jump-file))))
 
   (leaf consult-ghq
     :after consult
@@ -1529,17 +1546,30 @@ respectively."
   :require t
   :custom ((vertico-count . 10)
            (vertico-cycle . t))
-  :global-minor-mode t savehist-mode)
+  :global-minor-mode t savehist-mode
+  :config
+
+  (leaf vertico-directory
+    :after vertico
+    :load-path "~/.emacs.d/elisp/vertico/extensions/"
+    :require t
+    ;; Tidy shadowed file names
+    :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy)
+    :bind (:vertico-map
+           ("DEL"   . vertico-directory-delete-char)
+           ("M-DEL" . vertico-directory-delete-word)
+           ("C-w"   . vertico-directory-delete-word)
+           ("RET"   . vertico-directory-enter))))
 
 (leaf corfu
   :ensure t
   :require t
-  :hook (after-init-hook . corfu-global-mode)
-  ;; Optional customizations
+  :global-minor-mode corfu-global-mode
+  ;; :hook ((prog-mode-hook text-mode-hook org-mode-hook) . corfu-mode)
   :custom
-  (
+  ((corfu-excluded-modes . '(shell-mode eshell-mode))
    (corfu-auto-prefix . 2)
-   (corfu-auto-delay . 0.4)
+   (corfu-auto-delay . 0.3)
    (corfu-cycle . t)
    (corfu-auto . t)
    (corfu-quit-no-match . t)
@@ -1578,6 +1608,20 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
   :bind* (("M-/" . dabbrev-expand)
           ("C-M-/" . dabbrev-completion)))
+
+(leaf *complete-path-at-point
+    :hook (completion-at-point-functions . my/complete-path-at-point)
+    :preface
+    (defun my/complete-path-at-point ()
+      "Return completion data for UNIX path at point."
+      (let ((fn (ffap-file-at-point))
+            (fap (thing-at-point 'filename)))
+        (when (and (or fn (equal "/" fap))
+                   (save-excursion
+                     (search-backward fap (line-beginning-position) t)))
+          (list (match-beginning 0)
+                (match-end 0)
+                #'completion-file-name-table :exclusive 'no)))))
 
 (leaf avy
   :doc "Jump to arbitrary positions in visible text and select text quickly."
@@ -2060,28 +2104,26 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :req "dash-2.11.0" "htmlize-1.51" "helm-1.5.5" "helm-bibtex-2.0.0" "ivy-0.8.0" "hydra-0.13.2" "key-chord-0" "s-1.10.0" "f-0.18.0" "pdf-tools-0.7"
   :url "https://github.com/jkitchin/org-ref"
   :ensure t
-  :after org-roam
-  :bind (org-mode-map
-         ("C-c c" . org-ref-insert-cite-link))
+  :after org
+  ;; :bind (org-mode-map
+  ;;        ("C-c c" . org-ref-insert-cite-link))
   :custom
   `(;; RefTeX
     (reftex-plug-into-AUCTeX . t)
-    (reftex-insert-label-flags quote ("s" "sfte"))
-    (reftex-label-alist quote ((nil ?e nil "\\eqref{%s}" nil nil)))
-    (reftex-default-bibliography quote
-                                 (,(concat org-directory
-                                           "braindump/preferences/ref.bib")))
-    (reftex-bibliography-commands quote
-                                  ("bibliography"
-                                   "nobibliography"
-                                   "addbibresource"))
+    (reftex-insert-label-flags . '("s" "sfte"))
+    (reftex-label-alist . '((nil ?e nil "\\eqref{%s}" nil nil)))
+    (reftex-default-bibliography . `(,(concat org-directory
+                                              "braindump/preferences/ref.bib")))
+    (reftex-bibliography-commands . '("bibliography"
+                                      "nobibliography"
+                                      "addbibresource"))
     ;; org-ref
     (org-ref-bibliography-notes . ,(concat org-directory
                                            "braindump/lit/notes.org"))
-    (org-ref-default-bibliography quote
-                                  (,(concat org-directory
-                                            "braindump/preferences/ref.bib")))
-    (org-ref-pdf-directory . ,(concat org-directory "braindump/lit/"))))
+    (org-ref-default-bibliography . `(,(concat org-directory
+                                               "braindump/preferences/ref.bib")))
+    (org-ref-pdf-directory . ,(concat org-directory "braindump/lit/"))
+    ))
 
 (leaf xref
   :doc "Cross-referencing commands"
@@ -2955,7 +2997,9 @@ Interactively, URL defaults to the string looking like a url around point."
      ("s" . pdf-annot-add-strikeout-markup-annotation)
      ("u" . pdf-annot-add-underline-markup-annotation))))
 
-(leaf command-log-mode :ensure t)
+(leaf command-log-mode
+  :ensure t
+  :commands command-log-mode)
 
 (leaf exwm
   :disabled t
