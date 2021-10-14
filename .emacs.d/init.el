@@ -1609,6 +1609,20 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :bind* (("M-/" . dabbrev-expand)
           ("C-M-/" . dabbrev-completion)))
 
+(leaf *complete-path-at-point
+    :hook (completion-at-point-functions . my/complete-path-at-point)
+    :preface
+    (defun my/complete-path-at-point ()
+      "Return completion data for UNIX path at point."
+      (let ((fn (ffap-file-at-point))
+            (fap (thing-at-point 'filename)))
+        (when (and (or fn (equal "/" fap))
+                   (save-excursion
+                     (search-backward fap (line-beginning-position) t)))
+          (list (match-beginning 0)
+                (match-end 0)
+                #'completion-file-name-table :exclusive 'no)))))
+
 (leaf avy
   :doc "Jump to arbitrary positions in visible text and select text quickly."
   :req "emacs-24.1" "cl-lib-0.5"
