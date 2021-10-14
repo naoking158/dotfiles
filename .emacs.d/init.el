@@ -1529,17 +1529,30 @@ respectively."
   :require t
   :custom ((vertico-count . 10)
            (vertico-cycle . t))
-  :global-minor-mode t savehist-mode)
+  :global-minor-mode t savehist-mode
+  :config
+
+  (leaf vertico-directory
+    :after vertico
+    :load-path "~/.emacs.d/elisp/vertico/extensions/"
+    :require t
+    ;; Tidy shadowed file names
+    :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy)
+    :bind (:vertico-map
+           ("DEL"   . vertico-directory-delete-char)
+           ("M-DEL" . vertico-directory-delete-word)
+           ("C-w"   . vertico-directory-delete-word)
+           ("RET"   . vertico-directory-enter))))
 
 (leaf corfu
   :ensure t
   :require t
-  :hook (after-init-hook . corfu-global-mode)
-  ;; Optional customizations
+  :global-minor-mode corfu-global-mode
+  ;; :hook ((prog-mode-hook text-mode-hook org-mode-hook) . corfu-mode)
   :custom
-  (
+  ((corfu-excluded-modes . '(shell-mode eshell-mode))
    (corfu-auto-prefix . 2)
-   (corfu-auto-delay . 0.4)
+   (corfu-auto-delay . 0.3)
    (corfu-cycle . t)
    (corfu-auto . t)
    (corfu-quit-no-match . t)

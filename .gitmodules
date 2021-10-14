@@ -22,3 +22,6 @@
 [submodule ".emacs.d/elisp/org-roam-ui"]
 	path = .emacs.d/elisp/org-roam-ui
 	url = git@github.com:org-roam/org-roam-ui.git
+[submodule ".emacs.d/elisp/vertico"]
+	path = .emacs.d/elisp/vertico
+	url = https://github.com/minad/vertico.git

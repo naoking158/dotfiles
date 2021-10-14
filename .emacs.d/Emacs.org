@@ -2178,7 +2178,20 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :require t
     :custom ((vertico-count . 10)
              (vertico-cycle . t))
-    :global-minor-mode t savehist-mode)
+    :global-minor-mode t savehist-mode
+    :config
+    
+    (leaf vertico-directory
+      :after vertico
+      :load-path "~/.emacs.d/elisp/vertico/extensions/"
+      :require t
+      ;; Tidy shadowed file names
+      :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy)
+      :bind (:vertico-map
+             ("DEL"   . vertico-directory-delete-char)
+             ("M-DEL" . vertico-directory-delete-word)
+             ("C-w"   . vertico-directory-delete-word)
+             ("RET"   . vertico-directory-enter))))
   
 #+end_src
 
