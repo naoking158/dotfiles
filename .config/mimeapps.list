@@ -13,6 +13,8 @@ application/x-extension-xht=brave.desktop
 application/pdf=okularApplication_pdf.desktop
 x-scheme-handler/msteams=teams-for-linux.desktop
 x-scheme-handler/mailto=brave-browser.desktop
+text/x-emacs-lisp=userapp-emacsclient-5KHJB1.desktop
+text/plain=userapp-emacsclient-832XA1.desktop
 
 [Added Associations]
 x-scheme-handler/http=brave.desktop;
@@ -27,3 +29,7 @@ application/xhtml+xml=brave.desktop;
 application/x-extension-xhtml=brave.desktop;
 application/x-extension-xht=brave.desktop;
 application/pdf=org.gnome.Evince.desktop;okularApplication_pdf.desktop;
+text/x-emacs-lisp=userapp-emacsclient-5KHJB1.desktop;userapp-emacsclient-3OV5A1.desktop;
+text/plain=userapp-emacsclient-832XA1.desktop;
+
+[Removed Associations]
