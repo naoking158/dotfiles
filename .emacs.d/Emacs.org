@@ -534,7 +534,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
       eshell-mode-hook
       vterm-mode-hook) . (lambda ()
       (display-line-numbers-mode 0)))
-  
+
     :config
     (leaf dashboard
       :doc "A startup screen extracted from Spacemacs"
@@ -544,6 +544,11 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
       :ensure t
       :require dashboard-widgets
       :leaf-defer nil
+      :init
+      (custom-set-variables
+       '(dashboard-projects-backend (if (<= emacs-major-version 27)
+                                        'projectile
+                                      'project-el)))
       :custom ((dashboard-items . '((agenda . 5)
                                     (recents . 5)
                                     (projects . 5)
@@ -552,7 +557,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
       (when window-system
         (setq dashboard-startup-banner "~/.emacs.d/banner/coffee.png"))
       (dashboard-setup-startup-hook))
-  
+	
     (leaf set-title-bar
       :when window-system
       :config
@@ -2066,7 +2071,6 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
       :config
       (tramp-set-completion-function "ssh"
                                      '((tramp-parse-sconfig "~/.ssh/config")))))
-  
 #+end_src
 
 ** Improved Candidate Filtering with Orderless
@@ -2201,38 +2205,38 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 :END:
 
 #+begin_src emacs-lisp
-  
+
   (leaf corfu
     :ensure t
     :require t
-    :hook (after-init-hook . corfu-global-mode)
-    ;; Optional customizations
+    :global-minor-mode corfu-global-mode
+    ;; :hook ((prog-mode-hook text-mode-hook org-mode-hook) . corfu-mode)
     :custom
-    (
+    ((corfu-excluded-modes . '(shell-mode eshell-mode))
      (corfu-auto-prefix . 2)
-     (corfu-auto-delay . 0.4)
+     (corfu-auto-delay . 0.3)
      (corfu-cycle . t)
      (corfu-auto . t)
      (corfu-quit-no-match . t)
      (corfu-quit-at-boundary . nil)
-  
+
      ;; Enable indentation+completion using the TAB key.
      ;; `completion-at-point' is often bound to M-TAB.
      (tab-always-indent . 'complete))
-  
+
     ;; Optionally use TAB for cycling, default is `corfu-complete'.
     :bind (corfu-map
            ("<tab>" . corfu-complete)))
-  
+
   ;; Dabbrev works with Corfu
   (leaf dabbrev
     :doc """Cited from Sec. 3.1.8.2 at https://protesilaos.com/dotemacs/#h:675ebef4-d74d-41af-808d-f9579c2a5ec4
-  
+
   ```
   Whereas dabbrev-completion benefits from minibuffer interactivity and the pattern matching styles in effect (Completion framework and extras). With the help of Corfu, the completion candidates are displayed in a pop-up window near point (Corfu for in-buffer completion).
-  
+
   The dabbrev-abbrev-char-regexp is configured to match both regular words and symbols (e.g. words separated by hyphens). This makes it equally suitable for code and ordinary language.
-  
+
   While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words and symbols that start with any of these: $, *, /, =, ~, '. This regexp may be expanded in the future, but the idea is to be able to perform completion in contexts where the known word/symbol is preceded by a special character. For example, in the org-mode version of this document, all inline code must be placed between the equals sign. So now typing the =, then a letter, will still allow me to expand text based on that input.
   ```
     """
@@ -2246,11 +2250,30 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
              (dabbrev-check-other-buffers . t)
              (dabbrev-eliminate-newlines . t)
              (dabbrev-upcase-means-case-search . t))
-  
+
     :bind* (("M-/" . dabbrev-expand)
             ("C-M-/" . dabbrev-completion)))
-  
 #+end_src
+
+** File path completion in string
+https://with-emacs.com/posts/tutorials/customize-completion-at-point/
+
+  #+begin_src emacs-lisp
+    (leaf *complete-path-at-point
+        :hook (completion-at-point-functions . my/complete-path-at-point)
+        :preface
+        (defun my/complete-path-at-point ()
+          "Return completion data for UNIX path at point."
+          (let ((fn (ffap-file-at-point))
+                (fap (thing-at-point 'filename)))
+            (when (and (or fn (equal "/" fap))
+                       (save-excursion
+                         (search-backward fap (line-beginning-position) t)))
+              (list (match-beginning 0)
+                    (match-end 0)
+                    #'completion-file-name-table :exclusive 'no)))))
+  #+end_src
+
 
 * Moving in buffer
 ** Jumping with Avy
@@ -4058,7 +4081,7 @@ While browsing, remember the following:
   (leaf pdf-tools
     :ensure t
     ;; :require t pdf-view pdf-misc pdf-occur pdf-util pdf-annot pdf-info pdf-isearch pdf-history pdf-links
-    
+  
     :mode ("\\.pdf\\'" . pdf-view-mode)
     :hook ((TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
            (pdf-view-mode-hook . (lambda () (set-buffer-multibyte t))))
@@ -4083,7 +4106,9 @@ While browsing, remember the following:
 :END:
 
 #+begin_src emacs-lisp
-  (leaf command-log-mode :ensure t)
+  (leaf command-log-mode
+    :ensure t
+    :commands command-log-mode)
 #+end_src
 
 ** EXWM

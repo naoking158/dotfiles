@@ -284,6 +284,11 @@
     :ensure t
     :require dashboard-widgets
     :leaf-defer nil
+    :init
+    (custom-set-variables
+     '(dashboard-projects-backend (if (<= emacs-major-version 27)
+                                      'projectile
+                                    'project-el)))
     :custom ((dashboard-items . '((agenda . 5)
                                   (recents . 5)
                                   (projects . 5)
@@ -2966,7 +2971,9 @@ Interactively, URL defaults to the string looking like a url around point."
      ("s" . pdf-annot-add-strikeout-markup-annotation)
      ("u" . pdf-annot-add-underline-markup-annotation))))
 
-(leaf command-log-mode :ensure t)
+(leaf command-log-mode
+  :ensure t
+  :commands command-log-mode)
 
 (leaf exwm
   :disabled t
