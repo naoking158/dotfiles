@@ -1199,6 +1199,103 @@ Only in Neotree Buffer:
 :ID:       9C320B3B-BEB9-40A0-A0DF-9587475A9D88
 :END:
 
+#+begin_src emacs-lisp
+  
+  (leaf python-mode
+    :doc "Python major mode"
+    :url "https://gitlab.com/groups/python-mode-devs"
+    :ensure t
+    :custom ((python-indent-guess-indent-offset . t)
+             (python-indent-guess-indent-offset-verbose . nil))
+    :config
+    (leaf conda
+      :doc "Work with your conda environments"
+      :req "emacs-24.4" "pythonic-0.1.0" "dash-2.13.0" "s-1.11.0" "f-0.18.2"
+      :url "http://github.com/necaris/conda.el"
+      :ensure t
+      :require t
+      :preface
+      (defun my/string-trim-final-newline (string)
+        (let ((len (length string)))
+          (cond
+           ((and (> len 0) (eql (aref string (- len 1)) ?\n))
+            (substring string 0 (- len 1)))
+           (t string))))
+  
+      (setq path-to-miniconda
+            (my/string-trim-final-newline
+             (shell-command-to-string
+              "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
+  
+      (let ((path-to-venv (expand-file-name "envs/torch" path-to-miniconda)))
+        (when (file-exists-p path-to-venv)
+          (setq path-to-venv-python
+                (expand-file-name "bin/python" path-to-venv))
+          (custom-set-variables
+           '(org-babel-python-command path-to-venv-python))))
+  
+      :commands conda-env-activate
+      :custom ((conda-anaconda-home . path-to-miniconda)
+               (conda-env-home-directory . path-to-miniconda))
+      :hook ((after-init-hook . (lambda ()
+                                  (conda-env-initialize-eshell)
+                                  (conda-env-initialize-interactive-shells)))
+             )))
+  
+  (leaf lsp-pyright
+    :doc "Python LSP client using Pyright"
+    :req "emacs-26.1" "lsp-mode-7.0" "dash-2.18.0" "ht-2.0"
+    :url "https://github.com/emacs-lsp/lsp-pyright"
+    :ensure t
+    :preface
+    (defun my/lsp-pyright-setup-when-conda ()
+      (setq-local lsp-pyright-venv-path python-shell-virtualenv-root)
+      (lsp-restart-workspace))
+  
+    (defun my/python-basic-config ()
+      (setq indent-tabs-mode nil
+            python-indent 4
+            tab-width 4)
+      (require 'lsp-pyright)
+      (lsp-deferred))
+  
+    :hook
+    ((conda-postactivate-hook . my/lsp-pyright-setup-when-conda)
+     (conda-postdeactivate-hook . my/lsp-pyright-setup-when-conda)
+     (python-mode-hook . my/python-basic-config))
+  
+    :config
+    (when (not window-system)
+      (defadvice python-shell-completion-at-point (around fix-company-bug activate)
+        "python-shell-completion-at-point breaks when point is before the prompt"
+        (when (or (not comint-last-prompt)
+                  (>= (point) (cdr comint-last-prompt)))
+          ad-do-it))))
+#+end_src
+
+
+**** Enable lsp in org-code-block
+:PROPERTIES:
+:ID:       725ED664-EA71-4344-A509-458228B9A6CD
+:END:
+
+- https://github.com/emacs-lsp/lsp-mode/issues/2842#issuecomment-870807018
+- https://github.com/emacs-lsp/lsp-mode/issues/655#issuecomment-592331844
+
+- =:file filename= or =:tangle filename= のどちらかを書く
+- =:tangle= の場合は下記の関数を用意することで，code-block に入ったときにバッファ名が filename になる
+- バッファ全体に適用するならこう
+   =#+PROPERTY: header-args:jupyter-python :file tmp.py=
+
+#+begin_src emacs-lisp
+  (defun org-babel-edit-prep:jupyter-python (babel-info)
+    (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+    (my/python-basic-config))
+  (defun org-babel-edit-prep:python (babel-info)
+    (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+    (my/python-basic-config))
+#+end_src
+
 
 *** HTML
 :PROPERTIES:
@@ -1276,91 +1373,7 @@ Only in Neotree Buffer:
 #+end_src
 
 
-#+begin_src emacs-lisp
-  
-  (leaf python-mode
-    :doc "Python major mode"
-    :url "https://gitlab.com/groups/python-mode-devs"
-    :ensure t
-    :custom ((python-indent-guess-indent-offset . t)
-             (python-indent-guess-indent-offset-verbose . nil))
-    :config
-    (leaf conda
-      :doc "Work with your conda environments"
-      :req "emacs-24.4" "pythonic-0.1.0" "dash-2.13.0" "s-1.11.0" "f-0.18.2"
-      :url "http://github.com/necaris/conda.el"
-      :ensure t
-      :require t
-      :preface
-      (defun my/string-trim-final-newline (string)
-        (let ((len (length string)))
-          (cond
-           ((and (> len 0) (eql (aref string (- len 1)) ?\n))
-            (substring string 0 (- len 1)))
-           (t string))))
-  
-      (setq path-to-miniconda
-            (my/string-trim-final-newline
-             (shell-command-to-string
-              "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
-  
-      (let ((path-to-venv (expand-file-name "envs/torch" path-to-miniconda)))
-        (when (file-exists-p path-to-venv)
-          (setq path-to-venv-python
-                (expand-file-name "bin/python" path-to-venv))
-          (custom-set-variables
-           '(org-babel-python-command path-to-venv-python))))
-  
-      :commands conda-env-activate
-      :custom ((conda-anaconda-home . path-to-miniconda)
-               (conda-env-home-directory . path-to-miniconda))
-      :hook ((after-init-hook . (lambda ()
-                                  (conda-env-initialize-eshell)
-                                  (conda-env-initialize-interactive-shells)))
-             )))
-  
-  (leaf lsp-pyright
-    :doc "Python LSP client using Pyright"
-    :req "emacs-26.1" "lsp-mode-7.0" "dash-2.18.0" "ht-2.0"
-    :url "https://github.com/emacs-lsp/lsp-pyright"
-    :ensure t
-    :preface
-    (defun my/lsp-pyright-setup-when-conda ()
-      (setq-local lsp-pyright-venv-path python-shell-virtualenv-root)
-      (lsp-restart-workspace))
-  
-    (defun my/python-basic-config ()
-      (setq indent-tabs-mode nil
-            python-indent 4
-            tab-width 4)
-      (require 'lsp-pyright)
-      (lsp-deferred))
-  
-    :hook
-    ((conda-postactivate-hook . my/lsp-pyright-setup-when-conda)
-     (conda-postdeactivate-hook . my/lsp-pyright-setup-when-conda)
-     (python-mode-hook . my/python-basic-config))
-  
-    :config
-    (when (not window-system)
-      (defadvice python-shell-completion-at-point (around fix-company-bug activate)
-        "python-shell-completion-at-point breaks when point is before the prompt"
-        (when (or (not comint-last-prompt)
-                  (>= (point) (cdr comint-last-prompt)))
-          ad-do-it)))
-  
-    (defun org-babel-edit-prep:jupyter-python (babel-info)
-      (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
-      (my/python-basic-config))
-    (defun org-babel-edit-prep:python (babel-info)
-      (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
-      (my/python-basic-config))
-  
-    )
-#+end_src
 
-#+RESULTS:
-: lsp-pyright
 
 *** Indent checking with highlight-indent-guides
 :PROPERTIES:
@@ -4280,6 +4293,10 @@ While browsing, remember the following:
 :PROPERTIES:
 :ID:       74EFE5D2-733F-438B-8FC8-69E925BAC7C6
 :END:
+
+
+
+
 To enable support for Jupyter based source code blocks, add jupyter to org-babel-load-languages. Ensure the jupyter entry is added last since loading ob-jupyter depends on the value of variables such as org-src-lang-modes and org-babel-tangle-lang-exts.
 
 #+begin_src emacs-lisp

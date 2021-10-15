@@ -792,58 +792,6 @@
   :ensure t
   :bind (("C-c e" . macrostep-expand)))
 
-(leaf web-mode
-  :ensure t
-  :custom ((web-mode-markup-indent-offset . 2)
-           (web-mode-css-indent-offset . 2)
-           (web-mode-code-indent-offset . 2))
-  :mode ("\\.phtml\\'"
-         "\\.tpl\\.php\\'"
-         "\\.[agj]sp\\'"
-         "\\.as[cp]x\\'"
-         "\\.erb\\'"
-         "\\.mustache\\'"
-         "\\.djhtml\\'"))
-
-(leaf flymake
-  :doc "A universal on-the-fly syntax checker"
-  :tag "builtin"
-  :custom (flymake-gui-warnings-enabled . t)
-  :bind (flymake-mode-map
-         ("C-c C-n" . flymake-goto-next-error)
-         ("C-c C-p" . flymake-goto-prev-error))
-  :config
-  (leaf flymake-proselint
-    :ensure t
-    :hook
-    ((markdown-mode-hook org-mode-hook text-mode-hook) . flymake-proselint-setup))
-
-  (leaf flymake-diagnostic-at-point
-    :doc "Display flymake diagnostics at point"
-    :req "emacs-26.1" "popup-0.5.3"
-    :tag "tools" "languages" "convenience" "emacs>=26.1"
-    :url "https://github.com/meqif/flymake-diagnostic-at-point"
-    :ensure t
-    :after flymake
-    :custom ((flymake-diagnostic-at-point-timer-delay . 0.8)
-             (flymake-diagnostic-at-point-error-prefix . " ► ")
-             (flymake-diagnostic-at-point-display-diagnostic-function
-              quote flymake-diagnostic-at-point-display-minibuffer))
-    :hook (flymake-mode-hook . flymake-diagnostic-at-point-mode)))
-
-(leaf flyspell
-  :hook (LaTeX-mode-hook org-mode-hook markdown-mode-hook text-mode-hook)
-  :config
-  (leaf ispell
-    :doc "interface to spell checkers"
-    :tag "builtin"
-    :custom ((ispell-program-name . "aspell")
-             (ispell-local-dictionary . "en_US"))
-    :hook (after-init-hook . (lambda ()
-                               ;; for text mixed English and Japanese
-                               (add-to-list 'ispell-skip-region-alist
-                                            '("[^\000-\377]+"))))))
-
 (leaf python-mode
   :doc "Python major mode"
   :url "https://gitlab.com/groups/python-mode-devs"
@@ -913,16 +861,66 @@
       "python-shell-completion-at-point breaks when point is before the prompt"
       (when (or (not comint-last-prompt)
                 (>= (point) (cdr comint-last-prompt)))
-        ad-do-it)))
+        ad-do-it))))
 
-  (defun org-babel-edit-prep:jupyter-python (babel-info)
-    (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
-    (my/python-basic-config))
-  (defun org-babel-edit-prep:python (babel-info)
-    (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
-    (my/python-basic-config))
+(defun org-babel-edit-prep:jupyter-python (babel-info)
+  (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+  (my/python-basic-config))
+(defun org-babel-edit-prep:python (babel-info)
+  (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+  (my/python-basic-config))
 
-  )
+(leaf web-mode
+  :ensure t
+  :custom ((web-mode-markup-indent-offset . 2)
+           (web-mode-css-indent-offset . 2)
+           (web-mode-code-indent-offset . 2))
+  :mode ("\\.phtml\\'"
+         "\\.tpl\\.php\\'"
+         "\\.[agj]sp\\'"
+         "\\.as[cp]x\\'"
+         "\\.erb\\'"
+         "\\.mustache\\'"
+         "\\.djhtml\\'"))
+
+(leaf flymake
+  :doc "A universal on-the-fly syntax checker"
+  :tag "builtin"
+  :custom (flymake-gui-warnings-enabled . t)
+  :bind (flymake-mode-map
+         ("C-c C-n" . flymake-goto-next-error)
+         ("C-c C-p" . flymake-goto-prev-error))
+  :config
+  (leaf flymake-proselint
+    :ensure t
+    :hook
+    ((markdown-mode-hook org-mode-hook text-mode-hook) . flymake-proselint-setup))
+
+  (leaf flymake-diagnostic-at-point
+    :doc "Display flymake diagnostics at point"
+    :req "emacs-26.1" "popup-0.5.3"
+    :tag "tools" "languages" "convenience" "emacs>=26.1"
+    :url "https://github.com/meqif/flymake-diagnostic-at-point"
+    :ensure t
+    :after flymake
+    :custom ((flymake-diagnostic-at-point-timer-delay . 0.8)
+             (flymake-diagnostic-at-point-error-prefix . " ► ")
+             (flymake-diagnostic-at-point-display-diagnostic-function
+              quote flymake-diagnostic-at-point-display-minibuffer))
+    :hook (flymake-mode-hook . flymake-diagnostic-at-point-mode)))
+
+(leaf flyspell
+  :hook (LaTeX-mode-hook org-mode-hook markdown-mode-hook text-mode-hook)
+  :config
+  (leaf ispell
+    :doc "interface to spell checkers"
+    :tag "builtin"
+    :custom ((ispell-program-name . "aspell")
+             (ispell-local-dictionary . "en_US"))
+    :hook (after-init-hook . (lambda ()
+                               ;; for text mixed English and Japanese
+                               (add-to-list 'ispell-skip-region-alist
+                                            '("[^\000-\377]+"))))))
 
 (leaf highlight-indent-guides
   :blackout
