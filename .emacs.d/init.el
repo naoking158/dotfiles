@@ -708,6 +708,7 @@
             ;; (lsp-diagnostics-modeline-scope . :project)
             ;; debug
             (lsp-auto-guess-root . nil)
+            (lsp-headerline-breadcrumb-enable . nil)
             (lsp-log-io . nil)
             (lsp-trace . nil)
             (lsp-print-performance . nil)
@@ -791,6 +792,58 @@
   :ensure t
   :bind (("C-c e" . macrostep-expand)))
 
+(leaf web-mode
+  :ensure t
+  :custom ((web-mode-markup-indent-offset . 2)
+           (web-mode-css-indent-offset . 2)
+           (web-mode-code-indent-offset . 2))
+  :mode ("\\.phtml\\'"
+         "\\.tpl\\.php\\'"
+         "\\.[agj]sp\\'"
+         "\\.as[cp]x\\'"
+         "\\.erb\\'"
+         "\\.mustache\\'"
+         "\\.djhtml\\'"))
+
+(leaf flymake
+  :doc "A universal on-the-fly syntax checker"
+  :tag "builtin"
+  :custom (flymake-gui-warnings-enabled . t)
+  :bind (flymake-mode-map
+         ("C-c C-n" . flymake-goto-next-error)
+         ("C-c C-p" . flymake-goto-prev-error))
+  :config
+  (leaf flymake-proselint
+    :ensure t
+    :hook
+    ((markdown-mode-hook org-mode-hook text-mode-hook) . flymake-proselint-setup))
+
+  (leaf flymake-diagnostic-at-point
+    :doc "Display flymake diagnostics at point"
+    :req "emacs-26.1" "popup-0.5.3"
+    :tag "tools" "languages" "convenience" "emacs>=26.1"
+    :url "https://github.com/meqif/flymake-diagnostic-at-point"
+    :ensure t
+    :after flymake
+    :custom ((flymake-diagnostic-at-point-timer-delay . 0.8)
+             (flymake-diagnostic-at-point-error-prefix . " ► ")
+             (flymake-diagnostic-at-point-display-diagnostic-function
+              quote flymake-diagnostic-at-point-display-minibuffer))
+    :hook (flymake-mode-hook . flymake-diagnostic-at-point-mode)))
+
+(leaf flyspell
+  :hook (LaTeX-mode-hook org-mode-hook markdown-mode-hook text-mode-hook)
+  :config
+  (leaf ispell
+    :doc "interface to spell checkers"
+    :tag "builtin"
+    :custom ((ispell-program-name . "aspell")
+             (ispell-local-dictionary . "en_US"))
+    :hook (after-init-hook . (lambda ()
+                               ;; for text mixed English and Japanese
+                               (add-to-list 'ispell-skip-region-alist
+                                            '("[^\000-\377]+"))))))
+
 (leaf python-mode
   :doc "Python major mode"
   :url "https://gitlab.com/groups/python-mode-devs"
@@ -860,59 +913,16 @@
       "python-shell-completion-at-point breaks when point is before the prompt"
       (when (or (not comint-last-prompt)
                 (>= (point) (cdr comint-last-prompt)))
-        ad-do-it))))
+        ad-do-it)))
 
-(leaf web-mode
-  :ensure t
-  :custom ((web-mode-markup-indent-offset . 2)
-           (web-mode-css-indent-offset . 2)
-           (web-mode-code-indent-offset . 2))
-  :mode ("\\.phtml\\'"
-         "\\.tpl\\.php\\'"
-         "\\.[agj]sp\\'"
-         "\\.as[cp]x\\'"
-         "\\.erb\\'"
-         "\\.mustache\\'"
-         "\\.djhtml\\'"))
+  (defun org-babel-edit-prep:jupyter-python (babel-info)
+    (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+    (my/python-basic-config))
+  (defun org-babel-edit-prep:python (babel-info)
+    (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+    (my/python-basic-config))
 
-(leaf flymake
-  :doc "A universal on-the-fly syntax checker"
-  :tag "builtin"
-  :custom (flymake-gui-warnings-enabled . t)
-  :bind (flymake-mode-map
-         ("C-c C-n" . flymake-goto-next-error)
-         ("C-c C-p" . flymake-goto-prev-error))
-  :config
-  (leaf flymake-proselint
-    :ensure t
-    :hook
-    ((markdown-mode-hook org-mode-hook text-mode-hook) . flymake-proselint-setup))
-
-  (leaf flymake-diagnostic-at-point
-    :doc "Display flymake diagnostics at point"
-    :req "emacs-26.1" "popup-0.5.3"
-    :tag "tools" "languages" "convenience" "emacs>=26.1"
-    :url "https://github.com/meqif/flymake-diagnostic-at-point"
-    :ensure t
-    :after flymake
-    :custom ((flymake-diagnostic-at-point-timer-delay . 0.8)
-             (flymake-diagnostic-at-point-error-prefix . " ► ")
-             (flymake-diagnostic-at-point-display-diagnostic-function
-              quote flymake-diagnostic-at-point-display-minibuffer))
-    :hook (flymake-mode-hook . flymake-diagnostic-at-point-mode)))
-
-(leaf flyspell
-  :hook (LaTeX-mode-hook org-mode-hook markdown-mode-hook text-mode-hook)
-  :config
-  (leaf ispell
-    :doc "interface to spell checkers"
-    :tag "builtin"
-    :custom ((ispell-program-name . "aspell")
-             (ispell-local-dictionary . "en_US"))
-    :hook (after-init-hook . (lambda ()
-                               ;; for text mixed English and Japanese
-                               (add-to-list 'ispell-skip-region-alist
-                                            '("[^\000-\377]+"))))))
+  )
 
 (leaf highlight-indent-guides
   :blackout
@@ -1699,10 +1709,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (org-log-done . t)
    (org-return-follows-link . t)
    (org-highlight-latex-and-related . '(latex script entities))
-   (org-babel-load-languages . '((emacs-lisp . t)
-                                 (python . t)
-                                 (latex . t)
-                                 (shell . t)))
    (org-confirm-babel-evaluate . nil)
    (org-catch-invisible-edits . 'show)
    (org-preview-latex-image-directory . "~/tmp/ltximg/")
@@ -1712,6 +1718,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (isearch-yank-on-move . 'shift)
    (isearch-allow-scroll . 'unlimited)
    (org-show-notification-handler . nil)
+   (org-babel-load-languages . '((emacs-lisp . t)
+                                 (python . t)
+                                 (latex . t)
+                                 (shell . t)))
    (org-structure-template-alist . '(("sh" . "src shell")
                                      ("c" . "center")
                                      ("C" . "comment")
@@ -1722,7 +1732,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                      ("q" . "quote")
                                      ("s" . "src")
                                      ("py" . "src python :session py :async yes")
-                                     ("jp" . "src jupyter-python :session py :async yes")
+                                     ("jp" . "src jupyter-python :session py :async yes :kernel torch")
                                      ("d" . "definition")
                                      ("t" . "theorem")
                                      ("mc" . "quoting")
@@ -2346,6 +2356,22 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf org-protocol
   :after org-roam
   :require t org-roam-protocol)
+
+(setq kw-str-list '("gan" "vae"))
+(defun extract-keywords-from-string (str kw-str-list)
+  (progn (setq extracted-keywords nil)
+    (dolist (kw kw-str-list)
+      (when (string-match kw str)
+        (push kw extracted-keywords)))))
+extract-keywords-from-string
+
+
+(setq abst "The beginning and end of STRING, and each match for SEPARATORS, are
+splitting points.  The substrings matching SEPARATORS are removed, and
+the substrings between the splitting points are collected as a list,
+which is returned.")
+
+(extract-keywords-from-string abst '("which" "collect"))
 
 (leaf org-bullets
   :disabled t
@@ -3069,9 +3095,16 @@ Interactively, URL defaults to the string looking like a url around point."
 (leaf applescript-mode :ensure t)
 
 (leaf jupyter
+  :after org
   :ensure t websocket
   :require zmq
+  :bind (jupyter-org-interaction-mode
+         ("C-c C-." . jupyter-org-hydra/body))
   :config
-  (add-to-list 'org-babel-load-languages '(jupyter . t)))
+  (add-to-list 'org-babel-load-languages '(jupyter . t) t)
+  (org-babel-do-load-languages
+   'org-babel-load-languages org-babel-load-languages))
+
+org-babel-load-languages
 
 (provide 'init)
