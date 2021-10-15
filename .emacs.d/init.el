@@ -2945,7 +2945,8 @@ Interactively, URL defaults to the string looking like a url around point."
         (expand-file-name "cookies" no-littering-etc-directory)) 
 
   ;; Set webkit as the default browse-url browser
-  (setq browse-url-browser-function 'webkit-browse-url)
+  ;; (setq browse-url-browser-function 'webkit-browse-url)
+  (setq browse-url-browser-function 'browse-url-default-browser)
 
   ;; Force webkit to always open a new session instead of reusing a current one
   (setq webkit-browse-url-force-new t)
