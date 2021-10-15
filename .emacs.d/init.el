@@ -3070,6 +3070,7 @@ Interactively, URL defaults to the string looking like a url around point."
 
 (leaf jupyter
   :ensure t websocket
+  :require zmq
   :config
   (add-to-list 'org-babel-load-languages '(jupyter . t)))
 
