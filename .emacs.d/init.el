@@ -1718,10 +1718,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (isearch-yank-on-move . 'shift)
    (isearch-allow-scroll . 'unlimited)
    (org-show-notification-handler . nil)
-   (org-babel-load-languages . '((emacs-lisp . t)
-                                 (python . t)
-                                 (latex . t)
-                                 (shell . t)))
    (org-structure-template-alist . '(("sh" . "src shell")
                                      ("c" . "center")
                                      ("C" . "comment")
@@ -3101,9 +3097,12 @@ Interactively, URL defaults to the string looking like a url around point."
   :bind (jupyter-org-interaction-mode
          ("C-c C-." . jupyter-org-hydra/body))
   :config
-  (add-to-list 'org-babel-load-languages '(jupyter . t) t)
   (org-babel-do-load-languages
-   'org-babel-load-languages org-babel-load-languages))
+   'org-babel-load-languages '((emacs-lisp . t)
+                               (python . t)
+                               (latex . t)
+                               (shell . t)
+                               (jupyter . t))))
 
 org-babel-load-languages
 

@@ -2439,10 +2439,6 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
       (isearch-yank-on-move . 'shift)
       (isearch-allow-scroll . 'unlimited)
       (org-show-notification-handler . nil)
-      (org-babel-load-languages . '((emacs-lisp . t)
-                                    (python . t)
-                                    (latex . t)
-                                    (shell . t)))
       (org-structure-template-alist . '(("sh" . "src shell")
                                         ("c" . "center")
                                         ("C" . "comment")
@@ -4261,9 +4257,12 @@ While browsing, remember the following:
     :bind (jupyter-org-interaction-mode
            ("C-c C-." . jupyter-org-hydra/body))
     :config
-    (add-to-list 'org-babel-load-languages '(jupyter . t) t)
     (org-babel-do-load-languages
-     'org-babel-load-languages org-babel-load-languages))
+     'org-babel-load-languages '((emacs-lisp . t)
+                                 (python . t)
+                                 (latex . t)
+                                 (shell . t)
+                                 (jupyter . t))))
 #+end_src
 
 *** Preparation
