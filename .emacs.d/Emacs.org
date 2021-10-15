@@ -1098,6 +1098,7 @@ Only in Neotree Buffer:
               ;; (lsp-diagnostics-modeline-scope . :project)
               ;; debug
               (lsp-auto-guess-root . nil)
+              (lsp-headerline-breadcrumb-enable . nil)
               (lsp-log-io . nil)
               (lsp-trace . nil)
               (lsp-print-performance . nil)
@@ -1273,6 +1274,29 @@ Only in Neotree Buffer:
 #+end_src
 
 
+**** Enable lsp in org-code-block
+:PROPERTIES:
+:ID:       725ED664-EA71-4344-A509-458228B9A6CD
+:END:
+
+- https://github.com/emacs-lsp/lsp-mode/issues/2842#issuecomment-870807018
+- https://github.com/emacs-lsp/lsp-mode/issues/655#issuecomment-592331844
+
+- =:file filename= or =:tangle filename= のどちらかを書く
+- =:tangle= の場合は下記の関数を用意することで，code-block に入ったときにバッファ名が filename になる
+- バッファ全体に適用するならこう
+   =#+PROPERTY: header-args:jupyter-python :file tmp.py=
+
+#+begin_src emacs-lisp
+  (defun org-babel-edit-prep:jupyter-python (babel-info)
+    (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+    (my/python-basic-config))
+  (defun org-babel-edit-prep:python (babel-info)
+    (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+    (my/python-basic-config))
+#+end_src
+
+
 *** HTML
 :PROPERTIES:
 :ID:       8A817B4F-518D-40C2-BCEE-2573EACF9E9D
@@ -1347,6 +1371,8 @@ Only in Neotree Buffer:
                                  (add-to-list 'ispell-skip-region-alist
                                               '("[^\000-\377]+"))))))
 #+end_src
+
+
 
 
 *** Indent checking with highlight-indent-guides
@@ -1534,6 +1560,7 @@ Only in Neotree Buffer:
 :END:
 
 Sets the background of HTML color strings in buffers to be the color mentioned.
+
 
 #+begin_src emacs-lisp
   
@@ -2268,6 +2295,9 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 #+end_src
 
 ** File path completion in string
+:PROPERTIES:
+:ID:       1634340B-AA9E-4380-B3CA-7A4E10023945
+:END:
 https://with-emacs.com/posts/tutorials/customize-completion-at-point/
 
   #+begin_src emacs-lisp
@@ -2413,10 +2443,6 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
       (org-log-done . t)
       (org-return-follows-link . t)
       (org-highlight-latex-and-related . '(latex script entities))
-      (org-babel-load-languages . '((emacs-lisp . t)
-                                    (python . t)
-                                    (latex . t)
-                                    (shell . t)))
       (org-confirm-babel-evaluate . nil)
       (org-catch-invisible-edits . 'show)
       (org-preview-latex-image-directory . "~/tmp/ltximg/")
@@ -2436,7 +2462,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
                                         ("q" . "quote")
                                         ("s" . "src")
                                         ("py" . "src python :session py :async yes")
-                                        ("jp" . "src jupyter-python :session py :async yes")
+                                        ("jp" . "src jupyter-python :session py :async yes :kernel torch")
                                         ("d" . "definition")
                                         ("t" . "theorem")
                                         ("mc" . "quoting")
@@ -3186,6 +3212,28 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
   (leaf org-protocol
     :after org-roam
     :require t org-roam-protocol)
+#+end_src
+
+***** draft
+:PROPERTIES:
+:ID:       D7E41C99-28DC-464D-8C3F-45F8A8D5EEEB
+:END:
+#+begin_src emacs-lisp
+  (setq kw-str-list '("gan" "vae"))
+  (defun extract-keywords-from-string (str kw-str-list)
+    (progn (setq extracted-keywords nil)
+      (dolist (kw kw-str-list)
+        (when (string-match kw str)
+          (push kw extracted-keywords)))))
+  extract-keywords-from-string
+  
+  
+  (setq abst "The beginning and end of STRING, and each match for SEPARATORS, are
+  splitting points.  The substrings matching SEPARATORS are removed, and
+  the substrings between the splitting points are collected as a list,
+  which is returned.")
+  
+  (extract-keywords-from-string abst '("which" "collect"))
 #+end_src
 
 **** Create Bookmark
@@ -4217,10 +4265,51 @@ While browsing, remember the following:
 :END:
 #+begin_src emacs-lisp
   (leaf jupyter
+    :after org
     :ensure t websocket
+    :require zmq
+    :bind (jupyter-org-interaction-mode
+           ("C-c C-." . jupyter-org-hydra/body))
     :config
-    (add-to-list 'org-babel-load-languages '(jupyter . t)))
+    (org-babel-do-load-languages
+     'org-babel-load-languages '((emacs-lisp . t)
+                                 (python . t)
+                                 (latex . t)
+                                 (shell . t)
+                                 (jupyter . t))))
 #+end_src
+
+*** Preparation
+
+1. Install =jupyterlab= and =ipykernel= to both of base and Virtual env
+
+2. Create kernel in virtual env
+   #+begin_src shell
+     conda activate ENVNAME
+     ipython install kernel --user --name=ENVNAME
+   #+end_src
+
+   
+*** org-mode source blocks
+:PROPERTIES:
+:ID:       74EFE5D2-733F-438B-8FC8-69E925BAC7C6
+:END:
+
+
+
+
+To enable support for Jupyter based source code blocks, add jupyter to org-babel-load-languages. Ensure the jupyter entry is added last since loading ob-jupyter depends on the value of variables such as org-src-lang-modes and org-babel-tangle-lang-exts.
+
+#+begin_src emacs-lisp
+  org-babel-load-languages
+#+end_src
+
+#+RESULTS:
+: ((shell . t) (latex . t) (python . t) (emacs-lisp . t) (jupyter . t))
+
+
+*** How to use it?
+
 
 * Footer
 :PROPERTIES:

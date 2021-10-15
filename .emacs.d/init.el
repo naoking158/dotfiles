@@ -708,6 +708,7 @@
             ;; (lsp-diagnostics-modeline-scope . :project)
             ;; debug
             (lsp-auto-guess-root . nil)
+            (lsp-headerline-breadcrumb-enable . nil)
             (lsp-log-io . nil)
             (lsp-trace . nil)
             (lsp-print-performance . nil)
@@ -861,6 +862,13 @@
       (when (or (not comint-last-prompt)
                 (>= (point) (cdr comint-last-prompt)))
         ad-do-it))))
+
+(defun org-babel-edit-prep:jupyter-python (babel-info)
+  (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+  (my/python-basic-config))
+(defun org-babel-edit-prep:python (babel-info)
+  (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+  (my/python-basic-config))
 
 (leaf web-mode
   :ensure t
@@ -1699,10 +1707,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (org-log-done . t)
    (org-return-follows-link . t)
    (org-highlight-latex-and-related . '(latex script entities))
-   (org-babel-load-languages . '((emacs-lisp . t)
-                                 (python . t)
-                                 (latex . t)
-                                 (shell . t)))
    (org-confirm-babel-evaluate . nil)
    (org-catch-invisible-edits . 'show)
    (org-preview-latex-image-directory . "~/tmp/ltximg/")
@@ -1722,7 +1726,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                      ("q" . "quote")
                                      ("s" . "src")
                                      ("py" . "src python :session py :async yes")
-                                     ("jp" . "src jupyter-python :session py :async yes")
+                                     ("jp" . "src jupyter-python :session py :async yes :kernel torch")
                                      ("d" . "definition")
                                      ("t" . "theorem")
                                      ("mc" . "quoting")
@@ -2346,6 +2350,22 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf org-protocol
   :after org-roam
   :require t org-roam-protocol)
+
+(setq kw-str-list '("gan" "vae"))
+(defun extract-keywords-from-string (str kw-str-list)
+  (progn (setq extracted-keywords nil)
+    (dolist (kw kw-str-list)
+      (when (string-match kw str)
+        (push kw extracted-keywords)))))
+extract-keywords-from-string
+
+
+(setq abst "The beginning and end of STRING, and each match for SEPARATORS, are
+splitting points.  The substrings matching SEPARATORS are removed, and
+the substrings between the splitting points are collected as a list,
+which is returned.")
+
+(extract-keywords-from-string abst '("which" "collect"))
 
 (leaf org-bullets
   :disabled t
@@ -3070,8 +3090,19 @@ Interactively, URL defaults to the string looking like a url around point."
 (leaf applescript-mode :ensure t)
 
 (leaf jupyter
+  :after org
   :ensure t websocket
+  :require zmq
+  :bind (jupyter-org-interaction-mode
+         ("C-c C-." . jupyter-org-hydra/body))
   :config
-  (add-to-list 'org-babel-load-languages '(jupyter . t)))
+  (org-babel-do-load-languages
+   'org-babel-load-languages '((emacs-lisp . t)
+                               (python . t)
+                               (latex . t)
+                               (shell . t)
+                               (jupyter . t))))
+
+org-babel-load-languages
 
 (provide 'init)
