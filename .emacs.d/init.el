@@ -3208,4 +3208,29 @@ Interactively, URL defaults to the string looking like a url around point."
 
 org-babel-load-languages
 
+(leaf my/search-in-external-web-browser
+  :bind ("C-c s" . my/browse-web-with-keywords)
+  :preface
+  (defun my/get-keywords-for-browse-web ()
+    (let* ((default-keyword (substring-no-properties (car kill-ring)))
+           (input (read-from-minibuffer (format "Keywords (%s): "
+                                                default-keyword))))
+      (setq keywords (if (length> input 0)
+                         input
+                       default-keyword))))
+
+  (defun my/browse-web-with-keywords (&optional at-point)
+    (interactive "P")
+    (let* ((head "https://www.google.com/search?q=")
+           (tail "&sourceid=chrome&ie=UTF-8")
+           (keywords (cond
+                      (at-point (thing-at-point 'symbol))
+                      ((use-region-p) (buffer-substring-no-properties
+                                       (mark) (point)))
+                      (t (my/get-keywords-for-browse-web))))
+           (keywords (replace-regexp-in-string "\\\\[ \n\t\r\f ]"
+                                               "+"
+                                               keywords)))
+      (browse-url (concat head keywords tail)))))
+
 (provide 'init)
