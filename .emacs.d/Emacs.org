@@ -3125,7 +3125,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
                             "#+ROAM_KEY: ${ref}\n#+title: ${title}\n#+date: %U\n#+filetags: Literature\n\n${body}")
          :unnarrowed t)
         )))
-  
+
     :config
     (leaf org-roam-dailies
       :require t
@@ -3134,7 +3134,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
       (:org-roam-dailies-map
        ("Y" . org-roam-dailies-capture-yesterday)
        ("T" . org-roam-dailies-capture-tomorrow)))
-  
+
     ;; for org-roam-buffer-toggle
     ;; Recommendation in the official manual
     (add-to-list 'display-buffer-alist
@@ -3144,8 +3144,8 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
                    (window-width . 0.33)
                    (window-height . fit-window-to-buffer)))
     (org-roam-db-autosync-mode))
-  
-  
+
+
   (leaf org-roam-ui
     :after org-roam
     :load-path "~/.emacs.d/elisp/org-roam-ui/"
@@ -3209,16 +3209,118 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
 :END:
 
 #+begin_src emacs-lisp
-  (leaf org-protocol
+  (leaf org-roam-protocol
     :after org-roam
-    :require t org-roam-protocol)
+    ;; :require t org-protocol ol
+    :hook ((org-roam-capture-preface-hook . org-roam-protocol--try-capture-to-ref-h)
+           (org-roam-capture-new-node-hook . org-roam-protocol--insert-captured-ref-h))
+    :custom
+    ((org-protocol-protocol-alist . '(("org-roam-node" :protocol "roam-node" :function org-roam-protocol-open-node)
+                                      ("org-roam-ref" :protocol "roam-ref" :function org-roam-protocol-open-ref)
+                                      ("org-roam-paper" :protocol "roam-paper" :function my/org-roam-protocol-open-paper))))
+    :preface
+    (require 'org-protocol)
+    (require 'ol) ;; for org-link-decode
+    (require 'org-roam-protocol)
+  
+    (defun my/org-roam-visit-paperpile ()
+      (interactive)
+      (org-link-open-from-string (org-entry-get 0 "PAPERPILE")))
+
+    ;;; Handlers
+    (defun my/org-roam-protocol-open-paper (info)
+      (unless (plist-get info :ref)
+        (user-error "No ref key provided"))
+      (org-roam-plist-map! (lambda (k v)
+                             (org-link-decode
+                              (if (equal k :ref)
+                                  (org-protocol-sanitize-uri v)
+                                v))) info)
+      (when org-roam-protocol-store-links
+        (push (list (plist-get info :ref)
+                    (plist-get info :title)) org-stored-links))
+      (org-link-store-props :type (and (string-match org-link-plain-re
+                                                     (plist-get info :ref))
+                                       (match-string 1 (plist-get info :ref)))
+                            :link (plist-get info :ref)
+                            :annotation (org-link-make-string (plist-get info :ref)
+                                                              (or (plist-get info :title)
+                                                                  (plist-get info :ref)))
+                            :initial (or (plist-get info :body) ""))
+      (raise-frame)
+      (org-roam-capture-
+       :keys (plist-get info :template)
+       :node (org-roam-node-create :title (plist-get info :title))
+       :info (list :ref (plist-get info :ref)
+                   :cite (plist-get info :cite)
+                   :pdf (plist-get info :pdf)
+                   :abstract (plist-get info :abstract))
+       :templates org-roam-capture-ref-templates)
+      nil)
+
+    ;; Capture implementation
+    ;; (add-hook 'org-roam-capture-preface-hook #'org-roam-protocol--try-capture-to-ref-h)
+    (defun org-roam-protocol--try-capture-to-ref-h ()
+      "Try to capture to an existing node that match the ref."
+      (when-let ((node (and (plist-get org-roam-capture--info :ref)
+                            (org-roam-node-from-ref
+                             (plist-get org-roam-capture--info :ref)))))
+        (set-buffer (org-capture-target-buffer (org-roam-node-file node)))
+        (goto-char (org-roam-node-point node))
+        (widen)
+        (org-roam-node-id node)
+        (my/update-org-roam-paper org-roam-capture--info)))
+
+    ;; (add-hook 'org-roam-capture-new-node-hook #'org-roam-protocol--insert-captured-ref-h)
+    (defun org-roam-protocol--insert-captured-ref-h ()
+      (my/update-org-roam-paper org-roam-capture--info))
+
+    (defun my/update-org-roam-paper (info)
+      ;; (message "%s" info)
+
+      (when-let ((ref (plist-get info :ref)))
+        (org-roam-ref-add ref))
+
+      (when-let ((cite (plist-get info :cite)))
+        (goto-char (point-min))
+        (org-entry-delete 0 "CITE")
+        (org-roam-add-property cite "CITE"))
+
+      (when-let ((pdf (plist-get info :pdf)))
+        (goto-char (point-min))
+        (org-entry-delete 0 "PAPERPILE")
+        (org-roam-add-property pdf "PAPERPILE"))
+
+      (when-let ((abstract (plist-get info :abstract)))
+        (when (org-find-exact-headline-in-buffer "Abstract")
+          (goto-char (org-find-exact-headline-in-buffer "Abstract"))
+          (let (this-command (inhibit-message t)) (org-cut-subtree)))
+        (my/insert-abstract-to-top abstract)))
+
+    (defun my/insert-abstract-to-top (abstract)
+      (interactive)
+      (goto-char (point-min))
+      (org-next-visible-heading 1)
+      (insert (format "* Abstract\n%s\n\n" abstract)))
+
+    (defun my/delete-file-and-buffer ()
+      "Kill the current buffer and deletes the file it is visiting."
+      (interactive)
+      (let ((filename (buffer-file-name)))
+        (if filename
+            (if (y-or-n-p (concat "Do you really want to delete file " filename " ?"))
+                (progn
+                  (delete-file filename)
+                  (message "Deleted file %s." filename)
+                  (kill-buffer)))
+          (message "Not a file visiting buffer!")))))
 #+end_src
 
-***** draft
+***** COMMENT draft
 :PROPERTIES:
 :ID:       D7E41C99-28DC-464D-8C3F-45F8A8D5EEEB
 :END:
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :noweb
   (setq kw-str-list '("gan" "vae"))
   (defun extract-keywords-from-string (str kw-str-list)
     (progn (setq extracted-keywords nil)
@@ -3237,7 +3339,6 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
 #+end_src
 
 **** Create Bookmark
-
 #+begin_src js
   javascript:location.href =
       'org-protocol://roam-ref?template=r&ref='
@@ -3270,6 +3371,140 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
         encodeURIComponent(location.href)+'/'+
         encodeURIComponent(document.title)+'/'+
         encodeURIComponent(window.getSelection())
+#+end_src
+
+#+begin_src text
+  function get_pdf_url(a, b) {
+  var c = {
+  pub: a.pub,
+  attachment_id: a.attachment._id,
+  openInBackground: a.openInBackground,
+  openedFromWebApp: true,
+  preferredViewer: a.preferredViewer,
+  openInCurrentTab: a.openInCurrentTab
+  };
+  if ("forceGoogleDrive" in a) {
+  c.forceGoogleDrive = a.forceGoogleDrive;
+  }
+  var d = a.pub;
+  var e = a.attachment;
+  var f = "file";
+  if (e.article_pdf == 1) {
+  f = "PDF";
+  }
+  var g = Paperpile.Utils.createStatus({
+  text: "Loading " + f,
+  progress: -1,
+  showDelay: 200
+  });
+  var h = false;
+  PP.Utils.defer(function() {
+  if (!g.destroyed && !h) {
+  g.setText("Still working...");
+  }
+  }, 1e4);
+  PP.Utils.defer(function() {
+  var d = function(a) {
+  var b = a.msg;
+  if (b.attachmentCacheProgress && b.attachmentId == e._id) {
+  h = true;
+  if (!g.destroyed) {
+  if (b.attachmentCacheProgressPercent) {
+  var c = Math.round(b.attachmentCacheProgressPercent * 100);
+  g.setText("Loading " + f + " (" + c + "%)");
+  } else if (b.attachmentCacheProgressBytes) {
+  var d = Math.round(b.attachmentCacheProgressBytes / 1024);
+  g.setText("Loading " + f + "file (" + d + " Kb)");
+  }
+  }
+  }
+  };
+  PP.Msg.on("message", d);
+  PP.Msg.sendMessage({
+  fn: "viewPubAttachment",
+  args: [ c ],
+  callback: function(c, e) {
+  h = true;
+  if (!g.destroyed) {
+  g.destroy();
+  }
+  PP.Msg.un("message", d);
+  if (e) {
+  Paperpile.Utils.createStatus({
+  text: "Something went wrong &mdash; could not open file.",
+  links: [ "STATUS_PANEL_TROUBLESHOOTING", "STATUS_PANEL_CONTACT_SUPPORT" ],
+  data: {
+  type: "error",
+  errorMsg: "Could not open attachment.",
+  fullError: e,
+  troubleSection: "/h/troubleshooting-chrome-extension/#filesystem-access"
+  }
+  });
+  PP.Utils.callback(b, null, [ null, e ]);
+  } else {
+  PP.Utils.apply(a, c);
+  PP.Utils.callback(b, null, [ a, null ]);
+  }
+  }
+  });
+  }, 20);
+  }
+
+  function get_citation(callback_fn) {
+  format = "plain";
+  var b = Paperpile.view.papers.Grid.getVisibleGrid();
+  var c = b.getSelection();
+  var d = PP.backend.Settings.get("citation_lastUsedFormat");
+  if (d !== format) {
+  PP.backend.Settings.setSetting("citation_lastUsedFormat", format);
+  }
+  var e = {};
+  c.applySelection(e);
+  e.formatType = format;
+  delete e.pubs;
+  PP.Msg.sendMessage({
+  fn: "copyFormatted",
+  args: [ e ],
+  callback: callback_fn,
+  loadingMessage: "Copying formatted citations"
+  });
+  }
+
+  function callback_fn(value, error) {
+  if (error) {
+  Paperpile.Utils.createStatus({
+  text: "Something went wrong &mdash; error formatting citations",
+  iconCls: "error",
+  showDelay: 200
+  });
+  } else {
+  var citation = value.text;
+  citation = citation.replace(/^\n+/, "");
+  citation = citation.replace(/\n+$/, "");
+  citation = citation.replace(/\<i\>/, "");
+  citation = citation.replace(/\<\/i\>/, "");
+  citation = citation.replace(/\<.?br.?\>/, "");
+
+  s = Paperpile.Globals.grid().getSelection();
+  p = s.getRecord().raw;
+  a = {attachment: PP.library.Publication.getPdfAttachment(p), pub: p, openInBackground: false, url: ''};
+  get_pdf_url(a, function(a, b) {
+  if (b) {
+  console.log("ERROR");
+  } else {
+  location.href = 'org-protocol://roam-paper?template=r'
+  + '&ref=@' + encodeURIComponent(p.citekey)
+  + '&cite=' + encodeURIComponent(citation)
+  + '&pdf=[[' + encodeURIComponent(a.url) + ']]'
+  + '&abstract=' + encodeURIComponent(p.abstract)
+  + '&title=' + encodeURIComponent(p.title)
+  + '. ' + encodeURIComponent(a.pub._first_author)
+  + ' (' + encodeURIComponent(p.published.year) + ')';}
+  });
+  }
+  }
+
+  get_citation(callback_fn);
 #+end_src
 
 ** Bullets
@@ -3584,12 +3819,13 @@ While browsing, remember the following:
 - s to look through the page history for this session.
 
 #+begin_src emacs-lisp :tangle no
-  
+
   (leaf ace-link
     :ensure t
     :config (ace-link-setup-default))
-  
+
   (leaf w3m
+    :disabled t
     :ensure t
     :require t ace-link
     :init
@@ -3606,9 +3842,9 @@ While browsing, remember the following:
             ("&" . w3m-view-url-with-external-browser)))
     :config
     ;; Web Page Cleanup
-  
+
     ;; Navigating some sites in a text browser is a bit painful, but we could have some functions that either move the cursor passed the header to the start of the content, or actually remove some of the content.
-  
+
     ;; Google Search
     ;; Don’t need to actually remove stuff when search in Google, as I really just need to jump ahead and skip the header:
     (defun w3m-skip-in-google ()
@@ -3617,17 +3853,17 @@ While browsing, remember the following:
       (search-forward-regexp "[0-9, ]+ results")
       (forward-line 2)
       (recenter-top-bottom 0))
-  
+
     ;; Stack Overflow
     ;; Without a clear enough label, searching for the start of content will always be fragile. We’ll look for the start of the first column.
-  
+
     ;; Stack Overflow has a lot of text that isn’t helpful to someone in a text-based browser, so I would like to remove the voting and other parts. Not sure how to do it, since the columns are of variable width.
     (defun w3m-skip-in-stackoverflow ()
       (beginning-of-buffer)
       (search-forward-regexp "^   ")
       (forward-line -2)
       (recenter-top-bottom 0))
-  
+
     ;; Web Site Dispatch Function
     ;; Add a hook to the w3m-display-functions to match the URL to see which function we need to call:
     (defun w3m-hide-stuff (url)
@@ -3637,7 +3873,7 @@ While browsing, remember the following:
             ((string-match "clojuredocs.org" url) (w3m-skip-in-clojuredocs))
             ((string-match "stackoverflow.com" url) (w3m-skip-in-stackoverflow))
             )))
-  
+
 #+end_src
 
 #+RESULTS:
@@ -4071,7 +4307,7 @@ While browsing, remember the following:
           (progn (xwidget-webkit-goto-url url)
                  (switch-to-buffer (xwidget-buffer
                                     (xwidget-webkit-current-session))))))))
-  
+
   (leaf webkit
     :when (and (eq 28 emacs-major-version)
                (memq window-system '(x pgtk)))
@@ -4084,30 +4320,42 @@ While browsing, remember the following:
     :config
     ;; If you don't care so much about privacy and want to give your data to google
     (setq webkit-search-prefix "https://google.com/search?q=") 
-  
+
     ;; Specify a different set of characters use in the link hints
     ;; For example the following are more convienent if you use dvorak
     (setq webkit-ace-chars "asdfjkl;")
-  
+
     ;; If you want history saved in a different place or
     ;; Set to `nil' to if you don't want history saved to file (will stay in memory)
     (setq webkit-history-file
           (expand-file-name "webkit-history" no-littering-etc-directory))
-  
+
     ;; If you want cookies saved in a different place or
     ;; Set to `nil' to if you don't want cookies saved
     (setq webkit-cookie-file
           (expand-file-name "cookies" no-littering-etc-directory)) 
-  
+
     ;; Set webkit as the default browse-url browser
-    (setq browse-url-browser-function 'webkit-browse-url)
-  
+    ;; (setq browse-url-browser-function 'webkit-browse-url)
+    ;; (setq browse-url-browser-function 'browse-url-default-browser)
+    (setq browse-url-browser-function 'browse-url-generic
+          browse-url-generic-program "brave")
+    (setq org-file-apps
+          '(("\\\\.x?html\\\\\\='" . "brave %s")
+            ("\\\\(?:xhtml\\\\|html\\\\)\\\\\\='" . "brave %s")
+            (auto-mode . emacs)
+            (directory . emacs)
+            ("\\.mm\\'" . default)
+            ;; ("\\.x?html?\\'" . default)
+            ("\\.pdf\\'" . default)
+            ))
+
     ;; Force webkit to always open a new session instead of reusing a current one
     (setq webkit-browse-url-force-new t)
-  
+
     ;; Globally disable javascript
     ;; (add-hook 'webkit-new-hook #'webkit-enable-javascript)
-  
+
     ;; Override the "loading:" mode line indicator with an icon from `all-the-icons.el'
     ;; You could also use a unicode icon like ↺
     (defun webkit--display-progress (progress)
@@ -4116,7 +4364,7 @@ While browsing, remember the following:
                 ""
               (format "%s%.0f%%  " (all-the-icons-faicon "spinner") progress)))
       (force-mode-line-update))
-  
+
     ;; Set action to be taken on a download request. Predefined actions are
     ;; `webkit-download-default', `webkit-download-save', and `webkit-download-open'
     ;; where the save function saves to the download directory, the open function
@@ -4124,10 +4372,10 @@ While browsing, remember the following:
     (setq webkit-download-action-alist '(("\\.pdf\\'" . webkit-download-open)
                                          ("\\.png\\'" . webkit-download-save)
                                          (".*" . webkit-download-default)))
-  
+
     ;; Globally use a proxy
     ;; (add-hook 'webkit-new-hook (lambda () (webkit-set-proxy "socks://localhost:8000")))
-  
+
     ;; Globally use the simple dark mode
     (setq webkit-dark-mode t))
 #+end_src

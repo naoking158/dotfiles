@@ -15,6 +15,7 @@ x-scheme-handler/msteams=teams-for-linux.desktop
 x-scheme-handler/mailto=brave-browser.desktop
 text/x-emacs-lisp=userapp-emacsclient-5KHJB1.desktop
 text/plain=userapp-emacsclient-832XA1.desktop
+x-scheme-handler/org-protocol=org-protocol.desktop
 
 [Added Associations]
 x-scheme-handler/http=brave.desktop;
