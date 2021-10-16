@@ -2361,6 +2361,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   (require 'ol) ;; for org-link-decode
   (require 'org-roam-protocol)
 
+  ;; for open papertile link in external browser
+  (org-add-link-type "chrome-extension"
+                     (lambda (path) (browse-url (concat "chrome-extension://"
+                                                        path))))
+
   (defun my/org-roam-visit-paperpile ()
     (interactive)
     (org-link-open-from-string (org-entry-get 0 "PAPERPILE")))
@@ -3024,6 +3029,7 @@ Interactively, URL defaults to the string looking like a url around point."
                                   (xwidget-webkit-current-session))))))))
 
 (leaf webkit
+  :disabled t
   :when (and (eq 28 emacs-major-version)
              (memq window-system '(x pgtk)))
   :load-path "~/.emacs.d/elisp/emacs-webkit/"
