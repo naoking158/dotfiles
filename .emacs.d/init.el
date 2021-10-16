@@ -2347,25 +2347,111 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
 
-(leaf org-protocol
+(leaf org-roam-protocol
   :after org-roam
-  :require t org-roam-protocol)
+  ;; :require t org-protocol ol
+  :hook ((org-roam-capture-preface-hook . org-roam-protocol--try-capture-to-ref-h)
+         (org-roam-capture-new-node-hook . org-roam-protocol--insert-captured-ref-h))
+  :custom
+  ((org-protocol-protocol-alist . '(("org-roam-node" :protocol "roam-node" :function org-roam-protocol-open-node)
+                                    ("org-roam-ref" :protocol "roam-ref" :function org-roam-protocol-open-ref)
+                                    ("org-roam-paper" :protocol "roam-paper" :function my/org-roam-protocol-open-paper))))
+  :preface
+  (require 'org-protocol)
+  (require 'ol) ;; for org-link-decode
+  (require 'org-roam-protocol)
 
-(setq kw-str-list '("gan" "vae"))
-(defun extract-keywords-from-string (str kw-str-list)
-  (progn (setq extracted-keywords nil)
-    (dolist (kw kw-str-list)
-      (when (string-match kw str)
-        (push kw extracted-keywords)))))
-extract-keywords-from-string
+  (defun my/org-roam-visit-paperpile ()
+    (interactive)
+    (org-link-open-from-string (org-entry-get 0 "PAPERPILE")))
 
+  ;;; Handlers
+  (defun my/org-roam-protocol-open-paper (info)
+    (unless (plist-get info :ref)
+      (user-error "No ref key provided"))
+    (org-roam-plist-map! (lambda (k v)
+                           (org-link-decode
+                            (if (equal k :ref)
+                                (org-protocol-sanitize-uri v)
+                              v))) info)
+    (when org-roam-protocol-store-links
+      (push (list (plist-get info :ref)
+                  (plist-get info :title)) org-stored-links))
+    (org-link-store-props :type (and (string-match org-link-plain-re
+                                                   (plist-get info :ref))
+                                     (match-string 1 (plist-get info :ref)))
+                          :link (plist-get info :ref)
+                          :annotation (org-link-make-string (plist-get info :ref)
+                                                            (or (plist-get info :title)
+                                                                (plist-get info :ref)))
+                          :initial (or (plist-get info :body) ""))
+    (raise-frame)
+    (org-roam-capture-
+     :keys (plist-get info :template)
+     :node (org-roam-node-create :title (plist-get info :title))
+     :info (list :ref (plist-get info :ref)
+                 :cite (plist-get info :cite)
+                 :pdf (plist-get info :pdf)
+                 :abstract (plist-get info :abstract))
+     :templates org-roam-capture-ref-templates)
+    nil)
 
-(setq abst "The beginning and end of STRING, and each match for SEPARATORS, are
-splitting points.  The substrings matching SEPARATORS are removed, and
-the substrings between the splitting points are collected as a list,
-which is returned.")
+  ;; Capture implementation
+  ;; (add-hook 'org-roam-capture-preface-hook #'org-roam-protocol--try-capture-to-ref-h)
+  (defun org-roam-protocol--try-capture-to-ref-h ()
+    "Try to capture to an existing node that match the ref."
+    (when-let ((node (and (plist-get org-roam-capture--info :ref)
+                          (org-roam-node-from-ref
+                           (plist-get org-roam-capture--info :ref)))))
+      (set-buffer (org-capture-target-buffer (org-roam-node-file node)))
+      (goto-char (org-roam-node-point node))
+      (widen)
+      (org-roam-node-id node)
+      (my/update-org-roam-paper org-roam-capture--info)))
 
-(extract-keywords-from-string abst '("which" "collect"))
+  ;; (add-hook 'org-roam-capture-new-node-hook #'org-roam-protocol--insert-captured-ref-h)
+  (defun org-roam-protocol--insert-captured-ref-h ()
+    (my/update-org-roam-paper org-roam-capture--info))
+
+  (defun my/update-org-roam-paper (info)
+    ;; (message "%s" info)
+
+    (when-let ((ref (plist-get info :ref)))
+      (org-roam-ref-add ref))
+
+    (when-let ((cite (plist-get info :cite)))
+      (goto-char (point-min))
+      (org-entry-delete 0 "CITE")
+      (org-roam-add-property cite "CITE"))
+
+    (when-let ((pdf (plist-get info :pdf)))
+      (goto-char (point-min))
+      (org-entry-delete 0 "PAPERPILE")
+      (org-roam-add-property pdf "PAPERPILE"))
+
+    (when-let ((abstract (plist-get info :abstract)))
+      (when (org-find-exact-headline-in-buffer "Abstract")
+        (goto-char (org-find-exact-headline-in-buffer "Abstract"))
+        (let (this-command (inhibit-message t)) (org-cut-subtree)))
+      (my/insert-abstract-to-top abstract)))
+
+  (defun my/insert-abstract-to-top (abstract)
+    (interactive)
+    (goto-char (point-min))
+    (org-next-visible-heading 1)
+    (insert (format "* Abstract\n%s\n\n" abstract)))
+
+  (defun my/delete-file-and-buffer ()
+    "Kill the current buffer and deletes the file it is visiting."
+    (interactive)
+    (let ((filename (buffer-file-name)))
+      (if filename
+          (if (y-or-n-p (concat "Do you really want to delete file " filename " ?"))
+              (progn
+                (delete-file filename)
+                (message "Deleted file %s." filename)
+                (kill-buffer)))
+        (message "Not a file visiting buffer!")))))
 
 (leaf org-bullets
   :disabled t
@@ -2966,7 +3052,18 @@ Interactively, URL defaults to the string looking like a url around point."
 
   ;; Set webkit as the default browse-url browser
   ;; (setq browse-url-browser-function 'webkit-browse-url)
-  (setq browse-url-browser-function 'browse-url-default-browser)
+  ;; (setq browse-url-browser-function 'browse-url-default-browser)
+  (setq browse-url-browser-function 'browse-url-generic
+        browse-url-generic-program "brave")
+  (setq org-file-apps
+        '(("\\\\.x?html\\\\\\='" . "brave %s")
+          ("\\\\(?:xhtml\\\\|html\\\\)\\\\\\='" . "brave %s")
+          (auto-mode . emacs)
+          (directory . emacs)
+          ("\\.mm\\'" . default)
+          ;; ("\\.x?html?\\'" . default)
+          ("\\.pdf\\'" . default)
+          ))
 
   ;; Force webkit to always open a new session instead of reusing a current one
   (setq webkit-browse-url-force-new t)
