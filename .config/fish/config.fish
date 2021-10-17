@@ -105,6 +105,10 @@ if test (uname -s) = "Darwin"
     set -x FZF_DEFAULT_COMMAND 'rg -a --files --hidden --no-ignore --follow'
 
     set -g fish_user_paths "/usr/local/sbin" $fish_user_paths
+
+		function brave
+		    '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser' $argv		
+    end
 end
 
 ################################################################

@@ -2997,7 +2997,10 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
         org-msg-convert-citation t)
   (org-msg-mode))
 
-(leaf xwwp  
+(setq browse-url-browser-function 'browse-url-default-browser)
+
+(leaf xwwp
+  :disabled t
   :when (or (<= emacs-major-version 27)
             (memq window-system '(ns darwin)))
   :ensure t
@@ -3059,17 +3062,6 @@ Interactively, URL defaults to the string looking like a url around point."
   ;; Set webkit as the default browse-url browser
   ;; (setq browse-url-browser-function 'webkit-browse-url)
   ;; (setq browse-url-browser-function 'browse-url-default-browser)
-  (setq browse-url-browser-function 'browse-url-generic
-        browse-url-generic-program "brave")
-  (setq org-file-apps
-        '(("\\\\.x?html\\\\\\='" . "brave %s")
-          ("\\\\(?:xhtml\\\\|html\\\\)\\\\\\='" . "brave %s")
-          (auto-mode . emacs)
-          (directory . emacs)
-          ("\\.mm\\'" . default)
-          ;; ("\\.x?html?\\'" . default)
-          ("\\.pdf\\'" . default)
-          ))
 
   ;; Force webkit to always open a new session instead of reusing a current one
   (setq webkit-browse-url-force-new t)
@@ -3212,8 +3204,11 @@ org-babel-load-languages
   :bind ("C-c s" . my/browse-web-with-keywords)
   :preface
   (defun my/get-keywords-for-browse-web ()
-    (let* ((default-keyword (substring-no-properties (car kill-ring)))
-           (input (read-from-minibuffer (format "Keywords (%s): "
+    (let* ((default-keyword (if kill-ring
+                                (format " (%s)"
+                                        (substring-no-properties (car kill-ring)))
+                              ""))
+           (input (read-from-minibuffer (format "Keywords%s: "
                                                 default-keyword))))
       (setq keywords (if (length> input 0)
                          input
