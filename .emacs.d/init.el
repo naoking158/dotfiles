@@ -2997,8 +2997,6 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
         org-msg-convert-citation t)
   (org-msg-mode))
 
-(setq browse-url-browser-function 'browse-url-default-browser)
-
 (leaf xwwp
   :disabled t
   :when (or (<= emacs-major-version 27)
@@ -3200,32 +3198,74 @@ Interactively, URL defaults to the string looking like a url around point."
 
 org-babel-load-languages
 
-(leaf my/search-in-external-web-browser
-  :bind ("C-c s" . my/browse-web-with-keywords)
+(leaf sie-brow
+  :doc "Sie-Brow; Search in external browser with keywords
+        - at point with prefix `C-u',
+        - in selected region,
+        - killed latest, or
+        - input by user."
+  :bind (("C-c s" . sie-brow/search-in-google)
+         ("C-c p" . sie-brow/search-in-google-scholar))
+  :custom (browse-url-browser-function . 'browse-url-default-browser)
   :preface
-  (defun my/get-keywords-for-browse-web ()
-    (let* ((default-keyword (if kill-ring
-                                (format " (%s)"
-                                        (substring-no-properties (car kill-ring)))
-                              ""))
-           (input (read-from-minibuffer (format "Keywords%s: "
-                                                default-keyword))))
-      (setq keywords (if (length> input 0)
-                         input
-                       default-keyword))))
+  (defgroup sie-brow nil
+    "Search in external browser with keywords."
+    :prefix "sie-brow/"
+    :group 'sie-brow)
 
-  (defun my/browse-web-with-keywords (&optional at-point)
+  (defcustom sie-brow/prefix-for-google-search "https://www.google.com/search"
+    "Prefix for google search."
+    :type 'string
+    :group 'sie-brow)
+
+  (defcustom sie-brow/prefix-for-google-scholar "https://scholar.google.com/scholar"
+    "Prefix for google scholar."
+    :type 'string
+    :group 'sie-brow)
+
+  (defcustom sie-brow/url-suffix "&ie=UTF-8"
+    "Suffix of the URL."
+    :type 'string
+    :group 'sie-brow)
+
+  (defun sie-brow/keyword-suitable-for-url-format (&optional at-point)
+    "Return a search keyword suitable for the URL format."
+    (let* ((default-keyword (cond
+                             (at-point (thing-at-point 'symbol))
+                             ((use-region-p) (buffer-substring-no-properties
+                                              (mark) (point)))
+                             (t (if kill-ring
+                                    (substring-no-properties (car kill-ring))
+                                  nil))))
+           (keywords (read-from-minibuffer (if default-keyword
+                                               (format "Search keywords (%s): "
+                                                       default-keyword)
+                                             "Search keywords: "))))
+      (setq keyword (replace-regexp-in-string "[ \n\t\r\f ]"
+                                              "+"
+                                              (if (length> keywords 0)
+                                                  keywords
+                                                default-keyword)))))
+
+  (defun sie-brow/search-in-external-browser (prefix &optional at-point)
+    "Search in external browser with keywords
+        - at point with prefix `C-u',
+        - in selected region,
+        - that are latest killed words, or
+        - input by user."
+    (let* ((search-keyword (sie-brow/keyword-suitable-for-url-format at-point)))
+      (browse-url (concat prefix
+                          "?q=" search-keyword
+                          sie-brow/query-suffix))))
+
+  (defun sie-brow/search-in-google (&optional at-point)
+    "Search in Google."
     (interactive "P")
-    (let* ((head "https://www.google.com/search?q=")
-           (tail "&sourceid=chrome&ie=UTF-8")
-           (keywords (cond
-                      (at-point (thing-at-point 'symbol))
-                      ((use-region-p) (buffer-substring-no-properties
-                                       (mark) (point)))
-                      (t (my/get-keywords-for-browse-web))))
-           (keywords (replace-regexp-in-string "\\\\[ \n\t\r\f ]"
-                                               "+"
-                                               keywords)))
-      (browse-url (concat head keywords tail)))))
+    (sie-brow/search-in-external-browser sie-brow/prefix-for-google-search at-point))
+
+  (defun sie-brow/search-in-google-scholar (&optional at-point)
+    "Search in Google Scholar."
+    (interactive "P")
+    (sie-brow/search-in-external-browser sie-brow/prefix-for-google-scholar at-point)))
 
 (provide 'init)
