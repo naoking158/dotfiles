@@ -4531,6 +4531,10 @@ While browsing, remember the following:
    #+begin_src shell
      conda activate ENVNAME
      ipython install kernel --user --name=ENVNAME
+
+     # or
+     
+     python -m ipykernel install --user --name=ENVNAME
    #+end_src
 
 
@@ -4574,7 +4578,7 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
       "Search in external browser with keywords."
       :prefix "sie-brow/"
       :group 'sie-brow)
-	
+
     (defcustom sie-brow/prefix-for-google-search "https://www.google.com/search"
       "Prefix for google search."
       :type 'string
@@ -4603,11 +4607,18 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
                                                  (format "Search keywords (%s): "
                                                          default-keyword)
                                                "Search keywords: "))))
-        (setq keyword (replace-regexp-in-string "[ \n\t\r\f ]"
-                                                "+"
-                                                (if (length> keywords 0)
-                                                    keywords
-                                                  default-keyword)))))
+        (replace-regexp-in-string "[ \n\t\r\f ]"
+                                  "+"
+                                  (if (length> keywords 0)
+                                      keywords
+                                    default-keyword))
+        ;; (setq keyword (replace-regexp-in-string "[ \n\t\r\f ]"
+        ;;                                         "+"
+        ;;                                         (if (length> keywords 0)
+        ;;                                             keywords
+        ;;                                           default-keyword)))
+
+        ))
 
     (defun sie-brow/search-in-external-browser (prefix &optional at-point)
       "Search in external browser with keywords

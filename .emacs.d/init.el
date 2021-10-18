@@ -3241,11 +3241,18 @@ org-babel-load-languages
                                                (format "Search keywords (%s): "
                                                        default-keyword)
                                              "Search keywords: "))))
-      (setq keyword (replace-regexp-in-string "[ \n\t\r\f ]"
-                                              "+"
-                                              (if (length> keywords 0)
-                                                  keywords
-                                                default-keyword)))))
+      (replace-regexp-in-string "[ \n\t\r\f ]"
+                                "+"
+                                (if (length> keywords 0)
+                                    keywords
+                                  default-keyword))
+      ;; (setq keyword (replace-regexp-in-string "[ \n\t\r\f ]"
+      ;;                                         "+"
+      ;;                                         (if (length> keywords 0)
+      ;;                                             keywords
+      ;;                                           default-keyword)))
+
+      ))
 
   (defun sie-brow/search-in-external-browser (prefix &optional at-point)
     "Search in external browser with keywords
