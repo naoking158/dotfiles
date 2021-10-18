@@ -187,7 +187,7 @@
     :leaf-defer nil
     :when (memq window-system '(mac ns x))
     :custom ((exec-path-from-shell-check-startup-files)
-             (exec-path-from-shell-variables . '("PATH" "PYTHONPATH")))
+             (exec-path-from-shell-variables . '("PATH" "PYTHONPATH" "NEPTUNE_API_TOKEN")))
     :config
     (exec-path-from-shell-initialize))
 
@@ -862,13 +862,6 @@
       (when (or (not comint-last-prompt)
                 (>= (point) (cdr comint-last-prompt)))
         ad-do-it))))
-
-(defun org-babel-edit-prep:jupyter-python (babel-info)
-  (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
-  (my/python-basic-config))
-(defun org-babel-edit-prep:python (babel-info)
-  (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
-  (my/python-basic-config))
 
 (leaf web-mode
   :ensure t
@@ -3184,11 +3177,12 @@ Interactively, URL defaults to the string looking like a url around point."
 (leaf applescript-mode :ensure t)
 
 (leaf jupyter
-  :after org
   :ensure t websocket
-  :require zmq
-  :bind (jupyter-org-interaction-mode
-         ("C-c C-." . jupyter-org-hydra/body))
+  :require t zmq
+  :after org
+  :leaf-defer nil
+  :bind ((jupyter-org-interaction-mode-map
+         ("C-c C-." . jupyter-org-hydra/body)))
   :config
   (org-babel-do-load-languages
    'org-babel-load-languages '((emacs-lisp . t)
@@ -3196,6 +3190,16 @@ Interactively, URL defaults to the string looking like a url around point."
                                (latex . t)
                                (shell . t)
                                (jupyter . t))))
+
+(leaf org-babel
+  :after org python-mode
+  :config
+  (defun org-babel-edit-prep:jupyter-python (babel-info)
+    (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+    (my/python-basic-config))
+  (defun org-babel-edit-prep:python (babel-info)
+    (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+    (my/python-basic-config)))
 
 org-babel-load-languages
 
