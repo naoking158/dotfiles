@@ -2290,31 +2290,26 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (org-roam-capture-templates
      quote
      (("c" "concept" plain "%?"
-       :if-new (file+head "concepts/${slug}.org"
+       :target (file+head "concepts/${slug}.org"
                           "#+title: ${title}\n#+date: %U")
        :unnarrowed t)
       ("l" "lit" plain
        (file "~/org/braindump/preferences/LiteratureTemplate.org")
-       :if-new (file+head "lit/${slug}.org"
+       :target (file+head "lit/${slug}.org"
                           "#+title: ${title}\n#+date: %U\n#+filetags: Literature")
        :unnarrowed t)
       ("m" "Meeting" plain "%?"
-       :if-new (file+head "work/${slug}.org"
+       :target (file+head "work/${slug}.org"
                           "#+title: ${title}\n#+filetags: Meeting\n#+options: toc:nil")
        :unnarrowed t)
       ("w" "Working" plain "%?"
-       :if-new (file+head "work/${slug}.org"
+       :target (file+head "work/${slug}.org"
                           "#+title: ${title}\n#+filetags: Working\n#+options: toc:nil")
        :unnarrowed t)
       ("p" "private" plain "%?"
-       :if-new (file+head "private/${slug}.org"
+       :target (file+head "private/${slug}.org"
                           "#+title: ${title}\n#+date: %U\n")
-       :unnarrowed t)
-      ("r" "ref" plain "%?"
-       :if-new (file+head "lit/${slug}.org"
-                          "#+ROAM_KEY: ${ref}\n#+title: ${title}\n#+date: %U\n#+filetags: Literature\n\n${body}")
-       :unnarrowed t)
-      )))
+       :unnarrowed t))))
 
   :config
   (leaf org-roam-dailies
@@ -2349,13 +2344,18 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf org-roam-protocol
   :after org-roam
-  ;; :require t org-protocol ol
+  :leaf-defer nil
   :hook ((org-roam-capture-preface-hook . org-roam-protocol--try-capture-to-ref-h)
          (org-roam-capture-new-node-hook . org-roam-protocol--insert-captured-ref-h))
   :custom
   ((org-protocol-protocol-alist . '(("org-roam-node" :protocol "roam-node" :function org-roam-protocol-open-node)
                                     ("org-roam-ref" :protocol "roam-ref" :function org-roam-protocol-open-ref)
-                                    ("org-roam-paper" :protocol "roam-paper" :function my/org-roam-protocol-open-paper))))
+                                    ("org-roam-paper" :protocol "roam-paper" :function my/org-roam-protocol-open-paper)))
+   ;; (org-roam-capture-ref-templates . '(("r" "ref" plain "%?"
+   ;;                                      :target (file+head "lit/${slug}.org"
+   ;;                                                         "#+date: %U\n#+filetags: Literature\n#+title: ${title}")
+   ;;                                      :unnarrowed t)))
+   )
   :preface
   (require 'org-protocol)
   (require 'ol) ;; for org-link-decode
@@ -2402,7 +2402,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     nil)
 
   ;; Capture implementation
-  ;; (add-hook 'org-roam-capture-preface-hook #'org-roam-protocol--try-capture-to-ref-h)
   (defun org-roam-protocol--try-capture-to-ref-h ()
     "Try to capture to an existing node that match the ref."
     (when-let ((node (and (plist-get org-roam-capture--info :ref)
@@ -2414,25 +2413,27 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
       (org-roam-node-id node)
       (my/update-org-roam-paper org-roam-capture--info)))
 
-  ;; (add-hook 'org-roam-capture-new-node-hook #'org-roam-protocol--insert-captured-ref-h)
   (defun org-roam-protocol--insert-captured-ref-h ()
     (my/update-org-roam-paper org-roam-capture--info))
 
   (defun my/update-org-roam-paper (info)
-    ;; (message "%s" info)
+    (message "%s" info)
 
     (when-let ((ref (plist-get info :ref)))
       (org-roam-ref-add ref))
 
     (when-let ((cite (plist-get info :cite)))
-      (goto-char (point-min))
       (org-entry-delete 0 "CITE")
       (org-roam-add-property cite "CITE"))
 
-    (when-let ((pdf (plist-get info :pdf)))
-      (goto-char (point-min))
+    (when-let ((pdf (plist-get info :pdf))
+               (file (plist-get info :file))
+               (permalink (plist-get info :permalink)))
       (org-entry-delete 0 "PAPERPILE")
-      (org-roam-add-property pdf "PAPERPILE"))
+      (org-entry-delete 0 "PDF")
+      (org-roam-add-property
+       (concat "[[" pdf "][online]]-----" "[[file:/Volumes/GoogleDrive/My Drive/Paperpile/" file "][offline]]-----" "[[" permalink "][paperpile]]")
+       "PDF"))
 
     (when-let ((abstract (plist-get info :abstract)))
       (when (org-find-exact-headline-in-buffer "Abstract")
