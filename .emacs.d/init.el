@@ -3178,12 +3178,12 @@ Interactively, URL defaults to the string looking like a url around point."
 
 (leaf jupyter
   :ensure t websocket
-  :require t zmq
+  :require t zmq 
   :after org
-  :leaf-defer nil
   :bind ((jupyter-org-interaction-mode-map
-         ("C-c C-." . jupyter-org-hydra/body)))
-  :config
+            ("C-c h" . nil)
+            ("C-c C-." . jupyter-org-hydra/body)))
+  :preface
   (org-babel-do-load-languages
    'org-babel-load-languages '((emacs-lisp . t)
                                (python . t)
@@ -3193,7 +3193,7 @@ Interactively, URL defaults to the string looking like a url around point."
 
 (leaf org-babel
   :after org python-mode
-  :config
+  :preface
   (defun org-babel-edit-prep:jupyter-python (babel-info)
     (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
     (my/python-basic-config))
