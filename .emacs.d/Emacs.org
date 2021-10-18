@@ -4574,22 +4574,22 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
       "Search in external browser with keywords."
       :prefix "sie-brow/"
       :group 'sie-brow)
-	
+  
     (defcustom sie-brow/prefix-for-google-search "https://www.google.com/search"
       "Prefix for google search."
       :type 'string
       :group 'sie-brow)
-
+  
     (defcustom sie-brow/prefix-for-google-scholar "https://scholar.google.com/scholar"
       "Prefix for google scholar."
       :type 'string
       :group 'sie-brow)
-
+  
     (defcustom sie-brow/url-suffix "&ie=UTF-8"
       "Suffix of the URL."
       :type 'string
       :group 'sie-brow)
-
+  
     (defun sie-brow/keyword-suitable-for-url-format (&optional at-point)
       "Return a search keyword suitable for the URL format."
       (let* ((default-keyword (cond
@@ -4603,12 +4603,12 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
                                                  (format "Search keywords (%s): "
                                                          default-keyword)
                                                "Search keywords: "))))
-        (setq keyword (replace-regexp-in-string "[ \n\t\r\f ]"
-                                                "+"
-                                                (if (length> keywords 0)
-                                                    keywords
-                                                  default-keyword)))))
-
+        (replace-regexp-in-string "[ \n\t\r\f ]"
+                                  "+"
+                                  (if (length> keywords 0)
+                                      keywords
+                                    default-keyword))))
+  
     (defun sie-brow/search-in-external-browser (prefix &optional at-point)
       "Search in external browser with keywords
           - at point with prefix `C-u',
@@ -4618,13 +4618,13 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
       (let* ((search-keyword (sie-brow/keyword-suitable-for-url-format at-point)))
         (browse-url (concat prefix
                             "?q=" search-keyword
-                            sie-brow/query-suffix))))
-
+                            sie-brow/url-suffix))))
+  
     (defun sie-brow/search-in-google (&optional at-point)
       "Search in Google."
       (interactive "P")
       (sie-brow/search-in-external-browser sie-brow/prefix-for-google-search at-point))
-
+  
     (defun sie-brow/search-in-google-scholar (&optional at-point)
       "Search in Google Scholar."
       (interactive "P")

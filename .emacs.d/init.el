@@ -3241,11 +3241,11 @@ org-babel-load-languages
                                                (format "Search keywords (%s): "
                                                        default-keyword)
                                              "Search keywords: "))))
-      (setq keyword (replace-regexp-in-string "[ \n\t\r\f ]"
-                                              "+"
-                                              (if (length> keywords 0)
-                                                  keywords
-                                                default-keyword)))))
+      (replace-regexp-in-string "[ \n\t\r\f ]"
+                                "+"
+                                (if (length> keywords 0)
+                                    keywords
+                                  default-keyword))))
 
   (defun sie-brow/search-in-external-browser (prefix &optional at-point)
     "Search in external browser with keywords
@@ -3256,7 +3256,7 @@ org-babel-load-languages
     (let* ((search-keyword (sie-brow/keyword-suitable-for-url-format at-point)))
       (browse-url (concat prefix
                           "?q=" search-keyword
-                          sie-brow/query-suffix))))
+                          sie-brow/url-suffix))))
 
   (defun sie-brow/search-in-google (&optional at-point)
     "Search in Google."
