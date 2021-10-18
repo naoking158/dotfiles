@@ -187,7 +187,7 @@
     :leaf-defer nil
     :when (memq window-system '(mac ns x))
     :custom ((exec-path-from-shell-check-startup-files)
-             (exec-path-from-shell-variables . '("PATH" "PYTHONPATH")))
+             (exec-path-from-shell-variables . '("PATH" "PYTHONPATH" "NEPTUNE_API_TOKEN")))
     :config
     (exec-path-from-shell-initialize))
 
@@ -862,13 +862,6 @@
       (when (or (not comint-last-prompt)
                 (>= (point) (cdr comint-last-prompt)))
         ad-do-it))))
-
-(defun org-babel-edit-prep:jupyter-python (babel-info)
-  (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
-  (my/python-basic-config))
-(defun org-babel-edit-prep:python (babel-info)
-  (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
-  (my/python-basic-config))
 
 (leaf web-mode
   :ensure t
@@ -2290,31 +2283,26 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (org-roam-capture-templates
      quote
      (("c" "concept" plain "%?"
-       :if-new (file+head "concepts/${slug}.org"
+       :target (file+head "concepts/${slug}.org"
                           "#+title: ${title}\n#+date: %U")
        :unnarrowed t)
       ("l" "lit" plain
        (file "~/org/braindump/preferences/LiteratureTemplate.org")
-       :if-new (file+head "lit/${slug}.org"
+       :target (file+head "lit/${slug}.org"
                           "#+title: ${title}\n#+date: %U\n#+filetags: Literature")
        :unnarrowed t)
       ("m" "Meeting" plain "%?"
-       :if-new (file+head "work/${slug}.org"
+       :target (file+head "work/${slug}.org"
                           "#+title: ${title}\n#+filetags: Meeting\n#+options: toc:nil")
        :unnarrowed t)
       ("w" "Working" plain "%?"
-       :if-new (file+head "work/${slug}.org"
+       :target (file+head "work/${slug}.org"
                           "#+title: ${title}\n#+filetags: Working\n#+options: toc:nil")
        :unnarrowed t)
       ("p" "private" plain "%?"
-       :if-new (file+head "private/${slug}.org"
+       :target (file+head "private/${slug}.org"
                           "#+title: ${title}\n#+date: %U\n")
-       :unnarrowed t)
-      ("r" "ref" plain "%?"
-       :if-new (file+head "lit/${slug}.org"
-                          "#+ROAM_KEY: ${ref}\n#+title: ${title}\n#+date: %U\n#+filetags: Literature\n\n${body}")
-       :unnarrowed t)
-      )))
+       :unnarrowed t))))
 
   :config
   (leaf org-roam-dailies
@@ -2349,13 +2337,18 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf org-roam-protocol
   :after org-roam
-  ;; :require t org-protocol ol
+  :leaf-defer nil
   :hook ((org-roam-capture-preface-hook . org-roam-protocol--try-capture-to-ref-h)
          (org-roam-capture-new-node-hook . org-roam-protocol--insert-captured-ref-h))
   :custom
   ((org-protocol-protocol-alist . '(("org-roam-node" :protocol "roam-node" :function org-roam-protocol-open-node)
                                     ("org-roam-ref" :protocol "roam-ref" :function org-roam-protocol-open-ref)
-                                    ("org-roam-paper" :protocol "roam-paper" :function my/org-roam-protocol-open-paper))))
+                                    ("org-roam-paper" :protocol "roam-paper" :function my/org-roam-protocol-open-paper)))
+   ;; (org-roam-capture-ref-templates . '(("r" "ref" plain "%?"
+   ;;                                      :target (file+head "lit/${slug}.org"
+   ;;                                                         "#+date: %U\n#+filetags: Literature\n#+title: ${title}")
+   ;;                                      :unnarrowed t)))
+   )
   :preface
   (require 'org-protocol)
   (require 'ol) ;; for org-link-decode
@@ -2402,7 +2395,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     nil)
 
   ;; Capture implementation
-  ;; (add-hook 'org-roam-capture-preface-hook #'org-roam-protocol--try-capture-to-ref-h)
   (defun org-roam-protocol--try-capture-to-ref-h ()
     "Try to capture to an existing node that match the ref."
     (when-let ((node (and (plist-get org-roam-capture--info :ref)
@@ -2414,25 +2406,27 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
       (org-roam-node-id node)
       (my/update-org-roam-paper org-roam-capture--info)))
 
-  ;; (add-hook 'org-roam-capture-new-node-hook #'org-roam-protocol--insert-captured-ref-h)
   (defun org-roam-protocol--insert-captured-ref-h ()
     (my/update-org-roam-paper org-roam-capture--info))
 
   (defun my/update-org-roam-paper (info)
-    ;; (message "%s" info)
+    (message "%s" info)
 
     (when-let ((ref (plist-get info :ref)))
       (org-roam-ref-add ref))
 
     (when-let ((cite (plist-get info :cite)))
-      (goto-char (point-min))
       (org-entry-delete 0 "CITE")
       (org-roam-add-property cite "CITE"))
 
-    (when-let ((pdf (plist-get info :pdf)))
-      (goto-char (point-min))
+    (when-let ((pdf (plist-get info :pdf))
+               (file (plist-get info :file))
+               (permalink (plist-get info :permalink)))
       (org-entry-delete 0 "PAPERPILE")
-      (org-roam-add-property pdf "PAPERPILE"))
+      (org-entry-delete 0 "PDF")
+      (org-roam-add-property
+       (concat "[[" pdf "][online]]-----" "[[file:/Volumes/GoogleDrive/My Drive/Paperpile/" file "][offline]]-----" "[[" permalink "][paperpile]]")
+       "PDF"))
 
     (when-let ((abstract (plist-get info :abstract)))
       (when (org-find-exact-headline-in-buffer "Abstract")
@@ -3183,12 +3177,13 @@ Interactively, URL defaults to the string looking like a url around point."
 (leaf applescript-mode :ensure t)
 
 (leaf jupyter
-  :after org
   :ensure t websocket
-  :require zmq
-  :bind (jupyter-org-interaction-mode
-         ("C-c C-." . jupyter-org-hydra/body))
-  :config
+  :require t zmq 
+  :after org
+  :bind ((jupyter-org-interaction-mode-map
+            ("C-c h" . nil)
+            ("C-c C-." . jupyter-org-hydra/body)))
+  :preface
   (org-babel-do-load-languages
    'org-babel-load-languages '((emacs-lisp . t)
                                (python . t)
@@ -3196,83 +3191,98 @@ Interactively, URL defaults to the string looking like a url around point."
                                (shell . t)
                                (jupyter . t))))
 
+(leaf org-babel
+  :after org python-mode
+  :preface
+  (defun org-babel-edit-prep:jupyter-python (babel-info)
+    (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+    (my/python-basic-config))
+  (defun org-babel-edit-prep:python (babel-info)
+    (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+    (my/python-basic-config)))
+
 org-babel-load-languages
 
 (leaf sie-brow
-  :doc "Sie-Brow; Search in external browser with keywords
-        - at point with prefix `C-u',
-        - in selected region,
-        - killed latest, or
-        - input by user."
-  :bind (("C-c s" . sie-brow/search-in-google)
-         ("C-c p" . sie-brow/search-in-google-scholar))
-  :custom (browse-url-browser-function . 'browse-url-default-browser)
-  :preface
-  (defgroup sie-brow nil
-    "Search in external browser with keywords."
-    :prefix "sie-brow/"
-    :group 'sie-brow)
+    :doc "Sie-Brow; Search in external browser with keywords
+          - at point with prefix `C-u',
+          - in selected region,
+          - killed latest, or
+          - input by user."
+    :bind (("C-c s" . sie-brow/search-in-google)
+           ("C-c p" . sie-brow/search-in-google-scholar))
+    :custom (browse-url-browser-function . 'browse-url-default-browser)
+    :preface
+    (defgroup sie-brow nil
+      "Search in external browser with keywords."
+      :prefix "sie-brow/"
+      :group 'sie-brow)
 
-  (defcustom sie-brow/prefix-for-google-search "https://www.google.com/search"
-    "Prefix for google search."
-    :type 'string
-    :group 'sie-brow)
+    (defcustom sie-brow/prefix-for-google-search "https://www.google.com/search"
+      "Prefix for google search."
+      :type 'string
+      :group 'sie-brow)
 
-  (defcustom sie-brow/prefix-for-google-scholar "https://scholar.google.com/scholar"
-    "Prefix for google scholar."
-    :type 'string
-    :group 'sie-brow)
+    (defcustom sie-brow/prefix-for-google-scholar "https://scholar.google.com/scholar"
+      "Prefix for google scholar."
+      :type 'string
+      :group 'sie-brow)
 
-  (defcustom sie-brow/url-suffix "&ie=UTF-8"
-    "Suffix of the URL."
-    :type 'string
-    :group 'sie-brow)
+    (defcustom sie-brow/url-suffix "&ie=UTF-8"
+      "Suffix of the URL."
+      :type 'string
+      :group 'sie-brow)
 
-  (defun sie-brow/keyword-suitable-for-url-format (&optional at-point)
-    "Return a search keyword suitable for the URL format."
-    (let* ((default-keyword (cond
-                             (at-point (thing-at-point 'symbol))
-                             ((use-region-p) (buffer-substring-no-properties
-                                              (mark) (point)))
-                             (t (if kill-ring
-                                    (substring-no-properties (car kill-ring))
-                                  nil))))
-           (keywords (read-from-minibuffer (if default-keyword
-                                               (format "Search keywords (%s): "
-                                                       default-keyword)
-                                             "Search keywords: "))))
-      (replace-regexp-in-string "[ \n\t\r\f ]"
-                                "+"
-                                (if (length> keywords 0)
-                                    keywords
-                                  default-keyword))
-      ;; (setq keyword (replace-regexp-in-string "[ \n\t\r\f ]"
-      ;;                                         "+"
-      ;;                                         (if (length> keywords 0)
-      ;;                                             keywords
-      ;;                                           default-keyword)))
+    (defun sie-brow/keyword-suitable-for-url-format (&optional at-point)
+      "Return a search keyword suitable for the URL format."
+      (let* ((default-keyword (cond
+                               (at-point (thing-at-point 'symbol))
+                               ((use-region-p) (buffer-substring-no-properties
+                                                (mark) (point)))
+                               (t (if kill-ring
+                                      (substring-no-properties (car kill-ring))
+                                    nil))))
+             (keywords (read-from-minibuffer (if default-keyword
+                                                 (format "Search keywords (%s): "
+                                                         default-keyword)
+                                               "Search keywords: "))))
+        (replace-regexp-in-string "[ \n\t\r\f ]"
+                                  "+"
+                                  (if (length> keywords 0)
+                                      keywords
+<<<<<<< HEAD
+                                    default-keyword))
+        ;; (setq keyword (replace-regexp-in-string "[ \n\t\r\f ]"
+        ;;                                         "+"
+        ;;                                         (if (length> keywords 0)
+        ;;                                             keywords
+        ;;                                           default-keyword)))
 
-      ))
+        ))
 
-  (defun sie-brow/search-in-external-browser (prefix &optional at-point)
-    "Search in external browser with keywords
-        - at point with prefix `C-u',
-        - in selected region,
-        - that are latest killed words, or
-        - input by user."
-    (let* ((search-keyword (sie-brow/keyword-suitable-for-url-format at-point)))
-      (browse-url (concat prefix
-                          "?q=" search-keyword
-                          sie-brow/query-suffix))))
+=======
+                                    default-keyword))))
 
-  (defun sie-brow/search-in-google (&optional at-point)
-    "Search in Google."
-    (interactive "P")
-    (sie-brow/search-in-external-browser sie-brow/prefix-for-google-search at-point))
+>>>>>>> 38f8dcc9c4a9053e0b21c60a417ea403521f19f7
+    (defun sie-brow/search-in-external-browser (prefix &optional at-point)
+      "Search in external browser with keywords
+          - at point with prefix `C-u',
+          - in selected region,
+          - that are latest killed words, or
+          - input by user."
+      (let* ((search-keyword (sie-brow/keyword-suitable-for-url-format at-point)))
+        (browse-url (concat prefix
+                            "?q=" search-keyword
+                            sie-brow/url-suffix))))
 
-  (defun sie-brow/search-in-google-scholar (&optional at-point)
-    "Search in Google Scholar."
-    (interactive "P")
-    (sie-brow/search-in-external-browser sie-brow/prefix-for-google-scholar at-point)))
+    (defun sie-brow/search-in-google (&optional at-point)
+      "Search in Google."
+      (interactive "P")
+      (sie-brow/search-in-external-browser sie-brow/prefix-for-google-search at-point))
+
+    (defun sie-brow/search-in-google-scholar (&optional at-point)
+      "Search in Google Scholar."
+      (interactive "P")
+      (sie-brow/search-in-external-browser sie-brow/prefix-for-google-scholar at-point)))
 
 (provide 'init)
