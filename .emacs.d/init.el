@@ -2121,11 +2121,18 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                       "nobibliography"
                                       "addbibresource"))
     ;; org-ref
-    (org-ref-bibliography-notes . ,(concat org-directory
-                                           "braindump/lit/notes.org"))
-    (org-ref-default-bibliography . `(,(concat org-directory
-                                               "braindump/preferences/ref.bib")))
-    (org-ref-pdf-directory . ,(concat org-directory "braindump/lit/"))
+    (bibtex-completion-notes-path . ,(concat org-directory
+                                             "braindump/lit/notes.org"))
+    (bibtex-completion-bibliography . `(,(concat org-directory
+                                                 "braindump/preferences/ref.bib")))
+    (bibtex-completion-library-path . ,(concat org-directory "braindump/lit/"))
+
+    ;;; They are deprecated since org-ref ver. 3
+    ;; (org-ref-bibliography-notes . ,(concat org-directory
+    ;;                                        "braindump/lit/notes.org"))
+    ;; (org-ref-default-bibliography . `(,(concat org-directory
+    ;;                                            "braindump/preferences/ref.bib")))
+    ;; (org-ref-pdf-directory . ,(concat org-directory "braindump/lit/"))
     ))
 
 (leaf xref
