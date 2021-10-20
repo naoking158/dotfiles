@@ -80,7 +80,7 @@ if test -e $G_REPO/envs/neptune_api_token
 end
 
 if test -e /usr/lib/w3m/w3mimagedisplay
-		set PATH /usr/lib/w3m/w3mimagedisplay $PATH
+    set PATH /usr/lib/w3m/w3mimagedisplay $PATH
 end
 
 if test (uname -s) = "Darwin"
@@ -106,8 +106,8 @@ if test (uname -s) = "Darwin"
 
     set -g fish_user_paths "/usr/local/sbin" $fish_user_paths
 
-		function brave
-		    '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser' $argv		
+    function brave
+        '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser' $argv    
     end
 end
 
@@ -115,27 +115,27 @@ end
 # Functions
 ################################################################
 function _rm
-		set TRASH $HOME/.myTrash
+    set TRASH $HOME/.myTrash
 
-		if test -e $TRASH/$argv
-				mv $TRASH/$argv $TRASH/$argv-(date +%Y%m%d%I%M%S)
+    if test -e $TRASH/$argv
+        mv $TRASH/$argv $TRASH/$argv-(date +%Y%m%d%I%M%S)
     end
     mv -i $argv $HOME/.myTrash/
 end
 
 function rm
-		argparse -n mycmdname f/force -- $argv
+    argparse -n mycmdname f/force -- $argv
     or return
 
     if set -lq _flag_f
         /bin/rm -rf $argv
     else
-				set TRASH $HOME/.myTrash
+        set TRASH $HOME/.myTrash
         if ! test -e $TRASH
             mkdir $TRASH
         end
 
-				for arg in $argv
+        for arg in $argv
             _rm $arg
         end
         echo "They are moved to $HOME/.myTrash"
@@ -165,15 +165,15 @@ end
 # Create an ssh tunnel (args: machineID, remotePORT, hostPORT)
 function sshtunnel
     if count $argv = 3
-    	set host (hostname_of $argv[1])
-    	set port $argv[2]
-    	set hostport $argv[3]
+      set host (hostname_of $argv[1])
+      set port $argv[2]
+      set hostport $argv[3]
 
         eval (command ssh -M -S mdlssh-socket -fNL $hostport:$host:$port $MDL -l $USER)
         echo "Tunnel from localhost:$hostport to $hostname:$port has been created."
         echo "Be sure to kill the tunnel after you finish your job, by sshexit $hostport"
     else
-    	echo "Usage: sshtunnel HOST HOSTPORT LOCALPORT"
+      echo "Usage: sshtunnel HOST HOSTPORT LOCALPORT"
     end
 end
 
@@ -182,9 +182,9 @@ function sshexit
 
     if ps aux | grep "mdlssh-socket" | grep $hostport -c
         ssh -S mdlssh-socket -O exit $MDL
-	      echo "All SSH tunnels closed"
+        echo "All SSH tunnels closed"
     else
-    	  echo "No running tunnels"
+        echo "No running tunnels"
     end
 end
 
@@ -258,33 +258,33 @@ function mdlrsyncfrom
 end
 
 function backup_homedir
-		echo \n"+ ---------------------------------------------------------------- +"
-		echo "+ -------- Backup procedure is started!!!"
-		echo "+ ---------------------------------------------------------------- +"\n
+    echo \n"+ ---------------------------------------------------------------- +"
+    echo "+ -------- Backup procedure is started!!!"
+    echo "+ ---------------------------------------------------------------- +"\n
 
-		if test -n "$IS_MAC"
+    if test -n "$IS_MAC"
         set basedir /Volumes/NSSD/backup/Mac
-		else if test -n "$IS_MANJARO"
-				set basedir /Volumes/NSSD/backup/Manjaro
-		else
-				set basedir /Volumes/NSSD/backup/$OS
+    else if test -n "$IS_MANJARO"
+        set basedir /Volumes/NSSD/backup/Manjaro
+    else
+        set basedir /Volumes/NSSD/backup/$OS
     end
 
-		set backup_dirs $HOME/Downloads $HOME/src $HOME/.dotfiles $HOME/drive
+    set backup_dirs $HOME/Downloads $HOME/src $HOME/.dotfiles $HOME/drive
 
     echo "+ -------- These dirs will be backup:"
-		echo \n"$backup_dirs"\n
-		read -p '
+    echo \n"$backup_dirs"\n
+    read -p '
         echo "  - Press ENTER to confirm the location"
         echo "  - Or specify differents location below"
         echo "    (e.g., $HOME/foo $HOME/bar)"\n
-				echo "Backup dirs: "
+        echo "Backup dirs: "
         ' -S backup_location
-		if test -n "$backup_location"
+    if test -n "$backup_location"
         set backup_dirs $backup_location
     end
 
-		echo \n"+ -------- Backup destination is: "
+    echo \n"+ -------- Backup destination is: "
     echo \n"$basedir"\n
     read -p '
         echo "  - Press ENTER to confirm the location"
@@ -295,34 +295,34 @@ function backup_homedir
     if test -n "$input_location"
         set basedir $input_location
     end
-		
+    
     set path_to_backupdir $basedir/backup-(date +%Y%m%d-%H%M%S)
-		if test -e "$basedir"
-				set latestbackup (find $basedir -maxdepth 2 -type d -name 'backup-*' | sort | tail -n 1)
+    if test -e "$basedir"
+        set latestbackup (find $basedir -maxdepth 2 -type d -name 'backup-*' | sort | tail -n 1)
     end
 
     if test -n "$latestbackup"
-				echo \n"+ -------- Latest backup is found in $latestbackup"
+        echo \n"+ -------- Latest backup is found in $latestbackup"
         echo \n"Execute incremental backup to: "
-		else
+    else
         echo \n"+ -------- No latest backup is in $basedir"
         echo \n"Execute full backup to: "
     end
     echo \n"$path_to_backupdir"
 
-		echo \n"+ ---------------------------------------------------------------- +"
-		echo "+ -------- Final confirmation"
-		echo "+ ---------------------------------------------------------------- +"\n
-		read -p '
+    echo \n"+ ---------------------------------------------------------------- +"
+    echo "+ -------- Final confirmation"
+    echo "+ ---------------------------------------------------------------- +"\n
+    read -p '
     echo " [yes]  : Proceed"
     echo " [no]   : Cancel"
     echo " [test] : Dry run"
-		echo \n"Choose one: "
+    echo \n"Choose one: "
     ' -S confirm
     
     switch $confirm
         case 'yes'
-						mkdir -p $path_to_backupdir
+            mkdir -p $path_to_backupdir
             rsync -avh --link-dest=$latestbackup $backup_dirs $path_to_backupdir
         case 'test'
             rsync -avh --dry-run --stats --link-dest=$latestbackup $backup_dirs $path_to_backupdir
@@ -420,15 +420,15 @@ end
 
 # check existence and initialize of zoxide command 
 if type -q zoxide
-		zoxide init fish | source
+    zoxide init fish | source
 end
 
 # opam configuration
 # source /home/naoki/.opam/opam-init/init.fish > /dev/null 2> /dev/null; or true
 
 if test -n "$IS_MANJARO"
-		export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
-		export EDITOR=/usr/bin/emacsclient
-		export BROWSER=/usr/bin/brave
-		set PATH /usr/include $PATH 
+    export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+    export EDITOR=/usr/bin/emacsclient
+    export BROWSER=/usr/bin/brave
+    set PATH /usr/include $PATH 
 end
