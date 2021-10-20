@@ -2870,7 +2870,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
 :END:
 
 #+begin_src emacs-lisp
-  
+
   (leaf org-ref
     :doc "citations, cross-references and bibliographies in org-mode"
     :req "dash-2.11.0" "htmlize-1.51" "helm-1.5.5" "helm-bibtex-2.0.0" "ivy-0.8.0" "hydra-0.13.2" "key-chord-0" "s-1.10.0" "f-0.18.0" "pdf-tools-0.7"
@@ -3120,7 +3120,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
          :target (file+head "private/${slug}.org"
                             "#+title: ${title}\n#+date: %U\n")
          :unnarrowed t))))
-  
+
     :config
     (leaf org-roam-dailies
       :require t
@@ -3129,7 +3129,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
       (:org-roam-dailies-map
        ("Y" . org-roam-dailies-capture-yesterday)
        ("T" . org-roam-dailies-capture-tomorrow)))
-  
+
     ;; for org-roam-buffer-toggle
     ;; Recommendation in the official manual
     (add-to-list 'display-buffer-alist
@@ -3139,8 +3139,8 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
                    (window-width . 0.33)
                    (window-height . fit-window-to-buffer)))
     (org-roam-db-autosync-mode))
-  
-  
+
+
   (leaf org-roam-ui
     :after org-roam
     :load-path "~/.emacs.d/elisp/org-roam-ui/"
@@ -3257,15 +3257,10 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
        :keys (plist-get info :template)
        :node (org-roam-node-create :title (plist-get info :title))
        :info (list :ref (plist-get info :ref)
-         :cite (plist-get info :cite)
-         :file (plist-get info :file)
-         :pdf (plist-get info :pdf)
-         :permalink (plist-get info :permalink)
-         :abstract (plist-get info :abstract))
-       ;; :info (list :ref (plist-get info :ref)
-       ;;             :cite (plist-get info :cite)
-       ;;             :pdf (plist-get info :pdf)
-       ;;             :abstract (plist-get info :abstract))
+                   :cite (plist-get info :cite)
+                   :pdf (plist-get info :pdf)
+                   :permalink (plist-get info :permalink)
+                   :abstract (plist-get info :abstract))
        :templates org-roam-capture-ref-templates)
       nil)
 
