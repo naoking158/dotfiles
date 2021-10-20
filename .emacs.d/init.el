@@ -167,7 +167,9 @@
               (show-paren-mode . 1)
               (confirm-kill-emacs . 'y-or-n-p)
               (recentf-auto-cleanup . 'never)
-              (save-place-mode . 1))
+              (save-place-mode . 1)
+              (save-interprogram-paste-before-kill . t)
+              (indent-tabs-mode . nil))
     :config
     (let ((gls "/usr/local/bin/gls"))
       (if (file-exists-p gls) (setq insert-directory-program gls)))
@@ -266,6 +268,13 @@
   :bind* (("C-/" . undo-fu-only-undo)
           ("C-?" . undo-fu-only-redo)))
 
+(defun my/toggle-modeline ()
+  (interactive)
+  (if (null mode-line-format)
+      (kill-local-variable 'mode-line-format)
+    (setq-local mode-line-format nil)
+    (force-mode-line-update)))
+
 (leaf ui
   :leaf-defer nil
   :hook
@@ -331,13 +340,13 @@
   :preface
   (defun my/change-transparency (&optional alpha-num)
     "Sets the transparency of the frame window. 0=transparent/100=opaque"
-    (interactive)
-    (let ((alpha-num (if alpha-num alpha-num
-                       (read-number "Transparency Value 0 - 100 opaque:"))))
-      (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5)))
-      (add-to-list 'default-frame-alist `(alpha . (,alpha-num . ,(- alpha-num 5))))))
+    (interactive "nTransparency Value 0 - 100 opaque: ")
+    (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5)))
+    (add-to-list 'default-frame-alist
+                 `(alpha . (,alpha-num . ,(- alpha-num 5)))))
+
   :config
-  (my/change-transparency 95))
+  (my/change-transparency 100))
 
 (leaf font
   :when window-system
@@ -348,37 +357,35 @@
   (setq-default text-scale-remap-header-line t)
 
   (defun my/set-font (&optional font-size)
-    (interactive)
-    (let ((font-size (if font-size font-size
-                       (read-number "Fontsize: " 14))))
-      ;; ascii
-      (set-face-attribute 'default nil
-                          :font "JetBrains Mono"
-                          :height (* font-size 10))
+    (interactive "nFontsize: ")
+    ;; ascii
+    (set-face-attribute 'default nil
+                        :font "JetBrains Mono"
+                        :height (* font-size 10))
 
-      ;; Set the fixed pitch face
-      (set-face-attribute 'fixed-pitch nil
-                          :font "JetBrains Mono"
-                          :height (* font-size 10))
+    ;; Set the fixed pitch face
+    (set-face-attribute 'fixed-pitch nil
+                        :font "JetBrains Mono"
+                        :height (* font-size 10))
 
-      ;; Set the variable pitch face
-      (set-face-attribute 'variable-pitch nil
-                          :font "Iosevka Aile"
-                          :height (* font-size 10))
+    ;; Set the variable pitch face
+    (set-face-attribute 'variable-pitch nil
+                        :font "Iosevka Aile"
+                        :height (* font-size 10))
 
-      ;; emoji
-      (set-fontset-font t '(#x1F000 . #x1FAFF)
-                        (font-spec
-                         :family "Noto Color Emoji"
-                         :height (* font-size 10))
-                        nil 'append)
+    ;; emoji
+    (set-fontset-font t '(#x1F000 . #x1FAFF)
+                      (font-spec
+                       :family "Noto Color Emoji"
+                       :height (* font-size 10))
+                      nil 'append)
 
-      ;; japanese
-      (set-fontset-font t 'unicode
-                        (font-spec
-                         :family "Noto Sans CJK JP"
-                         :height (* font-size 10))
-                        nil 'append))
+    ;; japanese
+    (set-fontset-font t 'unicode
+                      (font-spec
+                       :family "Noto Sans CJK JP"
+                       :height (* font-size 10))
+                      nil 'append)
 
     ;; Ligature for Fira Code or JetBrains Mono
     (let ((alist
@@ -411,13 +418,12 @@
                               `([,(cdr char-regexp) 0 font-shape-gstring])))))
 
   (defun my/set-font-weight (&optional weight)
-    (interactive)
-    (let ((weight (if weight weight
-                    (intern (completing-read "Choose weight:"
-                                             '(light normal bold))))))
-      (set-face-attribute 'default nil :weight weight)
-      (set-face-attribute 'fixed-pitch nil :weight weight)
-      (set-face-attribute 'variable-pitch nil :weight weight)))
+    (interactive
+     (list (intern (completing-read "Choose weight:"
+                                    '(light normal bold)))))
+    (set-face-attribute 'default nil :weight weight)
+    (set-face-attribute 'fixed-pitch nil :weight weight)
+    (set-face-attribute 'variable-pitch nil :weight weight))
 
   (defun my/set-font-weight-after-load-theme (&rest args)
     (let* ((str-theme (symbol-name (car args)))
@@ -2388,9 +2394,15 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
      :keys (plist-get info :template)
      :node (org-roam-node-create :title (plist-get info :title))
      :info (list :ref (plist-get info :ref)
-                 :cite (plist-get info :cite)
-                 :pdf (plist-get info :pdf)
-                 :abstract (plist-get info :abstract))
+       :cite (plist-get info :cite)
+       :file (plist-get info :file)
+       :pdf (plist-get info :pdf)
+       :permalink (plist-get info :permalink)
+       :abstract (plist-get info :abstract))
+     ;; :info (list :ref (plist-get info :ref)
+     ;;             :cite (plist-get info :cite)
+     ;;             :pdf (plist-get info :pdf)
+     ;;             :abstract (plist-get info :abstract))
      :templates org-roam-capture-ref-templates)
     nil)
 
