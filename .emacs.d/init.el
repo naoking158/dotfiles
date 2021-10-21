@@ -320,27 +320,12 @@
   :tag "builtin"
   :global-minor-mode t)
 
-;; (leaf hl-line
-;;   :doc "highlight the current line"
-;;   :tag "builtin"
-;;   :require t
-;;   :global-minor-mode t
-;;   :config
-;;       ;;; hl-lineを無効にするメジャーモードを指定する
-;;   (defvar global-hl-line-timer-exclude-modes '(todotxt-mode))
-;;   (defun global-hl-line-timer-function ()
-;;     (unless (memq major-mode global-hl-line-timer-exclude-modes)
-;;       (global-hl-line-unhighlight-all)
-;;       (let ((global-hl-line-mode t))
-;;         (global-hl-line-highlight))))
-;;   (setq global-hl-line-timer
-;;         (run-with-idle-timer 0.03 t 'global-hl-line-timer-function)))
-
 (leaf *frame-transparency
   :preface
   (defun my/change-transparency (&optional alpha-num)
     "Sets the transparency of the frame window. 0=transparent/100=opaque"
-    (interactive "nTransparency Value 0 - 100 opaque: ")
+    (interactive (list
+                  (read-number "Transparency Value 0 - 100 opaque: " 100)))
     (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5)))
     (add-to-list 'default-frame-alist
                  `(alpha . (,alpha-num . ,(- alpha-num 5)))))
@@ -356,8 +341,9 @@
   :preface
   (setq-default text-scale-remap-header-line t)
 
-  (defun my/set-font (&optional font-size)
-    (interactive "nFontsize: ")
+  (defun my/set-font (font-size)
+    (interactive (list
+                  (read-number "Fontsize: " 14)))
     ;; ascii
     (set-face-attribute 'default nil
                         :font "JetBrains Mono"
@@ -417,7 +403,7 @@
         (set-char-table-range composition-function-table (car char-regexp)
                               `([,(cdr char-regexp) 0 font-shape-gstring])))))
 
-  (defun my/set-font-weight (&optional weight)
+  (defun my/set-font-weight (weight)
     (interactive
      (list (intern (completing-read "Choose weight:"
                                     '(light normal bold)))))
