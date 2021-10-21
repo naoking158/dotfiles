@@ -3199,25 +3199,25 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
     ((org-protocol-protocol-alist . '(("org-roam-node" :protocol "roam-node" :function org-roam-protocol-open-node)
                                       ("org-roam-ref" :protocol "roam-ref" :function org-roam-protocol-open-ref)
                                       ("org-roam-paper" :protocol "roam-paper" :function my/org-roam-protocol-open-paper)))
-     ;; (org-roam-capture-ref-templates . '(("r" "ref" plain "%?"
-     ;;                                      :target (file+head "lit/${slug}.org"
-     ;;                                                         "#+date: %U\n#+filetags: Literature\n#+title: ${title}")
-     ;;                                      :unnarrowed t)))
+     (org-roam-capture-ref-templates . '(("r" "ref" plain "%?"
+                                          :target (file+head "lit/${slug}.org"
+                                                             "#+date: %U\n#+filetags: Literature\n#+title: ${title}")
+                                          :unnarrowed t)))
      )
     :preface
     (require 'org-protocol)
     (require 'ol) ;; for org-link-decode
     (require 'org-roam-protocol)
-
+  
     ;; for open papertile link in external browser
     (org-add-link-type "chrome-extension"
                        (lambda (path) (browse-url (concat "chrome-extension://"
                                                           path))))
-
+  
     (defun my/org-roam-visit-paperpile ()
       (interactive)
       (org-link-open-from-string (org-entry-get 0 "PAPERPILE")))
-
+  
     ;;; Handlers
     (defun my/org-roam-protocol-open-paper (info)
       (unless (plist-get info :ref)
@@ -3244,12 +3244,13 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
        :node (org-roam-node-create :title (plist-get info :title))
        :info (list :ref (plist-get info :ref)
                    :cite (plist-get info :cite)
+                   :file (plist-get info :file)
                    :pdf (plist-get info :pdf)
                    :permalink (plist-get info :permalink)
                    :abstract (plist-get info :abstract))
        :templates org-roam-capture-ref-templates)
       nil)
-
+  
     ;; Capture implementation
     (defun org-roam-protocol--try-capture-to-ref-h ()
       "Try to capture to an existing node that match the ref."
@@ -3261,20 +3262,20 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
         (widen)
         (org-roam-node-id node)
         (my/update-org-roam-paper org-roam-capture--info)))
-
+  
     (defun org-roam-protocol--insert-captured-ref-h ()
       (my/update-org-roam-paper org-roam-capture--info))
-
+  
     (defun my/update-org-roam-paper (info)
       (message "%s" info)
-
+  
       (when-let ((ref (plist-get info :ref)))
         (org-roam-ref-add ref))
-
+  
       (when-let ((cite (plist-get info :cite)))
         (org-entry-delete 0 "CITE")
         (org-roam-add-property cite "CITE"))
-
+  
       (when-let ((pdf (plist-get info :pdf))
                  (file (plist-get info :file))
                  (permalink (plist-get info :permalink)))
@@ -3283,19 +3284,19 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
         (org-roam-add-property
          (concat "[[" pdf "][online]]-----" "[[file:/Volumes/GoogleDrive/My Drive/Paperpile/" file "][offline]]-----" "[[" permalink "][paperpile]]")
          "PDF"))
-
+  
       (when-let ((abstract (plist-get info :abstract)))
         (when (org-find-exact-headline-in-buffer "Abstract")
           (goto-char (org-find-exact-headline-in-buffer "Abstract"))
           (let (this-command (inhibit-message t)) (org-cut-subtree)))
         (my/insert-abstract-to-top abstract)))
-
+  
     (defun my/insert-abstract-to-top (abstract)
       (interactive)
       (goto-char (point-min))
       (org-next-visible-heading 1)
       (insert (format "* Abstract\n%s\n\n" abstract)))
-
+  
     (defun my/delete-file-and-buffer ()
       "Kill the current buffer and deletes the file it is visiting."
       (interactive)

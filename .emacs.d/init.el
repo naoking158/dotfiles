@@ -2343,10 +2343,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   ((org-protocol-protocol-alist . '(("org-roam-node" :protocol "roam-node" :function org-roam-protocol-open-node)
                                     ("org-roam-ref" :protocol "roam-ref" :function org-roam-protocol-open-ref)
                                     ("org-roam-paper" :protocol "roam-paper" :function my/org-roam-protocol-open-paper)))
-   ;; (org-roam-capture-ref-templates . '(("r" "ref" plain "%?"
-   ;;                                      :target (file+head "lit/${slug}.org"
-   ;;                                                         "#+date: %U\n#+filetags: Literature\n#+title: ${title}")
-   ;;                                      :unnarrowed t)))
+   (org-roam-capture-ref-templates . '(("r" "ref" plain "%?"
+                                        :target (file+head "lit/${slug}.org"
+                                                           "#+date: %U\n#+filetags: Literature\n#+title: ${title}")
+                                        :unnarrowed t)))
    )
   :preface
   (require 'org-protocol)
@@ -2388,6 +2388,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
      :node (org-roam-node-create :title (plist-get info :title))
      :info (list :ref (plist-get info :ref)
                  :cite (plist-get info :cite)
+                 :file (plist-get info :file)
                  :pdf (plist-get info :pdf)
                  :permalink (plist-get info :permalink)
                  :abstract (plist-get info :abstract))
