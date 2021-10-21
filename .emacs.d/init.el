@@ -2681,6 +2681,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :bind (("C-M-j" . skk-undo-kakutei))
   :global-minor-mode t context-skk-mode
   :custom ((default-input-method . "japanese-skk")
+           (skk-jisyo-code . 'utf-8)
            (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
            (skk-save-jisyo-instantly . t)
            (skk-server-host . "localhost")

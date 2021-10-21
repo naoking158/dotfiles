@@ -3914,6 +3914,8 @@ While browsing, remember the following:
 :ID:       D4DD8E44-349F-4870-B0F3-C434BFBA6222
 :END:
 
+- 個人辞書を =UTF-8= に変換しておく
+
 #+begin_src emacs-lisp
   
   (leaf skk
@@ -3922,6 +3924,7 @@ While browsing, remember the following:
     :bind (("C-M-j" . skk-undo-kakutei))
     :global-minor-mode t context-skk-mode
     :custom ((default-input-method . "japanese-skk")
+             (skk-jisyo-code . 'utf-8)
              (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
              (skk-save-jisyo-instantly . t)
              (skk-server-host . "localhost")
