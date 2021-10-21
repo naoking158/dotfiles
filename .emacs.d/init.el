@@ -2683,7 +2683,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :global-minor-mode t context-skk-mode
   :custom ((default-input-method . "japanese-skk")
            (skk-jisyo-code . 'utf-8)
-           (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
+           (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L.utf8")
            (skk-save-jisyo-instantly . t)
            (skk-server-host . "localhost")
            (skk-server-prtnum . 1178)
