@@ -11,7 +11,7 @@
 
 (setq comp-deferred-compilation-deny-list (list "jupyter"))
 
-(setq exec-profile nil)
+(setq exec-profile t)
 
 (when exec-profile
   (defvar setup-tracker--level 0)
@@ -2146,36 +2146,36 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :req "emacs-24.4" "org-9.0"
   :url "https://ox-hugo.scripter.co"
   :ensure t
-  :require t
   :commands org-exports-dispatch
   :defun (org-set-property)
   :custom ((org-hugo-front-matter-format . "yaml")
            (org-hugo-link-desc-insert-type . t))
-  :defer-config
-  (defun c/ox-hugo-add-lastmod nil
-    "Add `lastmod' property with the current time."
-    (interactive)
-    (org-set-property "EXPORT_HUGO_LASTMOD"
-                      (format-time-string "[%Y-%m-%d %a %H:%M]")))
+  ;; :defer-config
+  ;; (defun c/ox-hugo-add-lastmod nil
+  ;;   "Add `lastmod' property with the current time."
+  ;;   (interactive)
+  ;;   (org-set-property "EXPORT_HUGO_LASTMOD"
+  ;;                     (format-time-string "[%Y-%m-%d %a %H:%M]")))
 
-  (leaf *ox-hugo-capture
-    :require org-capture
-    :after org
-    :defvar (org-capture-templates)
-    :config
-    (add-to-list 'org-capture-templates
-                 '("b" "Create new blog post" entry
-                   (file+headline "~/src/omgithub.com/naoking158/blog-src/org/naoki.org" "blog")
-                   "** TODO %?
-:PROPERTIES:
-:EXPORT_FILE_NAME: %(apply #'format \"%s-%s-%s\"
-        (format-time-string \"%Y %m %d\")
-:EXPORT_HUGO_TAGS:
-:EXPORT_HUGO_LASTMOD:
-:END:
--
-")
-                 'append)))
+  ;; (leaf *ox-hugo-capture
+;;     :require org-capture
+;;     :after org
+;;     :defvar (org-capture-templates)
+;;     :config
+;;     (add-to-list 'org-capture-templates
+;;                  '("b" "Create new blog post" entry
+;;                    (file+headline "~/src/omgithub.com/naoking158/blog-src/org/naoki.org" "blog")
+;;                    "** TODO %?
+;; :PROPERTIES:
+;; :EXPORT_FILE_NAME: %(apply #'format \"%s-%s-%s\"
+;;         (format-time-string \"%Y %m %d\")
+;; :EXPORT_HUGO_TAGS:
+;; :EXPORT_HUGO_LASTMOD:
+;; :END:
+;; -
+;; ")
+;;                  'append))
+  )
 
 (leaf ox-latex
   :doc "LaTeX Back-End for Org Export Engine"
@@ -2714,7 +2714,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf dap-mode
   :ensure t
-  :require t dap-python
   ;; :after exec-path-from-shell
   :custom (;; (dap-python-debugger . 'debugpy)
            ;; (dap-python-executable . path-to-venv-python)
@@ -2722,10 +2721,20 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            ;; (lsp-enable-dap-auto-configure . nil)
            )
   :hook
-  ((dap-stopped-hook . (lambda (arg) (call-interactively #'dap-hydra)))
-   (python-mode-hook . dap-mode)
-   (python-mode-hook . dap-ui-mode)
-   (python-mode-hook . dap-tooltip-mode)))
+  (python-mode-hook . (lambda nil
+                        (require 'dap-mode)
+                        (require 'dap-python)
+                        (dap-mode)
+                        (dap-ui-mode)
+                        (dap-tooltip-mode)
+                        (add-hook 'dap-stopped-hook
+                                  #'(lambda (arg)
+                                      (call-interactively #'dap-hydra)))))
+  ;; ((dap-stopped-hook . (lambda (arg) (call-interactively #'dap-hydra)))
+  ;;  (python-mode-hook . dap-mode)
+  ;;  (python-mode-hook . dap-ui-mode)
+  ;;  (python-mode-hook . dap-tooltip-mode))
+  )
 
 (let* ((parent (if (memq window-system '(darwin ns)) "/usr/local/Cellar/mu/"
                  "/usr/share/emacs/"))
@@ -2736,8 +2745,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :when path-to-mu
   :load-path path-to-mu
   :hook (after-init-hook . (lambda () (require 'mu4e)))
-  ;; :require t
-  ;; :hook (mu4e-headers-mode-hook . (lambda () (visual-line-mode -1)))
   :defer-config
   (set-variable 'read-mail-command 'mu4e)
   (setq mail-user-agent 'mu4e-user-agent
@@ -2964,13 +2971,14 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
 
 (leaf mu4e-views
   :ensure t
+  :after mu4e
   :bind (mu4e-headers-mode-map
          :package mu4e
          ("v" . mu4e-views-mu4e-select-view-msg-method) ;; select viewing method
          ("M-n" . mu4e-views-cursor-msg-view-window-down) ;; from headers window scroll the email view
          ("M-p" . mu4e-views-cursor-msg-view-window-up) ;; from headers window scroll the email view
          )
-  :defer-config
+  :config
   (setq mu4e-views-default-view-method "dispatcher") ;; make xwidgets default
   (mu4e-views-mu4e-use-view-msg-method "text") ;; select the default
   (setq mu4e-views-next-previous-message-behaviour 'stick-to-current-window) ;; when pressing n and p stay in the current window
@@ -2978,6 +2986,7 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
   (setq mu4e-views-dispatcher-predicate-view-map
         `((,(lambda (msg) (mu4e-message-field msg :body-html)) . "html")
           (,(lambda (msg) (ignore msg) t) . "text"))))
+
 
 (leaf org-msg
   :ensure t
