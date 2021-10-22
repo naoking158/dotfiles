@@ -3179,4 +3179,24 @@ org-babel-load-languages
     (interactive "P")
     (sie-brow/search-in-external-browser sie-brow/prefix-for-google-scholar at-point)))
 
+(leaf eaf
+  :when (not (eq 'darwin window-system))
+  :load-path "~/.emacs.d/elisp/emacs-application-framework/"
+  :require t
+  :custom
+  ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
+  ((eaf-python-command . "/usr/bin/python")
+   (eaf-browser-continue-where-left-off . t)
+   (eaf-browser-enable-adblocker . t)
+   (browse-url-browser-function . 'eaf-open-browser))
+  :config
+  (require 'eaf-browser)
+  (require 'eaf-pdf-viewer)
+  (require 'eaf-jupyter)
+
+  (defalias 'browse-web #'eaf-open-browser)
+  (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+  (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+  (eaf-bind-key nil "M-q" eaf-browser-keybinding))
+
 (provide 'init)
