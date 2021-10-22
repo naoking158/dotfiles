@@ -1338,8 +1338,8 @@ Only in Neotree Buffer:
 
 #+begin_src emacs-lisp
   (leaf flyspell
-    :hook (LaTeX-mode-hook org-mode-hook markdown-mode-hook text-mode-hook)
-    :config
+    ;; :hook (LaTeX-mode-hook org-mode-hook markdown-mode-hook text-mode-hook)
+    :defer-config
     (leaf ispell
       :doc "interface to spell checkers"
       :tag "builtin"
@@ -4545,11 +4545,13 @@ While browsing, remember the following:
 :END:
 #+begin_src emacs-lisp
   (leaf jupyter
-    :ensure t zmp websocket
-    :after org
+    :ensure t websocket
+    :require t zmp
+    :after python-mode
+    :custom (jupyter-org-interaction-mode . nil)
     :bind ((jupyter-org-interaction-mode-map
-              ("C-c h" . nil)
-              ("C-c C-." . jupyter-org-hydra/body)))
+            ("C-c h" . nil)
+            ("C-c C-." . jupyter-org-hydra/body)))
     :preface
     (org-babel-do-load-languages
      'org-babel-load-languages '((emacs-lisp . t)

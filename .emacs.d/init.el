@@ -895,8 +895,8 @@
     :hook (flymake-mode-hook . flymake-diagnostic-at-point-mode)))
 
 (leaf flyspell
-  :hook (LaTeX-mode-hook org-mode-hook markdown-mode-hook text-mode-hook)
-  :config
+  ;; :hook (LaTeX-mode-hook org-mode-hook markdown-mode-hook text-mode-hook)
+  :defer-config
   (leaf ispell
     :doc "interface to spell checkers"
     :tag "builtin"
@@ -3221,11 +3221,13 @@ Interactively, URL defaults to the string looking like a url around point."
 (leaf applescript-mode :ensure t)
 
 (leaf jupyter
-  :ensure t zmp websocket
-  :after org
+  :ensure t websocket
+  :require t zmp
+  :after python-mode
+  :custom (jupyter-org-interaction-mode . nil)
   :bind ((jupyter-org-interaction-mode-map
-            ("C-c h" . nil)
-            ("C-c C-." . jupyter-org-hydra/body)))
+          ("C-c h" . nil)
+          ("C-c C-." . jupyter-org-hydra/body)))
   :preface
   (org-babel-do-load-languages
    'org-babel-load-languages '((emacs-lisp . t)
