@@ -25,3 +25,6 @@
 [submodule ".emacs.d/elisp/vertico"]
 	path = .emacs.d/elisp/vertico
 	url = https://github.com/minad/vertico.git
+[submodule ".emacs.d/elisp/emacs-application-framework"]
+	path = .emacs.d/elisp/emacs-application-framework
+	url = https://github.com/emacs-eaf/emacs-application-framework.git
