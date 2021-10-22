@@ -2334,36 +2334,52 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
 
-(leaf org-roam-protocol
+(leaf *orp-paperpile
+  :doc "orp-paperpile; Org-Roam-Protocol Paperpile is an interface
+        to comunicate between org-mode and paperpile using org-roam-protocol."
   :after org-roam
-  :leaf-defer nil
   :hook ((org-roam-capture-preface-hook . org-roam-protocol--try-capture-to-ref-h)
          (org-roam-capture-new-node-hook . org-roam-protocol--insert-captured-ref-h))
+  :advice
+  ((:override org-roam-protocol--try-capture-to-ref-h orp--try-capture-to-ref-h)
+   (:override org-roam-protocol--insert-captured-ref-h orp--insert-captured-ref-h))
   :custom
-  ((org-protocol-protocol-alist . '(("org-roam-node" :protocol "roam-node" :function org-roam-protocol-open-node)
-                                    ("org-roam-ref" :protocol "roam-ref" :function org-roam-protocol-open-ref)
-                                    ("org-roam-paper" :protocol "roam-paper" :function my/org-roam-protocol-open-paper)))
-   (org-roam-capture-ref-templates . '(("r" "ref" plain "%?"
-                                        :target (file+head "lit/${slug}.org"
-                                                           "#+date: %U\n#+filetags: Literature\n#+title: ${title}")
-                                        :unnarrowed t)))
-   )
+  ((orp-local-pdf-dir . "~/drive/Paperpile/")
+   (orp-ref-templates . '(("r" "ref" plain "%?"
+                          :target (file+head "lit/${slug}.org"
+                                             "#+date: %U\n#+filetags: Literature\n#+title: ${title}")
+                          :unnarrowed t))))
   :preface
   (require 'org-protocol)
   (require 'ol) ;; for org-link-decode
   (require 'org-roam-protocol)
 
-  ;; for open papertile link in external browser
+  (defgroup orp-paperpile nil
+    "Org-Roam-Protocol Paperpile."
+    :prefix "orp-"
+    :group 'orp)
+
+  (defcustom orp-local-pdf-dir "/Volumes/GoogleDrive/My Drive/Paperpile/"
+    "Local PDFs managed by Paperpile are here. If your OS is macOS and Google-Drive-Desktop has been introduced, the PDFs are located under `/Volumes/GoogleDrive/My Drive/Paperpile/'."
+    :type 'string
+    :group 'orp)
+
+  (defcustom orp-ref-templates org-roam-capture-ref-templates
+    "See the usage of org-roam-capture-ref-templates."
+    :type "See the type of org-roam-capture-ref-templates."
+    :group 'orp)
+
+  ;; for open paperpile link in external browser
   (org-add-link-type "chrome-extension"
                      (lambda (path) (browse-url (concat "chrome-extension://"
                                                         path))))
 
-  (defun my/org-roam-visit-paperpile ()
+  (defun orp-org-roam-visit-paperpile ()
     (interactive)
     (org-link-open-from-string (org-entry-get 0 "PAPERPILE")))
 
   ;;; Handlers
-  (defun my/org-roam-protocol-open-paper (info)
+  (defun orp--open-paper (info)
     (unless (plist-get info :ref)
       (user-error "No ref key provided"))
     (org-roam-plist-map! (lambda (k v)
@@ -2396,8 +2412,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     nil)
 
   ;; Capture implementation
-  (defun org-roam-protocol--try-capture-to-ref-h ()
-    "Try to capture to an existing node that match the ref."
+  (defun orp--try-capture-to-ref-h ()
+    "Try to capture to an existing node that match the ref. This overrides org-roam-protocol--try-capture-to-ref-h"
     (when-let ((node (and (plist-get org-roam-capture--info :ref)
                           (org-roam-node-from-ref
                            (plist-get org-roam-capture--info :ref)))))
@@ -2405,12 +2421,13 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
       (goto-char (org-roam-node-point node))
       (widen)
       (org-roam-node-id node)
-      (my/update-org-roam-paper org-roam-capture--info)))
+      (orp--update-org-roam-paper org-roam-capture--info)))
 
-  (defun org-roam-protocol--insert-captured-ref-h ()
-    (my/update-org-roam-paper org-roam-capture--info))
+  (defun orp--insert-captured-ref-h ()
+    "This overrides org-roam-protocol--insert-captured-ref-h."
+    (orp--update-org-roam-paper org-roam-capture--info))
 
-  (defun my/update-org-roam-paper (info)
+  (defun orp--update-org-roam-paper (info)
     (message "%s" info)
 
     (when-let ((ref (plist-get info :ref)))
@@ -2426,22 +2443,25 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
       (org-entry-delete 0 "PAPERPILE")
       (org-entry-delete 0 "PDF")
       (org-roam-add-property
-       (concat "[[" pdf "][online]]-----" "[[file:/Volumes/GoogleDrive/My Drive/Paperpile/" file "][offline]]-----" "[[" permalink "][paperpile]]")
+       (concat (format "[[%s][online]]-----" pdf)
+               (format "[[file:%s][offline]]-----"
+                       (expand-file-name file orp-local-pdf-dir))
+               (format "[[%s][paperpile]]" permalink))
        "PDF"))
 
     (when-let ((abstract (plist-get info :abstract)))
       (when (org-find-exact-headline-in-buffer "Abstract")
         (goto-char (org-find-exact-headline-in-buffer "Abstract"))
         (let (this-command (inhibit-message t)) (org-cut-subtree)))
-      (my/insert-abstract-to-top abstract)))
+      (orp-insert-abstract-to-top abstract)))
 
-  (defun my/insert-abstract-to-top (abstract)
+  (defun orp-insert-abstract-to-top (abstract)
     (interactive)
     (goto-char (point-min))
     (org-next-visible-heading 1)
     (insert (format "* Abstract\n%s\n\n" abstract)))
 
-  (defun my/delete-file-and-buffer ()
+  (defun orp-delete-file-and-buffer ()
     "Kill the current buffer and deletes the file it is visiting."
     (interactive)
     (let ((filename (buffer-file-name)))
@@ -2451,7 +2471,19 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                 (delete-file filename)
                 (message "Deleted file %s." filename)
                 (kill-buffer)))
-        (message "Not a file visiting buffer!")))))
+        (message "Not a file visiting buffer!"))))
+
+  (custom-set-variables
+   '(org-protocol-protocol-alist '(("org-roam-node"
+                                    :protocol "roam-node"
+                                    :function org-roam-protocol-open-node)
+                                   ("org-roam-ref"
+                                    :protocol "roam-ref"
+                                    :function org-roam-protocol-open-ref)
+                                   ("org-roam-paper"
+                                    :protocol "roam-paper"
+                                    :function orp--open-paper)))
+   '(org-roam-capture-ref-templates orp-ref-templates)))
 
 (leaf org-bullets
   :disabled t
@@ -3189,8 +3221,7 @@ Interactively, URL defaults to the string looking like a url around point."
 (leaf applescript-mode :ensure t)
 
 (leaf jupyter
-  :ensure t websocket
-  :require t zmq 
+  :ensure t zmp websocket
   :after org
   :bind ((jupyter-org-interaction-mode-map
             ("C-c h" . nil)
