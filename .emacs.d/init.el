@@ -282,6 +282,51 @@
       (substring string 0 (- len 1)))
      (t string))))
 
+;; https://github.com/alphapapa/unpackaged.el#sort-sexps
+(defun my-sort-sexps (beg end)
+  "Sort sexps in region (from BEG to END)."
+  (interactive "r")
+  (cl-flet ((skip-whitespace () (while (looking-at (rx (1+ (or space "\n"))))
+                                  (goto-char (match-end 0))))
+            (skip-both () (while (cond ((or (nth 4 (syntax-ppss))
+                                            (ignore-errors
+                                              (save-excursion
+                                                (forward-char 1)
+                                                (nth 4 (syntax-ppss)))))
+                                        (forward-line 1))
+                                       ((looking-at (rx (1+ (or space "\n"))))
+                                        (goto-char (match-end 0)))))))
+    (save-excursion
+      (save-restriction
+        (narrow-to-region beg end)
+        (goto-char beg)
+        (skip-both)
+        (cl-destructuring-bind (sexps markers)
+            (cl-loop do (skip-whitespace)
+                     for start = (point-marker)
+                     for sexp = (ignore-errors
+                                  (read (current-buffer)))
+                     for end = (point-marker)
+                     while sexp
+                     ;; Collect the real string, then one used for sorting.
+                     collect (cons (buffer-substring (marker-position start) (marker-position end))
+                                   (save-excursion
+                                     (goto-char (marker-position start))
+                                     (skip-both)
+                                     (buffer-substring (point) (marker-position end))))
+                     into sexps
+                     collect (cons start end)
+                     into markers
+                     finally return (list sexps markers))
+          (setq sexps (sort sexps (lambda (a b)
+                                    (string< (cdr a) (cdr b)))))
+          (cl-loop for (real . sort) in sexps
+                   for (start . end) in markers
+                   do (progn
+                        (goto-char (marker-position start))
+                        (insert-before-markers real)
+                        (delete-region (point) (marker-position end)))))))))
+
 (leaf ui
   :leaf-defer nil
   :hook
@@ -1633,6 +1678,22 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :ensure t
   :bind (("C-a" . mwim-beginning-of-code-or-line)
          ("C-e" . mwim-end-of-code-or-line)))
+
+(leaf eshell
+  :bind* ("C-x m" . eshell)
+  :commands (magit-get-current-branch eshell/pwd)
+  :config
+  (defun my-eshell-prompt-function ()
+    (require 'magit)
+    (concat
+     "\n"
+     (propertize (abbreviate-file-name (eshell/pwd)) 'face '(:foreground "#A3BE8C"))
+     (and (magit-get-current-branch)
+          (concat " on " (propertize (magit-get-current-branch) 'face '(:foreground "#EBCB8B")))) "\n$ "))
+
+  (setq eshell-highlight-prompt nil
+        eshell-prompt-function 'my-eshell-prompt-function
+        eshell-prompt-regexp "^$ "))
 
 (leaf fish-mode
   :doc "Major mode for fish shell scripts"

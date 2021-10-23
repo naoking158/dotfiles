@@ -551,6 +551,54 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
   
 #+end_src
 
+** Sort Sexpresions
+
+#+begin_src emacs-lisp
+  ;; https://github.com/alphapapa/unpackaged.el#sort-sexps
+  (defun my-sort-sexps (beg end)
+    "Sort sexps in region (from BEG to END)."
+    (interactive "r")
+    (cl-flet ((skip-whitespace () (while (looking-at (rx (1+ (or space "\n"))))
+                                    (goto-char (match-end 0))))
+              (skip-both () (while (cond ((or (nth 4 (syntax-ppss))
+                                              (ignore-errors
+                                                (save-excursion
+                                                  (forward-char 1)
+                                                  (nth 4 (syntax-ppss)))))
+                                          (forward-line 1))
+                                         ((looking-at (rx (1+ (or space "\n"))))
+                                          (goto-char (match-end 0)))))))
+      (save-excursion
+        (save-restriction
+          (narrow-to-region beg end)
+          (goto-char beg)
+          (skip-both)
+          (cl-destructuring-bind (sexps markers)
+              (cl-loop do (skip-whitespace)
+                       for start = (point-marker)
+                       for sexp = (ignore-errors
+                                    (read (current-buffer)))
+                       for end = (point-marker)
+                       while sexp
+                       ;; Collect the real string, then one used for sorting.
+                       collect (cons (buffer-substring (marker-position start) (marker-position end))
+                                     (save-excursion
+                                       (goto-char (marker-position start))
+                                       (skip-both)
+                                       (buffer-substring (point) (marker-position end))))
+                       into sexps
+                       collect (cons start end)
+                       into markers
+                       finally return (list sexps markers))
+            (setq sexps (sort sexps (lambda (a b)
+                                      (string< (cdr a) (cdr b)))))
+            (cl-loop for (real . sort) in sexps
+                     for (start . end) in markers
+                     do (progn
+                          (goto-char (marker-position start))
+                          (insert-before-markers real)
+                          (delete-region (point) (marker-position end)))))))))
+#+end_src
 
 * Basic UI Configuration
 :PROPERTIES:
@@ -1327,7 +1375,7 @@ Only in Neotree Buffer:
       :ensure t
       :hook
       ((markdown-mode-hook org-mode-hook text-mode-hook) . flymake-proselint-setup))
-  
+
     (leaf flymake-diagnostic-at-point
       :doc "Display flymake diagnostics at point"
       :req "emacs-26.1" "popup-0.5.3"
@@ -2342,6 +2390,26 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
 
 * Shell
 
+** Eshell
+
+#+begin_src emacs-lisp
+  (leaf eshell
+    :bind* ("C-x m" . eshell)
+    :commands (magit-get-current-branch eshell/pwd)
+    :config
+    (defun my-eshell-prompt-function ()
+      (require 'magit)
+      (concat
+       "\n"
+       (propertize (abbreviate-file-name (eshell/pwd)) 'face '(:foreground "#A3BE8C"))
+       (and (magit-get-current-branch)
+            (concat " on " (propertize (magit-get-current-branch) 'face '(:foreground "#EBCB8B")))) "\n$ "))
+  
+    (setq eshell-highlight-prompt nil
+          eshell-prompt-function 'my-eshell-prompt-function
+          eshell-prompt-regexp "^$ "))
+#+end_src
+
 ** Fish Mode
 :PROPERTIES:
 :ID:       BD30FB24-87F8-4503-BCE5-2DC188CF290C
@@ -2377,7 +2445,6 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
       ))
   
 #+end_src
-
 
 * Runtime Performance
 ** Silent Garbage collection with gcmh
@@ -2582,7 +2649,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
     (defun jethro/set-todo-state-next ()
       "Visit each parent task and change NEXT states to TODO"
       (org-todo "NEXT"))
-  
+
     (defun my/org-agenda-cache (&optional regenerate)
       "Show agenda buffer without updating if it exists"
       (interactive "P")
@@ -2591,15 +2658,15 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
             (setq current-prefix-arg nil)
             (org-agenda nil "a"))
         (org-switch-to-buffer-other-window "*Org Agenda*")))
-  
+
     (defun jethro/org-inbox-capture ()
       (interactive)
       "Capture a task in agenda mode."
       (org-capture))
-  
+
     (defvar jethro/org-current-effort "1:00"
       "Current effort for agenda items.")
-  
+
     (defun jethro/my-org-agenda-set-effort (effort)
       "Set the effort property for the current headline."
       (interactive
@@ -2622,7 +2689,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
             (end-of-line 1)
             (setq newhead (org-get-heading)))
           (org-agenda-change-all-lines newhead hdmarker))))
-  
+
     (defun jethro/org-agenda-process-inbox-item ()
       "Process a single item in the org-agenda."
       (interactive)
@@ -2631,10 +2698,10 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
        (org-agenda-priority)
        (call-interactively 'jethro/my-org-agenda-set-effort)
        (org-agenda-refile nil nil t)))
-  
+
     (defvar jethro/org-agenda-bulk-process-key ?f
       "Default key for bulk processing inbox items.")
-  
+
     (defun jethro/bulk-process-entries ()
       (if (not (null org-agenda-bulk-marked-entries))
           (let ((entries (reverse org-agenda-bulk-marked-entries))
@@ -2662,18 +2729,18 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
                        (format ", skipped %d (disappeared before their turn)"
                                skipped))
                      (if (not org-agenda-persistent-marks) "" " (kept marked)")))))
-  
+
     (defun jethro/org-process-inbox ()
       "Called in org-agenda-mode, processes all inbox items."
       (interactive)
       (org-agenda-bulk-mark-regexp "inbox:")
       (jethro/bulk-process-entries))
-  
+
     (defun ladicle/org-clock-out-and-save-when-exit ()
       "Save buffers and stop clocking when kill emacs."
       (ignore-errors (org-clock-out) t)
       (save-some-buffers t))
-  
+
     :defvar (org-capture-templates)
     :advice (:before org-agenda-redo-all
                      (lambda (&rest args)
@@ -2706,17 +2773,17 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
      org-refile-targets '((org-agenda-files . (:level . 1)))
      org-agenda-bulk-custom-functions `((,jethro/org-agenda-bulk-process-key
                                          jethro/org-agenda-process-inbox-item)))
-  
+
     (add-to-list 'org-capture-templates
                  `("i" "inbox" entry
                    (file ,(concat jethro/org-agenda-directory "inbox.org"))
                    "* TODO %?"))
-  
+
     (defun jethro/org-archive-done-tasks ()
       "Archive all done tasks."
       (interactive)
       (org-map-entries 'org-archive-subtree "/DONE" 'file))
-  
+
     (defun jethro/is-project-p ()
       "Any task with a todo keyword subtask"
       (save-restriction
@@ -2732,7 +2799,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
               (when (member (org-get-todo-state) org-todo-keywords-1)
                 (setq has-subtask t))))
           (and is-a-task has-subtask))))
-  
+
     (defun jethro/skip-projects ()
       "Skip trees that are projects"
       (save-restriction
@@ -2745,7 +2812,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
             next-headline)
            (t
             nil)))))
-  
+
     (setq org-agenda-custom-commands
           `(("a" "Agenda"
              ((agenda ""
