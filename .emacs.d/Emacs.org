@@ -4561,10 +4561,14 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** Emacs Application Framework
+:PROPERTIES:
+:ID:       24FB1875-D6A4-4609-9485-FAAB24E07AA6
+:END:
 
 #+begin_src emacs-lisp
+  
   (leaf eaf
-    :when (not (eq 'darwin window-system))
+    :when (not (memq window-system '(ns darwin)))
     :load-path "~/.emacs.d/elisp/emacs-application-framework/"
     :require t
     :custom
@@ -4577,11 +4581,12 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
     (require 'eaf-browser)
     (require 'eaf-pdf-viewer)
     (require 'eaf-jupyter)
-
+  
     (defalias 'browse-web #'eaf-open-browser)
     (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
     (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
     (eaf-bind-key nil "M-q" eaf-browser-keybinding))
+
 #+end_src
 
 * Footer

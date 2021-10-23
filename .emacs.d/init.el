@@ -3180,7 +3180,7 @@ org-babel-load-languages
     (sie-brow/search-in-external-browser sie-brow/prefix-for-google-scholar at-point)))
 
 (leaf eaf
-  :when (not (eq 'darwin window-system))
+  :when (not (memq window-system '(ns darwin)))
   :load-path "~/.emacs.d/elisp/emacs-application-framework/"
   :require t
   :custom
