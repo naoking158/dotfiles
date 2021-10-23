@@ -14,4 +14,4 @@ echo ""
 echo "==> Fisher install..."
 exec fish
 curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
-fisher install 0rax/fish-bd jethrokuan/z oh-my-fish/theme-clearance
+fisher install 0rax/fish-bd jethrokuan/z IlanCosman/tide@v5

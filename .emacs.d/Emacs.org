@@ -2204,7 +2204,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 :END:
 
 #+begin_src emacs-lisp
-  
+
   (leaf vertico
     :ensure t
     :require t
@@ -2212,7 +2212,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
              (vertico-cycle . t))
     :global-minor-mode t savehist-mode
     :config
-    
+
     (leaf vertico-directory
       :load-path "~/.emacs.d/elisp/vertico/extensions/"
       ;; Tidy shadowed file names
@@ -2222,7 +2222,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
              ("M-DEL" . vertico-directory-delete-word)
              ("C-w"   . vertico-directory-delete-word)
              ("RET"   . vertico-directory-enter))))
-  
+
 #+end_src
 
 ** Completions in Regions with Corfu
