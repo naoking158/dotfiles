@@ -336,6 +336,7 @@ end
 function fish_user_key_bindings
     bind \cr 'peco_select_history (commandline -b)'
     bind \c] peco_select_ghq_repository
+    bind \co peco_change_directory
 end
 
 function reformatpdftoeps
@@ -432,3 +433,10 @@ if test -n "$IS_MANJARO"
     export BROWSER=/usr/bin/brave
     set PATH /usr/include $PATH
 end
+
+if type -q exa
+    alias ll "exa -l -g --icons"
+    alias lla "ll -a"
+end
+
+
