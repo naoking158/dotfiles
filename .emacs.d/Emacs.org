@@ -535,6 +535,23 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
       (force-mode-line-update)))
 #+end_src
 
+** Trim newline from string
+:PROPERTIES:
+:ID:       7A1535E8-FE3A-443B-8A05-BDB5F4C6703B
+:END:
+
+#+begin_src emacs-lisp
+  
+  (defun my/trim-newline-from-string (string)
+    (let ((len (length string)))
+      (cond
+       ((and (> len 0) (eql (aref string (- len 1)) ?\n))
+        (substring string 0 (- len 1)))
+       (t string))))
+  
+#+end_src
+
+
 * Basic UI Configuration
 :PROPERTIES:
 :ID:       55BAFA5B-FF42-4569-98F4-E85A27ACAE9A
@@ -1204,6 +1221,18 @@ Only in Neotree Buffer:
 
 #+begin_src emacs-lisp
   
+  (setq path-to-miniconda
+          (my/trim-newline-from-string
+           (shell-command-to-string
+            "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
+    
+    (let ((path-to-venv (expand-file-name "envs/torch" path-to-miniconda)))
+      (when (file-exists-p path-to-venv)
+        (setq path-to-venv-python
+              (expand-file-name "bin/python" path-to-venv))
+        (custom-set-variables
+         '(org-babel-python-command path-to-venv-python))))
+  
   (leaf python-mode
     :doc "Python major mode"
     :url "https://gitlab.com/groups/python-mode-devs"
@@ -1218,26 +1247,6 @@ Only in Neotree Buffer:
       :url "http://github.com/necaris/conda.el"
       :ensure t
       :require t
-      :preface
-      (defun my/string-trim-final-newline (string)
-        (let ((len (length string)))
-          (cond
-           ((and (> len 0) (eql (aref string (- len 1)) ?\n))
-            (substring string 0 (- len 1)))
-           (t string))))
-  
-      (setq path-to-miniconda
-            (my/string-trim-final-newline
-             (shell-command-to-string
-              "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
-  
-      (let ((path-to-venv (expand-file-name "envs/torch" path-to-miniconda)))
-        (when (file-exists-p path-to-venv)
-          (setq path-to-venv-python
-                (expand-file-name "bin/python" path-to-venv))
-          (custom-set-variables
-           '(org-babel-python-command path-to-venv-python))))
-  
       :commands conda-env-activate
       :custom ((conda-anaconda-home . path-to-miniconda)
                (conda-env-home-directory . path-to-miniconda))
@@ -2425,6 +2434,10 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
       (isearch-yank-on-move . 'shift)
       (isearch-allow-scroll . 'unlimited)
       (org-show-notification-handler . nil)
+      (org-babel-load-languages . '((emacs-lisp . t)
+                                    (python . t)
+                                    (latex . t)
+                                    (shell . t)))
       (org-structure-template-alist . '(("sh" . "src shell")
                                         ("c" . "center")
                                         ("C" . "comment")
@@ -2515,7 +2528,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
      :config
      (require 'org-tempo)   ;; need for org-template
      (require 'org-indent)  ;; Make sure org-indent face is available
-     
+   
      (leaf org-fragtog
        :ensure t
        :hook (org-mode-hook . org-fragtog-mode)))
@@ -2528,8 +2541,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
 
 #+begin_src emacs-lisp
   (leaf org-agenda
-    ;; :after org
-    :require t org-habit org-capture
+    :after org
     :bind* (("C-c C-a" . my/org-agenda-cache)
             ("C-c C-m" . jethro/org-inbox-capture))
     :bind (org-agenda-mode-map
@@ -2668,7 +2680,9 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
                        (setq org-agenda-files
                              (directory-files-recursively org-directory
                                                           "\\.org$"))))
-    :defer-config
+    :config
+    (require 'org-habit)
+    (require 'org-capture)
     (setq
      jethro/org-agenda-directory (file-truename "~/org/gtd/")
      org-agenda-files (directory-files-recursively org-directory "\\.org$")
@@ -2853,15 +2867,15 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
 :END:
 
 #+begin_src emacs-lisp
-
+  
   (leaf org-ref
     :doc "citations, cross-references and bibliographies in org-mode"
     :req "dash-2.11.0" "htmlize-1.51" "helm-1.5.5" "helm-bibtex-2.0.0" "ivy-0.8.0" "hydra-0.13.2" "key-chord-0" "s-1.10.0" "f-0.18.0" "pdf-tools-0.7"
     :url "https://github.com/jkitchin/org-ref"
     :ensure t
     :after org
-    ;; :bind (org-mode-map
-    ;;        ("C-c c" . org-ref-insert-cite-link))
+    :bind (org-mode-map
+           ("C-c c" . org-ref-insert-cite-link))
     :custom
     `(;; RefTeX
       (reftex-plug-into-AUCTeX . t)
@@ -2878,7 +2892,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
       (bibtex-completion-bibliography . `(,(concat org-directory
                                                    "braindump/preferences/ref.bib")))
       (bibtex-completion-library-path . ,(concat org-directory "braindump/lit/"))
-
+  
       ;;; They are deprecated since org-ref ver. 3
       ;; (org-ref-bibliography-notes . ,(concat org-directory
       ;;                                        "braindump/lit/notes.org"))
@@ -2886,14 +2900,14 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
       ;;                                            "braindump/preferences/ref.bib")))
       ;; (org-ref-pdf-directory . ,(concat org-directory "braindump/lit/"))
       ))
-
+  
   (leaf xref
     :doc "Cross-referencing commands"
     :req "emacs-26.3"
     :url "http://elpa.gnu.org/packages/xref.html"
     :ensure t
     :after org)
-
+  
 #+end_src
 
 
@@ -3063,10 +3077,10 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
   (leaf org-roam
     :doc "Roam Research replica with Org-mode"
     :url "https://github.com/org-roam/org-roam"
-    ;; :after org
+    :after org
     :ensure t
     ;; This is necessary for variables to be initialized correctly.
-    :require t
+    ;; :require t
     :bind* (("C-c n l" . org-roam-buffer-toggle)
             ("C-c n f" . org-roam-node-find)
             ("C-c n g" . org-roam-graph)
@@ -4025,6 +4039,11 @@ While browsing, remember the following:
                                   (mu4e-action-retag-message msg (concat "+" target)))))
     (mu4e~headers-defun-mark-for tag)
   
+    (add-to-list 'org-capture-templates
+                 `("o" "respond to email" entry 
+                   (file ,(concat jethro/org-agenda-directory "inbox.org"))
+                   "* TODO %^{Description}\n%A\n%?\n"))
+  
     (leaf org-msg
       :ensure t
       :config
@@ -4051,13 +4070,10 @@ While browsing, remember the following:
       "Capture a TODO item via email."
       (org-capture nil "o"))
   
-    (add-to-list 'org-capture-templates
-                 `("o" "respond to email" entry 
-                   (file ,(concat jethro/org-agenda-directory "inbox.org"))
-                   "* TODO %^{Description}\n%A\n%?\n"))
-  
     :bind
-    ((mu4e-main-mode-map ("q" . quit-window))
+    ((mu4e-main-mode-map
+      ("q" . quit-window)
+      ("Q" . mu4e-quit))
      (mu4e-headers-mode-map
       ("{" . mu4e-headers-query-prev)      ; differs from built-in
       ("}" . mu4e-headers-query-next)      ; differs from built-in
@@ -4393,7 +4409,12 @@ While browsing, remember the following:
 :ID:       4f42d25d-a7e3-4a7b-9a39-975f1d79631c
 :END:
 
-- Disabling native compilation is for avoid the issue: https://github.com/nnicandro/emacs-jupyter/issues/297#issuecomment-778924175
+
+Disabling native compilation is for avoid the issue: https://github.com/nnicandro/emacs-jupyter/issues/297#issuecomment-778924175
+
+
+To enable support for Jupyter based source code blocks, add jupyter to org-babel-load-languages. Ensure the jupyter entry is added last since loading ob-jupyter depends on the value of variables such as org-src-lang-modes and org-babel-tangle-lang-exts.
+
 
 :PROPERTIES:
 :ID:       63281654-074e-4602-b527-36a5afc3c770
@@ -4402,8 +4423,9 @@ While browsing, remember the following:
   (leaf jupyter
     :ensure t websocket
     :after python-mode
-    :bind ((jupyter-org-interaction-mode-map
-            ("C-c h" . nil)
+    :bind (([remap jupyter-org-hydra/body] . nil)
+           (jupyter-org-interaction-mode-map
+            ([remap jupyter-org-hydra/body] . nil)
             ("C-c C-." . jupyter-org-hydra/body)))
     :hook (org-mode-hook . (lambda nil
                              (require 'zmq)
@@ -4431,7 +4453,7 @@ While browsing, remember the following:
 #+begin_src emacs-lisp
   (leaf org-babel
     :after org python-mode
-    :preface
+    :config
     (defun org-babel-edit-prep:jupyter-python (babel-info)
       (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
       (my/python-basic-config))
@@ -4449,29 +4471,11 @@ While browsing, remember the following:
    #+begin_src shell
      conda activate ENVNAME
      ipython install kernel --user --name=ENVNAME
-
+     
      # or
      
      python -m ipykernel install --user --name=ENVNAME
    #+end_src
-
-
-*** org-mode source blocks
-:PROPERTIES:
-:ID:       74EFE5D2-733F-438B-8FC8-69E925BAC7C6
-:END:
-
-
-
-
-To enable support for Jupyter based source code blocks, add jupyter to org-babel-load-languages. Ensure the jupyter entry is added last since loading ob-jupyter depends on the value of variables such as org-src-lang-modes and org-babel-tangle-lang-exts.
-
-#+begin_src emacs-lisp :noweb
-  org-babel-load-languages
-#+end_src
-
-#+RESULTS:
-: ((shell . t) (latex . t) (python . t) (emacs-lisp . t) (jupyter . t))
 
 
 *** How to use it?
@@ -4580,6 +4584,19 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
     (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
     (eaf-bind-key nil "M-q" eaf-browser-keybinding))
 
+#+end_src
+
+** Browse at remote
+:PROPERTIES:
+:ID:       D593E6DF-F5FF-48BB-9137-805205B140BF
+:END:
+
+#+begin_src emacs-lisp
+  (leaf browse-at-remote
+    :ensure t
+    :commands browse-at-remote-get-url
+    :custom (browse-at-remote-prefer-symbolic . nil)
+    :bind ("M-g r" . browse-at-remote))
 #+end_src
 
 * Footer

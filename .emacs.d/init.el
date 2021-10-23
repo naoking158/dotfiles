@@ -275,6 +275,13 @@
     (setq-local mode-line-format nil)
     (force-mode-line-update)))
 
+(defun my/trim-newline-from-string (string)
+  (let ((len (length string)))
+    (cond
+     ((and (> len 0) (eql (aref string (- len 1)) ?\n))
+      (substring string 0 (- len 1)))
+     (t string))))
+
 (leaf ui
   :leaf-defer nil
   :hook
@@ -784,6 +791,18 @@
   :ensure t
   :bind (("C-c e" . macrostep-expand)))
 
+(setq path-to-miniconda
+        (my/trim-newline-from-string
+         (shell-command-to-string
+          "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
+
+  (let ((path-to-venv (expand-file-name "envs/torch" path-to-miniconda)))
+    (when (file-exists-p path-to-venv)
+      (setq path-to-venv-python
+            (expand-file-name "bin/python" path-to-venv))
+      (custom-set-variables
+       '(org-babel-python-command path-to-venv-python))))
+
 (leaf python-mode
   :doc "Python major mode"
   :url "https://gitlab.com/groups/python-mode-devs"
@@ -798,26 +817,6 @@
     :url "http://github.com/necaris/conda.el"
     :ensure t
     :require t
-    :preface
-    (defun my/string-trim-final-newline (string)
-      (let ((len (length string)))
-        (cond
-         ((and (> len 0) (eql (aref string (- len 1)) ?\n))
-          (substring string 0 (- len 1)))
-         (t string))))
-
-    (setq path-to-miniconda
-          (my/string-trim-final-newline
-           (shell-command-to-string
-            "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
-
-    (let ((path-to-venv (expand-file-name "envs/torch" path-to-miniconda)))
-      (when (file-exists-p path-to-venv)
-        (setq path-to-venv-python
-              (expand-file-name "bin/python" path-to-venv))
-        (custom-set-variables
-         '(org-babel-python-command path-to-venv-python))))
-
     :commands conda-env-activate
     :custom ((conda-anaconda-home . path-to-miniconda)
              (conda-env-home-directory . path-to-miniconda))
@@ -1695,6 +1694,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (isearch-yank-on-move . 'shift)
    (isearch-allow-scroll . 'unlimited)
    (org-show-notification-handler . nil)
+   (org-babel-load-languages . '((emacs-lisp . t)
+                                 (python . t)
+                                 (latex . t)
+                                 (shell . t)))
    (org-structure-template-alist . '(("sh" . "src shell")
                                      ("c" . "center")
                                      ("C" . "comment")
@@ -1791,8 +1794,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     :hook (org-mode-hook . org-fragtog-mode)))
 
 (leaf org-agenda
-  ;; :after org
-  :require t org-habit org-capture
+  :after org
   :bind* (("C-c C-a" . my/org-agenda-cache)
           ("C-c C-m" . jethro/org-inbox-capture))
   :bind (org-agenda-mode-map
@@ -1931,7 +1933,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                      (setq org-agenda-files
                            (directory-files-recursively org-directory
                                                         "\\.org$"))))
-  :defer-config
+  :config
+  (require 'org-habit)
+  (require 'org-capture)
   (setq
    jethro/org-agenda-directory (file-truename "~/org/gtd/")
    org-agenda-files (directory-files-recursively org-directory "\\.org$")
@@ -2091,8 +2095,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :url "https://github.com/jkitchin/org-ref"
   :ensure t
   :after org
-  ;; :bind (org-mode-map
-  ;;        ("C-c c" . org-ref-insert-cite-link))
+  :bind (org-mode-map
+         ("C-c c" . org-ref-insert-cite-link))
   :custom
   `(;; RefTeX
     (reftex-plug-into-AUCTeX . t)
@@ -2259,10 +2263,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf org-roam
   :doc "Roam Research replica with Org-mode"
   :url "https://github.com/org-roam/org-roam"
-  ;; :after org
+  :after org
   :ensure t
   ;; This is necessary for variables to be initialized correctly.
-  :require t
+  ;; :require t
   :bind* (("C-c n l" . org-roam-buffer-toggle)
           ("C-c n f" . org-roam-node-find)
           ("C-c n g" . org-roam-graph)
@@ -2749,6 +2753,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                 (mu4e-action-retag-message msg (concat "+" target)))))
   (mu4e~headers-defun-mark-for tag)
 
+  (add-to-list 'org-capture-templates
+               `("o" "respond to email" entry 
+                 (file ,(concat jethro/org-agenda-directory "inbox.org"))
+                 "* TODO %^{Description}\n%A\n%?\n"))
+
   (leaf org-msg
     :ensure t
     :config
@@ -2775,13 +2784,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     "Capture a TODO item via email."
     (org-capture nil "o"))
 
-  (add-to-list 'org-capture-templates
-               `("o" "respond to email" entry 
-                 (file ,(concat jethro/org-agenda-directory "inbox.org"))
-                 "* TODO %^{Description}\n%A\n%?\n"))
-
   :bind
-  ((mu4e-main-mode-map ("q" . quit-window))
+  ((mu4e-main-mode-map
+    ("q" . quit-window)
+    ("Q" . mu4e-quit))
    (mu4e-headers-mode-map
     ("{" . mu4e-headers-query-prev)      ; differs from built-in
     ("}" . mu4e-headers-query-next)      ; differs from built-in
@@ -3078,8 +3084,9 @@ Interactively, URL defaults to the string looking like a url around point."
 (leaf jupyter
   :ensure t websocket
   :after python-mode
-  :bind ((jupyter-org-interaction-mode-map
-          ("C-c h" . nil)
+  :bind (([remap jupyter-org-hydra/body] . nil)
+         (jupyter-org-interaction-mode-map
+          ([remap jupyter-org-hydra/body] . nil)
           ("C-c C-." . jupyter-org-hydra/body)))
   :hook (org-mode-hook . (lambda nil
                            (require 'zmq)
@@ -3092,15 +3099,13 @@ Interactively, URL defaults to the string looking like a url around point."
 
 (leaf org-babel
   :after org python-mode
-  :preface
+  :config
   (defun org-babel-edit-prep:jupyter-python (babel-info)
     (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
     (my/python-basic-config))
   (defun org-babel-edit-prep:python (babel-info)
     (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
     (my/python-basic-config)))
-
-org-babel-load-languages
 
 (leaf sie-brow
   :doc "Sie-Brow; Search in external browser with keywords
@@ -3191,5 +3196,11 @@ org-babel-load-languages
   (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
   (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
   (eaf-bind-key nil "M-q" eaf-browser-keybinding))
+
+(leaf browse-at-remote
+  :ensure t
+  :commands browse-at-remote-get-url
+  :custom (browse-at-remote-prefer-symbolic . nil)
+  :bind ("M-g r" . browse-at-remote))
 
 (provide 'init)
