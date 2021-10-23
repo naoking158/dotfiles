@@ -1208,6 +1208,7 @@ Only in Neotree Buffer:
     :doc "Python major mode"
     :url "https://gitlab.com/groups/python-mode-devs"
     :ensure t
+    :mode "\\.py\\'"
     :custom ((python-indent-guess-indent-offset . t)
              (python-indent-guess-indent-offset-verbose . nil))
     :config
@@ -2084,8 +2085,8 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   
     (leaf consult-tramp
       :load-path "~/.emacs.d/elisp/consult-tramp/"
-      :require t
       :custom ((tramp-default-method . "ssh"))
+      :commands consult-tramp
       :config
       (tramp-set-completion-function "ssh"
                                      '((tramp-parse-sconfig "~/.ssh/config")))))
@@ -2204,9 +2205,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :config
     
     (leaf vertico-directory
-      :after vertico
       :load-path "~/.emacs.d/elisp/vertico/extensions/"
-      :require t
       ;; Tidy shadowed file names
       :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy)
       :bind (:vertico-map
@@ -2396,11 +2395,6 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
      :doc "Export Framework for Org Mode"
      :tag "builtin"
      :ensure t
-   
-     :require
-     org-tempo   ;; need for org-template
-     org-indent  ;; Make sure org-indent face is available
-   
      :mode "\\.org\\'"
      :hook (org-mode-hook . my/org-mode-hook)
      :custom
@@ -2519,6 +2513,9 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
        (my/set-org-face))
    
      :config
+     (require 'org-tempo)   ;; need for org-template
+     (require 'org-indent)  ;; Make sure org-indent face is available
+     
      (leaf org-fragtog
        :ensure t
        :hook (org-mode-hook . org-fragtog-mode)))
@@ -3106,7 +3103,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
          :target (file+head "private/${slug}.org"
                             "#+title: ${title}\n#+date: %U\n")
          :unnarrowed t))))
-
+  
     :config
     (leaf org-roam-dailies
       :require t
@@ -3115,7 +3112,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
       (:org-roam-dailies-map
        ("Y" . org-roam-dailies-capture-yesterday)
        ("T" . org-roam-dailies-capture-tomorrow)))
-
+  
     ;; for org-roam-buffer-toggle
     ;; Recommendation in the official manual
     (add-to-list 'display-buffer-alist
@@ -3125,13 +3122,13 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
                    (window-width . 0.33)
                    (window-height . fit-window-to-buffer)))
     (org-roam-db-autosync-mode))
-
-
+  
+  
   (leaf org-roam-ui
     :after org-roam
     :load-path "~/.emacs.d/elisp/org-roam-ui/"
-    :require t
     :ensure simple-httpd websocket
+    :commands (org-roam-ui-mode)
     :config
       (setq org-roam-ui-sync-theme t
             org-roam-ui-follow t
@@ -3194,7 +3191,6 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
     :doc "orp-paperpile; Org-Roam-Protocol Paperpile is an interface
           to comunicate between org-mode and paperpile using org-roam-protocol."
     :load-path "~/.emacs.d/elisp/orp-paperpile/"
-    :require t
     :custom
     ((orp-paperpile-local-pdf-dir . "~/drive/Paperpile/")
      (orp-paperpile-ref-templates . '(("r" "ref" plain "%?"
@@ -3909,22 +3905,22 @@ While browsing, remember the following:
                    "/usr/share/emacs/"))
          (cmd (concat "find " parent " -type d -name mu4e")))
     (setq path-to-mu (car (last (split-string (shell-command-to-string cmd))))))
-
+  
   (leaf mu4e
     :when path-to-mu
     :load-path path-to-mu
-    :hook (after-init-hook . (lambda () (require 'mu4e)))
-    :defer-config
+    :commands (mu4e)
+    :config
     (set-variable 'read-mail-command 'mu4e)
     (setq mail-user-agent 'mu4e-user-agent
           message-send-mail-function 'smtpmail-send-it
-
+  
           ;; Make sure plain text mails flow correctly for recipients
           mu4e-compose-format-flowed t
-
+  
           ;; This is set to 't' to avoid mail syncing issues when using mbsync
           mu4e-change-filenames-when-moving t
-
+  
           ;; Refresh mail using isync every 10 minutes
           mu4e-update-interval (* 10 60)
           mu4e-get-mail-command "mbsync -a"
@@ -3933,7 +3929,7 @@ While browsing, remember the following:
           mu4e-completing-read-function 'completing-read
           mu4e-headers-precise-alignment t
           mu4e-use-fancy-chars t)
-
+  
     (setq mu4e-contexts
           (list
            ;; Work account
@@ -3952,7 +3948,7 @@ While browsing, remember the following:
                     (mu4e-sent-folder				. "/BBO/[Gmail]/Sent Mail")
                     (mu4e-refile-folder			. "/BBO/[Gmail]/All Mail")
                     (mu4e-trash-folder			. "/BBO/[Gmail]/Trash")))
-
+  
            ;; Private account
            (make-mu4e-context
             :name "Private"
@@ -3969,7 +3965,7 @@ While browsing, remember the following:
                     (mu4e-sent-folder				. "/Private/[Gmail]/Sent Mail")
                     (mu4e-refile-folder			. "/Private/[Gmail]/All Mail")
                     (mu4e-trash-folder			. "/Private/[Gmail]/Trash")))
-
+  
            ;; University account
            (make-mu4e-context
             :name "University"
@@ -3987,7 +3983,7 @@ While browsing, remember the following:
                     (mu4e-refile-folder			. "/University/Archive")
                     (mu4e-trash-folder			. "/University/Deleted Items")
                     ))))
-
+  
     (setq mu4e-maildir-shortcuts
           '((:maildir "/BBO/[Gmail]/All Mail"		:key ?a)
             (:maildir "/BBO/Inbox"							:key ?i)
@@ -3996,7 +3992,7 @@ While browsing, remember the following:
             (:maildir "/BBO/[Gmail]/Trash"			:key ?t)
             (:maildir "/Private/Inbox"					:key ?p)
             ))
-
+  
     (setq mu4e-bookmarks
           '((:name "All Inbox"
                    :query "(maildir:/BBO/Inbox OR maildir:/Private/Inbox OR maildir:/University/Inbox) AND NOT flag:trashed"
@@ -4017,7 +4013,7 @@ While browsing, remember the following:
             (:name "All massages"
                    :query "NOT flag:trashed AND NOT flag:draft AND NOT flag:sent"
                    :key ?a)))
-
+  
     (add-to-list 'mu4e-marks
                  '(tag
                    :char       "g"
@@ -4028,37 +4024,51 @@ While browsing, remember the following:
                    :action      (lambda (docid msg target)
                                   (mu4e-action-retag-message msg (concat "+" target)))))
     (mu4e~headers-defun-mark-for tag)
-
+  
+    (leaf org-msg
+      :ensure t
+      :config
+      (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
+            ;; org-msg-startup "hidestars indent inlineimages"
+            org-msg-recipient-names '(("naoki@bbo.cs.tsukuba.ac.jp" . "Naoki Sakamoto")
+                                      ("nok.skmt.snow@gmail.com" . "Naoki Sakamoto"))
+            ;; org-msg-greeting-name-limit 3
+            org-msg-default-alternatives '((new		. (text html))
+                                           (reply-to-html	. (text html))
+                                           (reply-to-text	. (text)))
+            org-msg-convert-citation t)
+      (org-msg-mode))
+  
     :advice
     ;; disable fancy characters only for flags
     (:around mu4e~headers-flags-str (lambda (f &rest args)
                                       (let* ((mu4e-use-fancy-chars nil))
                                         (apply f args))))
-
+  
     :preface
     (defun my/org-capture-mu4e ()
       (interactive)
       "Capture a TODO item via email."
       (org-capture nil "o"))
-
+  
     (add-to-list 'org-capture-templates
                  `("o" "respond to email" entry 
                    (file ,(concat jethro/org-agenda-directory "inbox.org"))
                    "* TODO %^{Description}\n%A\n%?\n"))
-
+  
     :bind
     ((mu4e-main-mode-map ("q" . quit-window))
      (mu4e-headers-mode-map
       ("{" . mu4e-headers-query-prev)      ; differs from built-in
       ("}" . mu4e-headers-query-next)      ; differs from built-in
       ("o" . my/org-capture-mu4e)          ; differs from built-in
-
+  
       ("A" . mu4e-headers-mark-for-action) ; differs from built-in
-
+  
       ("`" . mu4e-update-mail-and-index)   ; differs from built-in
       ("|" . mu4e-view-pipe)               ; does not seem to be built in any longer
       ("." . hydra-mu4e-headers/body)))
-
+  
     :hydra
     (hydra-mu4e-headers
      (:color blue :hint nil)
@@ -4074,7 +4084,7 @@ While browsing, remember the following:
   _C_: compose | _}_: next query    | _a_: action  | _|_: thru shl  | _`_: update, reindex
   _F_: forward | _C-+_: show more   | _A_: mk4actn | _H_: help      | _;_: context-switch
   _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2maildir "
-
+  
      ;; general
      ("n" mu4e-headers-next)
      ("p" mu4e-headers-previous)
@@ -4085,7 +4095,7 @@ While browsing, remember the following:
      ("C" mu4e-compose-new)
      ("F" mu4e-compose-forward)
      ("o" my/org-capture-mu4e)                  ; differs from built-in
-
+  
      ;; search
      ("s" mu4e-headers-search)
      ("S" mu4e-headers-search-edit)
@@ -4096,7 +4106,7 @@ While browsing, remember the following:
      ("}" mu4e-headers-query-next)              ; differs from built-in
      ("C-+" mu4e-headers-split-view-grow)
      ("C--" mu4e-headers-split-view-shrink)
-
+  
      ;; mark stuff 
      ("!" mu4e-headers-mark-for-read)
      ("?" mu4e-headers-mark-for-unread)
@@ -4109,7 +4119,7 @@ While browsing, remember the following:
      ("a" mu4e-headers-action)                  ; not really a mark per-se
      ("A" mu4e-headers-mark-for-action)         ; differs from built-in
      ("*" mu4e-headers-mark-for-something)
-
+  
      ("#" mu4e-mark-resolve-deferred-marks)
      ("%" mu4e-headers-mark-pattern)
      ("&" mu4e-headers-mark-custom)
@@ -4117,27 +4127,27 @@ While browsing, remember the following:
      ("-" mu4e-headers-mark-for-unflag)
      ("t" mu4e-headers-mark-subthread)
      ("T" mu4e-headers-mark-thread)
-
+  
      ;; miscellany
      ("q" mu4e~headers-quit-buffer)
      ("H" mu4e-display-manual)
      ("|" mu4e-view-pipe)                       ; does not seem built-in any longer
-
+  
      ;; switches
      ("O" mu4e-headers-change-sorting)
      ("P" mu4e-headers-toggle-threading)
      ("Q" mu4e-headers-toggle-full-search)
      ("V" mu4e-headers-toggle-skip-duplicates)
      ("W" mu4e-headers-toggle-include-related)
-
+  
      ;; more miscellany
      ("`" mu4e-update-mail-and-index)           ; differs from built-in
      (";" mu4e-context-switch)  
      ("j" mu4e~headers-jump-to-maildir)
-
+  
      ("." nil)))
-
-
+  
+  
   (leaf mu4e-views
     :ensure t
     :after mu4e
@@ -4155,22 +4165,6 @@ While browsing, remember the following:
     (setq mu4e-views-dispatcher-predicate-view-map
           `((,(lambda (msg) (mu4e-message-field msg :body-html)) . "html")
             (,(lambda (msg) (ignore msg) t) . "text"))))
-
-
-  (leaf org-msg
-    :ensure t
-    :after mu4e
-    :config
-    (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
-          ;; org-msg-startup "hidestars indent inlineimages"
-          org-msg-recipient-names '(("naoki@bbo.cs.tsukuba.ac.jp" . "Naoki Sakamoto")
-                                    ("nok.skmt.snow@gmail.com" . "Naoki Sakamoto"))
-          ;; org-msg-greeting-name-limit 3
-          org-msg-default-alternatives '((new		. (text html))
-                                         (reply-to-html	. (text html))
-                                         (reply-to-text	. (text)))
-          org-msg-convert-citation t)
-    (org-msg-mode))
 #+end_src
 
 ** Enhance xwidget webkit browser
@@ -4179,7 +4173,7 @@ While browsing, remember the following:
 :END:
 
 #+begin_src emacs-lisp
-    
+  
   (leaf xwwp
     :disabled t
     :when (or (<= emacs-major-version 27)
@@ -4407,19 +4401,18 @@ While browsing, remember the following:
 #+begin_src emacs-lisp
   (leaf jupyter
     :ensure t websocket
-    :require t zmp
     :after python-mode
-    :custom (jupyter-org-interaction-mode . nil)
     :bind ((jupyter-org-interaction-mode-map
             ("C-c h" . nil)
             ("C-c C-." . jupyter-org-hydra/body)))
-    :preface
-    (org-babel-do-load-languages
-     'org-babel-load-languages '((emacs-lisp . t)
-                                 (python . t)
-                                 (latex . t)
-                                 (shell . t)
-                                 (jupyter . t))))
+    :hook (org-mode-hook . (lambda nil
+                             (require 'zmq)
+                             (org-babel-do-load-languages
+                              'org-babel-load-languages '((emacs-lisp . t)
+                                                          (python . t)
+                                                          (latex . t)
+                                                          (shell . t)
+                                                          (jupyter . t))))))
 #+end_src
 
 *** Enable lsp in org-code-block

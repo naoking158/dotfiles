@@ -788,6 +788,7 @@
   :doc "Python major mode"
   :url "https://gitlab.com/groups/python-mode-devs"
   :ensure t
+  :mode "\\.py\\'"
   :custom ((python-indent-guess-indent-offset . t)
            (python-indent-guess-indent-offset-verbose . nil))
   :config
@@ -1447,8 +1448,8 @@ respectively."
 
   (leaf consult-tramp
     :load-path "~/.emacs.d/elisp/consult-tramp/"
-    :require t
     :custom ((tramp-default-method . "ssh"))
+    :commands consult-tramp
     :config
     (tramp-set-completion-function "ssh"
                                    '((tramp-parse-sconfig "~/.ssh/config")))))
@@ -1543,9 +1544,7 @@ respectively."
   :config
 
   (leaf vertico-directory
-    :after vertico
     :load-path "~/.emacs.d/elisp/vertico/extensions/"
-    :require t
     ;; Tidy shadowed file names
     :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy)
     :bind (:vertico-map
@@ -1666,11 +1665,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :doc "Export Framework for Org Mode"
   :tag "builtin"
   :ensure t
-
-  :require
-  org-tempo   ;; need for org-template
-  org-indent  ;; Make sure org-indent face is available
-
   :mode "\\.org\\'"
   :hook (org-mode-hook . my/org-mode-hook)
   :custom
@@ -1789,6 +1783,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (my/set-org-face))
 
   :config
+  (require 'org-tempo)   ;; need for org-template
+  (require 'org-indent)  ;; Make sure org-indent face is available
+
   (leaf org-fragtog
     :ensure t
     :hook (org-mode-hook . org-fragtog-mode)))
@@ -2326,8 +2323,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf org-roam-ui
   :after org-roam
   :load-path "~/.emacs.d/elisp/org-roam-ui/"
-  :require t
   :ensure simple-httpd websocket
+  :commands (org-roam-ui-mode)
   :config
     (setq org-roam-ui-sync-theme t
           org-roam-ui-follow t
@@ -2338,7 +2335,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :doc "orp-paperpile; Org-Roam-Protocol Paperpile is an interface
         to comunicate between org-mode and paperpile using org-roam-protocol."
   :load-path "~/.emacs.d/elisp/orp-paperpile/"
-  :require t
   :custom
   ((orp-paperpile-local-pdf-dir . "~/drive/Paperpile/")
    (orp-paperpile-ref-templates . '(("r" "ref" plain "%?"
@@ -2637,8 +2633,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf mu4e
   :when path-to-mu
   :load-path path-to-mu
-  :hook (after-init-hook . (lambda () (require 'mu4e)))
-  :defer-config
+  :commands (mu4e)
+  :config
   (set-variable 'read-mail-command 'mu4e)
   (setq mail-user-agent 'mu4e-user-agent
         message-send-mail-function 'smtpmail-send-it
@@ -2752,6 +2748,20 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                  :action      (lambda (docid msg target)
                                 (mu4e-action-retag-message msg (concat "+" target)))))
   (mu4e~headers-defun-mark-for tag)
+
+  (leaf org-msg
+    :ensure t
+    :config
+    (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
+          ;; org-msg-startup "hidestars indent inlineimages"
+          org-msg-recipient-names '(("naoki@bbo.cs.tsukuba.ac.jp" . "Naoki Sakamoto")
+                                    ("nok.skmt.snow@gmail.com" . "Naoki Sakamoto"))
+          ;; org-msg-greeting-name-limit 3
+          org-msg-default-alternatives '((new		. (text html))
+                                         (reply-to-html	. (text html))
+                                         (reply-to-text	. (text)))
+          org-msg-convert-citation t)
+    (org-msg-mode))
 
   :advice
   ;; disable fancy characters only for flags
@@ -2879,22 +2889,6 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
   (setq mu4e-views-dispatcher-predicate-view-map
         `((,(lambda (msg) (mu4e-message-field msg :body-html)) . "html")
           (,(lambda (msg) (ignore msg) t) . "text"))))
-
-
-(leaf org-msg
-  :ensure t
-  :after mu4e
-  :config
-  (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
-        ;; org-msg-startup "hidestars indent inlineimages"
-        org-msg-recipient-names '(("naoki@bbo.cs.tsukuba.ac.jp" . "Naoki Sakamoto")
-                                  ("nok.skmt.snow@gmail.com" . "Naoki Sakamoto"))
-        ;; org-msg-greeting-name-limit 3
-        org-msg-default-alternatives '((new		. (text html))
-                                       (reply-to-html	. (text html))
-                                       (reply-to-text	. (text)))
-        org-msg-convert-citation t)
-  (org-msg-mode))
 
 (leaf xwwp
   :disabled t
@@ -3083,19 +3077,18 @@ Interactively, URL defaults to the string looking like a url around point."
 
 (leaf jupyter
   :ensure t websocket
-  :require t zmp
   :after python-mode
-  :custom (jupyter-org-interaction-mode . nil)
   :bind ((jupyter-org-interaction-mode-map
           ("C-c h" . nil)
           ("C-c C-." . jupyter-org-hydra/body)))
-  :preface
-  (org-babel-do-load-languages
-   'org-babel-load-languages '((emacs-lisp . t)
-                               (python . t)
-                               (latex . t)
-                               (shell . t)
-                               (jupyter . t))))
+  :hook (org-mode-hook . (lambda nil
+                           (require 'zmq)
+                           (org-babel-do-load-languages
+                            'org-babel-load-languages '((emacs-lisp . t)
+                                                        (python . t)
+                                                        (latex . t)
+                                                        (shell . t)
+                                                        (jupyter . t))))))
 
 (leaf org-babel
   :after org python-mode
