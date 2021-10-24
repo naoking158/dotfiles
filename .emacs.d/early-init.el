@@ -6,7 +6,6 @@
 ;;
 ;;; Code:
 
-
 ;; Speed up startup
 (defvar default-file-name-handler-alist file-name-handler-alist)
 (setq file-name-handler-alist nil)
@@ -31,13 +30,9 @@
       user-mail-address "naoki@bbo.cs.tsukuba.ac.jp"
       user-login-name "naoking158"
       package-native-compile t)
-;; (native-compile-async "~/.emacs.d/elisp/" 'recursively)
-;; (dolist (item (split-string
-;; 							 (shell-command-to-string "which fish") "\n"))
-;; 	(when (string-match "/usr/" item)
-;; 		(setq shell-file-name item)))
-(let ((fish (executable-find "fish")))
-  (when fish (setq shell-file-name fish)))
+
+(when-let ((fish (executable-find "fish")))
+  (setq shell-file-name fish))
 
 ;; GUI
 (setq default-frame-alist (append '((line-spacing . 4)
@@ -48,8 +43,6 @@
                                     (right-fringe . 10))
                                   initial-frame-alist))
 
-;; (push '(fullscreen . maximized) default-frame-alist)
-;; (push initial-frame-alist default-frame-alist)
 (setq inhibit-splash-screen t
       frame-inhibit-implied-resize t
       byte-compile-warnings '(cl-functions))

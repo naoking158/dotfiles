@@ -94,8 +94,7 @@ This is an ongoing evolution of my original Emacs configuration files, inspired 
   ;; before package and UI initialization happens.
   ;;
   ;;; Code:
-  
-  
+
   ;; Speed up startup
   (defvar default-file-name-handler-alist file-name-handler-alist)
   (setq file-name-handler-alist nil)
@@ -105,7 +104,7 @@ This is an ongoing evolution of my original Emacs configuration files, inspired 
               "Restore defalut values after startup."
               (setq file-name-handler-alist default-file-name-handler-alist
             gc-cons-threshold (* 1024 1024 1024))))
-  
+
   ;; basic
   (prefer-coding-system 'utf-8)
   (set-file-name-coding-system 'utf-8)
@@ -120,14 +119,10 @@ This is an ongoing evolution of my original Emacs configuration files, inspired 
         user-mail-address "naoki@bbo.cs.tsukuba.ac.jp"
         user-login-name "naoking158"
         package-native-compile t)
-  ;; (native-compile-async "~/.emacs.d/elisp/" 'recursively)
-  ;; (dolist (item (split-string
-  ;; 							 (shell-command-to-string "which fish") "\n"))
-  ;; 	(when (string-match "/usr/" item)
-  ;; 		(setq shell-file-name item)))
-  (let ((fish (executable-find "fish")))
-    (when fish (setq shell-file-name fish)))
-  
+
+  (when-let ((fish (executable-find "fish")))
+    (setq shell-file-name fish))
+
   ;; GUI
   (setq default-frame-alist (append '((line-spacing . 4)
                                       (vertical-scroll-bars)
@@ -136,13 +131,11 @@ This is an ongoing evolution of my original Emacs configuration files, inspired 
                                       (left-fringe . 10)
                                       (right-fringe . 10))
                                     initial-frame-alist))
-  
-  ;; (push '(fullscreen . maximized) default-frame-alist)
-  ;; (push initial-frame-alist default-frame-alist)
+
   (setq inhibit-splash-screen t
         frame-inhibit-implied-resize t
         byte-compile-warnings '(cl-functions))
-  
+
   (provide 'early-init)
   
   ;;; early-init.el ends here
@@ -3875,6 +3868,7 @@ While browsing, remember the following:
 :END:
 
 - 個人辞書を =UTF-8= に変換しておく
+- =skk-auto-okuri-process= は =nil= にしておかないと，=いぞん (izonn)= など一部の文字の変換ができなくなる.
 
 #+begin_src emacs-lisp
 
@@ -3898,7 +3892,7 @@ While browsing, remember the following:
              (skk-show-inline . 'vertical)
              (skk-inline-show-face . nil)
              (skk-egg-like-newline . t)  ;; skk-kakutei by RET
-             (skk-auto-okuri-process . t)
+             (skk-auto-okuri-process . nil)
              (skk-henkan-strict-okuri-precedence . t)
              (skk-auto-insert-paren . t)
              (skk-use-auto-enclose-pair-of-region . t)
@@ -4628,7 +4622,8 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
   (leaf eaf
     :when (memq window-system '(x))
     :load-path "~/.emacs.d/elisp/emacs-application-framework/"
-    :require t
+    :commands
+    (eaf-search-it eaf-open eaf-open-browser eaf-open-browser-with-history)
     :custom
     ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
     ((eaf-python-command . "/usr/bin/python")

@@ -2639,7 +2639,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (skk-show-inline . 'vertical)
            (skk-inline-show-face . nil)
            (skk-egg-like-newline . t)  ;; skk-kakutei by RET
-           (skk-auto-okuri-process . t)
+           (skk-auto-okuri-process . nil)
            (skk-henkan-strict-okuri-precedence . t)
            (skk-auto-insert-paren . t)
            (skk-use-auto-enclose-pair-of-region . t)
@@ -3234,7 +3234,8 @@ Interactively, URL defaults to the string looking like a url around point."
 (leaf eaf
   :when (memq window-system '(x))
   :load-path "~/.emacs.d/elisp/emacs-application-framework/"
-  :require t
+  :commands
+  (eaf-search-it eaf-open eaf-open-browser eaf-open-browser-with-history)
   :custom
   ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
   ((eaf-python-command . "/usr/bin/python")
