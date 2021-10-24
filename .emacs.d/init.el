@@ -3052,9 +3052,13 @@ Interactively, URL defaults to the string looking like a url around point."
 
 (leaf pdf-tools
   :ensure t
-  ;; :require t pdf-view pdf-misc pdf-occur pdf-util pdf-annot pdf-info pdf-isearch pdf-history pdf-links
-
   :mode ("\\.pdf\\'" . pdf-view-mode)
+  :bind (:pdf-view-mode-map
+         ("j" . pdf-view-next-line-or-next-page)
+         ("k" . pdf-view-previous-line-or-previous-page)
+         ("h" . image-backward-hscroll)
+         ("l" . image-forward-hscroll)
+         ("/" . pdf-occur))
   :hook ((TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
          (pdf-view-mode-hook . (lambda () (set-buffer-multibyte t))))
   :custom (pdf-view-display-size . 'fit-width)
@@ -3250,12 +3254,7 @@ Interactively, URL defaults to the string looking like a url around point."
    (browse-url-browser-function . 'eaf-open-browser))
   :config
   (require 'eaf-browser)
-  (require 'eaf-pdf-viewer)
-  (require 'eaf-jupyter)
-
   (defalias 'browse-web #'eaf-open-browser)
-  (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-  (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
   (eaf-bind-key nil "M-q" eaf-browser-keybinding))
 
 (leaf browse-at-remote
