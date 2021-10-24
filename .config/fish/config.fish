@@ -111,9 +111,18 @@ alias _zeus='ssh zeus'
 alias _koike='ssh koike'
 alias _tanabe='ssh tanabe'
 
+alias dua='/usr/bin/du -shc * | sort -h'
+alias en_latex='latexmk -e "$bibtex=q/bibtex/" -pdf -pvc'
+alias ja_latex='latexmk -pvc'
+
 alias e='emacsclient'
-alias ee='open ~/src/emacs28-macOS115/builds/Emacs.app'
+alias en='emacsclient -nw'
 alias ekill='emacsclient -e "(kill-emacs)"'
+
+if type -q exa
+    alias ll "exa -l -g --icons"
+    alias lla "ll -a"
+end
 
 if [ "$INSIDE_EMACS" = 'vterm' ]
     function clear
@@ -122,10 +131,6 @@ if [ "$INSIDE_EMACS" = 'vterm' ]
     end
 end
 
-if type -q exa
-    alias ll "exa -l -g --icons"
-    alias lla "ll -a"
-end
 
 ################################################################
 # Local Config

@@ -27,28 +27,8 @@ function rm
     end
 end
 
-function en_latex
-    command latexmk -e "$bibtex=q/bibtex/" -pdf -pvc $argv
-end
-
-function ja_latex
-    command latexmk -pvc $argv
-end
-
-function reformatpdftoeps
-    find . -name "*.pdf" -print0 | xargs -0 -I '{}' pdftops -f 1 -l 1 -eps '{}' '{}.eps'
-end
-
-function renamepdfeps
-    find . -name "*.pdf.eps" -print0 | xargs -0 -I '{}' rename 's/(.*\.)pdf.eps/$1eps/' '{}'
-end
-
 function replace --argument-names 'before' 'after'
     find . -name "*$before*" | xargs rename -s $before $after
-end
-
-function du
-    command /usr/bin/du -shc * | sort -h
 end
 
 # # check existence and initialize of zoxide command 

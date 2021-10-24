@@ -1,5 +1,3 @@
-set -xg localhome /Users/$USER
-
 # Homebrew
 set -xg HOMEBREW_EDITOR "/usr/local/bin/emacs -q -nw"
 
@@ -26,9 +24,12 @@ function brave
     '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser' $argv    
 end
 
-
 set -gx LDFLAGS "-L/usr/local/opt/ruby/lib" $LDFLAGS
 set -gx CPPFLAGS "-I/usr/local/opt/ruby/include" $CPPFLAGS
 set -gx PKG_CONFIG_PATH "/usr/local/opt/ruby/lib/pkgconfig" $PKG_CONFIG_PATH
 set -gx PKG_CONFIG_PATH "/usr/local/lib/pkgconfig" $PKG_CONFIG_PATH
 set -gx PKG_CONFIG_PATH "/usr/local/lib/pkgconfig" $PKG_CONFIG_PATH
+
+
+alias reformatpdftoeps='find . -name "*.pdf" -print0 | xargs -0 -I "{}" pdftops -f 1 -l 1 -eps "{}" "{}.eps"'
+alias renamepdfeps='find . -name "*.pdf.eps" -print0 | xargs -0 -I "{}" rename "s/(.*\\.)pdf.eps/$1eps/" "{}"'
