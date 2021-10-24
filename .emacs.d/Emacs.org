@@ -1268,19 +1268,15 @@ Only in Neotree Buffer:
 :END:
 
 #+begin_src emacs-lisp
-  
-  (setq path-to-miniconda
-          (my/trim-newline-from-string
-           (shell-command-to-string
-            "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
-    
-    (let ((path-to-venv (expand-file-name "envs/torch" path-to-miniconda)))
-      (when (file-exists-p path-to-venv)
-        (setq path-to-venv-python
-              (expand-file-name "bin/python" path-to-venv))
-        (custom-set-variables
-         '(org-babel-python-command path-to-venv-python))))
-  
+  (when-let* ((path-to-miniconda
+               (my/trim-newline-from-string
+                (shell-command-to-string
+                 "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
+              (path-to-venv (expand-file-name "envs/torch" path-to-miniconda)))
+    (setq path-to-miniconda path-to-miniconda)
+    (setq path-to-venv-python (expand-file-name "bin/python" path-to-venv))
+    (custom-set-variables '(org-babel-python-command path-to-venv-python)))
+
   (leaf python-mode
     :doc "Python major mode"
     :url "https://gitlab.com/groups/python-mode-devs"
@@ -1300,9 +1296,8 @@ Only in Neotree Buffer:
                (conda-env-home-directory . path-to-miniconda))
       :hook ((after-init-hook . (lambda ()
                                   (conda-env-initialize-eshell)
-                                  (conda-env-initialize-interactive-shells)))
-             )))
-  
+                                  (conda-env-initialize-interactive-shells))))))
+
   (leaf lsp-pyright
     :doc "Python LSP client using Pyright"
     :req "emacs-26.1" "lsp-mode-7.0" "dash-2.18.0" "ht-2.0"
@@ -1312,26 +1307,19 @@ Only in Neotree Buffer:
     (defun my/lsp-pyright-setup-when-conda ()
       (setq-local lsp-pyright-venv-path python-shell-virtualenv-root)
       (lsp-restart-workspace))
-  
+
     (defun my/python-basic-config ()
       (setq indent-tabs-mode nil
             python-indent 4
             tab-width 4)
       (require 'lsp-pyright)
       (lsp-deferred))
-  
+
     :hook
     ((conda-postactivate-hook . my/lsp-pyright-setup-when-conda)
      (conda-postdeactivate-hook . my/lsp-pyright-setup-when-conda)
-     (python-mode-hook . my/python-basic-config))
+     (python-mode-hook . my/python-basic-config)))
   
-    :config
-    (when (not window-system)
-      (defadvice python-shell-completion-at-point (around fix-company-bug activate)
-        "python-shell-completion-at-point breaks when point is before the prompt"
-        (when (or (not comint-last-prompt)
-                  (>= (point) (cdr comint-last-prompt)))
-          ad-do-it))))
 #+end_src
 
 *** HTML
@@ -4638,7 +4626,7 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+begin_src emacs-lisp
 
   (leaf eaf
-    :when (not (memq window-system '(ns darwin)))
+    :when (memq window-system '(x))
     :load-path "~/.emacs.d/elisp/emacs-application-framework/"
     :require t
     :custom

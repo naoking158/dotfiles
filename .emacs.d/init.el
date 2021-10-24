@@ -836,17 +836,14 @@
   :ensure t
   :bind (("C-c e" . macrostep-expand)))
 
-(setq path-to-miniconda
-        (my/trim-newline-from-string
-         (shell-command-to-string
-          "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
-
-  (let ((path-to-venv (expand-file-name "envs/torch" path-to-miniconda)))
-    (when (file-exists-p path-to-venv)
-      (setq path-to-venv-python
-            (expand-file-name "bin/python" path-to-venv))
-      (custom-set-variables
-       '(org-babel-python-command path-to-venv-python))))
+(when-let* ((path-to-miniconda
+             (my/trim-newline-from-string
+              (shell-command-to-string
+               "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
+            (path-to-venv (expand-file-name "envs/torch" path-to-miniconda)))
+  (setq path-to-miniconda path-to-miniconda)
+  (setq path-to-venv-python (expand-file-name "bin/python" path-to-venv))
+  (custom-set-variables '(org-babel-python-command path-to-venv-python)))
 
 (leaf python-mode
   :doc "Python major mode"
@@ -867,8 +864,7 @@
              (conda-env-home-directory . path-to-miniconda))
     :hook ((after-init-hook . (lambda ()
                                 (conda-env-initialize-eshell)
-                                (conda-env-initialize-interactive-shells)))
-           )))
+                                (conda-env-initialize-interactive-shells))))))
 
 (leaf lsp-pyright
   :doc "Python LSP client using Pyright"
@@ -890,15 +886,7 @@
   :hook
   ((conda-postactivate-hook . my/lsp-pyright-setup-when-conda)
    (conda-postdeactivate-hook . my/lsp-pyright-setup-when-conda)
-   (python-mode-hook . my/python-basic-config))
-
-  :config
-  (when (not window-system)
-    (defadvice python-shell-completion-at-point (around fix-company-bug activate)
-      "python-shell-completion-at-point breaks when point is before the prompt"
-      (when (or (not comint-last-prompt)
-                (>= (point) (cdr comint-last-prompt)))
-        ad-do-it))))
+   (python-mode-hook . my/python-basic-config)))
 
 (leaf web-mode
   :ensure t
@@ -3244,7 +3232,7 @@ Interactively, URL defaults to the string looking like a url around point."
     (sie-brow/search-in-external-browser sie-brow/prefix-for-google-scholar at-point)))
 
 (leaf eaf
-  :when (not (memq window-system '(ns darwin)))
+  :when (memq window-system '(x))
   :load-path "~/.emacs.d/elisp/emacs-application-framework/"
   :require t
   :custom
