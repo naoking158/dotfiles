@@ -3272,6 +3272,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
     :doc "orp-paperpile; Org-Roam-Protocol Paperpile is an interface
           to comunicate between org-mode and paperpile using org-roam-protocol."
     :load-path "~/.emacs.d/elisp/orp-paperpile/"
+    :hook (after-init-hook . orp-activate)
     :custom
     ((orp-paperpile-local-pdf-dir . "~/drive/Paperpile/")
      (orp-paperpile-ref-templates . '(("r" "ref" plain "%?"

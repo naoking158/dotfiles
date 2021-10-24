@@ -2400,6 +2400,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :doc "orp-paperpile; Org-Roam-Protocol Paperpile is an interface
         to comunicate between org-mode and paperpile using org-roam-protocol."
   :load-path "~/.emacs.d/elisp/orp-paperpile/"
+  :hook (after-init-hook . orp-activate)
   :custom
   ((orp-paperpile-local-pdf-dir . "~/drive/Paperpile/")
    (orp-paperpile-ref-templates . '(("r" "ref" plain "%?"

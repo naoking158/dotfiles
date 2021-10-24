@@ -137,14 +137,10 @@
     (widen)
     (org-roam-node-id node)
     (orp-paperpile--update-org-roam-paper org-roam-capture--info)))
-(advice-add #'org-roam-protocol--try-capture-to-ref-h
-            :override #'orp-paperpile--try-capture-to-ref-h)
 
 (defun orp-paperpile--insert-captured-ref-h ()
   "This overrides org-roam-protocol--insert-captured-ref-h."
   (orp-paperpile--update-org-roam-paper org-roam-capture--info))
-(advice-add #'org-roam-protocol--insert-captured-ref-h
-            :override #'orp-paperpile--insert-captured-ref-h)
 
 (defun orp-paperpile--update-org-roam-paper (info)
   (message "%s" info)
@@ -180,20 +176,56 @@
   (org-next-visible-heading 1)
   (insert (format "* Abstract\n%s\n\n" abstract)))
 
-(custom-set-variables
- '(org-protocol-protocol-alist '(("org-roam-node"
-                                  :protocol "roam-node"
-                                  :function org-roam-protocol-open-node)
-                                 ("org-roam-ref"
-                                  :protocol "roam-ref"
-                                  :function org-roam-protocol-open-ref)
-                                 ("org-roam-paper"
-                                  :protocol "roam-paper"
-                                  :function orp-paperpile--open-paper))))
-
 ;; for open paperpile link in external browser
-(org-add-link-type "chrome-extension"
-                   (lambda (path) (browse-url (concat "chrome-extension://"
-                                                      path))))
+(defun orp-open-external (path)
+  (interactive)
+  (cond ((memq system-type '(cygwin windows-nt ms-dos))
+         (w32-shell-execute "open" path))
+        ((eq system-type 'darwin)
+         (shell-command (concat "open " (shell-quote-argument path))))
+        ((eq system-type 'gnu/linux)
+         (let ((process-connection-type nil))
+           (start-process "" nil "xdg-open" path)))))
+
+(defun orp--around-org-link-open (f link &optional arg)
+  (let ((path (org-element-property :raw-link link))
+        (type (org-element-property :type link)))
+    (if (or (string-match "paperpile" path)
+            (string-match "chrome-extension" path))
+        (let ((path (if (string-equal "file" type)
+                        (cadr (split-string path ":"))
+                      path)))
+          (orp-open-external path)
+          (message "Open: %s" path))
+      (apply f link arg))))
+
+(defun orp-activate nil
+  (interactive)
+  (advice-add #'org-roam-protocol--try-capture-to-ref-h
+              :override #'orp-paperpile--try-capture-to-ref-h)
+  (advice-add #'org-roam-protocol--insert-captured-ref-h
+              :override #'orp-paperpile--insert-captured-ref-h)
+  (advice-add #'org-link-open
+              :around #'orp--around-org-link-open)
+
+  (custom-set-variables
+   '(org-protocol-protocol-alist '(("org-roam-node"
+                                    :protocol "roam-node"
+                                    :function org-roam-protocol-open-node)
+                                   ("org-roam-ref"
+                                    :protocol "roam-ref"
+                                    :function org-roam-protocol-open-ref)
+                                   ("org-roam-paper"
+                                    :protocol "roam-paper"
+                                    :function orp-paperpile--open-paper)))))
+
+(defun orp-deactivate nil
+  (interactive)
+  (advice-remove #'org-roam-protocol--try-capture-to-ref-h
+                 #'orp-paperpile--try-capture-to-ref-h)
+  (advice-remove #'org-roam-protocol--insert-captured-ref-h
+                 #'orp-paperpile--insert-captured-ref-h)
+  (advice-remove #'org-link-open
+                 #'orp--around-org-link-open))
 
 (provide 'orp-paperpile)
