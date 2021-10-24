@@ -2621,9 +2621,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf skk
   :ensure ddskk
-  :leaf-defer nil
-  :bind (("C-M-j" . skk-undo-kakutei))
-  :global-minor-mode t context-skk-mode
+  :hook ((after-init-hook . skk-mode)
+         (after-init-hook . context-skk-mode))
   :custom ((default-input-method . "japanese-skk")
            (skk-jisyo-code . 'utf-8)
            (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L.utf8")
@@ -2632,7 +2631,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (skk-server-prtnum . 1178)
            (skk-server-report-response . t)
            (skk-byte-compile-init-file . t)
-           (skk-preload . t)
+           (skk-preload . nil)
            (skk-isearch-mode-enable . 'always)
            (skk-kutouten-type . 'en)
            (skk-use-auto-kutouten . t)
