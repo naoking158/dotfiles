@@ -4680,6 +4680,58 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
     :bind ("M-g r" . browse-at-remote))
 #+end_src
 
+** Elfeed
+:PROPERTIES:
+:ID:       66D649D3-84C7-44D7-8F23-E549647FF0CE
+:END:
+
+For a complete documentation visit the official elfeed page: https://github.com/skeeto/elfeed
+
+Running the interactive function elfeed will pop up the *elfeed-search* buffer, which will display feed items.
+
++ =g=: refresh view of the feed listing
++ =G=: fetch feed updates from the servers
++ =s=: update the search filter (see tags)
++ =c=: clear the search filter
+
+From the search buffer there are a number of ways to interact with entries. Entries are selected by placing the point over an entry. Multiple entries are selected at once by using an active region.
+
+- =RET=: view selected entry in a buffer
+- =b=: open selected entries in your browser (browse-url)
+- =y=: copy selected entries URL to the clipboard
+- =r=: mark selected entries as read
+- =u=: mark selected entries as unread
+- =+=: add a specific tag to selected entries
+- =-=: remove a specific tag from selected entries
+
+
+#+begin_src emacs-lisp
+  (leaf elfeed
+    :ensure t
+    :advice (:after elfeed (lambda nil (visual-line-mode -1)))
+    :custom
+    ((elfeed-search-filter . "@2-days-ago +unread")
+     (elfeed-search-trailing-width . 15)
+     (elfeed-search-title-max-width . 70)
+     (elfeed-search-title-min-width . 70)
+     (elfeed-feeds
+      quote
+      (;; programming
+       ("https://news.ycombinator.com/rss" Hacker)
+       ("https://www.reddit.com/r/programming.rss" Programming)
+       ("https://www.reddit.com/r/learnprogramming.rss" LearnProgramming)
+       ("https://www.reddit.com/r/emacs.rss" Emacs)
+       ("https://www.reddit.com/r/planetemacs.rss" PlanetEmacs)
+  
+       ;; programming languages
+       ("https://www.reddit.com/r/python.rss" Python)
+  
+       ;; Apple
+       ("https://www.reddit.com/r/apple.rss" Apple)
+       ("https://www.reddit.com/r/mac.rss" Mac)
+       ("https://www.reddit.com/r/AppleWatch.rss" AppleWatch)))))
+#+end_src
+
 * Footer
 :PROPERTIES:
 :ID:       B2B50080-95ED-4DEC-B99E-B120D1A08233

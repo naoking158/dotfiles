@@ -3277,4 +3277,29 @@ Interactively, URL defaults to the string looking like a url around point."
   :custom (browse-at-remote-prefer-symbolic . nil)
   :bind ("M-g r" . browse-at-remote))
 
+(leaf elfeed
+  :ensure t
+  :advice (:after elfeed (lambda nil (visual-line-mode -1)))
+  :custom
+  ((elfeed-search-filter . "@2-days-ago +unread")
+   (elfeed-search-trailing-width . 15)
+   (elfeed-search-title-max-width . 70)
+   (elfeed-search-title-min-width . 70)
+   (elfeed-feeds
+    quote
+    (;; programming
+     ("https://news.ycombinator.com/rss" Hacker)
+     ("https://www.reddit.com/r/programming.rss" Programming)
+     ("https://www.reddit.com/r/learnprogramming.rss" LearnProgramming)
+     ("https://www.reddit.com/r/emacs.rss" Emacs)
+     ("https://www.reddit.com/r/planetemacs.rss" PlanetEmacs)
+
+     ;; programming languages
+     ("https://www.reddit.com/r/python.rss" Python)
+
+     ;; Apple
+     ("https://www.reddit.com/r/apple.rss" Apple)
+     ("https://www.reddit.com/r/mac.rss" Mac)
+     ("https://www.reddit.com/r/AppleWatch.rss" AppleWatch)))))
+
 (provide 'init)
