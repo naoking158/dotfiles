@@ -2712,6 +2712,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :when path-to-mu
   :load-path path-to-mu
   :commands (mu4e)
+  :hook (mu4e-headers-mode-hook . (lambda nil (visual-line-mode -1)))
   :config
   (set-variable 'read-mail-command 'mu4e)
   (setq mail-user-agent 'mu4e-user-agent
