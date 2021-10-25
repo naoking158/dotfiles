@@ -3279,6 +3279,7 @@ Interactively, URL defaults to the string looking like a url around point."
 
 (leaf elfeed
   :ensure t
+  :commands elfeed
   :advice (:after elfeed (lambda nil (visual-line-mode -1)))
   :custom
   ((elfeed-search-filter . "@2-days-ago +unread")

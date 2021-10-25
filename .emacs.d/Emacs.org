@@ -4708,6 +4708,7 @@ From the search buffer there are a number of ways to interact with entries. Entr
 #+begin_src emacs-lisp
   (leaf elfeed
     :ensure t
+    :commands elfeed
     :advice (:after elfeed (lambda nil (visual-line-mode -1)))
     :custom
     ((elfeed-search-filter . "@2-days-ago +unread")
