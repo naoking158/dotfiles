@@ -3284,9 +3284,8 @@ Interactively, URL defaults to the string looking like a url around point."
   :advice (:after elfeed (lambda nil (visual-line-mode -1)))
   :custom
   ((elfeed-search-filter . "@2-days-ago +unread")
-   (elfeed-search-trailing-width . 15)
-   (elfeed-search-title-max-width . 70)
-   (elfeed-search-title-min-width . 70)
+   (elfeed-search-title-max-width . 80)
+   (elfeed-search-title-min-width . 80)
    (elfeed-feeds
     quote
     (;; programming
@@ -3295,6 +3294,7 @@ Interactively, URL defaults to the string looking like a url around point."
      ("https://www.reddit.com/r/learnprogramming.rss" LearnProgramming)
      ("https://www.reddit.com/r/emacs.rss" Emacs)
      ("https://www.reddit.com/r/planetemacs.rss" PlanetEmacs)
+     ("https://www.reddit.com/r/orgmode.rss" Org-mode)
 
      ;; programming languages
      ("https://www.reddit.com/r/python.rss" Python)
