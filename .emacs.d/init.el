@@ -2388,13 +2388,38 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :doc "orp-paperpile; Org-Roam-Protocol Paperpile is an interface
         to comunicate between org-mode and paperpile using org-roam-protocol."
   :load-path "~/.emacs.d/elisp/orp-paperpile/"
-  :hook (after-init-hook . orp-activate)
+  :require t
   :custom
   ((orp-paperpile-local-pdf-dir . "~/drive/Paperpile/")
    (orp-paperpile-ref-templates . '(("r" "ref" plain "%?"
                                      :target (file+head "lit/${slug}.org"
                                                         "#+date: %U\n#+filetags: Literature\n#+title: ${title}")
-                                     :unnarrowed t)))))
+                                     :unnarrowed t))))
+  :advice (:around org-link-open advice-around-org-link-open)
+  :preface
+  (defun open-external (path)
+    (interactive)
+    (cond
+     ((eq system-type 'darwin)
+      (if (string-prefix-p "chrome-extension" path)
+          (async-shell-command (concat "brave " (shell-quote-argument path)))
+        (async-shell-command (concat "open " (shell-quote-argument path)))))
+     ((eq system-type 'gnu/linux)
+      (let ((process-connection-type nil))
+        (start-process "" nil "xdg-open" path)))))
+
+  ;; for open paperpile link in external browser
+  (defun advice-around-org-link-open (f link &optional arg)
+    (let ((path (org-element-property :raw-link link))
+          (type (org-element-property :type link)))
+      (if (or (string-match "paperpile" path)
+              (string-match "chrome-extension" path))
+          (let ((path (if (string-equal "file" type)
+                          (cadr (split-string path ":"))
+                        path)))
+            (open-external path)
+            (message "Open: %s" path))
+        (apply f link arg)))))
 
 (leaf org-bullets
   :disabled t

@@ -123,7 +123,7 @@
                :pdf (plist-get info :pdf)
                :permalink (plist-get info :permalink)
                :abstract (plist-get info :abstract))
-   :templates org-roam-capture-ref-templates)
+   :templates orp-paperpile-ref-templates)
   nil)
 
 ;; Capture implementation
@@ -176,37 +176,12 @@
   (org-next-visible-heading 1)
   (insert (format "* Abstract\n%s\n\n" abstract)))
 
-;; for open paperpile link in external browser
-(defun orp-open-external (path)
-  (interactive)
-  (cond ((memq system-type '(cygwin windows-nt ms-dos))
-         (w32-shell-execute "open" path))
-        ((eq system-type 'darwin)
-         (shell-command (concat "open " (shell-quote-argument path))))
-        ((eq system-type 'gnu/linux)
-         (let ((process-connection-type nil))
-           (start-process "" nil "xdg-open" path)))))
-
-(defun orp--around-org-link-open (f link &optional arg)
-  (let ((path (org-element-property :raw-link link))
-        (type (org-element-property :type link)))
-    (if (or (string-match "paperpile" path)
-            (string-match "chrome-extension" path))
-        (let ((path (if (string-equal "file" type)
-                        (cadr (split-string path ":"))
-                      path)))
-          (orp-open-external path)
-          (message "Open: %s" path))
-      (apply f link arg))))
-
 (defun orp-activate nil
   (interactive)
   (advice-add #'org-roam-protocol--try-capture-to-ref-h
               :override #'orp-paperpile--try-capture-to-ref-h)
   (advice-add #'org-roam-protocol--insert-captured-ref-h
               :override #'orp-paperpile--insert-captured-ref-h)
-  (advice-add #'org-link-open
-              :around #'orp--around-org-link-open)
 
   (custom-set-variables
    '(org-protocol-protocol-alist '(("org-roam-node"
@@ -224,8 +199,10 @@
   (advice-remove #'org-roam-protocol--try-capture-to-ref-h
                  #'orp-paperpile--try-capture-to-ref-h)
   (advice-remove #'org-roam-protocol--insert-captured-ref-h
-                 #'orp-paperpile--insert-captured-ref-h)
-  (advice-remove #'org-link-open
-                 #'orp--around-org-link-open))
+                 #'orp-paperpile--insert-captured-ref-h))
+
+(orp-activate)
 
 (provide 'orp-paperpile)
+
+;; orp-paperpile.el ends here
