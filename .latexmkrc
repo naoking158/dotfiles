@@ -12,4 +12,4 @@ $dvips = 'dvips %O -z -f %S | convbkmk -u > %D';
 $ps2pdf = 'ps2pdf %O %S %D';
 $pdf_mode = 3;
 $pvc_view_file_via_temporary = 0;
-$pdf_previewer = 'okular';
+# $pdf_previewer = 'okular';

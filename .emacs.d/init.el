@@ -2577,14 +2577,14 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
     :preface
     (defun my/latex-mode-hook nil
-      (let ((opts "latexmk -synctex=1 -interaction=nonstopmode -pvc -f "))
+      (let ((opts "latexmk -synctex=1 -interaction=nonstopmode -pv -f "))
         (dolist (command-alist
                  `(("ja-uptex" . ,(concat opts "%s.tex"))
                    ("en-pdflatex" . ,(concat opts "-e $bibtex=q/bibtex/ -pdf %s.tex"))
                    ("pdfview" . "open %s.pdf")
-                   ;; mac ("Displayline" . "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b")
-                   ("Displayline" . "okular --unique %o#src:%n%(dir)./%b")
-                   ))
+                   ,(if (eq 'darwin system-type)
+                        '("Displayline" . "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b")
+                      '("Displayline" . "okular --unique %o#src:%n%(dir)./%b"))))
           (add-to-list 'TeX-command-list `(,(car command-alist)
                                            ,(cdr command-alist)
                                            TeX-run-command t nil))))))
