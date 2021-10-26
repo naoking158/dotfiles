@@ -1,7 +1,8 @@
 #+TITLE: Emacs Configuration
 #+PROPERTY: header-args:emacs-lisp :tangle ~/.emacs.d/init.el
 
-This is an ongoing evolution of my original Emacs configuration files, inspired by a bunch of resources I've found online.
+This is an ongoing evolution of my original Emacs configuration files, inspired by
+a bunch of resources I've found online.
 
 * Table of Contents
 :PROPERTIES:
@@ -727,15 +728,11 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
         ;; Set the variable pitch face
         (set-face-attribute 'variable-pitch nil :font variable-font)
   
-        ;; emoji
-        (set-fontset-font t '(#x1F000 . #x1FAFF)
-                          (font-spec :family emoji-font)
-                          nil 'append)
-  
         ;; japanese
-        (set-fontset-font t 'unicode
-                          (font-spec :family japanese-font)
-                          nil 'append))
+        (set-fontset-font t 'unicode japanese-font nil 'append)
+  
+        ;; emoji
+        (set-fontset-font t 'unicode emoji-font nil 'prepend))
   
       ;; set font height
       (when fontsize (my/set-font-size fontsize))

@@ -424,15 +424,11 @@
       ;; Set the variable pitch face
       (set-face-attribute 'variable-pitch nil :font variable-font)
 
-      ;; emoji
-      (set-fontset-font t '(#x1F000 . #x1FAFF)
-                        (font-spec :family emoji-font)
-                        nil 'append)
-
       ;; japanese
-      (set-fontset-font t 'unicode
-                        (font-spec :family japanese-font)
-                        nil 'append))
+      (set-fontset-font t 'unicode japanese-font nil 'append)
+
+      ;; emoji
+      (set-fontset-font t 'unicode emoji-font nil 'prepend))
 
     ;; set font height
     (when fontsize (my/set-font-size fontsize))
