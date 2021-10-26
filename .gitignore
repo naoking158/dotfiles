@@ -51,6 +51,8 @@
 !/.emacs.d/Emacs.org
 !/.emacs.d/elisp/
 !/.emacs.d/elisp/**
+!/.emacs.d/skk-get-jisyo/
+!/.emacs.d/skk-get-jisyo/SKK-JISYO.Huge.utf8
 !/.emacs.d/snippets/
 !/.emacs.d/snippets/**
 

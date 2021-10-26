@@ -2668,7 +2668,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
          (after-init-hook . context-skk-mode))
   :custom ((default-input-method . "japanese-skk")
            (skk-jisyo-code . 'utf-8)
-           (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L.utf8")
+           (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.Huge.utf8")
            (skk-jisyo . "~/.skk-jisyo")
            (skk-backup-jisyo . "~/.skk-jisyo.BAK")
            (skk-save-jisyo-instantly . t)
