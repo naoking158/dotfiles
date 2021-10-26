@@ -145,7 +145,8 @@
     :tag "builtin" "internal"
     :url "http://handlename.hatenablog.jp/entry/2011/12/11/214923"
     :leaf-defer nil
-    :bind ("C-M-h" . delete-region)
+    :bind (("C-M-h" . delete-region)
+           ([remap eval-last-sexp] . pp-eval-last-sexp))
     :hook (after-init-hook . (lambda nil (menu-bar-mode -1)))
     :custom '((fill-column . 82)
               (tab-width . 2)             
@@ -171,15 +172,19 @@
               (save-interprogram-paste-before-kill . t)
               (indent-tabs-mode . nil))
     :config
-    (let ((gls "/usr/local/bin/gls"))
-      (if (file-exists-p gls) (setq insert-directory-program gls)))
+    (when-let ((gls (executable-find "gls")))
+      (setq insert-directory-program gls))
 
     (defalias 'yes-or-no-p 'y-or-n-p)
     (keyboard-translate 8 127)
-    (mapc
-     (lambda (fn)
-       (put fn 'disabled nil))
-     (list 'upcase-region 'downcase-region 'narrow-to-region 'narrow-to-page 'narrow-to-defun 'list-timers)))
+    (mapc (lambda (fn)
+            (put fn 'disabled nil))
+          (list 'upcase-region
+                'downcase-region
+                'narrow-to-region
+                'narrow-to-page
+                'narrow-to-defun
+                'list-timers)))
 
   (leaf exec-path-from-shell
     :doc "Get environment variables such as $PATH from the shell"
@@ -2580,6 +2585,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
     :preface
     (defun my/latex-mode-hook nil
+      (visual-fill-column-mode t)
       (let ((opts "latexmk -synctex=1 -interaction=nonstopmode -pv -f "))
         (dolist (command-alist
                  `(("ja-uptex" . ,(concat opts "%s.tex"))
