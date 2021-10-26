@@ -393,9 +393,10 @@
 (leaf font
   :leaf-defer nil
   :hook (after-init-hook . (lambda () (my/set-font my-fontsize)))
+  :advice (:after load-theme my/set-font-weight-after-load-theme)
   :preface
   (setq-default text-scale-remap-header-line t)
-  (setq-default my-fontsize (if (eq 'darwin system-type) 15 13))
+  (setq-default my-fontsize (if (eq 'darwin system-type) 18 14))
 
   (defun my/set-font-size (fontsize)
     (interactive (list
@@ -407,13 +408,16 @@
   (defun my/set-font (&optional fontsize)
     (interactive)
     (let ((ascii-font (if (eq 'darwin system-type)
-                          "JetBrainsMono Nerd Font"
+                          "PlemolJP Console NF"
+                        ;; "JetBrainsMono Nerd Font"
                         "JetBrains Mono"))
           (variable-font "Iosevka Aile")
           (emoji-font (if (eq 'darwin system-type)
                           "Apple Color Emoji"
                         "Noto Color Emoji"))
-          (japanese-font "Noto Sans CJK JP"))
+          (japanese-font (if (eq 'darwin system-type)
+                             "PlemolJP Console NF"
+                           "Noto Sans CJK JP")))
 
       ;; ascii
       (set-face-attribute 'default nil :font ascii-font)
