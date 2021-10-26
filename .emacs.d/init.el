@@ -410,7 +410,9 @@
                           "JetBrainsMono Nerd Font"
                         "JetBrains Mono"))
           (variable-font "Iosevka Aile")
-          (emoji-font "Noto Color Emoji")
+          (emoji-font (if (eq 'darwin system-type)
+                          "Apple Color Emoji"
+                        "Noto Color Emoji"))
           (japanese-font "Noto Sans CJK JP"))
 
       ;; ascii

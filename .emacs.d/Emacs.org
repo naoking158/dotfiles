@@ -685,6 +685,12 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :ID:       33497084-41F6-44A1-8AC0-3AFDA7FFFEC1
 :END:
 
+Since Apple does not support the CBDT/CBLC (color bitmap data table/color bitmap location table) color emoji format that Google and some others use for their emoji, the Noto Color Emoji can not be used in Mac. 
+
+Instead, I use *the compiled emoji fonts* uploaded in https://github.com/vXBaKeRXv/vxbakerxv.github.io/tree/master/repo/debs.
+
+For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-your-macbook-f99da72cf126.
+
 #+begin_src emacs-lisp
   
   (leaf font
@@ -707,7 +713,9 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                             "JetBrainsMono Nerd Font"
                           "JetBrains Mono"))
             (variable-font "Iosevka Aile")
-            (emoji-font "Noto Color Emoji")
+            (emoji-font (if (eq 'darwin system-type)
+                            "Apple Color Emoji"
+                          "Noto Color Emoji"))
             (japanese-font "Noto Sans CJK JP"))
   
         ;; ascii
