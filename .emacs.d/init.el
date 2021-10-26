@@ -406,24 +406,31 @@
 
   (defun my/set-font (&optional fontsize)
     (interactive)
-    ;; ascii
-    (set-face-attribute 'default nil :font "JetBrains Mono")
+    (let ((ascii-font (if (eq 'darwin system-type)
+                          "JetBrainsMono Nerd Font"
+                        "JetBrains Mono"))
+          (variable-font "Iosevka Aile")
+          (emoji-font "Noto Color Emoji")
+          (japanese-font "Noto Sans CJK JP"))
 
-    ;; Set the fixed pitch face
-    (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono")
+      ;; ascii
+      (set-face-attribute 'default nil :font ascii-font)
 
-    ;; Set the variable pitch face
-    (set-face-attribute 'variable-pitch nil :font "Iosevka Aile")
+      ;; Set the fixed pitch face
+      (set-face-attribute 'fixed-pitch nil :font ascii-font)
 
-    ;; emoji
-    (set-fontset-font t '(#x1F000 . #x1FAFF)
-                      (font-spec :family "Noto Color Emoji")
-                      nil 'append)
+      ;; Set the variable pitch face
+      (set-face-attribute 'variable-pitch nil :font variable-font)
 
-    ;; japanese
-    (set-fontset-font t 'unicode
-                      (font-spec :family "Noto Sans CJK JP")
-                      nil 'append)
+      ;; emoji
+      (set-fontset-font t '(#x1F000 . #x1FAFF)
+                        (font-spec :family emoji-font)
+                        nil 'append)
+
+      ;; japanese
+      (set-fontset-font t 'unicode
+                        (font-spec :family japanese-font)
+                        nil 'append))
 
     ;; set font height
     (when fontsize (my/set-font-size fontsize))
