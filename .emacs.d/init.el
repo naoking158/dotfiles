@@ -1716,7 +1716,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf org
   :doc "Export Framework for Org Mode"
   :tag "builtin"
-  :ensure t
+  ;; :ensure t
   :mode "\\.org\\'"
   :hook (org-mode-hook . my/org-mode-hook)
   :custom
@@ -2569,7 +2569,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     :req "emacs-24.3" "cl-lib-1.0"
     :tag "preview-latex" "doctex" "context" "texinfo" "latex" "tex" "emacs>=24.3"
     :ensure t
-    :require reftex
     :hook (LaTeX-mode-hook . my/latex-mode-hook)
     :custom ((TeX-master . nil)
              (TeX-auto-save . t)
@@ -2598,10 +2597,12 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     :req "auctex-11.86.1" "cl-lib-0.5"
     :url "http://github.com/Malabarba/latex-extra"
     :ensure t
-    :hook (LaTeX-mode-hook . latex-extra-mode))
+    :hook (LaTeX-mode-hook . latex-extra-mode)
+    :bind (:latex-extra-mode-map
+           ("C-M-f" . forward-paragraph)
+           ("C-M-b" . backward-paragraph)))
 
   (leaf reftex
-    :require t
     :hook (LaTeX-mode-hook . reftex-mode)
     :bind (reftex-mode-map
            ("C-c r" . reftex-reference)
