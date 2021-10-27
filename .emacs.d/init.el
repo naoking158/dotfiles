@@ -407,17 +407,12 @@
 
   (defun my/set-font (&optional fontsize)
     (interactive)
-    (let ((ascii-font (if (eq 'darwin system-type)
-                          "PlemolJP Console NF"
-                        ;; "JetBrainsMono Nerd Font"
-                        "JetBrains Mono"))
+    (let ((ascii-font "PlemolJP Console NF")
           (variable-font "Iosevka Aile")
+          (japanese-font "PlemolJP Console NF")
           (emoji-font (if (eq 'darwin system-type)
                           "Apple Color Emoji"
-                        "Noto Color Emoji"))
-          (japanese-font (if (eq 'darwin system-type)
-                             "PlemolJP Console NF"
-                           "Noto Sans CJK JP")))
+                        "Noto Color Emoji")))
 
       ;; ascii
       (set-face-attribute 'default nil :font ascii-font)

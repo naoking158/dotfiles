@@ -693,7 +693,7 @@ Instead, I use *the compiled emoji fonts* uploaded in https://github.com/vXBaKeR
 For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-your-macbook-f99da72cf126.
 
 #+begin_src emacs-lisp
-  
+
   (leaf font
     :leaf-defer nil
     :hook (after-init-hook . (lambda () (my/set-font my-fontsize)))
@@ -701,46 +701,41 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
     :preface
     (setq-default text-scale-remap-header-line t)
     (setq-default my-fontsize (if (eq 'darwin system-type) 18 14))
-  
+
     (defun my/set-font-size (fontsize)
       (interactive (list
                     (read-number "Fontsize: " my-fontsize)))
       (set-face-attribute 'default nil :height (* fontsize 10))
       (set-face-attribute 'fixed-pitch nil :height (* fontsize 10))
       (set-face-attribute 'variable-pitch nil :height (* fontsize 10)))
-  
+
     (defun my/set-font (&optional fontsize)
       (interactive)
-      (let ((ascii-font (if (eq 'darwin system-type)
-                            "PlemolJP Console NF"
-                          ;; "JetBrainsMono Nerd Font"
-                          "JetBrains Mono"))
+      (let ((ascii-font "PlemolJP Console NF")
             (variable-font "Iosevka Aile")
+            (japanese-font "PlemolJP Console NF")
             (emoji-font (if (eq 'darwin system-type)
                             "Apple Color Emoji"
-                          "Noto Color Emoji"))
-            (japanese-font (if (eq 'darwin system-type)
-                               "PlemolJP Console NF"
-                             "Noto Sans CJK JP")))
-  
+                          "Noto Color Emoji")))
+
         ;; ascii
         (set-face-attribute 'default nil :font ascii-font)
-  
+
         ;; Set the fixed pitch face
         (set-face-attribute 'fixed-pitch nil :font ascii-font)
-  
+
         ;; Set the variable pitch face
         (set-face-attribute 'variable-pitch nil :font variable-font)
-  
+
         ;; japanese
         (set-fontset-font t 'unicode japanese-font nil 'append)
-  
+
         ;; emoji
         (set-fontset-font t 'unicode emoji-font nil 'prepend))
-  
+
       ;; set font height
       (when fontsize (my/set-font-size fontsize))
-  
+
       ;; Ligature for Fira Code or JetBrains Mono
       (let ((alist
              '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
@@ -770,7 +765,7 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
         (dolist (char-regexp alist)
           (set-char-table-range composition-function-table (car char-regexp)
                                 `([,(cdr char-regexp) 0 font-shape-gstring])))))
-  
+
     (defun my/set-font-weight (weight)
       (interactive
        (list (intern (completing-read "Choose weight:"
@@ -778,7 +773,7 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
       (set-face-attribute 'default nil :weight weight)
       (set-face-attribute 'fixed-pitch nil :weight weight)
       (set-face-attribute 'variable-pitch nil :weight weight))
-  
+
     (defun my/set-font-weight-after-load-theme (&rest args)
       (let* ((str-theme (symbol-name (car args)))
              (weight (cond
@@ -3926,10 +3921,10 @@ While browsing, remember the following:
 :END:
 
 - 個人辞書を =UTF-8= に変換しておく
-- =skk-auto-okuri-process= は =nil= にしておかないと，=いぞん (izonn)= など一部の文字の変換ができなくなる.
+- =skk-auto-okuri-process= は =nil= にしておかないと， =いぞん (izonn)= など一部の文字の変換ができなくなる.
 
 #+begin_src emacs-lisp
-  
+
   (leaf skk
     :ensure ddskk
     :hook ((after-init-hook . skk-mode)
@@ -3961,13 +3956,13 @@ While browsing, remember the following:
              (skk-inline-show-face . '( :foreground "#ECEFF4"
                                         :background "#4C566A"
                                         :inherit 'normal)))
-  
+
     :config
     (leaf ddskk-posframe
       :load-path "~/.emacs.d/elisp/ddskk-posframe/"
       :require t
       :custom (ddskk-posframe-mode . t)))
-  
+
 #+end_src
 
 ** Dap Mode
