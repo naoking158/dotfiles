@@ -2676,7 +2676,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (skk-save-jisyo-instantly . t)
            (skk-server-host . "localhost")
            (skk-server-portnum . 1178)
-           (skk-server-report-response . t)
+           (skk-server-report-response . nil)
            (skk-byte-compile-init-file . t)
            (skk-preload . nil)
            (skk-isearch-mode-enable . 'always)
@@ -2691,6 +2691,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (skk-use-auto-enclose-pair-of-region . t)
            (skk-sticky-key . ";")
            (skk-dcomp-activate . t)
+           (skk-dcomp-multiple-activate . t)
            (skk-inline-show-face . '( :foreground "#ECEFF4"
                                       :background "#4C566A"
                                       :inherit 'normal)))
