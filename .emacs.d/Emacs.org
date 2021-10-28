@@ -3298,7 +3298,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
        ((eq system-type 'gnu/linux)
         (let ((process-connection-type nil))
           (start-process "" nil "xdg-open" path)))))
-  
+
     ;; for open paperpile link in external browser
     (defun advice-around-org-link-open (f link &optional arg)
       (let ((path (org-element-property :raw-link link))
@@ -3346,160 +3346,153 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
       + '&body='
       + encodeURIComponent(window.getSelection())
 #+end_src
-#+begin_src javascript
-  javascript:location.href =
-      'org-protocol://roam-ref?template=r&ref='
-      + encodeURIComponent(location.href)
-      + '&title='
-      + encodeURIComponent(document.title)
-      + '&body='
-      + encodeURIComponent(window.getSelection())
-  
-  javascript:location.href =
-      'org-protocol://roam-ref?template=r&ref='
-      + encodeURIComponent(location.href)
-      + '&title='
-      + encodeURIComponent(document.title)
-      + '&body='
-      + encodeURIComponent(window.getSelection())
-  
-  
-  
-  javascript:location.href='org-protocol://capture://x/'+
-        encodeURIComponent(location.href)+'/'+
-        encodeURIComponent(document.title)+'/'+
-        encodeURIComponent(window.getSelection())
-#+end_src
 
-#+begin_src text
-  function get_pdf_url(a, b) {
-  var c = {
-  pub: a.pub,
-  attachment_id: a.attachment._id,
-  openInBackground: a.openInBackground,
-  openedFromWebApp: true,
-  preferredViewer: a.preferredViewer,
-  openInCurrentTab: a.openInCurrentTab
-  };
-  if ("forceGoogleDrive" in a) {
-  c.forceGoogleDrive = a.forceGoogleDrive;
-  }
-  var d = a.pub;
-  var e = a.attachment;
-  var f = "file";
-  if (e.article_pdf == 1) {
-  f = "PDF";
-  }
-  var g = Paperpile.Utils.createStatus({
-  text: "Loading " + f,
-  progress: -1,
-  showDelay: 200
-  });
-  var h = false;
-  PP.Utils.defer(function() {
-  if (!g.destroyed && !h) {
-  g.setText("Still working...");
-  }
-  }, 1e4);
-  PP.Utils.defer(function() {
-  var d = function(a) {
-  var b = a.msg;
-  if (b.attachmentCacheProgress && b.attachmentId == e._id) {
-  h = true;
-  if (!g.destroyed) {
-  if (b.attachmentCacheProgressPercent) {
-  var c = Math.round(b.attachmentCacheProgressPercent * 100);
-  g.setText("Loading " + f + " (" + c + "%)");
-  } else if (b.attachmentCacheProgressBytes) {
-  var d = Math.round(b.attachmentCacheProgressBytes / 1024);
-  g.setText("Loading " + f + "file (" + d + " Kb)");
-  }
-  }
-  }
-  };
-  PP.Msg.on("message", d);
-  PP.Msg.sendMessage({
-  fn: "viewPubAttachment",
-  args: [ c ],
-  callback: function(c, e) {
-  h = true;
-  if (!g.destroyed) {
-  g.destroy();
-  }
-  PP.Msg.un("message", d);
-  if (e) {
-  Paperpile.Utils.createStatus({
-  text: "Something went wrong &mdash; could not open file.",
-  links: [ "STATUS_PANEL_TROUBLESHOOTING", "STATUS_PANEL_CONTACT_SUPPORT" ],
-  data: {
-  type: "error",
-  errorMsg: "Could not open attachment.",
-  fullError: e,
-  troubleSection: "/h/troubleshooting-chrome-extension/#filesystem-access"
-  }
-  });
-  PP.Utils.callback(b, null, [ null, e ]);
-  } else {
-  PP.Utils.apply(a, c);
-  PP.Utils.callback(b, null, [ a, null ]);
-  }
-  }
-  });
-  }, 20);
+#+begin_src js
+  javascript: function get_pdf_url(a, b) {
+      var c = {pub: a.pub,
+               attachment_id: a.attachment._id,
+               openInBackground: a.openInBackground,
+               openedFromWebApp: true,
+               preferredViewer: a.preferredViewer,
+               openInCurrentTab: a.openInCurrentTab
+              };
+      if ("forceGoogleDrive" in a) {
+          c.forceGoogleDrive = a.forceGoogleDrive;
+      }
+      var d = a.pub;
+      var e = a.attachment;
+      var f = "file";
+    
+      if (e.article_pdf == 1) {
+          f = "PDF";
+      }
+      var g = Paperpile.Utils.createStatus({text: "Loading " + f,progress: -1,showDelay: 200    });
+      var h = false;
+      PP.Utils.defer(function() {
+          if (!g.destroyed && !h) {
+              g.setText("Still working...");}
+      }, 1e4);
+      PP.Utils.defer(function() {
+          var d = function(a) {
+              var b = a.msg;
+              if (b.attachmentCacheProgress && b.attachmentId == e._id) {
+                  h = true;
+                  if (!g.destroyed) {
+                      if (b.attachmentCacheProgressPercent) {
+                          var c = Math.round(b.attachmentCacheProgressPercent * 100);
+                          g.setText("Loading " + f + " (" + c + "%)");
+                      } else if (b.attachmentCacheProgressBytes) {
+                          var d = Math.round(b.attachmentCacheProgressBytes / 1024);
+                          g.setText("Loading " + f + "file (" + d + " Kb)");
+                      }
+                  }
+              }
+          };
+          PP.Msg.on("message", d);
+          PP.Msg.sendMessage({
+              fn: "viewPubAttachment",
+              args: [ c ],
+              callback: function(c, e) {
+                  h = true;
+                  if (!g.destroyed) {g.destroy();}
+                  PP.Msg.un("message", d);
+                
+                  if (e) {
+                      Paperpile.Utils.createStatus({
+                          text: "Something went wrong &mdash; could not open file.",
+                          links: [ "STATUS_PANEL_TROUBLESHOOTING", "STATUS_PANEL_CONTACT_SUPPORT" ],
+                          data: {
+                              type: "error",
+                              errorMsg: "Could not open attachment.",
+                              fullError: e,
+                              troubleSection: "/h/troubleshooting-chrome-extension/#filesystem-access"
+                          }
+                      });
+                      PP.Utils.callback(b, null, [ null, e ]);
+                  } else {
+                      PP.Utils.apply(a, c);
+                      PP.Utils.callback(b, null, [ a, null ]);
+                  }
+              }
+          });
+      }, 20);
   }
 
   function get_citation(callback_fn) {
-  format = "plain";
-  var b = Paperpile.view.papers.Grid.getVisibleGrid();
-  var c = b.getSelection();
-  var d = PP.backend.Settings.get("citation_lastUsedFormat");
-  if (d !== format) {
-  PP.backend.Settings.setSetting("citation_lastUsedFormat", format);
-  }
-  var e = {};
-  c.applySelection(e);
-  e.formatType = format;
-  delete e.pubs;
-  PP.Msg.sendMessage({
-  fn: "copyFormatted",
-  args: [ e ],
-  callback: callback_fn,
-  loadingMessage: "Copying formatted citations"
-  });
+      format = "plain";
+      var b = Paperpile.view.papers.Grid.getVisibleGrid();
+      var selection = b.view.getSelectionModel();
+      if (selection.selected.length == 0) {selection.selectFirstRow(); }
+    
+      var c = b.getSelection();
+      var d = PP.backend.Settings.get("citation_lastUsedFormat");
+      if (d !== format) {
+          PP.backend.Settings.setSetting("citation_lastUsedFormat", format);
+      }
+    
+      c = b.getSelection();
+      var e = {};
+      c.applySelection(e);
+      e.formatType = format;
+      delete e.pubs;
+      PP.Msg.sendMessage({
+          fn: "copyFormatted",
+          args: [ e ],
+          callback: callback_fn,
+          loadingMessage: "Copying formatted citations"
+      });
   }
 
   function callback_fn(value, error) {
-  if (error) {
-  Paperpile.Utils.createStatus({
-  text: "Something went wrong &mdash; error formatting citations",
-  iconCls: "error",
-  showDelay: 200
-  });
-  } else {
-  var citation = value.text;
-  citation = citation.replace(/^\n+/, "");
-  citation = citation.replace(/\n+$/, "");
-  citation = citation.replace(/\<i\>/, "");
-  citation = citation.replace(/\<\/i\>/, "");
-  citation = citation.replace(/\<.?br.?\>/, "");
-
-  s = Paperpile.Globals.grid().getSelection();
-  p = s.getRecord().raw;
-  a = {attachment: PP.library.Publication.getPdfAttachment(p), pub: p, openInBackground: false, url: ''};
-  get_pdf_url(a, function(a, b) {
-  if (b) {
-  console.log("ERROR");
-  } else {
-  location.href = 'org-protocol://roam-paper?template=r'
-  + '&ref=@' + encodeURIComponent(p.citekey)
-  + '&cite=' + encodeURIComponent(citation)
-  + '&pdf=[[' + encodeURIComponent(a.url) + ']]'
-  + '&abstract=' + encodeURIComponent(p.abstract)
-  + '&title=' + encodeURIComponent(p.title)
-  + '. ' + encodeURIComponent(a.pub._first_author)
-  + ' (' + encodeURIComponent(p.published.year) + ')';}
-  });
-  }
+      if (error) {
+          Paperpile.Utils.createStatus({
+              text: "Something went wrong &mdash; error formatting citations",
+              iconCls: "error",
+              showDelay: 200
+          });
+      } else {
+          var citation = value.text;
+          citation = citation.replace(/^\n+/, "");
+          citation = citation.replace(/\n+$/, "");
+          citation = citation.replace(/\<i\>/, "");
+          citation = citation.replace(/\<\/i\>/, "");
+          citation = citation.replace(/\<.?br.?\>/, "");
+          s = Paperpile.Globals.grid().getSelection();
+          p = s.getRecord().raw;
+          a = {
+              attachment: PP.library.Publication.getPdfAttachment(p),
+              pub: p,
+              openInBackground: false,
+              url: ''
+          };
+  
+          get_pdf_url(a, function(a, b) {
+              if (b) {
+                  console.log("ERROR");
+              } else {
+                  location.href = 'org-protocol://roam-paper?template=r'
+                      + '&ref=@'
+                      + encodeURIComponent(p.citekey)
+                      + '&cite='
+                      + encodeURIComponent(citation)
+                      + '&pdf='
+                      + encodeURIComponent(a.url)
+                      + '&permalink='
+                      + encodeURIComponent(PP.Utils.getPermalink(p))
+                      + '&file='
+                      + encodeURIComponent(a.attachment.subfolders + '/' + a.attachment.filename)
+                      + '&abstract='
+                      + encodeURIComponent(p.abstract)
+                      + '&title='
+                      + encodeURIComponent(p.title)
+                      + '. '
+                      + encodeURIComponent(a.pub._first_author)
+                      + ' ('
+                      + encodeURIComponent(p.published.year)
+                      + ')';
+              }
+          });
+      }
   }
 
   get_citation(callback_fn);

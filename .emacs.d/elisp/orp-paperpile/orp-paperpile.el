@@ -93,7 +93,7 @@
   (interactive)
   (org-link-open-from-string (org-entry-get 0 "PAPERPILE")))
 
-  ;;; Handlers
+;;;###autoload
 (defun orp-paperpile--open-paper (info)
   (unless (plist-get info :ref)
     (user-error "No ref key provided"))
@@ -126,7 +126,7 @@
    :templates orp-paperpile-ref-templates)
   nil)
 
-;; Capture implementation
+;;;###autoload
 (defun orp-paperpile--try-capture-to-ref-h ()
   "Try to capture to an existing node that match the ref. This overrides org-roam-protocol--try-capture-to-ref-h"
   (when-let ((node (and (plist-get org-roam-capture--info :ref)
@@ -138,10 +138,12 @@
     (org-roam-node-id node)
     (orp-paperpile--update-org-roam-paper org-roam-capture--info)))
 
+;; Capture implementation
 (defun orp-paperpile--insert-captured-ref-h ()
   "This overrides org-roam-protocol--insert-captured-ref-h."
   (orp-paperpile--update-org-roam-paper org-roam-capture--info))
 
+;; Capture implementation
 (defun orp-paperpile--update-org-roam-paper (info)
   (message "%s" info)
 
@@ -201,7 +203,7 @@
   (advice-remove #'org-roam-protocol--insert-captured-ref-h
                  #'orp-paperpile--insert-captured-ref-h))
 
-(orp-activate)
+;; (orp-activate)
 
 (provide 'orp-paperpile)
 
