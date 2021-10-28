@@ -849,12 +849,12 @@
   :ensure t
   :bind (("C-c e" . macrostep-expand)))
 
-(when-let* ((path-to-miniconda
+(when-let* ((miniconda-path
              (my/trim-newline-from-string
               (shell-command-to-string
                "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
-            (path-to-venv (expand-file-name "envs/torch" path-to-miniconda)))
-  (setq path-to-miniconda path-to-miniconda)
+            (path-to-venv (expand-file-name "envs/torch" miniconda-path)))
+  (setq path-to-miniconda miniconda-path)
   (setq path-to-venv-python (expand-file-name "bin/python" path-to-venv))
   (custom-set-variables '(org-babel-python-command path-to-venv-python)))
 
@@ -864,20 +864,24 @@
   :ensure t
   :mode "\\.py\\'"
   :custom ((python-indent-guess-indent-offset . t)
-           (python-indent-guess-indent-offset-verbose . nil))
+           (python-indent-guess-indent-offset-verbose . nil)))
+
+(leaf conda
+  :doc "Work with your conda environments"
+  :req "emacs-24.4" "pythonic-0.1.0" "dash-2.13.0" "s-1.11.0" "f-0.18.2"
+  :url "http://github.com/necaris/conda.el"
+  :ensure t
+  ;; :after python-mode
+  ;; :require t
+  :commands conda-env-activate
+  :custom ((conda-anaconda-home . path-to-miniconda)
+           (conda-env-home-directory . path-to-miniconda))
   :config
-  (leaf conda
-    :doc "Work with your conda environments"
-    :req "emacs-24.4" "pythonic-0.1.0" "dash-2.13.0" "s-1.11.0" "f-0.18.2"
-    :url "http://github.com/necaris/conda.el"
-    :ensure t
-    :require t
-    :commands conda-env-activate
-    :custom ((conda-anaconda-home . path-to-miniconda)
-             (conda-env-home-directory . path-to-miniconda))
-    :hook ((after-init-hook . (lambda ()
-                                (conda-env-initialize-eshell)
-                                (conda-env-initialize-interactive-shells))))))
+  (conda-env-initialize-eshell)
+  (conda-env-initialize-interactive-shells)
+  ;; :hook ((after-init-hook . (lambda ()
+  ;;                             )))
+  )
 
 (leaf lsp-pyright
   :doc "Python LSP client using Pyright"
