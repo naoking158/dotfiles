@@ -1915,7 +1915,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                                               company-capf
                                               company-dabbrev))
                                 (company-mode +1)))))
-  
+
     (leaf company-yasnippet
       :doc "company-mode completion backend for Yasnippet"
       :tag "out-of-MELPA"
@@ -1935,7 +1935,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                                      '(:with company-yasnippet))))
                                 company-backends)))
       :hook ((prog-mode-hook . c/company-mode-with-yas)))
-  
+
     ;; using child frame
     (leaf company-posframe
       :when window-system
@@ -1947,7 +1947,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
       :ensure t
       :hook after-init-hook
       :blackout t)
-  
+
     (leaf company-math
       :doc "Completion backends for unicode math symbols and latex tags"
       :req "company-0.8.0" "math-symbol-lists-1.3"
@@ -1963,7 +1963,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                                company-math-symbols-unicode
                                company-latex-commands))
                             company-backends))))
-  
+
     (leaf company-tabnine
       :disabled t
       :doc "Completion backends using NLP model GPT-2"
