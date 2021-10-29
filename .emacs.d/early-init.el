@@ -47,6 +47,10 @@
       frame-inhibit-implied-resize t
       byte-compile-warnings '(cl-functions))
 
+;; Avoid popup Async buffer window
+(add-to-list 'display-buffer-alist
+             '("^*Async Shell Command*" . (display-buffer-no-window)))
+
 (provide 'early-init)
 
 ;;; early-init.el ends here

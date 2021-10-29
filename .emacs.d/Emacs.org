@@ -95,7 +95,7 @@ a bunch of resources I've found online.
   ;; before package and UI initialization happens.
   ;;
   ;;; Code:
-
+  
   ;; Speed up startup
   (defvar default-file-name-handler-alist file-name-handler-alist)
   (setq file-name-handler-alist nil)
@@ -105,7 +105,7 @@ a bunch of resources I've found online.
               "Restore defalut values after startup."
               (setq file-name-handler-alist default-file-name-handler-alist
             gc-cons-threshold (* 1024 1024 1024))))
-
+  
   ;; basic
   (prefer-coding-system 'utf-8)
   (set-file-name-coding-system 'utf-8)
@@ -120,10 +120,10 @@ a bunch of resources I've found online.
         user-mail-address "naoki@bbo.cs.tsukuba.ac.jp"
         user-login-name "naoking158"
         package-native-compile t)
-
+  
   (when-let ((fish (executable-find "fish")))
     (setq shell-file-name fish))
-
+  
   ;; GUI
   (setq default-frame-alist (append '((line-spacing . 4)
                                       (vertical-scroll-bars)
@@ -132,11 +132,15 @@ a bunch of resources I've found online.
                                       (left-fringe . 10)
                                       (right-fringe . 10))
                                     initial-frame-alist))
-
+  
   (setq inhibit-splash-screen t
         frame-inhibit-implied-resize t
         byte-compile-warnings '(cl-functions))
-
+  
+  ;; Avoid popup Async buffer window
+  (add-to-list 'display-buffer-alist
+               '("^*Async Shell Command*" . (display-buffer-no-window)))
+  
   (provide 'early-init)
   
   ;;; early-init.el ends here
@@ -3296,13 +3300,21 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
       (interactive)
       (cond
        ((eq system-type 'darwin)
-        (if (string-prefix-p "chrome-extension" path)
-            (async-shell-command (concat "brave " (shell-quote-argument path)))
-          (async-shell-command (concat "open " (shell-quote-argument path)))))
+        (let ((cmd-list (list
+                         (if (string-prefix-p "chrome-extension" path)
+                             "brave"
+                           "open")
+                         path "&")))
+          (shell-command (c-concat-separated cmd-list " "))
+  
+          ;; (if (string-prefix-p "chrome-extension" path)
+          ;;     (async-shell-command (concat "brave " (shell-quote-argument path)))
+          ;;   (async-shell-command (concat "open " (shell-quote-argument path))))
+          ))
        ((eq system-type 'gnu/linux)
         (let ((process-connection-type nil))
           (start-process "" nil "xdg-open" path)))))
-
+  
     ;; for open paperpile link in external browser
     (defun advice-around-org-link-open (f link &optional arg)
       (let ((path (org-element-property :raw-link link))
@@ -4016,6 +4028,8 @@ While browsing, remember the following:
 :ID:       708C16FF-B967-4E17-8846-C73B711FC9F5
 :END:
 
+https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-03.org
+
 #+begin_src emacs-lisp
   (let* ((parent (if (memq window-system '(darwin ns)) "/usr/local/Cellar/mu/"
                    "/usr/share/emacs/"))
@@ -4091,7 +4105,7 @@ While browsing, remember the following:
               (when msg
                 (string-prefix-p "/University" (mu4e-message-field msg :maildir))))
             :vars '((user-mail-address			. "s1930160@s.tsukuba.ac.jp")
-                    (user-full-name					. "Naoki Sakamoto")
+                    (user-full-name					. "s1930160@s.tsukuba.ac.jp")
                     (smtpmail-smtp-server		. "smtp.office365.com")
                     (smtpmail-smtp-service	. 587)
                     (smtpmail-stream-type		. starttls)

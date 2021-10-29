@@ -2418,9 +2418,17 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (interactive)
     (cond
      ((eq system-type 'darwin)
-      (if (string-prefix-p "chrome-extension" path)
-          (async-shell-command (concat "brave " (shell-quote-argument path)))
-        (async-shell-command (concat "open " (shell-quote-argument path)))))
+      (let ((cmd-list (list
+                       (if (string-prefix-p "chrome-extension" path)
+                           "brave"
+                         "open")
+                       path "&")))
+        (shell-command (c-concat-separated cmd-list " "))
+
+        ;; (if (string-prefix-p "chrome-extension" path)
+        ;;     (async-shell-command (concat "brave " (shell-quote-argument path)))
+        ;;   (async-shell-command (concat "open " (shell-quote-argument path))))
+        ))
      ((eq system-type 'gnu/linux)
       (let ((process-connection-type nil))
         (start-process "" nil "xdg-open" path)))))
@@ -2799,7 +2807,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
             (when msg
               (string-prefix-p "/University" (mu4e-message-field msg :maildir))))
           :vars '((user-mail-address			. "s1930160@s.tsukuba.ac.jp")
-                  (user-full-name					. "Naoki Sakamoto")
+                  (user-full-name					. "s1930160@s.tsukuba.ac.jp")
                   (smtpmail-smtp-server		. "smtp.office365.com")
                   (smtpmail-smtp-service	. 587)
                   (smtpmail-stream-type		. starttls)
