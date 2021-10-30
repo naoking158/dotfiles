@@ -3290,7 +3290,7 @@ Interactively, URL defaults to the string looking like a url around point."
   :when (memq window-system '(x))
   :load-path "~/.emacs.d/elisp/emacs-application-framework/"
   :commands
-  (eaf-search-it eaf-open eaf-open-browser eaf-open-browser-with-history)
+  (eaf-search-it eaf-open eaf-open-browser eaf-open-browser-with-history eaf-open-pdf-from-history)
   :custom
   ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
   ((eaf-python-command . "/usr/bin/python")

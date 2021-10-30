@@ -10,7 +10,9 @@ a bunch of resources I've found online.
 :END:
 :CONTENTS:
 - [[#table-of-contents][Table of Contents]]
+- [[#early-init][Early-Init]]
 - [[#header][Header]]
+  - [[#compilation-deny-packages][Compilation deny packages]]
 - [[#startup-performance][Startup Performance]]
 - [[#package-management-with-leaf][Package Management with Leaf]]
   - [[#install-leaf-and-set-leaf-keywords][Install Leaf and Set Leaf-Keywords]]
@@ -21,19 +23,25 @@ a bunch of resources I've found online.
   - [[#auto-revert-buffer][Auto revert buffer]]
   - [[#auto-saving-changed-files][Auto-Saving Changed Files]]
   - [[#undo-helper-with-undo-fu][Undo Helper with undo-fu]]
+- [[#utility-functions][Utility Functions]]
+  - [[#toggle-mode-line][Toggle Mode-line]]
+  - [[#trim-newline-from-string][Trim newline from string]]
+  - [[#sort-sexpresions][Sort Sexpresions]]
 - [[#basic-ui-configuration][Basic UI Configuration]]
+  - [[#user-interface][User Interface]]
   - [[#appearance-and-formatting][Appearance and Formatting]]
-  - [[#theme-configuration][Theme Configuration]]
   - [[#font-configuration][Font Configuration]]
+  - [[#theme-configuration][Theme Configuration]]
 - [[#keyboard-bindings][Keyboard Bindings]]
   - [[#keybinding-panel-which-key][Keybinding Panel (which-key)]]
   - [[#transient-commands][Transient Commands]]
 - [[#file-browsing][File Browsing]]
   - [[#dired][Dired]]
   - [[#opening-files-externally][Opening Files Externally]]
+  - [[#neotree][NeoTree]]
 - [[#development][Development]]
   - [[#git][Git]]
-  - [[#projectile][Projectile]]
+  - [[#projects-management][Projects Management]]
   - [[#language][Language]]
   - [[#productivity][Productivity]]
 - [[#window-management][Window Management]]
@@ -43,6 +51,7 @@ a bunch of resources I've found online.
   - [[#named-window-with-tab-bar][Named Window with tab-bar]]
   - [[#rotate-window-layout][Rotate Window Layout]]
   - [[#set-margins][Set Margins]]
+  - [[#control-buffer-placement][Control Buffer Placement]]
 - [[#completion-system][Completion System]]
   - [[#completions-with-company][Completions with Company]]
   - [[#duplicate-line-or-selected-regions-with-duplicate-thing][Duplicate line or selected regions with Duplicate-thing]]
@@ -54,10 +63,12 @@ a bunch of resources I've found online.
   - [[#completion-annotations-with-marginalia][Completion Annotations with Marginalia]]
   - [[#vertical-minibuffer-ui-and-completion-with-vertico][Vertical Minibuffer UI and Completion with Vertico]]
   - [[#completions-in-regions-with-corfu][Completions in Regions with Corfu]]
+  - [[#file-path-completion-in-string][File path completion in string]]
 - [[#moving-in-buffer][Moving in buffer]]
   - [[#jumping-with-avy][Jumping with Avy]]
   - [[#jumping-beginningend-of-line-with-mwim][Jumping beginning/end of line with mwim]]
 - [[#shell][Shell]]
+  - [[#eshell][Eshell]]
   - [[#fish-mode][Fish Mode]]
   - [[#vterm-mode][Vterm Mode]]
 - [[#runtime-performance][Runtime Performance]]
@@ -66,6 +77,7 @@ a bunch of resources I've found online.
   - [[#org-configuration][Org Configuration]]
   - [[#org-agenda][Org Agenda]]
   - [[#org-pomodoro][Org Pomodoro]]
+  - [[#presentations][Presentations]]
   - [[#cross-reference][Cross Reference]]
   - [[#outline-based-notes-management-and-organizer][Outline-based notes management and organizer]]
   - [[#org-roam][Org Roam]]
@@ -80,6 +92,21 @@ a bunch of resources I've found online.
 - [[#server-mode][Server Mode]]
 - [[#trial-packages][Trial Packages]]
   - [[#web-browser-with-emacs-w3m][Web Browser with emacs-w3m]]
+  - [[#tree-sitter][Tree Sitter]]
+  - [[#solaire-mode][Solaire-Mode]]
+  - [[#ddskk][DDSKK]]
+  - [[#dap-mode][Dap Mode]]
+  - [[#mail-with-mu4e][Mail with mu4e]]
+  - [[#enhance-xwidget-webkit-browser][Enhance xwidget webkit browser]]
+  - [[#pdf-tools][PDF Tools]]
+  - [[#command-log-mode][Command Log Mode]]
+  - [[#exwm][EXWM]]
+  - [[#apple-script-mode][Apple Script Mode]]
+  - [[#emacs-jupyter][Emacs Jupyter]]
+  - [[#search-in-external-web-browser][Search in external web browser]]
+  - [[#emacs-application-framework][Emacs Application Framework]]
+  - [[#browse-at-remote][Browse at remote]]
+  - [[#elfeed][Elfeed]]
 - [[#footer][Footer]]
 :END:
 
@@ -2167,7 +2194,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 :END:
 
 #+begin_src emacs-lisp
-  
+
   (if (not (executable-find "cmigemo"))
       (leaf orderless
         :ensure t
@@ -2177,13 +2204,13 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
         '((completion-styles . '(orderless))
           (completion-category-defaults . nil)
           (completion-category-overrides . ((file (styles partial-completion)))))
-  
+
         ;; :preface
         ;; (defun just-one-face (fn &rest args)
         ;;   (let ((orderless-match-faces [completions-common-part]))
         ;;     (apply fn args)))
         )
-  
+
     (leaf orderless
       :ensure t migemo
       :require t migemo
@@ -2198,30 +2225,30 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                 (unicode-name (styles orderless-migemo-style))
                 (command (styles orderless-default-style))
                 (org-roam-node (styles orderless-migemo-style)))))
-  
+
       :preface
       ;; (defun just-one-face (fn &rest args)
       ;;   (let ((orderless-match-faces [completions-common-part]))
       ;;     (apply fn args)))
-  
+
       (defun orderless-migemo (component)
         (let ((pattern (migemo-get-pattern component)))
           (condition-case nil
               (progn (string-match-p pattern "") pattern)
             (invalid-regexp nil))))
-  
+
       :config
       (orderless-define-completion-style orderless-default-style
         (orderless-matching-styles '(orderless-prefixes
                                      orderless-literal
                                      orderless-regexp)))
-  
+
       (orderless-define-completion-style orderless-migemo-style
         (orderless-matching-styles '(orderless-prefixes
                                      orderless-literal
                                      orderless-regexp
                                      orderless-migemo)))))
-  
+
   (leaf migemo
     :when (executable-find "cmigemo")
     :ensure t
@@ -4035,7 +4062,7 @@ https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-
                    "/usr/share/emacs/"))
          (cmd (concat "find " parent " -type d -name mu4e")))
     (setq path-to-mu (car (last (split-string (shell-command-to-string cmd))))))
-  
+
   (leaf mu4e
     :when path-to-mu
     :load-path path-to-mu
@@ -4045,13 +4072,13 @@ https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-
     (set-variable 'read-mail-command 'mu4e)
     (setq mail-user-agent 'mu4e-user-agent
           message-send-mail-function 'smtpmail-send-it
-  
+
           ;; Make sure plain text mails flow correctly for recipients
           mu4e-compose-format-flowed t
-  
+
           ;; This is set to 't' to avoid mail syncing issues when using mbsync
           mu4e-change-filenames-when-moving t
-  
+
           ;; Refresh mail using isync every 10 minutes
           mu4e-update-interval (* 10 60)
           mu4e-get-mail-command "mbsync -a"
@@ -4060,7 +4087,7 @@ https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-
           mu4e-completing-read-function 'completing-read
           mu4e-headers-precise-alignment t
           mu4e-use-fancy-chars t)
-  
+
     (setq mu4e-contexts
           (list
            ;; Work account
@@ -4079,7 +4106,7 @@ https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-
                     (mu4e-sent-folder				. "/BBO/[Gmail]/Sent Mail")
                     (mu4e-refile-folder			. "/BBO/[Gmail]/All Mail")
                     (mu4e-trash-folder			. "/BBO/[Gmail]/Trash")))
-  
+
            ;; Private account
            (make-mu4e-context
             :name "Private"
@@ -4096,7 +4123,7 @@ https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-
                     (mu4e-sent-folder				. "/Private/[Gmail]/Sent Mail")
                     (mu4e-refile-folder			. "/Private/[Gmail]/All Mail")
                     (mu4e-trash-folder			. "/Private/[Gmail]/Trash")))
-  
+
            ;; University account
            (make-mu4e-context
             :name "University"
@@ -4114,7 +4141,7 @@ https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-
                     (mu4e-refile-folder			. "/University/Archive")
                     (mu4e-trash-folder			. "/University/Deleted Items")
                     ))))
-  
+
     (setq mu4e-maildir-shortcuts
           '((:maildir "/BBO/[Gmail]/All Mail"		:key ?a)
             (:maildir "/BBO/Inbox"							:key ?i)
@@ -4123,7 +4150,7 @@ https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-
             (:maildir "/BBO/[Gmail]/Trash"			:key ?t)
             (:maildir "/Private/Inbox"					:key ?p)
             ))
-  
+
     (setq mu4e-bookmarks
           '((:name "All Inbox"
                    :query "(maildir:/BBO/Inbox OR maildir:/Private/Inbox OR maildir:/University/Inbox) AND NOT flag:trashed"
@@ -4144,7 +4171,7 @@ https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-
             (:name "All massages"
                    :query "NOT flag:trashed AND NOT flag:draft AND NOT flag:sent"
                    :key ?a)))
-  
+
     (add-to-list 'mu4e-marks
                  '(tag
                    :char       "g"
@@ -4155,12 +4182,12 @@ https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-
                    :action      (lambda (docid msg target)
                                   (mu4e-action-retag-message msg (concat "+" target)))))
     (mu4e~headers-defun-mark-for tag)
-  
+
     (add-to-list 'org-capture-templates
                  `("o" "respond to email" entry 
                    (file ,(concat jethro/org-agenda-directory "inbox.org"))
                    "* TODO %^{Description}\n%A\n%?\n"))
-  
+
     (leaf org-msg
       :ensure t
       :config
@@ -4174,19 +4201,19 @@ https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-
                                            (reply-to-text	. (text)))
             org-msg-convert-citation t)
       (org-msg-mode))
-  
+
     :advice
     ;; disable fancy characters only for flags
     (:around mu4e~headers-flags-str (lambda (f &rest args)
                                       (let* ((mu4e-use-fancy-chars nil))
                                         (apply f args))))
-  
+
     :preface
     (defun my/org-capture-mu4e ()
       (interactive)
       "Capture a TODO item via email."
       (org-capture nil "o"))
-  
+
     :bind
     ((mu4e-main-mode-map
       ("q" . quit-window)
@@ -4195,13 +4222,13 @@ https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-
       ("{" . mu4e-headers-query-prev)      ; differs from built-in
       ("}" . mu4e-headers-query-next)      ; differs from built-in
       ("o" . my/org-capture-mu4e)          ; differs from built-in
-  
+
       ("A" . mu4e-headers-mark-for-action) ; differs from built-in
-  
+
       ("`" . mu4e-update-mail-and-index)   ; differs from built-in
       ("|" . mu4e-view-pipe)               ; does not seem to be built in any longer
       ("." . hydra-mu4e-headers/body)))
-  
+
     :hydra
     (hydra-mu4e-headers
      (:color blue :hint nil)
@@ -4217,7 +4244,7 @@ https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-
   _C_: compose | _}_: next query    | _a_: action  | _|_: thru shl  | _`_: update, reindex
   _F_: forward | _C-+_: show more   | _A_: mk4actn | _H_: help      | _;_: context-switch
   _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2maildir "
-  
+
      ;; general
      ("n" mu4e-headers-next)
      ("p" mu4e-headers-previous)
@@ -4228,7 +4255,7 @@ https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-
      ("C" mu4e-compose-new)
      ("F" mu4e-compose-forward)
      ("o" my/org-capture-mu4e)                  ; differs from built-in
-  
+
      ;; search
      ("s" mu4e-headers-search)
      ("S" mu4e-headers-search-edit)
@@ -4239,7 +4266,7 @@ https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-
      ("}" mu4e-headers-query-next)              ; differs from built-in
      ("C-+" mu4e-headers-split-view-grow)
      ("C--" mu4e-headers-split-view-shrink)
-  
+
      ;; mark stuff 
      ("!" mu4e-headers-mark-for-read)
      ("?" mu4e-headers-mark-for-unread)
@@ -4252,7 +4279,7 @@ https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-
      ("a" mu4e-headers-action)                  ; not really a mark per-se
      ("A" mu4e-headers-mark-for-action)         ; differs from built-in
      ("*" mu4e-headers-mark-for-something)
-  
+
      ("#" mu4e-mark-resolve-deferred-marks)
      ("%" mu4e-headers-mark-pattern)
      ("&" mu4e-headers-mark-custom)
@@ -4260,27 +4287,27 @@ https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-
      ("-" mu4e-headers-mark-for-unflag)
      ("t" mu4e-headers-mark-subthread)
      ("T" mu4e-headers-mark-thread)
-  
+
      ;; miscellany
      ("q" mu4e~headers-quit-buffer)
      ("H" mu4e-display-manual)
      ("|" mu4e-view-pipe)                       ; does not seem built-in any longer
-  
+
      ;; switches
      ("O" mu4e-headers-change-sorting)
      ("P" mu4e-headers-toggle-threading)
      ("Q" mu4e-headers-toggle-full-search)
      ("V" mu4e-headers-toggle-skip-duplicates)
      ("W" mu4e-headers-toggle-include-related)
-  
+
      ;; more miscellany
      ("`" mu4e-update-mail-and-index)           ; differs from built-in
      (";" mu4e-context-switch)  
      ("j" mu4e~headers-jump-to-maildir)
-  
+
      ("." nil)))
-  
-  
+
+
   (leaf mu4e-views
     :ensure t
     :after mu4e
@@ -4690,7 +4717,7 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
     :when (memq window-system '(x))
     :load-path "~/.emacs.d/elisp/emacs-application-framework/"
     :commands
-    (eaf-search-it eaf-open eaf-open-browser eaf-open-browser-with-history)
+    (eaf-search-it eaf-open eaf-open-browser eaf-open-browser-with-history eaf-open-pdf-from-history)
     :custom
     ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
     ((eaf-python-command . "/usr/bin/python")
