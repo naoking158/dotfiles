@@ -1670,11 +1670,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :tag "location" "point" "emacs>=24.1"
   :url "https://github.com/abo-abo/avy"
   :ensure t
-  :bind (("C-c a" . avy-goto-char-2)
-         ;; ("C-c a w" . avy-goto-word-1)
-         ;; ("C-c a c" . avy-goto-char-2)
-         ;; ("C-c a l" . avy-goto-line)
-         ))
+  :bind* (("C-q" . avy-goto-word-1)
+          ;; ("C-c a w" . avy-goto-word-1)
+          ;; ("C-c a c" . avy-goto-char-2)
+          ;; ("C-c a l" . avy-goto-line)
+          ))
 
 (leaf mwim
   :doc "Switch between the beginning/end of line or code"
