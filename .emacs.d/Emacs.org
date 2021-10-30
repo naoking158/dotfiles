@@ -3704,11 +3704,11 @@ This package makes it much easier to edit Org documents when =org-hide-emphasis-
 It's nice to have a table of contents section for long literate configuration files (like this one!) so I use =org-make-toc= to automatically update the ToC in any header with a property named =TOC=.
 
 #+begin_src emacs-lisp
-  
+
   (leaf org-make-toc
     :ensure t
-    :hook (org-mode . org-make-toc-mode))
-  
+    :hook (org-mode-hook . org-make-toc-mode))
+
 #+end_src
 
 * Latex Mode
