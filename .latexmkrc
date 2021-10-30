@@ -15,9 +15,9 @@ $pdf_mode = 3;
 # Preview
 $pvc_view_file_via_temporary = 0;
 if ($^O eq 'linux') {
-    # $pdf_previewer = 'okular';
-    $pdf_previewer = "xdg-open %S";
+    $pdf_previewer = 'okular --unique %S';
+    # $pdf_previewer = "xdg-open %S";
 } else {
-    $pdf_previewer = "open %S";
+    $pdf_previewer = "skim";
 }
 
