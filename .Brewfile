@@ -7,7 +7,6 @@ tap "homebrew/core"
 tap "homebrew/services"
 tap "koekeishiya/formulae"
 tap "mongodb/brew"
-tap "railwaycat/emacsmacport"
 tap "rcmdnk/rcmdnkpac"
 tap "sal0max/nikon"
 tap "sanemat/font"
@@ -19,6 +18,7 @@ brew "pkg-config"
 brew "cairo"
 brew "clang-format"
 brew "cmake"
+brew "cmigemo"
 brew "coreutils"
 brew "ctags"
 brew "zstd"
@@ -40,9 +40,9 @@ brew "gh"
 brew "ghostscript"
 brew "ghq"
 brew "git"
-brew "gnu-sed"
 brew "unbound", restart_service: true
 brew "gnutls"
+brew "gnu-sed"
 brew "go"
 brew "gpm"
 brew "jasper"
@@ -54,6 +54,7 @@ brew "hugo"
 brew "libheif"
 brew "imagemagick"
 brew "imagemagick@6"
+brew "isync"
 brew "jansson"
 brew "jq"
 brew "languagetool"
@@ -68,6 +69,8 @@ brew "mailutils"
 brew "make"
 brew "mas"
 brew "mosh"
+brew "msmtp"
+brew "mu"
 brew "nkf"
 brew "nmap"
 brew "node"
@@ -88,6 +91,7 @@ brew "ruby"
 brew "shellcheck"
 brew "terminal-notifier"
 brew "texinfo"
+brew "texlab"
 brew "the_silver_searcher"
 brew "tmux"
 brew "w3m"
@@ -99,24 +103,25 @@ brew "carlocab/personal/unrar"
 brew "koekeishiya/formulae/skhd"
 brew "koekeishiya/formulae/yabai"
 brew "mongodb/brew/mongodb-community"
-brew "railwaycat/emacsmacport/emacs-mac", link: false
 brew "rcmdnk/rcmdnkpac/rcmdnk-trash"
+cask "1password"
 cask "alacritty"
 cask "alfred"
 cask "aquaskk"
+cask "brave-browser"
 cask "deepl"
 cask "evernote"
 cask "font-hackgen-nerd"
 cask "font-iosevka-aile"
-cask "font-noto-sans"
+cask "font-jetbrains-mono-nerd-font"
+cask "font-noto-color-emoji"
 cask "font-noto-sans-cjk-jp"
-cask "font-noto-serif"
 cask "font-noto-serif-cjk-jp"
 cask "fontforge"
-cask "google-backup-and-sync"
 cask "google-chrome"
 cask "google-japanese-ime"
 cask "grammarly"
+cask "hot"
 cask "karabiner-elements"
 cask "mactex"
 cask "microsoft-auto-update"
@@ -127,25 +132,12 @@ cask "skim"
 cask "slack"
 cask "spotify"
 cask "tunnelblick"
-cask "vagrant"
-cask "virtualbox"
-cask "xquartz"
-mas "1Blocker", id: 1365531024
-mas "1Password 7", id: 1333542190
-mas "AdBlock", id: 1402042596
-mas "AmorphousDiskMark", id: 1168254295
 mas "Be Focused Pro", id: 961632517
-mas "Cinebench", id: 1438772273
-mas "Copied", id: 1026349850
-mas "Disk Speed Test", id: 425264550
 mas "GoodNotes", id: 1444383602
 mas "Keynote", id: 409183694
-mas "Kindle", id: 405399194
-mas "LINE", id: 539883307
-mas "MagicanLite", id: 515798947
 mas "Magnet", id: 441258766
-mas "Numbers", id: 409203825
+mas "Microsoft Excel", id: 462058435
+mas "Microsoft Word", id: 462054704
+mas "OneDrive", id: 823766827
 mas "Pages", id: 409201541
-mas "Spark", id: 1176895641
-mas "XMind", id: 1327661892
 mas "Yoink", id: 457622435
