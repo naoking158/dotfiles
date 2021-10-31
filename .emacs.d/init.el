@@ -2431,8 +2431,13 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
         ;;   (async-shell-command (concat "open " (shell-quote-argument path))))
         ))
      ((eq system-type 'gnu/linux)
-      (let ((process-connection-type nil))
-        (start-process "" nil "xdg-open" path)))))
+      (let ((process-connection-type nil)
+            ;; (cmd-list (list
+            ;;            "start xdg-open" path "&"))
+            )
+        ;; (shell-command (c-concat-separated cmd-list " "))
+        (start-process "" nil "xdg-open" path)
+        ))))
 
   ;; for open paperpile link in external browser
   (defun advice-around-org-link-open (f link &optional arg)
@@ -2610,7 +2615,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                    ("pdfview" . "open %s.pdf")
                    ,(if (eq 'darwin system-type)
                         '("Displayline" . "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b")
-                      '("Displayline" . "okular --unique %o#src:%n%(dir)./%b"))))
+                      '("Displayline" . "okular --unique %o#src:%n%b"))))
           (add-to-list 'TeX-command-list `(,(car command-alist)
                                            ,(cdr command-alist)
                                            TeX-run-command t nil))))))
