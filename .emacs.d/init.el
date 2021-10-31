@@ -2406,6 +2406,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
         to comunicate between org-mode and paperpile using org-roam-protocol."
   :load-path "~/.emacs.d/elisp/orp-paperpile/"
   :require t
+  :hook (after-init-hook . orp-activate)
   :custom
   ((orp-paperpile-local-pdf-dir . "~/drive/Paperpile/")
    (orp-paperpile-ref-templates . '(("r" "ref" plain "%?"
@@ -2631,7 +2632,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            ("C-c l" . reftex-label)
            ("C-c c" . reftex-citation))
     :custom
-    (reftex-ref-style-default-list . '("Cleveref"))))
+    ((reftex-ref-style-default-list . '("Cleveref"))
+     (reftex-cite-format . 'natbib))))
 
 (leaf oj
 	:doc "Competitive programming tools client for AtCoder, Codeforces"
@@ -2681,8 +2683,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (skk-jisyo . "~/.skk-jisyo")
            (skk-backup-jisyo . "~/.skk-jisyo.BAK")
            (skk-save-jisyo-instantly . t)
-           (skk-server-host . "localhost")
-           (skk-server-portnum . 1178)
+           ;; (skk-server-host . "localhost")
+           ;; (skk-server-portnum . 1178)
            (skk-server-report-response . nil)
            (skk-byte-compile-init-file . t)
            (skk-preload . nil)

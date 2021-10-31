@@ -8,6 +8,7 @@
 
 (require 'ol)  ;; for org-link-decode
 (require 'org-protocol)
+(require 'org-ref)
 (require 'org-roam)
 (require 'org-roam-protocol)
 
@@ -93,7 +94,6 @@
   (interactive)
   (org-link-open-from-string (org-entry-get 0 "PAPERPILE")))
 
-;;;###autoload
 (defun orp-paperpile--open-paper (info)
   (unless (plist-get info :ref)
     (user-error "No ref key provided"))
@@ -126,7 +126,6 @@
    :templates orp-paperpile-ref-templates)
   nil)
 
-;;;###autoload
 (defun orp-paperpile--try-capture-to-ref-h ()
   "Try to capture to an existing node that match the ref. This overrides org-roam-protocol--try-capture-to-ref-h"
   (when-let ((node (and (plist-get org-roam-capture--info :ref)

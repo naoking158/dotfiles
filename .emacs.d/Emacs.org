@@ -141,7 +141,7 @@ a bunch of resources I've found online.
   (set-clipboard-coding-system 'utf-8)
   (set-selection-coding-system 'utf-8)
   (set-default 'buffer-file-coding-system 'utf-8)
-  (setq debug-on-error nil
+  (setq debug-on-error t
         init-file-debug t
         user-full-name "Naoki Sakamoto"
         user-mail-address "naoki@bbo.cs.tsukuba.ac.jp"
@@ -2976,7 +2976,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
 :END:
 
 #+begin_src emacs-lisp
-  
+
   (leaf org-ref
     :doc "citations, cross-references and bibliographies in org-mode"
     :req "dash-2.11.0" "htmlize-1.51" "helm-1.5.5" "helm-bibtex-2.0.0" "ivy-0.8.0" "hydra-0.13.2" "key-chord-0" "s-1.10.0" "f-0.18.0" "pdf-tools-0.7"
@@ -3001,7 +3001,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
       (bibtex-completion-bibliography . `(,(concat org-directory
                                                    "braindump/preferences/ref.bib")))
       (bibtex-completion-library-path . ,(concat org-directory "braindump/lit/"))
-  
+
       ;;; They are deprecated since org-ref ver. 3
       ;; (org-ref-bibliography-notes . ,(concat org-directory
       ;;                                        "braindump/lit/notes.org"))
@@ -3009,14 +3009,14 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
       ;;                                            "braindump/preferences/ref.bib")))
       ;; (org-ref-pdf-directory . ,(concat org-directory "braindump/lit/"))
       ))
-  
+
   (leaf xref
     :doc "Cross-referencing commands"
     :req "emacs-26.3"
     :url "http://elpa.gnu.org/packages/xref.html"
     :ensure t
     :after org)
-  
+
 #+end_src
 
 
@@ -3315,6 +3315,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
           to comunicate between org-mode and paperpile using org-roam-protocol."
     :load-path "~/.emacs.d/elisp/orp-paperpile/"
     :require t
+    :hook (after-init-hook . orp-activate)
     :custom
     ((orp-paperpile-local-pdf-dir . "~/drive/Paperpile/")
      (orp-paperpile-ref-templates . '(("r" "ref" plain "%?"
@@ -3333,7 +3334,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
                            "open")
                          path "&")))
           (shell-command (c-concat-separated cmd-list " "))
-  
+
           ;; (if (string-prefix-p "chrome-extension" path)
           ;;     (async-shell-command (concat "brave " (shell-quote-argument path)))
           ;;   (async-shell-command (concat "open " (shell-quote-argument path))))
@@ -3341,7 +3342,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
        ((eq system-type 'gnu/linux)
         (let ((process-connection-type nil))
           (start-process "" nil "xdg-open" path)))))
-  
+
     ;; for open paperpile link in external browser
     (defun advice-around-org-link-open (f link &optional arg)
       (let ((path (org-element-property :raw-link link))
@@ -3759,7 +3760,7 @@ It's nice to have a table of contents section for long literate configuration fi
                (TeX-source-correlate-start-server . t)
                (TeX-source-correlate-mode . t)
                (TeX-PDF-mode . t))
-  
+
       :preface
       (defun my/latex-mode-hook nil
         (visual-fill-column-mode t)
@@ -3774,7 +3775,7 @@ It's nice to have a table of contents section for long literate configuration fi
             (add-to-list 'TeX-command-list `(,(car command-alist)
                                              ,(cdr command-alist)
                                              TeX-run-command t nil))))))
-  
+
     (leaf latex-extra
       :doc "Adds several useful functionalities to LaTeX-mode."
       :req "auctex-11.86.1" "cl-lib-0.5"
@@ -3784,7 +3785,7 @@ It's nice to have a table of contents section for long literate configuration fi
       :bind (:latex-extra-mode-map
              ("C-M-f" . forward-paragraph)
              ("C-M-b" . backward-paragraph)))
-  
+
     (leaf reftex
       :hook (LaTeX-mode-hook . reftex-mode)
       :bind (reftex-mode-map
@@ -3792,7 +3793,8 @@ It's nice to have a table of contents section for long literate configuration fi
              ("C-c l" . reftex-label)
              ("C-c c" . reftex-citation))
       :custom
-      (reftex-ref-style-default-list . '("Cleveref"))))
+      ((reftex-ref-style-default-list . '("Cleveref"))
+       (reftex-cite-format . 'natbib))))
 #+end_src
 
 * Applications
@@ -3971,8 +3973,8 @@ While browsing, remember the following:
              (skk-jisyo . "~/.skk-jisyo")
              (skk-backup-jisyo . "~/.skk-jisyo.BAK")
              (skk-save-jisyo-instantly . t)
-             (skk-server-host . "localhost")
-             (skk-server-portnum . 1178)
+             ;; (skk-server-host . "localhost")
+             ;; (skk-server-portnum . 1178)
              (skk-server-report-response . nil)
              (skk-byte-compile-init-file . t)
              (skk-preload . nil)
