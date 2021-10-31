@@ -89,9 +89,12 @@
                                          ((const :format "%v " :table-line-pos) (string))
                                          ((const :format "%v " :kill-buffer) (const t))))))))
 
-(defun orp-paperpile-org-roam-visit-paperpile ()
-  (interactive)
-  (org-link-open-from-string (org-entry-get 0 "PAPERPILE")))
+(defun org-roam-visit-pdf-online ()
+      (interactive)
+      (setq pdf-string (replace-regexp-in-string "\"" "" (org-entry-get 0 "PDF")))
+      (setq pdf-string-list (split "-----" pdf-string))
+      (org-link-open-from-string (nth 0 pdf-string-list))
+      )
 
 ;;;###autoload
 (defun orp-paperpile--open-paper (info)

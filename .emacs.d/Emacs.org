@@ -3357,29 +3357,6 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
           (apply f link arg)))))
 #+end_src
 
-
-***** COMMENT draft
-:PROPERTIES:
-:ID:       D7E41C99-28DC-464D-8C3F-45F8A8D5EEEB
-:END:
-#+begin_src emacs-lisp :noweb
-  (setq kw-str-list '("gan" "vae"))
-  (defun extract-keywords-from-string (str kw-str-list)
-    (progn (setq extracted-keywords nil)
-      (dolist (kw kw-str-list)
-        (when (string-match kw str)
-          (push kw extracted-keywords)))))
-  extract-keywords-from-string
-  
-  
-  (setq abst "The beginning and end of STRING, and each match for SEPARATORS, are
-  splitting points.  The substrings matching SEPARATORS are removed, and
-  the substrings between the splitting points are collected as a list,
-  which is returned.")
-  
-  (extract-keywords-from-string abst '("which" "collect"))
-#+end_src
-
 **** Create Bookmark
 #+begin_src js
   javascript:location.href =
