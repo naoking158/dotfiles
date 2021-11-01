@@ -18,6 +18,6 @@ if ($^O eq 'linux') {
     $pdf_previewer = 'okular --unique %S';
     # $pdf_previewer = "xdg-open %S";
 } else {
-    $pdf_previewer = "skim";
+    $pdf_previewer = "open -a Skim";
 }
 
