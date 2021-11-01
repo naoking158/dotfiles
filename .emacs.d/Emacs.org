@@ -141,7 +141,7 @@ a bunch of resources I've found online.
   (set-clipboard-coding-system 'utf-8)
   (set-selection-coding-system 'utf-8)
   (set-default 'buffer-file-coding-system 'utf-8)
-  (setq debug-on-error t
+  (setq debug-on-error nil
         init-file-debug t
         user-full-name "Naoki Sakamoto"
         user-mail-address "naoki@bbo.cs.tsukuba.ac.jp"
@@ -3944,7 +3944,7 @@ While browsing, remember the following:
 - =skk-auto-okuri-process= は =nil= にしておかないと， =いぞん (izonn)= など一部の文字の変換ができなくなる.
 
 #+begin_src emacs-lisp
-
+  
   (leaf skk
     :ensure ddskk
     :hook ((after-init-hook . skk-mode)
@@ -3976,13 +3976,13 @@ While browsing, remember the following:
              (skk-inline-show-face . '( :foreground "#ECEFF4"
                                         :background "#4C566A"
                                         :inherit 'normal)))
-
+  
     :config
     (leaf ddskk-posframe
       :load-path "~/.emacs.d/elisp/ddskk-posframe/"
       :require t
       :custom (ddskk-posframe-mode . t)))
-
+  
 #+end_src
 
 ** Dap Mode
