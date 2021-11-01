@@ -1135,23 +1135,16 @@ respectively."
   :ensure t
   :hook (after-init-hook . yas-global-mode)
   :blackout yas-minor-mode
-  :custom (yas-indent-line . 'fixed)
+  :custom ((yas-indent-line . 'fixed)
+           (yas-snippet-dirs . `(,(file-truename "~/.emacs.d/snippets/"))))
   :bind ((yas-keymap
-           ("<tab>" . nil))  ;; conflict with company/corf
+           ("<tab>" . nil))  ;; conflict with company/coruf
          (yas-minor-mode-map
           ("C-c y i" . yas-insert-snippet)
           ("C-c y n" . yas-new-snippet)
           ("C-c y v" . yas-visit-snippet-file)
           ("C-c y l" . yas-describe-tables)
-          ("C-c y g" . yas-reload-all)))
-  :config
-  (leaf yasnippet-snippets
-    :ensure t
-    :after yasnippet)
-  (leaf yatemplate
-    :ensure t
-    :after yasnippet
-    :hook (after-init-hook . yatemplate-fill-alist)))
+          ("C-c y g" . yas-reload-all))))
 
 (leaf google-translate
   :ensure t
