@@ -376,7 +376,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :END:
 
 #+begin_src emacs-lisp
-  
+
   (leaf *general-configrations
     :config
     (leaf cus-start
@@ -412,8 +412,9 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                 (indent-tabs-mode . nil))
       :config
       (when-let ((gls (executable-find "gls")))
-        (setq insert-directory-program gls))
-  
+        (setq insert-directory-program gls dired-use-ls-dired t)
+        (setq dired-listing-switches "-al --group-directories-first"))
+
       (defalias 'yes-or-no-p 'y-or-n-p)
       (keyboard-translate 8 127)
       (mapc (lambda (fn)
@@ -424,7 +425,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                   'narrow-to-page
                   'narrow-to-defun
                   'list-timers)))
-  
+
     (leaf exec-path-from-shell
       :doc "Get environment variables such as $PATH from the shell"
       :tag "environment" "unix"
@@ -436,7 +437,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                (exec-path-from-shell-variables . '("PATH" "PYTHONPATH" "NEPTUNE_API_TOKEN")))
       :config
       (exec-path-from-shell-initialize))
-  
+
     (leaf eldoc
       :doc "Show function arglist or variable docstring in echo area"
       :tag "builtin"
@@ -2220,10 +2221,6 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                 (org-roam-node (styles orderless-migemo-style)))))
 
       :preface
-      ;; (defun just-one-face (fn &rest args)
-      ;;   (let ((orderless-match-faces [completions-common-part]))
-      ;;     (apply fn args)))
-
       (defun orderless-migemo (component)
         (let ((pattern (migemo-get-pattern component)))
           (condition-case nil
@@ -2247,10 +2244,14 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :ensure t
     :hook (after-init-hook . migemo-init)
     :custom
-    '((migemo-user-dictionary  . nil)
+    `((migemo-user-dictionary  . nil)
       (migemo-regex-dictionary . nil)
       (migemo-coding-system    . 'utf-8)
-      (migemo-dictionary . "/usr/local/share/migemo/utf-8/migemo-dict")
+      (migemo-dictionary . ,(cond
+                             ((file-exists-p "/usr/local/share/migemo/utf-8/migemo-dict")
+                              "/usr/local/share/migemo/utf-8/migemo-dict")
+                             ((file-exists-p "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
+                              "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")))
       (migemo-isearch-enable-p . t)))
 #+end_src
 
@@ -4032,13 +4033,36 @@ While browsing, remember the following:
 :ID:       708C16FF-B967-4E17-8846-C73B711FC9F5
 :END:
 
+*** Prepare
+
 https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-03.org
 
+#+begin_src shell
+  mbsync -a
+
+  mu init --maildir=~/Mail \
+     --my-address=naoki@bbo.cs.tsukuba.ac.jp \
+     --my-address=nok.skmt.snow@gmail.com \
+     --my-address=s1930160@s.tsukuba.ac.jp
+
+  mu index
+#+end_src
+
+
+*** Config
 #+begin_src emacs-lisp
-  (let* ((parent (if (memq window-system '(darwin ns)) "/usr/local/Cellar/mu/"
-                   "/usr/share/emacs/"))
-         (cmd (concat "find " parent " -type d -name mu4e")))
-    (setq path-to-mu (car (last (split-string (shell-command-to-string cmd))))))
+  (let* ((file-dir (cond
+                    ((when (file-exists-p "/usr/share/emacs/")
+                       "/usr/share/emacs/"))
+                    ((when (file-exists-p "/opt/homebrew/Cellar/mu/")
+                       "/opt/homebrew/Cellar/mu/"))
+                    ((when (file-exists-p "/usr/local/Cellar/mu/")
+                       "/usr/local/Cellar/mu/")))))
+    (setq path-to-mu
+          (car (last (split-string
+                      (shell-command-to-string
+                       (concat "find " file-dir " -type d -name mu4e")))))))
+
 
   (leaf mu4e
     :when path-to-mu

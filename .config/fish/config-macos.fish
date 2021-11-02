@@ -1,3 +1,5 @@
+eval (/opt/homebrew/bin/brew shellenv)
+
 # Homebrew
 set -xg HOMEBREW_EDITOR "/usr/local/bin/emacs -q -nw"
 
@@ -29,6 +31,7 @@ set -gx CPPFLAGS "-I/usr/local/opt/ruby/include" $CPPFLAGS
 set -gx PKG_CONFIG_PATH "/usr/local/opt/ruby/lib/pkgconfig" $PKG_CONFIG_PATH
 set -gx PKG_CONFIG_PATH "/usr/local/lib/pkgconfig" $PKG_CONFIG_PATH
 set -gx PKG_CONFIG_PATH "/usr/local/lib/pkgconfig" $PKG_CONFIG_PATH
+# set -gx LIBRARY_PATH (brew --prefix libgccjit)/lib/gcc/11 $LIBRARY_PATH
 
 
 alias reformatpdftoeps='find . -name "*.pdf" -print0 | xargs -0 -I "{}" pdftops -f 1 -l 1 -eps "{}" "{}.eps"'

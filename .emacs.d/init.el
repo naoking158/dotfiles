@@ -173,7 +173,8 @@
               (indent-tabs-mode . nil))
     :config
     (when-let ((gls (executable-find "gls")))
-      (setq insert-directory-program gls))
+      (setq insert-directory-program gls dired-use-ls-dired t)
+      (setq dired-listing-switches "-al --group-directories-first"))
 
     (defalias 'yes-or-no-p 'y-or-n-p)
     (keyboard-translate 8 127)
@@ -1528,10 +1529,6 @@ respectively."
               (org-roam-node (styles orderless-migemo-style)))))
 
     :preface
-    ;; (defun just-one-face (fn &rest args)
-    ;;   (let ((orderless-match-faces [completions-common-part]))
-    ;;     (apply fn args)))
-
     (defun orderless-migemo (component)
       (let ((pattern (migemo-get-pattern component)))
         (condition-case nil
@@ -1555,10 +1552,14 @@ respectively."
   :ensure t
   :hook (after-init-hook . migemo-init)
   :custom
-  '((migemo-user-dictionary  . nil)
+  `((migemo-user-dictionary  . nil)
     (migemo-regex-dictionary . nil)
     (migemo-coding-system    . 'utf-8)
-    (migemo-dictionary . "/usr/local/share/migemo/utf-8/migemo-dict")
+    (migemo-dictionary . ,(cond
+                           ((file-exists-p "/usr/local/share/migemo/utf-8/migemo-dict")
+                            "/usr/local/share/migemo/utf-8/migemo-dict")
+                           ((file-exists-p "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
+                            "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")))
     (migemo-isearch-enable-p . t)))
 
 (leaf marginalia
@@ -2733,10 +2734,18 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   ;;  (python-mode-hook . dap-tooltip-mode))
   )
 
-(let* ((parent (if (memq window-system '(darwin ns)) "/usr/local/Cellar/mu/"
-                 "/usr/share/emacs/"))
-       (cmd (concat "find " parent " -type d -name mu4e")))
-  (setq path-to-mu (car (last (split-string (shell-command-to-string cmd))))))
+(let* ((file-dir (cond
+                  ((when (file-exists-p "/usr/share/emacs/")
+                     "/usr/share/emacs/"))
+                  ((when (file-exists-p "/opt/homebrew/Cellar/mu/")
+                     "/opt/homebrew/Cellar/mu/"))
+                  ((when (file-exists-p "/usr/local/Cellar/mu/")
+                     "/usr/local/Cellar/mu/")))))
+  (setq path-to-mu
+        (car (last (split-string
+                    (shell-command-to-string
+                     (concat "find " file-dir " -type d -name mu4e")))))))
+
 
 (leaf mu4e
   :when path-to-mu
