@@ -12,7 +12,7 @@ function backup_homedir
         set basedir /Volumes/NSSD/backup/$OS
     end
 
-    set backup_dirs $HOME/Downloads $HOME/src $HOME/.dotfiles $HOME/drive
+    set backup_dirs "$HOME/Downloads" "$HOME/src/github.com/naoking158" "$HOME/.dotfiles $HOME/drive"
 
     echo "+ -------- These dirs will be backup:"
     echo \n"$backup_dirs"\n
@@ -65,9 +65,9 @@ function backup_homedir
     switch $confirm
         case 'yes'
             mkdir -p $path_to_backupdir
-            rsync -avh --link-dest=$latestbackup $backup_dirs $path_to_backupdir
+            rsync -avh --exclude 'Pictures' --link-dest=$latestbackup $backup_dirs $path_to_backupdir
         case 'test'
-            rsync -avh --dry-run --stats --link-dest=$latestbackup $backup_dirs $path_to_backupdir
+            rsync -avh --dry-run --stats --exclude 'Pictures' --link-dest=$latestbackup $backup_dirs $path_to_backupdir
         case '' 'no'
             command echo \n"Backup is canceled."
     end
