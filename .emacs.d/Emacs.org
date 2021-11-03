@@ -675,7 +675,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
       (when window-system
         (setq dashboard-startup-banner "~/.emacs.d/banner/coffee.png"))
       (dashboard-setup-startup-hook))
-	
+
     (leaf set-title-bar
       :when window-system
       :config
@@ -731,7 +731,7 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
     :advice (:after load-theme my/set-font-weight-after-load-theme)
     :preface
     (setq-default text-scale-remap-header-line t)
-    (setq-default my-fontsize (if (eq 'darwin system-type) 18 14))
+    (setq-default my-fontsize (if (eq 'darwin system-type) 16 14))
 
     (defun my/set-font-size (fontsize)
       (interactive (list
