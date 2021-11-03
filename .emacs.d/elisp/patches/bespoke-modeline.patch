@@ -1,19 +1,35 @@
-*** /tmp/ediffxaBkfH	2021-09-30 17:22:54.891121639 +0900
---- /home/naoki/.emacs.d/elisp/bespoke-theme/bespoke-modeline.el	2021-09-30 17:21:42.804450178 +0900
+*** /var/folders/8g/39bkjb7d4hd9zr934zmpt8180000gn/T/ediffCmaPd5	Wed Nov  3 16:47:26 2021
+--- /var/folders/8g/39bkjb7d4hd9zr934zmpt8180000gn/T/ediffn5Opm3	Wed Nov  3 16:47:26 2021
 ***************
-*** 252,258 ****
+*** 252,259 ****
   		                    'display `(raise ,space-down))
                   (if (derived-mode-p 'deft-mode)
                       (propertize primary 'face 'match)
 ! 	              (propertize primary 'face 'fringe))))
-           (right (concat secondary " "))
+!          (right (concat secondary " "))
            (available-width (- (window-total-width)
   			                 (length prefix) (length left) (length right)
---- 252,276 ----
+  			                 (/ (window-right-divider-width) char-width)))
+--- 252,292 ----
   		                    'display `(raise ,space-down))
                   (if (derived-mode-p 'deft-mode)
                       (propertize primary 'face 'match)
 ! 									(propertize primary 'face 'fringe))
+!                 (propertize "   "  'face (if active (cond ((eq bespoke-set-mode-line 'header)
+!                                                            'header-line)
+!                                                           ((eq bespoke-set-mode-line 'footer)
+!                                                            'mode-line)
+!                                                           ((eq bespoke-set-mode-line nil)
+!                                                            'mode-line))
+!                                            'fringe)
+! 		                        'display `(raise ,space-down))
+!                 (propertize secondary 'face (if active (cond ((eq bespoke-set-mode-line 'header)
+!                                                               'header-line)
+!                                                              ((eq bespoke-set-mode-line 'footer)
+!                                                               'mode-line)
+!                                                              ((eq bespoke-set-mode-line nil)
+!                                                               'mode-line))
+!                                               'fringe))
 ! 
 ! 								(when (and org-mode-line-string
 !  													 (not (or (bespoke-modeline-term-mode-p)
@@ -32,6 +48,7 @@
 !  																'fringe)
 !  															'display `(raise ,space-down))
 !  									(propertize org-mode-line-string 'face 'fringe))))
-           (right (concat secondary " "))
+!          (right (concat " " display-time-string "                  "))
            (available-width (- (window-total-width)
   			                 (length prefix) (length left) (length right)
+  			                 (/ (window-right-divider-width) char-width)))
