@@ -140,6 +140,9 @@
 
 (leaf *general-configrations
   :config
+  (when-let ((gls (executable-find "gls")))
+    (setq insert-directory-program gls dired-use-ls-dired t)
+    (setq dired-listing-switches "-al --group-directories-first"))
   (leaf cus-start
     :doc "define customization properties of builtins"
     :tag "builtin" "internal"
@@ -172,10 +175,6 @@
               (save-interprogram-paste-before-kill . t)
               (indent-tabs-mode . nil))
     :config
-    (when-let ((gls (executable-find "gls")))
-      (setq insert-directory-program gls dired-use-ls-dired t)
-      (setq dired-listing-switches "-al --group-directories-first"))
-
     (defalias 'yes-or-no-p 'y-or-n-p)
     (keyboard-translate 8 127)
     (mapc (lambda (fn)
@@ -2417,21 +2416,12 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                        (if (string-prefix-p "chrome-extension" path)
                            "brave"
                          "open")
-                       path "&")))
-        (shell-command (c-concat-separated cmd-list " "))
-
-        ;; (if (string-prefix-p "chrome-extension" path)
-        ;;     (async-shell-command (concat "brave " (shell-quote-argument path)))
-        ;;   (async-shell-command (concat "open " (shell-quote-argument path))))
-        ))
+                       (concat "'" path "'")
+                       "&")))
+        (shell-command (c-concat-separated cmd-list " "))))
      ((eq system-type 'gnu/linux)
-      (let ((process-connection-type nil)
-            ;; (cmd-list (list
-            ;;            "start xdg-open" path "&"))
-            )
-        ;; (shell-command (c-concat-separated cmd-list " "))
-        (start-process "" nil "xdg-open" path)
-        ))))
+      (let ((process-connection-type nil))
+        (start-process "" nil "xdg-open" path)))))
 
   ;; for open paperpile link in external browser
   (defun advice-around-org-link-open (f link &optional arg)
@@ -2682,6 +2672,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (skk-jisyo . "~/.skk-jisyo")
            (skk-backup-jisyo . "~/.skk-jisyo.BAK")
            (skk-save-jisyo-instantly . t)
+           (skk-share-private-jisyo . t)
            ;; (skk-server-host . "localhost")
            ;; (skk-server-portnum . 1178)
            (skk-server-report-response . nil)
