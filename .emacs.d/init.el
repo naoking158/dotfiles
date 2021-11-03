@@ -1239,7 +1239,7 @@ respectively."
 
 (leaf visual-fill-column
   :ensure t
-  :custom ((visual-fill-column-width . 82)
+  :custom ((visual-fill-column-width . 88)
            (visual-fill-column-center-text . t))
   :hook (org-mode-hook . visual-fill-column-mode))
 
