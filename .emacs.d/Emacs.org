@@ -3517,7 +3517,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
 :END:
 
 #+begin_src emacs-lisp
-  
+
   (leaf org-bullets
     :disabled t
     :doc "Show bullets in org-mode as UTF-8 characters"
@@ -3527,14 +3527,14 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
     (org-bullets-bullet-list quote
                              ("" "" "" "" "" "" "" "" "" ""))
     :hook (org-mode-hook . org-bullets-mode))
-  
+
   (leaf org-superstar
     :ensure t
     :after org
     :hook (org-mode-hook . org-superstar-mode)
     :custom
     ((org-superstar-remove-leading-stars . nil)
-     (org-superstar-headline-bullets-list . '("◉" "○" "●" "✿" "✸" " " " "))
+     (org-superstar-headline-bullets-list . '( "●" "○" "◉" "◇" "✿" "✸" " " ))
      (org-superstar-item-bullet-alist . '((?+ . ?➤)
                                           (?* . ?•)
                                           (?- . ?-)))

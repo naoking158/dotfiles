@@ -2455,7 +2455,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :hook (org-mode-hook . org-superstar-mode)
   :custom
   ((org-superstar-remove-leading-stars . nil)
-   (org-superstar-headline-bullets-list . '("◉" "○" "●" "✿" "✸" " " " "))
+   (org-superstar-headline-bullets-list . '( "●" "○" "◉" "◇" "✿" "✸" " " ))
    (org-superstar-item-bullet-alist . '((?+ . ?➤)
                                         (?* . ?•)
                                         (?- . ?-)))
