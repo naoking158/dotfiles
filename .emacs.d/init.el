@@ -140,9 +140,6 @@
 
 (leaf *general-configrations
   :config
-  (when-let ((gls (executable-find "gls")))
-    (setq insert-directory-program gls dired-use-ls-dired t)
-    (setq dired-listing-switches "-al --group-directories-first"))
   (leaf cus-start
     :doc "define customization properties of builtins"
     :tag "builtin" "internal"
@@ -150,7 +147,13 @@
     :leaf-defer nil
     :bind (("C-M-h" . delete-region)
            ([remap eval-last-sexp] . pp-eval-last-sexp))
-    :hook (after-init-hook . (lambda nil (menu-bar-mode -1)))
+    :hook (after-init-hook . general-init-hook)
+    :preface
+    (defun general-init-hook nil
+      (menu-bar-mode -1)
+      (when-let ((gls (executable-find "gls")))
+        (setq insert-directory-program gls dired-use-ls-dired t)
+        (setq dired-listing-switches "-al --group-directories-first")))
     :custom '((fill-column . 82)
               (tab-width . 2)             
               (frame-resize-pixelwise . t)
