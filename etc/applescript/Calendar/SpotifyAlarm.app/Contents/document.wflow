@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>AMApplicationBuild</key>
-	<string>509</string>
+	<string>512</string>
 	<key>AMApplicationVersion</key>
 	<string>2.10</string>
 	<key>AMDocumentVersion</key>
@@ -75,6 +75,8 @@
 				</array>
 				<key>Class Name</key>
 				<string>AMSetComputerVolume</string>
+				<key>Disabled</key>
+				<true/>
 				<key>InputUUID</key>
 				<string>83D59E9D-CEEF-4309-9C67-A787F9EFE162</string>
 				<key>Keywords</key>
@@ -151,14 +153,14 @@
 					</dict>
 				</dict>
 				<key>isViewVisible</key>
-				<true/>
+				<integer>0</integer>
 				<key>location</key>
-				<string>409.500000:315.000000</string>
+				<string>309.000000:111.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Set Computer Volume.action/Contents/Resources/Base.lproj/main.nib</string>
 			</dict>
 			<key>isViewVisible</key>
-			<true/>
+			<integer>0</integer>
 		</dict>
 		<dict>
 			<key>action</key>
@@ -214,7 +216,7 @@
 					<key>syncSetting</key>
 					<integer>0</integer>
 					<key>volumeSetting</key>
-					<real>49.355201198630141</real>
+					<real>75.30679223744292</real>
 				</dict>
 				<key>BundleIdentifier</key>
 				<string>com.apple.Automator.SetiTunesVolume</string>
@@ -230,6 +232,8 @@
 				</array>
 				<key>Class Name</key>
 				<string>AMSetiTunesVolumeAction</string>
+				<key>Disabled</key>
+				<true/>
 				<key>InputUUID</key>
 				<string>FE6AA50B-F8EE-4104-8999-572A99F95588</string>
 				<key>Keywords</key>
@@ -275,17 +279,15 @@
 						<string>1</string>
 					</dict>
 				</dict>
-				<key>conversionLabel</key>
-				<integer>0</integer>
 				<key>isViewVisible</key>
-				<integer>1</integer>
+				<integer>0</integer>
 				<key>location</key>
-				<string>409.500000:463.000000</string>
+				<string>309.000000:152.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Set iTunes Volume.action/Contents/Resources/Base.lproj/main.nib</string>
 			</dict>
 			<key>isViewVisible</key>
-			<integer>1</integer>
+			<integer>0</integer>
 		</dict>
 		<dict>
 			<key>action</key>
@@ -396,12 +398,10 @@
 						<string>0</string>
 					</dict>
 				</dict>
-				<key>conversionLabel</key>
-				<integer>0</integer>
 				<key>isViewVisible</key>
 				<integer>1</integer>
 				<key>location</key>
-				<string>409.500000:700.000000</string>
+				<string>309.000000:389.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Get Specified iTunes Items.action/Contents/Resources/Base.lproj/main.nib</string>
 			</dict>
@@ -531,12 +531,10 @@
 						<string>1</string>
 					</dict>
 				</dict>
-				<key>conversionLabel</key>
-				<integer>0</integer>
 				<key>isViewVisible</key>
 				<integer>1</integer>
 				<key>location</key>
-				<string>409.500000:855.000000</string>
+				<string>309.000000:488.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Play iTunes Playlist.action/Contents/Resources/Base.lproj/main.nib</string>
 			</dict>
@@ -546,21 +544,21 @@
 	</array>
 	<key>connectors</key>
 	<dict>
-		<key>60C64EFB-B139-4DF6-9C28-9CE427C3D8BF</key>
-		<dict>
-			<key>from</key>
-			<string>5D4519EF-5264-4E18-91A8-B159AF3BB645 - 5D4519EF-5264-4E18-91A8-B159AF3BB645</string>
-			<key>to</key>
-			<string>ED80DE74-E384-4D71-A1CC-45CCB72AF185 - ED80DE74-E384-4D71-A1CC-45CCB72AF185</string>
-		</dict>
-		<key>94D9E2D0-CD55-4B99-9F0E-0459CDE7639C</key>
+		<key>592700C4-7025-40DB-91F2-BD4ABC3004E0</key>
 		<dict>
 			<key>from</key>
 			<string>ED80DE74-E384-4D71-A1CC-45CCB72AF185 - ED80DE74-E384-4D71-A1CC-45CCB72AF185</string>
 			<key>to</key>
 			<string>27FF56EE-9F77-488C-B5BE-1E3B8A4E9018 - 27FF56EE-9F77-488C-B5BE-1E3B8A4E9018</string>
 		</dict>
-		<key>CC106D31-C0EA-4FB7-8A1E-4EB73DCB8E86</key>
+		<key>BAE033E2-72EC-4FAB-B9B3-8DA5AC9FAE79</key>
+		<dict>
+			<key>from</key>
+			<string>5D4519EF-5264-4E18-91A8-B159AF3BB645 - 5D4519EF-5264-4E18-91A8-B159AF3BB645</string>
+			<key>to</key>
+			<string>ED80DE74-E384-4D71-A1CC-45CCB72AF185 - ED80DE74-E384-4D71-A1CC-45CCB72AF185</string>
+		</dict>
+		<key>BD151034-8C37-4699-A2A0-467908D9BDD1</key>
 		<dict>
 			<key>from</key>
 			<string>423B7A19-12AA-4803-8D81-4F3E47272DD7 - 423B7A19-12AA-4803-8D81-4F3E47272DD7</string>
