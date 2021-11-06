@@ -482,82 +482,70 @@
                     (t 'light))))
       (my/set-font-weight weight))))
 
-(leaf doom-themes
-  :doc "an opinionated pack of modern color-themes"
-  :req "emacs-25.1" "cl-lib-0.5"
-  :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
-  :url "https://github.com/hlissner/emacs-doom-theme"
-  :leaf-defer nil
-  :ensure t neotree all-the-icons
-  :require neotree all-the-icons
-  :custom ((doom-themes-enable-italic . nil)
-           (doom-themes-enable-bold . t))
-  :config
-  (defun my/load-doom-theme (sym-theme)
-    (load-theme sym-theme t)
-    (doom-themes-neotree-config)
-    (doom-themes-org-config)
-    (doom-themes-treemacs-config)))
-
-(leaf modus-themes
-  :ensure t
-  :custom
-  ((modus-themes-bold-constructs . t)
-   (modus-themes-region . '(bg-only no-extend))
-   (modus-themes-org-blocks . 'gray-background)
-   (modus-themes-subtle-line-numbers . t)
-   (modus-themes-variable-pitch-headings . t)
-   (modus-themes-variable-pitch-ui . t)
-   (modus-themes-fringes . nil)
-   (modus-themes-prompts . '(intense gray))
-   (modus-themes-completions . 'opinionated)
-   (modus-themes-paren-match . '(bold intense underline))
-   ;; this is an alist: read the manual or its doc string
-   (modus-themes-org-agenda quote 
-                            '((header-block . (variable-pitch scale-title))
-                              (header-date . (grayscale workaholic bold-today))
-                              (scheduled . uniform)
-                              (habit . traffic-light-deuteranopia))))
-  :config
-  (defun my/load-modus-theme (sym-theme)
-    (modus-themes-load-themes)
-    (pcase sym-theme
-      ('modus-dark (modus-themes-load-vivendi))
-      ('modus-light (modus-themes-load-operandi)))))
-
-
-(leaf bespoke-themes
-  :load-path "~/.emacs.d/elisp/bespoke-theme/"
-  :require t bespoke-theme bespoke-modeline
-  :custom ((bespoke-set-mode-line . 'footer)      ;; Set header line
-           (bespoke-set-mode-line-cleaner . nil)  ;; Set mode-line cleaner
-           (bespoke-set-italic-comments . nil)    ;; Set use of italics
-           (bespoke-set-italic-keywords . nil)
-           ;; (bespoke-set-theme . 'dark)
-           ;; Set initial theme variant
-           (bespoke-set-mode-line-size . 1))
-  :preface
-  (defun my/load-bespoke-theme (sym-theme)
-    (funcall sym-theme)
-    (custom-theme-set-faces
-       `user
-       `(org-agenda-clocking ((t :foreground ,bespoke-salient)))
-       `(org-agenda-done ((t :foreground ,bespoke-faded :strike-through nil))))
-    (bespoke-modeline-org-agenda-mode)))
-
-
 (leaf themes
-  :leaf-defer nil
-  :hook (after-init-hook . (lambda ()
-                             (let ((time
-                                    (string-to-number
-                                     (format-time-string "%H"))))
-                               (if (and (> time 5) (< time 18))
-                                   (my/load-theme 'bespoke/light-theme)
-                                 (my/load-theme 'bespoke/dark-theme)))))
+  :hook (after-init-hook . my/default-theme)
   :advice (:before load-theme (lambda (&rest args)
                                 (mapc #'disable-theme custom-enabled-themes)))
   :preface
+  (leaf doom-themes
+    :doc "an opinionated pack of modern color-themes"
+    :req "emacs-25.1" "cl-lib-0.5"
+    :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
+    :url "https://github.com/hlissner/emacs-doom-theme"
+    :ensure t neotree all-the-icons
+    :custom ((doom-themes-enable-italic . nil)
+             (doom-themes-enable-bold . t))
+    :config
+    (defun my/load-doom-theme (sym-theme)
+      (require 'neotree)
+      (require 'all-the-icons)
+      (load-theme sym-theme t)
+      (doom-themes-neotree-config)
+      (doom-themes-org-config)
+      (doom-themes-treemacs-config)))
+
+  (leaf modus-themes
+    :ensure t
+    :custom
+    ((modus-themes-bold-constructs . t)
+     (modus-themes-region . '(bg-only no-extend))
+     (modus-themes-org-blocks . 'gray-background)
+     (modus-themes-subtle-line-numbers . t)
+     (modus-themes-variable-pitch-headings . t)
+     (modus-themes-variable-pitch-ui . t)
+     (modus-themes-fringes . nil)
+     (modus-themes-prompts . '(intense gray))
+     (modus-themes-completions . 'opinionated)
+     (modus-themes-paren-match . '(bold intense underline))
+     ;; this is an alist: read the manual or its doc string
+     (modus-themes-org-agenda quote 
+                              '((header-block . (variable-pitch scale-title))
+                                (header-date . (grayscale workaholic bold-today))
+                                (scheduled . uniform)
+                                (habit . traffic-light-deuteranopia))))
+    :config
+    (defun my/load-modus-theme (sym-theme)
+      (modus-themes-load-themes)
+      (pcase sym-theme
+        ('modus-dark (modus-themes-load-vivendi))
+        ('modus-light (modus-themes-load-operandi)))))
+
+  (leaf bespoke-themes
+    :load-path "~/.emacs.d/elisp/bespoke-themes/"
+    :require t bespoke-theme
+    :custom ((bespoke-set-mode-line-size . 1)  ;; Set initial theme variant
+             (bespoke-set-italic-comments . nil)
+             (bespoke-set-italic-keywords . nil))
+    :config
+    (defun my/load-bespoke-theme (sym-theme)
+      (funcall sym-theme)
+      (custom-theme-set-faces
+       `user
+       `(org-agenda-clocking ((t :foreground ,bespoke-salient)))
+       `(org-agenda-done ((t :foreground ,bespoke-faded :strike-through nil))))
+))
+
+    ;;; utils
   (setq my/theme-list '(doom-nord
                         doom-solarized-light
                         modus-light
@@ -583,35 +571,38 @@
     (setq my-load-theme-func (my/load-theme-func-for sym-theme))
     (funcall my-load-theme-func sym-theme))
 
+  (defun my/default-theme nil
+    (let ((time
+           (string-to-number
+            (format-time-string "%H"))))
+      (if (and (> time 5) (< time 18))
+          (my/load-theme 'bespoke/light-theme)
+        (my/load-theme 'bespoke/dark-theme))))
+
   :config
   (column-number-mode)
-  (setq inhibit-compacting-font-caches t)
+  (setq inhibit-compacting-font-caches t))
 
+(leaf *modelines
+  :leaf-defer nil
+  :hook (after-init-hook . my/modeline-bespoke)
+  :preface
   (leaf moody
-    :disabled t
-    :when window-system
     :ensure t
-    :custom (x-underline-at-descent-line . t)
-    :leaf-defer nil
-    ;; hide marks ``---'',
-    ;;     which is part of ``U:---'' on the left side of the mode line
-    :hook (after-init-hook . (lambda () (dolist (mode '(mode-line-client
-                                                        mode-line-modified
-                                                        mode-line-remote))
-                                          (moody-replace-element mode ""))))
-    :config
-    (moody-replace-mode-line-buffer-identification)
-    (moody-replace-vc-mode))
+    :config (defun my/moody-modeline nil
+              (interactive)
+              (setq x-underline-at-descent-line t)
+              (moody-replace-mode-line-buffer-identification)
+              (moody-replace-vc-mode)
+              (moody-replace-eldoc-minibuffer-message-function)))
 
   (leaf doom-modeline
     :disabled t
-    :when (not window-system)
     :doc "A minimal and modern mode-line"
     :req "emacs-25.1" "all-the-icons-2.2.0" "shrink-path-0.2.0" "dash-2.11.0"
     :tag "mode-line" "faces" "emacs>=25.1"
     :url "https://github.com/seagle0128/doom-modeline"
     :ensure t
-    :hook (after-init-hook . doom-modeline-init)
     :custom-face ((mode-line . '((t (:height 0.9))))
                   (mode-line-inactive . '((t (:height 0.9)))))
     :custom ((doom-modeline-buffer-file-name-style . 'truncate-from-project)
@@ -1816,6 +1807,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
       (face-remap-add-relative 'default :inherit 'variable-pitch)
 
       ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+      (require 'bespoke-theme
+               "~/.emacs.d/elisp/bespoke-themes/bespoke-theme.el")
       (set-face-attribute 'org-block nil						:inherit 'fixed-pitch :foreground nil :background bespoke-subtle)
       (set-face-attribute 'org-table nil						:inherit 'fixed-pitch)
       (set-face-attribute 'org-formula nil					:inherit 'fixed-pitch)

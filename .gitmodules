@@ -28,3 +28,6 @@
 [submodule ".emacs.d/elisp/emacs-application-framework"]
 	path = .emacs.d/elisp/emacs-application-framework
 	url = https://github.com/emacs-eaf/emacs-application-framework.git
+[submodule ".emacs.d/elisp/bespoke-themes"]
+	path = .emacs.d/elisp/bespoke-themes
+	url = https://github.com/mclear-tools/bespoke-themes.git
