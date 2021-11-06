@@ -37,3 +37,6 @@
 [submodule ".emacs.d/elisp/eshell-p10k"]
 	path = .emacs.d/elisp/eshell-p10k
 	url = https://github.com/elken/eshell-p10k.git
+[submodule ".emacs.d/elisp/lin"]
+	path = .emacs.d/elisp/lin
+	url = https://github.com/protesilaos/lin.git

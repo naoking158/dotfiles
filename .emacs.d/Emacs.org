@@ -107,6 +107,7 @@ a bunch of resources I've found online.
   - [[#emacs-application-framework][Emacs Application Framework]]
   - [[#browse-at-remote][Browse at remote]]
   - [[#elfeed][Elfeed]]
+  - [[#lin-is-noticeable---linel][LIN Is Noticeable - lin.el]]
 - [[#footer][Footer]]
 :END:
 
@@ -695,11 +696,11 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :END:
 
 #+begin_src emacs-lisp
-  
+
   (leaf global-visual-line-mode
     :tag "builtin"
     :global-minor-mode t)
-  
+
   (leaf *frame-transparency
     :preface
     (defun my/change-transparency (&optional alpha-num)
@@ -709,10 +710,10 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
       (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5)))
       (add-to-list 'default-frame-alist
                    `(alpha . (,alpha-num . ,(- alpha-num 5)))))
-  
+
     :config
     (my/change-transparency 100))
-  
+
 #+end_src
 
 ** Font Configuration
@@ -4785,6 +4786,35 @@ From the search buffer there are a number of ways to interact with entries. Entr
        ("https://www.reddit.com/r/AppleWatch.rss" AppleWatch)))))
 #+end_src
 
+** LIN Is Noticeable - lin.el
+
+#+begin_src emacs-lisp
+  (leaf lin
+    :load-path "~/.emacs.d/elisp/lin/"
+    :require t
+    :hook (after-init-hook . (lambda nil
+                               (global-hl-line-mode)))
+    :global-minor-mode global-lin-mode
+    :advice (:after load-theme my/advice-lin-face-after-load-theme)
+    :init
+    (define-globalized-minor-mode global-lin-mode lin-mode lin--on :group 'lin)
+    (defun lin--on ()
+      "Turn `lin-mode' on."
+      (unless (or noninteractive
+                  (eq (aref (buffer-name) 0) ?\s))
+        (lin-mode 1)))
+    :config
+    (defun my/advice-lin-face-after-load-theme (&rest args)
+      (let* ((str-theme (symbol-name (car args)))
+             (bg-color (cond
+                        ((string-match "\\(light\\|operandi\\)" str-theme) "#FAF2F0")
+                        ((and (string-match "bespoke" str-theme)
+                              (eq 'light bespoke-set-theme)) "#FAF2F0")
+                        (t "#1C2835"))))
+        (set-face-attribute 'lin-hl nil :background bg-color))))
+
+
+#+end_src
 
 * Footer
 :PROPERTIES:
