@@ -1,31 +1,27 @@
-*** /tmp/ediff0zHAHW	2021-09-30 17:23:35.751123909 +0900
---- /home/naoki/.emacs.d/elisp/bespoke-theme/bespoke-theme.el	2021-09-30 17:20:15.231109474 +0900
+*** /var/folders/8g/39bkjb7d4hd9zr934zmpt8180000gn/T/ediffU1kuBg	Sat Nov  6 16:24:15 2021
+--- /var/folders/8g/39bkjb7d4hd9zr934zmpt8180000gn/T/ediffaaAEzQ	Sat Nov  6 16:24:15 2021
 ***************
-*** 241,250 ****
+*** 226,233 ****
   
   (defun bespoke--set-theme-variant ()
     "Set theme colors according to LIGHT or DARK variant"
 !   (setq bespoke-foreground (--l/d "#282b35" "#eceff1"))
 !   (setq bespoke-background (--l/d "#fffef9" "#282b35"))
   
-!   (setq bespoke-modeline   (--l/d "#e3e7ef" "#3c4353"))
+    (setq bespoke-modeline   (--l/d "#e3e7ef" "#3c4353"))
     (setq bespoke-highlight  (--l/d "#dbe1eb" "#444B5c"))
-    (setq bespoke-inactive   (--l/d "#cbd3e1" "#525868"))
-  
---- 241,250 ----
+--- 226,233 ----
   
   (defun bespoke--set-theme-variant ()
     "Set theme colors according to LIGHT or DARK variant"
-! 	(setq bespoke-foreground (--l/d "#282b35" "#eceff8"))
-! 	(setq bespoke-background (--l/d "#fffef9" "#23262f"))
+!   (setq bespoke-foreground (--l/d "#161922" "#eceff1"))
+!   (setq bespoke-background (--l/d "#fffef9" "#161922"))
   
-! 	(setq bespoke-modeline   (--l/d "#e3e7ef" "#3c4353"))
+    (setq bespoke-modeline   (--l/d "#e3e7ef" "#3c4353"))
     (setq bespoke-highlight  (--l/d "#dbe1eb" "#444B5c"))
-    (setq bespoke-inactive   (--l/d "#cbd3e1" "#525868"))
-  
 ***************
-*** 794,836 ****
-  
+*** 855,897 ****
+                                     :underline nil))))
   
   ;;;;; Mu4e
 !    `(mu4e-attach-number-face                      ((,class :foreground ,bespoke-strong)))
@@ -68,8 +64,8 @@
   
   ;;;;; Org-agenda
      `(org-agenda-calendar-event                    ((,class :inherit default)))
---- 794,836 ----
-  
+--- 855,897 ----
+                                     :underline nil))))
   
   ;;;;; Mu4e
 !    ;; `(mu4e-attach-number-face                      ((,class :foreground ,bespoke-strong)))

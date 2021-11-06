@@ -1,54 +1,65 @@
-*** /var/folders/8g/39bkjb7d4hd9zr934zmpt8180000gn/T/ediffCmaPd5	Wed Nov  3 16:47:26 2021
---- /var/folders/8g/39bkjb7d4hd9zr934zmpt8180000gn/T/ediffn5Opm3	Wed Nov  3 16:47:26 2021
+*** /var/folders/8g/39bkjb7d4hd9zr934zmpt8180000gn/T/ediffxCk6h2	Sat Nov  6 16:25:04 2021
+--- /var/folders/8g/39bkjb7d4hd9zr934zmpt8180000gn/T/ediffDSYm9Y	Sat Nov  6 16:25:04 2021
 ***************
-*** 252,259 ****
-  		                    'display `(raise ,space-down))
-                  (if (derived-mode-p 'deft-mode)
-                      (propertize primary 'face 'match)
-! 	              (propertize primary 'face 'fringe))))
-!          (right (concat secondary " "))
+*** 455,466 ****
+                                           'bespoke-modeline-inactive)
+                              'display `(raise ,space-down))
+                  (propertize primary 'face (if active 'bespoke-modeline-active-primary
+!                                             'bespoke-modeline-inactive-primary))))
+           (right (concat secondary " "))
+  
            (available-width (- (window-total-width)
-  			                 (length prefix) (length left) (length right)
-  			                 (/ (window-right-divider-width) char-width)))
---- 252,292 ----
-  		                    'display `(raise ,space-down))
-                  (if (derived-mode-p 'deft-mode)
-                      (propertize primary 'face 'match)
-! 									(propertize primary 'face 'fringe))
-!                 (propertize "   "  'face (if active (cond ((eq bespoke-set-mode-line 'header)
-!                                                            'header-line)
-!                                                           ((eq bespoke-set-mode-line 'footer)
-!                                                            'mode-line)
-!                                                           ((eq bespoke-set-mode-line nil)
-!                                                            'mode-line))
-!                                            'fringe)
-! 		                        'display `(raise ,space-down))
-!                 (propertize secondary 'face (if active (cond ((eq bespoke-set-mode-line 'header)
-!                                                               'header-line)
-!                                                              ((eq bespoke-set-mode-line 'footer)
-!                                                               'mode-line)
-!                                                              ((eq bespoke-set-mode-line nil)
-!                                                               'mode-line))
-!                                               'fringe))
-! 
-! 								(when (and org-mode-line-string
-!  													 (not (or (bespoke-modeline-term-mode-p)
-!  																		(bespoke-modeline-vterm-mode-p)
-!  																		(bespoke-modeline-completion-list-mode-p)
-!  																		(bespoke-modeline-calendar-mode-p)
-!  																		(bespoke-modeline-org-capture-mode-p)
-!  																		(bespoke-modeline-org-agenda-mode-p))))
-!  									(propertize "  "  'face
-!  															(if active (cond ((eq bespoke-set-mode-line 'header)
-!  																								'header-line)
-!  																							 ((eq bespoke-set-mode-line 'footer)
-!  																								'mode-line)
-!  																							 ((eq bespoke-set-mode-line nil)
-!  																								'mode-line))
-!  																'fringe)
-!  															'display `(raise ,space-down))
-!  									(propertize org-mode-line-string 'face 'fringe))))
-!          (right (concat " " display-time-string "                  "))
+                               (length prefix) (length left) (length right)
+!                              (/ (window-right-divider-width) char-width)))
+           (available-width (max 1 available-width)))
+      (concat prefix
+              left
+--- 455,484 ----
+                                           'bespoke-modeline-inactive)
+                              'display `(raise ,space-down))
+                  (propertize primary 'face (if active 'bespoke-modeline-active-primary
+!                                             'bespoke-modeline-inactive-primary))
+!                 (when (and (boundp 'org-mode-line-string)
+!                            org-mode-line-string
+!   												 (not (or (bespoke-modeline-term-mode-p)
+!   																	(bespoke-modeline-vterm-mode-p)
+!   																	(bespoke-modeline-completion-list-mode-p)
+!   																	(bespoke-modeline-calendar-mode-p)
+!   																	(bespoke-modeline-org-capture-mode-p)
+!   																	(bespoke-modeline-org-agenda-mode-p))))
+!   								(propertize " "  'face (if active 'bespoke-modeline-active
+!                                            'bespoke-modeline-inactive)
+!                               'display `(raise ,space-up))
+!   								(propertize org-mode-line-string 'face
+!                               (if active 'bespoke-modeline-active-primary
+!                                 'bespoke-modeline-inactive-primary)))))
+           (right (concat secondary " "))
+  
            (available-width (- (window-total-width)
-  			                 (length prefix) (length left) (length right)
-  			                 (/ (window-right-divider-width) char-width)))
+                               (length prefix) (length left) (length right)
+!                              (/ (window-right-divider-width) char-width)
+!                              (if (and (boundp 'org-mode-line-string)
+!                                         org-mode-line-string)
+!                                  6
+!                                0))) ;; because length of time string is not contained
+           (available-width (max 1 available-width)))
+      (concat prefix
+              left
+***************
+*** 746,752 ****
+                                 ;; Narrowed buffer
+                                 (when (buffer-narrowed-p)
+                                   (propertize "⇥ "  'face `(:inherit fringe)))
+!                                org-mode-line-string))))
+  
+  
+  ;;;; Elfeed
+--- 764,771 ----
+                                 ;; Narrowed buffer
+                                 (when (buffer-narrowed-p)
+                                   (propertize "⇥ "  'face `(:inherit fringe)))
+!                                org-mode-line-string
+!                                (format-mode-line "%l:%c ")))))
+  
+  
+  ;;;; Elfeed
