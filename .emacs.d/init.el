@@ -619,11 +619,23 @@
              (doom-modeline-persp-name . nil)))
 
   (leaf minions
-    :disabled t
     :ensure t
     :custom ((minions-mode-line-lighter . ";")
-             (minions-direct . '(defining-kbd-macro flymake-mode)))
-    :global-minor-mode t))
+             (minions-direct . '(defining-kbd-macro flymake-mode))))
+
+  (leaf bespoke-modeline
+    :load-path "~/.emacs.d/elisp/bespoke-modeline/"
+    :require t
+    :custom ((bespoke-modeline-position . 'bottom)
+             (bespoke-modeline-size . 1)
+             (bespoke-modeline-git-diff-mode-line . t)
+             (bespoke-modeline-cleaner . nil)
+             (bespoke-modeline-visual-bell . t))
+    :config
+    (defun my/modeline-bespoke nil
+      (interactive)
+      (bespoke-modeline-org-agenda-mode)
+      (bespoke-modeline-mode))))
 
 (leaf which-key
   :doc "Display available keybindings in popup"

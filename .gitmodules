@@ -31,3 +31,6 @@
 [submodule ".emacs.d/elisp/bespoke-themes"]
 	path = .emacs.d/elisp/bespoke-themes
 	url = https://github.com/mclear-tools/bespoke-themes.git
+[submodule ".emacs.d/elisp/bespoke-modeline"]
+	path = .emacs.d/elisp/bespoke-modeline
+	url = https://github.com/mclear-tools/bespoke-modeline.git
