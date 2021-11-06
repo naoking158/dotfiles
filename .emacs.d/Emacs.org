@@ -152,7 +152,7 @@ a bunch of resources I've found online.
     (setq shell-file-name fish))
 
   ;; GUI
-  (setq default-frame-alist (append '((line-spacing . 4)
+  (setq default-frame-alist (append '((line-spacing . 3)
                                       (vertical-scroll-bars)
                                       (menu-bar-lines . 0)
                                       (tool-bar-lines . 0)
@@ -2532,14 +2532,14 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
      :custom
      ((org-directory . "~/org/")
       (org-ellipsis . " ▼ ")
-   
+
       (org-hide-emphasis-markers . t)
       (org-src-window-setup . 'current-window)
       (org-src-fontify-natively . t)
       (org-fontify-quote-and-verse-blocks . t)
       (org-hide-block-startup . nil)
       (org-startup-folded . 'content)
-   
+
       (org-adapt-indentation . t)
       (org-indent-indentation-per-level . 1)
       (org-startup-indented . t)
@@ -2578,18 +2578,18 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
                                         ("mq" . "question")
                                         ("mt" . "todo")
                                         ("ms" . "summary"))))
-   
+
      :defun my/set-org-face
      :preface
      (when window-system
-   
+
        (create-fontset-from-ascii-font "Iosevka Aile-14"
                                        nil
                                        "myoutline")
        (set-fontset-font "fontset-myoutline" 'unicode
                          "Noto Sans CJK JP-14"
                          nil 'append)
-   
+
        (defun my/set-org-face (&rest sym-theme)
          ;; Increase the size of various headings
          (interactive)
@@ -2628,11 +2628,11 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
          (set-face-attribute 'org-special-keyword nil	:inherit '(font-lock-comment-face fixed-pitch))
          (set-face-attribute 'org-meta-line nil				:inherit '(font-lock-comment-face fixed-pitch))
          (set-face-attribute 'org-checkbox nil					:inherit 'fixed-pitch)
-   
+
          ;; Get rid of the background on column views
          (set-face-attribute 'org-column nil :background nil)
          (set-face-attribute 'org-column-title nil :background nil))
-   
+
        (setq org-format-latex-options
              '( :foreground default
                 :background default
@@ -2641,19 +2641,19 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
                 :html-background "Transparent"
                 :html-scale 1.0
                 :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
-   
+
        (when (fboundp 'mac-toggle-input-method)
          (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii)))
-   
+
      (defun my/org-mode-hook ()
        ;; (add-hook 'completion-at-point-functions
        ;;           'pcomplete-completions-at-point nil t)
        (my/set-org-face))
-   
+
      :config
      (require 'org-tempo)   ;; need for org-template
      (require 'org-indent)  ;; Make sure org-indent face is available
-   
+
      (leaf org-fragtog
        :ensure t
        :hook (org-mode-hook . org-fragtog-mode)))
