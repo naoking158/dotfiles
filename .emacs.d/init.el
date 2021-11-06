@@ -1685,19 +1685,35 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf eshell
   :bind* ("C-x m" . eshell)
-  :commands (magit-get-current-branch eshell/pwd)
   :config
-  (defun my-eshell-prompt-function ()
-    (require 'magit)
-    (concat
-     "\n"
-     (propertize (abbreviate-file-name (eshell/pwd)) 'face '(:foreground "#A3BE8C"))
-     (and (magit-get-current-branch)
-          (concat " on " (propertize (magit-get-current-branch) 'face '(:foreground "#EBCB8B")))) "\n$ "))
+  (leaf eshell-p10k
+    :load-path "~/.emacs.d/elisp/eshell-p10k/"
+    :require t
+    :config
+    (eshell-p10k-def-segment time
+      ""
+      (format-time-string "%H:%M" (current-time))
+      'eshell-p10k-distro-face)
+    (defun eshell-p10k-prompt-function ()
+      "Prompt defining function."
+      (eshell-p10k-def-prompt '(distro dir git prompt-num time)))
 
-  (setq eshell-highlight-prompt nil
-        eshell-prompt-function 'my-eshell-prompt-function
-        eshell-prompt-regexp "^$ "))
+    (setq eshell-prompt-function #'eshell-p10k-prompt-function
+          eshell-prompt-regexp eshell-p10k-prompt-string))
+
+
+  ;; (defun my-eshell-prompt-function ()
+  ;;   (require 'magit)
+  ;;   (concat
+  ;;    "\n"
+  ;;    (propertize (abbreviate-file-name (eshell/pwd)) 'face '(:foreground "#A3BE8C"))
+  ;;    (and (magit-get-current-branch)
+  ;;         (concat " on " (propertize (magit-get-current-branch) 'face '(:foreground "#EBCB8B")))) "\n$ "))
+
+  ;; (setq eshell-highlight-prompt nil
+  ;;       eshell-prompt-function 'my-eshell-prompt-function
+  ;;       eshell-prompt-regexp "^$ ")
+  )
 
 (leaf fish-mode
   :doc "Major mode for fish shell scripts"

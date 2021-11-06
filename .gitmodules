@@ -34,3 +34,6 @@
 [submodule ".emacs.d/elisp/bespoke-modeline"]
 	path = .emacs.d/elisp/bespoke-modeline
 	url = https://github.com/mclear-tools/bespoke-modeline.git
+[submodule ".emacs.d/elisp/eshell-p10k"]
+	path = .emacs.d/elisp/eshell-p10k
+	url = https://github.com/elken/eshell-p10k.git
