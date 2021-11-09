@@ -93,8 +93,7 @@
       (interactive)
       (setq pdf-string (replace-regexp-in-string "\"" "" (org-entry-get 0 "PDF")))
       (setq pdf-string-list (split "-----" pdf-string))
-      (org-link-open-from-string (nth 0 pdf-string-list))
-      )
+      (org-link-open-from-string (nth 0 pdf-string-list)))
 
 ;;;###autoload
 (defun orp-paperpile--open-paper (info)
@@ -141,11 +140,13 @@
     (org-roam-node-id node)
     (orp-paperpile--update-org-roam-paper org-roam-capture--info)))
 
+
 ;; Capture implementation
 ;;;###autoload
 (defun orp-paperpile--insert-captured-ref-h ()
   "This overrides org-roam-protocol--insert-captured-ref-h."
   (orp-paperpile--update-org-roam-paper org-roam-capture--info))
+
 
 ;; Capture implementation
 ;;;###autoload
@@ -207,8 +208,6 @@
                  #'orp-paperpile--try-capture-to-ref-h)
   (advice-remove #'org-roam-protocol--insert-captured-ref-h
                  #'orp-paperpile--insert-captured-ref-h))
-
-;; (orp-activate)
 
 (provide 'orp-paperpile)
 

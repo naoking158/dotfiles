@@ -78,7 +78,7 @@
       (leaf blackout :ensure t)
       (leaf key-chord
         :ensure t
-        :hook (after-init-hook . (lambda () (key-chord-mode 1)))
+        :hook (emacs-startup-hook . (lambda () (key-chord-mode 1)))
         :custom ((key-chord-one-keys-delay . 0.02)
                  (key-chord-two-keys-delay . 0.03))
         :config
@@ -204,7 +204,6 @@
   (leaf eldoc
     :doc "Show function arglist or variable docstring in echo area"
     :tag "builtin"
-    :blackout
     :custom (eldoc-idle-delay . 0.1)))
 
 (leaf change-system-configuration
@@ -395,7 +394,7 @@
 
 (leaf font
   :leaf-defer nil
-  :hook (after-init-hook . (lambda () (my/set-font my-fontsize)))
+  :hook (emacs-startup-hook . (lambda () (my/set-font my-fontsize)))
   :advice (:after load-theme my/set-font-weight-after-load-theme)
   :preface
   (setq-default text-scale-remap-header-line t)
@@ -453,7 +452,7 @@
       (my/set-font-weight weight))))
 
 (leaf themes
-  :hook (after-init-hook . my/default-theme)
+  :hook (emacs-startup-hook . my/default-theme)
   :advice (:before load-theme (lambda (&rest args)
                                 (mapc #'disable-theme custom-enabled-themes)))
   :preface
@@ -555,7 +554,7 @@
 
 (leaf *modelines
   :leaf-defer nil
-  :hook (after-init-hook . my/modeline-bespoke)
+  :hook (emacs-startup-hook . my/modeline-bespoke)
   :preface
   (leaf moody
     :ensure t
@@ -922,16 +921,16 @@
 
 (leaf flyspell
   ;; :hook (LaTeX-mode-hook org-mode-hook markdown-mode-hook text-mode-hook)
-  :defer-config
+  :config
   (leaf ispell
     :doc "interface to spell checkers"
     :tag "builtin"
     :custom ((ispell-program-name . "aspell")
              (ispell-local-dictionary . "en_US"))
-    :hook (after-init-hook . (lambda ()
-                               ;; for text mixed English and Japanese
-                               (add-to-list 'ispell-skip-region-alist
-                                            '("[^\000-\377]+"))))))
+    :hook (emacs-startup-hook . (lambda ()
+                                  ;; for text mixed English and Japanese
+                                  (add-to-list 'ispell-skip-region-alist
+                                               '("[^\000-\377]+"))))))
 
 (leaf highlight-indent-guides
   :blackout
@@ -990,7 +989,7 @@
           )))))
 
 (leaf paren
-  :hook (after-init-hook . show-paren-mode)
+  :hook (emacs-startup-hook . show-paren-mode)
   :custom-face
   (show-paren-match . '((nil
                          (:background "#44475a" :foreground "#f1fa8c"))))
@@ -1102,14 +1101,14 @@ respectively."
   :url "http://www.emacswiki.org/emacs/download/volatile-highlights.el"
   :ensure t
   :blackout
-  :hook after-init-hook
+  :hook emacs-startup-hook
   :custom-face
   (vhl/default-face quote
                     ((nil (:foreground "#FF3333" :background "#FFCDCD")))))
 
 (leaf yasnippet
   :ensure t
-  :hook (after-init-hook . yas-global-mode)
+  :hook (emacs-startup-hook . yas-global-mode)
   :blackout yas-minor-mode
   :custom ((yas-indent-line . 'fixed)
            (yas-snippet-dirs . `(,(file-truename "~/.emacs.d/snippets/"))))
@@ -1142,7 +1141,7 @@ respectively."
   :tag "builtin"
   :bind (("C-x <right>" . winner-redo)
          ("C-x <left>" . winner-undo))
-  :hook (after-init-hook . winner-mode))
+  :hook (emacs-startup-hook . winner-mode))
 
 (leaf ace-window
   :doc "Quickly switch windows."
@@ -1202,7 +1201,7 @@ respectively."
          ("s-]" . tab-bar-switch-to-next-tab)
          ("s-[" . tab-bar-switch-to-prev-tab))
   :custom (tab-bar-show . nil)
-  :hook (after-init-hook . (lambda ()
+  :hook (emacs-startup-hook . (lambda ()
                              (tab-bar-mode)
                              (tab-bar-new-tab))))
 
@@ -1301,7 +1300,7 @@ respectively."
     :url "https://github.com/tumashu/company-posframe"
     :emacs>= 26.0
     :ensure t
-    :hook after-init-hook
+    :hook emacs-startup-hook
     :blackout t)
 
   (leaf company-math
@@ -1525,7 +1524,7 @@ respectively."
 (leaf migemo
   :when (executable-find "cmigemo")
   :ensure t
-  :hook (after-init-hook . migemo-init)
+  :hook (emacs-startup-hook . migemo-init)
   :custom
   `((migemo-user-dictionary  . nil)
     (migemo-regex-dictionary . nil)
@@ -1714,7 +1713,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf org
   :doc "Export Framework for Org Mode"
   :tag "builtin"
-  ;; :ensure t
+  ;; :ensure org-plus-contrib
   :mode "\\.org\\'"
   :hook (org-mode-hook . my/org-mode-hook)
   :custom
@@ -1745,10 +1744,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (isearch-yank-on-move . 'shift)
    (isearch-allow-scroll . 'unlimited)
    (org-show-notification-handler . nil)
-   (org-babel-load-languages . '((emacs-lisp . t)
-                                 (python . t)
-                                 (latex . t)
-                                 (shell . t)))
    (org-structure-template-alist . '(("sh" . "src shell")
                                      ("c" . "center")
                                      ("C" . "comment")
@@ -2092,6 +2087,26 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                                'deadline))))))))
   )
 
+;; (org-babel-load-languages . '((emacs-lisp . t)
+;;                                     (python . t)
+;;                                     (latex . t)
+;;                                     (shell . t)))
+
+(leaf ob-emacs-lisp
+  :commands (org-babel-execute:emacs-lisp))
+
+(leaf ob-python
+  :commands (org-babel-execute:python))
+
+(leaf ob-latex
+  :commands (org-babel-execute:latex))
+
+(leaf ob-shell
+  :commands (org-babel-execute:sh
+              org-babel-expand-body:sh
+              org-babel-execute:bash
+              org-babel-expand-body:bash))
+
 (leaf org-pomodoro
   :disabled t
   :ensure t
@@ -2393,12 +2408,15 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
         to comunicate between org-mode and paperpile using org-roam-protocol."
   :load-path "~/.emacs.d/elisp/orp-paperpile/"
   ;; :require t
-  :hook (after-init-hook . orp-activate)
+  :hook (emacs-startup-hook . orp-activate)
   :custom
   ((orp-paperpile-local-pdf-dir . "~/drive/Paperpile/")
    (orp-paperpile-ref-templates . '(("r" "ref" plain "%?"
                                      :target (file+head "lit/${slug}.org"
-                                                        "#+date: %U\n#+filetags: Literature\n#+title: ${title}")
+                                                        (concat
+                                                         "#+date: %U\n"
+                                                         "#+filetags: Literature\n"
+                                                         "#+title: ${title}"))
                                      :unnarrowed t))))
   :advice (:around org-link-open advice-around-org-link-open)
   :preface
@@ -2565,7 +2583,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf org-make-toc
   :ensure t
-  :hook (org-mode-hook . org-make-toc-mode))
+  :hook (org-babel-pre-tangle-hook . org-make-toc-mode))
 
 (leaf *latex
   :config
@@ -2635,7 +2653,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :tag "builtin"
   :require t
   :bind ("C-x C-c" . server-edit)
-  :hook (after-init-hook . server-start))
+  :hook (emacs-startup-hook . server-start))
 
 (leaf tree-sitter
   :ensure t tree-sitter-langs
@@ -2658,8 +2676,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf skk
   :ensure ddskk
-  :hook ((after-init-hook . skk-mode)
-         (after-init-hook . context-skk-mode))
+  :hook ((text-mode-hook .  skk-mode)
+         (skk-mode-hook . context-skk-mode))
   :custom ((default-input-method . "japanese-skk")
            (skk-jisyo-code . 'utf-8)
            (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.Huge.utf8")
@@ -2692,7 +2710,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :config
   (leaf ddskk-posframe
     :load-path "~/.emacs.d/elisp/ddskk-posframe/"
-    :require t
     :custom (ddskk-posframe-mode . t)))
 
 (leaf dap-mode
@@ -3191,14 +3208,11 @@ Interactively, URL defaults to the string looking like a url around point."
          (jupyter-org-interaction-mode-map
           ([remap jupyter-org-hydra/body] . nil)
           ("C-c C-." . jupyter-org-hydra/body)))
-  :hook (org-mode-hook . (lambda nil
-                           (require 'zmq)
-                           (org-babel-do-load-languages
-                            'org-babel-load-languages '((emacs-lisp . t)
-                                                        (python . t)
-                                                        (latex . t)
-                                                        (shell . t)
-                                                        (jupyter . t))))))
+  :init
+  (require 'zmq)
+  (leaf ob-jupyter
+    :ensure jupyter
+    :commands (org-babel-execute:jupyter)))
 
 (leaf org-babel
   :after org python-mode
@@ -3334,8 +3348,8 @@ Interactively, URL defaults to the string looking like a url around point."
 (leaf lin
   :load-path "~/.emacs.d/elisp/lin/"
   :require t
-  :hook (after-init-hook . (lambda nil
-                             (global-hl-line-mode)))
+  :hook (emacs-startup-hook . (lambda nil
+                                (global-hl-line-mode)))
   :global-minor-mode global-lin-mode
   :advice (:after load-theme my/advice-lin-face-after-load-theme)
   :init

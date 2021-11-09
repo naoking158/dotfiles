@@ -1,5 +1,5 @@
 #+TITLE: Emacs Configuration
-#+PROPERTY: header-args:emacs-lisp :tangle ~/.emacs.d/init.el
+#+PROPERTY: header-args:emacs-lisp :tangle (file-truename "~/.emacs.d/init.el")
 
 This is an ongoing evolution of my original Emacs configuration files, inspired by
 a bunch of resources I've found online.
@@ -76,6 +76,7 @@ a bunch of resources I've found online.
 - [[#org-mode][Org Mode]]
   - [[#org-configuration][Org Configuration]]
   - [[#org-agenda][Org Agenda]]
+  - [[#org-babel][Org Babel]]
   - [[#org-pomodoro][Org Pomodoro]]
   - [[#presentations][Presentations]]
   - [[#cross-reference][Cross Reference]]
@@ -292,7 +293,7 @@ By setting ~exec-profile~ to ~t~, profiling startup time is executed.
         (leaf blackout :ensure t)
         (leaf key-chord
           :ensure t
-          :hook (after-init-hook . (lambda () (key-chord-mode 1)))
+          :hook (emacs-startup-hook . (lambda () (key-chord-mode 1)))
           :custom ((key-chord-one-keys-delay . 0.02)
                    (key-chord-two-keys-delay . 0.03))
           :config
@@ -377,7 +378,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :END:
 
 #+begin_src emacs-lisp
-
+  
   (leaf *general-configrations
     :config
     (leaf cus-start
@@ -428,7 +429,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                   'narrow-to-page
                   'narrow-to-defun
                   'list-timers)))
-
+  
     (leaf exec-path-from-shell
       :doc "Get environment variables such as $PATH from the shell"
       :tag "environment" "unix"
@@ -440,11 +441,10 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                (exec-path-from-shell-variables . '("PATH" "PYTHONPATH" "NEPTUNE_API_TOKEN")))
       :config
       (exec-path-from-shell-initialize))
-
+  
     (leaf eldoc
       :doc "Show function arglist or variable docstring in echo area"
       :tag "builtin"
-      :blackout
       :custom (eldoc-idle-delay . 0.1)))
 #+end_src
 
@@ -731,7 +731,7 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
 
   (leaf font
     :leaf-defer nil
-    :hook (after-init-hook . (lambda () (my/set-font my-fontsize)))
+    :hook (emacs-startup-hook . (lambda () (my/set-font my-fontsize)))
     :advice (:after load-theme my/set-font-weight-after-load-theme)
     :preface
     (setq-default text-scale-remap-header-line t)
@@ -797,7 +797,7 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
 #+begin_src emacs-lisp
 
   (leaf themes
-    :hook (after-init-hook . my/default-theme)
+    :hook (emacs-startup-hook . my/default-theme)
     :advice (:before load-theme (lambda (&rest args)
                                   (mapc #'disable-theme custom-enabled-themes)))
     :preface
@@ -899,7 +899,7 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
 
   (leaf *modelines
     :leaf-defer nil
-    :hook (after-init-hook . my/modeline-bespoke)
+    :hook (emacs-startup-hook . my/modeline-bespoke)
     :preface
     (leaf moody
       :ensure t
@@ -1412,16 +1412,16 @@ Only in Neotree Buffer:
 #+begin_src emacs-lisp
   (leaf flyspell
     ;; :hook (LaTeX-mode-hook org-mode-hook markdown-mode-hook text-mode-hook)
-    :defer-config
+    :config
     (leaf ispell
       :doc "interface to spell checkers"
       :tag "builtin"
       :custom ((ispell-program-name . "aspell")
                (ispell-local-dictionary . "en_US"))
-      :hook (after-init-hook . (lambda ()
-                                 ;; for text mixed English and Japanese
-                                 (add-to-list 'ispell-skip-region-alist
-                                              '("[^\000-\377]+"))))))
+      :hook (emacs-startup-hook . (lambda ()
+                                    ;; for text mixed English and Japanese
+                                    (add-to-list 'ispell-skip-region-alist
+                                                 '("[^\000-\377]+"))))))
 #+end_src
 
 
@@ -1499,7 +1499,7 @@ Only in Neotree Buffer:
 #+begin_src emacs-lisp
   
   (leaf paren
-    :hook (after-init-hook . show-paren-mode)
+    :hook (emacs-startup-hook . show-paren-mode)
     :custom-face
     (show-paren-match . '((nil
                            (:background "#44475a" :foreground "#f1fa8c"))))
@@ -1651,7 +1651,7 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
     :url "http://www.emacswiki.org/emacs/download/volatile-highlights.el"
     :ensure t
     :blackout
-    :hook after-init-hook
+    :hook emacs-startup-hook
     :custom-face
     (vhl/default-face quote
                       ((nil (:foreground "#FF3333" :background "#FFCDCD")))))
@@ -1667,7 +1667,7 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
   
   (leaf yasnippet
     :ensure t
-    :hook (after-init-hook . yas-global-mode)
+    :hook (emacs-startup-hook . yas-global-mode)
     :blackout yas-minor-mode
     :custom ((yas-indent-line . 'fixed)
              (yas-snippet-dirs . `(,(file-truename "~/.emacs.d/snippets/"))))
@@ -1725,7 +1725,7 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
     :tag "builtin"
     :bind (("C-x <right>" . winner-redo)
            ("C-x <left>" . winner-undo))
-    :hook (after-init-hook . winner-mode))
+    :hook (emacs-startup-hook . winner-mode))
 #+end_src
 
 ** Window Selection with ace-window
@@ -1807,7 +1807,7 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
            ("s-]" . tab-bar-switch-to-next-tab)
            ("s-[" . tab-bar-switch-to-prev-tab))
     :custom (tab-bar-show . nil)
-    :hook (after-init-hook . (lambda ()
+    :hook (emacs-startup-hook . (lambda ()
                                (tab-bar-mode)
                                (tab-bar-new-tab))))
 #+end_src
@@ -1945,7 +1945,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
       :url "https://github.com/tumashu/company-posframe"
       :emacs>= 26.0
       :ensure t
-      :hook after-init-hook
+      :hook emacs-startup-hook
       :blackout t)
 
     (leaf company-math
@@ -2217,7 +2217,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   (leaf migemo
     :when (executable-find "cmigemo")
     :ensure t
-    :hook (after-init-hook . migemo-init)
+    :hook (emacs-startup-hook . migemo-init)
     :custom
     `((migemo-user-dictionary  . nil)
       (migemo-regex-dictionary . nil)
@@ -2497,20 +2497,20 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
    (leaf org
      :doc "Export Framework for Org Mode"
      :tag "builtin"
-     ;; :ensure t
+     ;; :ensure org-plus-contrib
      :mode "\\.org\\'"
      :hook (org-mode-hook . my/org-mode-hook)
      :custom
      ((org-directory . "~/org/")
       (org-ellipsis . " ▼ ")
-
+   
       (org-hide-emphasis-markers . t)
       (org-src-window-setup . 'current-window)
       (org-src-fontify-natively . t)
       (org-fontify-quote-and-verse-blocks . t)
       (org-hide-block-startup . nil)
       (org-startup-folded . 'content)
-
+   
       (org-adapt-indentation . t)
       (org-indent-indentation-per-level . 1)
       (org-startup-indented . t)
@@ -2528,10 +2528,6 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
       (isearch-yank-on-move . 'shift)
       (isearch-allow-scroll . 'unlimited)
       (org-show-notification-handler . nil)
-      (org-babel-load-languages . '((emacs-lisp . t)
-                                    (python . t)
-                                    (latex . t)
-                                    (shell . t)))
       (org-structure-template-alist . '(("sh" . "src shell")
                                         ("c" . "center")
                                         ("C" . "comment")
@@ -2549,18 +2545,18 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
                                         ("mq" . "question")
                                         ("mt" . "todo")
                                         ("ms" . "summary"))))
-
+   
      :defun my/set-org-face
      :preface
      (when window-system
-
+   
        (create-fontset-from-ascii-font "Iosevka Aile-14"
                                        nil
                                        "myoutline")
        (set-fontset-font "fontset-myoutline" 'unicode
                          "Noto Sans CJK JP-14"
                          nil 'append)
-
+   
        (defun my/set-org-face (&rest sym-theme)
          ;; Increase the size of various headings
          (interactive)
@@ -2583,10 +2579,10 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
                                :weight 'normal
                                :slant 'normal
                                :height (cdr face)))
-
+   
          ;; variable pitch
          (face-remap-add-relative 'default :inherit 'variable-pitch)
-
+   
          ;; Ensure that anything that should be fixed-pitch in Org files appears that way
          (require 'bespoke-theme
                   "~/.emacs.d/elisp/bespoke-themes/bespoke-theme.el")
@@ -2599,11 +2595,11 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
          (set-face-attribute 'org-special-keyword nil	:inherit '(font-lock-comment-face fixed-pitch))
          (set-face-attribute 'org-meta-line nil				:inherit '(font-lock-comment-face fixed-pitch))
          (set-face-attribute 'org-checkbox nil					:inherit 'fixed-pitch)
-
+   
          ;; Get rid of the background on column views
          (set-face-attribute 'org-column nil :background nil)
          (set-face-attribute 'org-column-title nil :background nil))
-
+   
        (setq org-format-latex-options
              '( :foreground default
                 :background default
@@ -2612,19 +2608,19 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
                 :html-background "Transparent"
                 :html-scale 1.0
                 :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
-
+   
        (when (fboundp 'mac-toggle-input-method)
          (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii)))
-
+   
      (defun my/org-mode-hook ()
        ;; (add-hook 'completion-at-point-functions
        ;;           'pcomplete-completions-at-point nil t)
        (my/set-org-face))
-
+   
      :config
      (require 'org-tempo)   ;; need for org-template
      (require 'org-indent)  ;; Make sure org-indent face is available
-
+   
      (leaf org-fragtog
        :ensure t
        :hook (org-mode-hook . org-fragtog-mode)))
@@ -2883,6 +2879,32 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
     )
 #+end_src
 
+** Org Babel
+:PROPERTIES:
+:ID:       085EBDA5-B180-4BB0-A2CA-45FEC0742421
+:END:
+
+#+begin_src emacs-lisp
+  ;; (org-babel-load-languages . '((emacs-lisp . t)
+  ;;                                     (python . t)
+  ;;                                     (latex . t)
+  ;;                                     (shell . t)))
+  
+  (leaf ob-emacs-lisp
+    :commands (org-babel-execute:emacs-lisp))
+  
+  (leaf ob-python
+    :commands (org-babel-execute:python))
+  
+  (leaf ob-latex
+    :commands (org-babel-execute:latex))
+  
+  (leaf ob-shell
+    :commands (org-babel-execute:sh
+                org-babel-expand-body:sh
+                org-babel-execute:bash
+                org-babel-expand-body:bash))
+#+end_src
 
 ** Org Pomodoro
 :PROPERTIES:
@@ -3274,7 +3296,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
 - Save the script in /Applications/OrgProtocolClient.app, changing the script type to “Application”, rather than “Script”.
 - Edit /Applications/OrgProtocolClient.app/Contents/Info.plist, adding the following before the last </dict> tag:
 
-  #+begin_src
+  #+begin_src xml
     <key>CFBundleURLTypes</key>
     <array>
       <dict>
@@ -3302,12 +3324,15 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
           to comunicate between org-mode and paperpile using org-roam-protocol."
     :load-path "~/.emacs.d/elisp/orp-paperpile/"
     ;; :require t
-    :hook (after-init-hook . orp-activate)
+    :hook (emacs-startup-hook . orp-activate)
     :custom
     ((orp-paperpile-local-pdf-dir . "~/drive/Paperpile/")
      (orp-paperpile-ref-templates . '(("r" "ref" plain "%?"
                                        :target (file+head "lit/${slug}.org"
-                                                          "#+date: %U\n#+filetags: Literature\n#+title: ${title}")
+                                                          (concat
+                                                           "#+date: %U\n"
+                                                           "#+filetags: Literature\n"
+                                                           "#+title: ${title}"))
                                        :unnarrowed t))))
     :advice (:around org-link-open advice-around-org-link-open)
     :preface
@@ -3325,7 +3350,7 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
        ((eq system-type 'gnu/linux)
         (let ((process-connection-type nil))
           (start-process "" nil "xdg-open" path)))))
-
+  
     ;; for open paperpile link in external browser
     (defun advice-around-org-link-open (f link &optional arg)
       (let ((path (org-element-property :raw-link link))
@@ -3695,7 +3720,7 @@ It's nice to have a table of contents section for long literate configuration fi
 
   (leaf org-make-toc
     :ensure t
-    :hook (org-mode-hook . org-make-toc-mode))
+    :hook (org-babel-pre-tangle-hook . org-make-toc-mode))
 
 #+end_src
 
@@ -3790,7 +3815,7 @@ It's nice to have a table of contents section for long literate configuration fi
     :tag "builtin"
     :require t
     :bind ("C-x C-c" . server-edit)
-    :hook (after-init-hook . server-start))
+    :hook (emacs-startup-hook . server-start))
 #+end_src
 
 * Trial Packages
@@ -3922,11 +3947,11 @@ While browsing, remember the following:
 - =skk-auto-okuri-process= は =nil= にしておかないと， =いぞん (izonn)= など一部の文字の変換ができなくなる.
 
 #+begin_src emacs-lisp
-
+  
   (leaf skk
     :ensure ddskk
-    :hook ((after-init-hook . skk-mode)
-           (after-init-hook . context-skk-mode))
+    :hook ((text-mode-hook .  skk-mode)
+           (skk-mode-hook . context-skk-mode))
     :custom ((default-input-method . "japanese-skk")
              (skk-jisyo-code . 'utf-8)
              (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.Huge.utf8")
@@ -3955,13 +3980,12 @@ While browsing, remember the following:
              (skk-inline-show-face . '( :foreground "#ECEFF4"
                                         :background "#4C566A"
                                         :inherit 'normal)))
-
+  
     :config
     (leaf ddskk-posframe
       :load-path "~/.emacs.d/elisp/ddskk-posframe/"
-      :require t
       :custom (ddskk-posframe-mode . t)))
-
+  
 #+end_src
 
 ** Dap Mode
@@ -4035,6 +4059,9 @@ https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-
 
 
 *** Config
+:PROPERTIES:
+:ID:       ED299631-3A91-47B2-B004-9B8DBA051218
+:END:
 #+begin_src emacs-lisp
   (let* ((file-dir (cond
                     ((when (file-exists-p "/usr/share/emacs/")
@@ -4550,10 +4577,6 @@ Disabling native compilation is for avoid the issue: https://github.com/nnicandr
 
 To enable support for Jupyter based source code blocks, add jupyter to org-babel-load-languages. Ensure the jupyter entry is added last since loading ob-jupyter depends on the value of variables such as org-src-lang-modes and org-babel-tangle-lang-exts.
 
-
-:PROPERTIES:
-:ID:       63281654-074e-4602-b527-36a5afc3c770
-:END:
 #+begin_src emacs-lisp
   (leaf jupyter
     :ensure t websocket
@@ -4562,14 +4585,11 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
            (jupyter-org-interaction-mode-map
             ([remap jupyter-org-hydra/body] . nil)
             ("C-c C-." . jupyter-org-hydra/body)))
-    :hook (org-mode-hook . (lambda nil
-                             (require 'zmq)
-                             (org-babel-do-load-languages
-                              'org-babel-load-languages '((emacs-lisp . t)
-                                                          (python . t)
-                                                          (latex . t)
-                                                          (shell . t)
-                                                          (jupyter . t))))))
+    :init
+    (require 'zmq)
+    (leaf ob-jupyter
+      :ensure jupyter
+      :commands (org-babel-execute:jupyter)))
 #+end_src
 
 *** Enable lsp in org-code-block
@@ -4787,13 +4807,16 @@ From the search buffer there are a number of ways to interact with entries. Entr
 #+end_src
 
 ** LIN Is Noticeable - lin.el
+:PROPERTIES:
+:ID:       FDAF3AFD-70D4-48BB-8A55-EFFD8EE7FF7B
+:END:
 
 #+begin_src emacs-lisp
   (leaf lin
     :load-path "~/.emacs.d/elisp/lin/"
     :require t
-    :hook (after-init-hook . (lambda nil
-                               (global-hl-line-mode)))
+    :hook (emacs-startup-hook . (lambda nil
+                                  (global-hl-line-mode)))
     :global-minor-mode global-lin-mode
     :advice (:after load-theme my/advice-lin-face-after-load-theme)
     :init
@@ -4812,8 +4835,8 @@ From the search buffer there are a number of ways to interact with entries. Entr
                               (eq 'light bespoke-set-theme)) "#FAF2F0")
                         (t "#1C2835"))))
         (set-face-attribute 'lin-hl nil :background bg-color))))
-
-
+  
+  
 #+end_src
 
 * Footer
