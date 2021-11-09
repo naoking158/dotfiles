@@ -1,9 +1,30 @@
-function build_emacs
+
+function build_emacs --argument-names 'emacs_version'
+    
+    if test ! -n "$emacs_version"
+        set emacs_version "emacs-28"
+    end
+
+    set patch_dir ~/.emacs.d/emacs_patches
+    set patch_url "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/$emacs_version"
+    set patch_name "fix-window-role.patch"
+    set patch_name "system-appearance.patch" $patch_name
+
     if test ! -e "configure"
         ./autogen.sh
     end
 
-    for patch_file in ~/.emacs.d/emacs_patches/*
+    if test ! -e $patch_dir
+        mkdir -p $patch_dir
+    end
+
+    cd $patch_dir
+    for patch in $patch_name
+        curl -L $patch_url/$patch -o $patch_dir/$patch
+    end
+    cd -
+
+    for patch_file in $patch_dir/**
         echo "Apply patch: $patch_file ..."
         patch -p1 < $patch_file
     end
