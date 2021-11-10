@@ -213,7 +213,7 @@ a bunch of resources I've found online.
 By setting ~exec-profile~ to ~t~, profiling startup time is executed.
 
 #+begin_src emacs-lisp
-  (setq exec-profile t)
+  (setq exec-profile nil)
   
   (when exec-profile
     (defvar setup-tracker--level 0)
@@ -3948,8 +3948,9 @@ While browsing, remember the following:
   
   (leaf skk
     :ensure ddskk
-    :hook ((text-mode-hook .  skk-latin-mode-on)
-           (skk-mode-hook . context-skk-mode))
+    :hook ((text-mode-hook . (lambda nil
+                               (skk-latin-mode-on)
+                               (context-skk-mode))))
     :custom ((default-input-method . "japanese-skk")
              (skk-jisyo-code . 'utf-8)
              (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.Huge.utf8")

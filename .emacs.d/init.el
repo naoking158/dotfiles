@@ -11,7 +11,7 @@
 
 (setq comp-deferred-compilation-deny-list (list "jupyter"))
 
-(setq exec-profile t)
+(setq exec-profile nil)
 
 (when exec-profile
   (defvar setup-tracker--level 0)
@@ -2676,8 +2676,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf skk
   :ensure ddskk
-  :hook ((text-mode-hook .  skk-latin-mode-on)
-         (skk-mode-hook . context-skk-mode))
+  :hook ((text-mode-hook . (lambda nil
+                             (skk-latin-mode-on)
+                             (context-skk-mode))))
   :custom ((default-input-method . "japanese-skk")
            (skk-jisyo-code . 'utf-8)
            (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.Huge.utf8")
