@@ -849,23 +849,20 @@
   :req "emacs-24.4" "pythonic-0.1.0" "dash-2.13.0" "s-1.11.0" "f-0.18.2"
   :url "http://github.com/necaris/conda.el"
   :ensure t
-  ;; :after python-mode
-  ;; :require t
   :commands conda-env-activate
   :custom ((conda-anaconda-home . path-to-miniconda)
            (conda-env-home-directory . path-to-miniconda))
   :config
   (conda-env-initialize-eshell)
-  (conda-env-initialize-interactive-shells)
-  ;; :hook ((after-init-hook . (lambda ()
-  ;;                             )))
-  )
+  (conda-env-initialize-interactive-shells))
 
 (leaf lsp-pyright
   :doc "Python LSP client using Pyright"
   :req "emacs-26.1" "lsp-mode-7.0" "dash-2.18.0" "ht-2.0"
   :url "https://github.com/emacs-lsp/lsp-pyright"
+  :after lsp-mode
   :ensure t
+  :custom `(lsp-pyright-venv-path . ,(expand-file-name "envs" path-to-miniconda))
   :preface
   (defun my/lsp-pyright-setup-when-conda ()
     (setq-local lsp-pyright-venv-path python-shell-virtualenv-root)
