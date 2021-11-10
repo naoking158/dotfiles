@@ -1639,11 +1639,17 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :tag "location" "point" "emacs>=24.1"
   :url "https://github.com/abo-abo/avy"
   :ensure t
-  :bind* (("C-q" . avy-goto-word-1)
-          ;; ("C-c a w" . avy-goto-word-1)
-          ;; ("C-c a c" . avy-goto-char-2)
-          ;; ("C-c a l" . avy-goto-line)
-          ))
+  :bind* ("C-q" . avy-goto-migemo-timer)
+  :init (add-to-list 'avy-styles-alist '(avy-goto-migemo-timer . pre))
+  :preface
+  (defun avy-goto-migemo-timer (&optional arg)
+    (interactive "P")
+    (let ((avy-all-windows (if arg
+                               (not avy-all-windows)
+                             avy-all-windows)))
+      (avy-with avy-goto-migemo-timer
+        (setq avy--old-cands (avy--read-candidates #'migemo-get-pattern))
+        (avy-process avy--old-cands)))))
 
 (leaf mwim
   :doc "Switch between the beginning/end of line or code"
