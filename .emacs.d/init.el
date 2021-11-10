@@ -2661,19 +2661,27 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :hook (emacs-startup-hook . server-start))
 
 (leaf tree-sitter
-  :ensure t tree-sitter-langs
-  ;; :require tree-sitter-langs
-  :preface
-  (defun my/highlight-python-docstrings ()
-    (add-function
-     :before-until (local 'tree-sitter-hl-face-mapping-function)
-     (lambda (capture-name)
-       (pcase capture-name
-         ("doc" 'font-lock-comment-face)))))
+  :load-path `(,(mapcar (lambda (elm)
+                          (concat "~/.emacs.d/elisp/elisp-tree-sitter/" elm "/"))
+                        '("core" "langs" "lisp")))
+  :require t tree-sitter-langs
+  ;; If this isn't set then it'll download x86_64 dylibs over the arm64
+  ;; dylibs we built
+  :init (setf lyn--self-compiled-tsc t
+              tree-sitter-langs--testing lyn--self-compiled-tsc)
 
+
+  ;; :preface
+  ;; (defun my/highlight-python-docstrings ()
+  ;;   (add-function
+  ;;    :before-until (local 'tree-sitter-hl-face-mapping-function)
+  ;;    (lambda (capture-name)
+  ;;      (pcase capture-name
+  ;;        ("doc" 'font-lock-comment-face)))))
   :hook ((python-mode-hook . tree-sitter-hl-mode)
          ;; Highlight Python docstrings with a different face.
-         (python-mode-hook . my/highlight-python-docstrings)))
+         ;; (python-mode-hook . my/highlight-python-docstrings)
+         ))
 
 (leaf solaire-mode
   :ensure t

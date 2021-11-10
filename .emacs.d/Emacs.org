@@ -1302,7 +1302,7 @@ Only in Neotree Buffer:
     (setq path-to-miniconda miniconda-path)
     (setq path-to-venv-python (expand-file-name "bin/python" path-to-venv))
     (custom-set-variables '(org-babel-python-command path-to-venv-python)))
-
+  
   (leaf python-mode
     :doc "Python major mode"
     :url "https://gitlab.com/groups/python-mode-devs"
@@ -1310,7 +1310,7 @@ Only in Neotree Buffer:
     :mode "\\.py\\'"
     :custom ((python-indent-guess-indent-offset . t)
              (python-indent-guess-indent-offset-verbose . nil)))
-
+  
   (leaf conda
     :doc "Work with your conda environments"
     :req "emacs-24.4" "pythonic-0.1.0" "dash-2.13.0" "s-1.11.0" "f-0.18.2"
@@ -1327,7 +1327,7 @@ Only in Neotree Buffer:
     ;; :hook ((after-init-hook . (lambda ()
     ;;                             )))
     )
-
+  
   (leaf lsp-pyright
     :doc "Python LSP client using Pyright"
     :req "emacs-26.1" "lsp-mode-7.0" "dash-2.18.0" "ht-2.0"
@@ -1337,19 +1337,19 @@ Only in Neotree Buffer:
     (defun my/lsp-pyright-setup-when-conda ()
       (setq-local lsp-pyright-venv-path python-shell-virtualenv-root)
       (lsp-restart-workspace))
-
+  
     (defun my/python-basic-config ()
       (setq indent-tabs-mode nil
             python-indent 4
             tab-width 4)
       (require 'lsp-pyright)
       (lsp-deferred))
-
+  
     :hook
     ((conda-postactivate-hook . my/lsp-pyright-setup-when-conda)
      (conda-postdeactivate-hook . my/lsp-pyright-setup-when-conda)
      (python-mode-hook . my/python-basic-config)))
-
+  
 #+end_src
 
 *** HTML
@@ -3910,22 +3910,55 @@ While browsing, remember the following:
 :ID:       2B53130F-3718-4EE5-9CF1-1E8C33996939
 :END:
 
+*** Prepare for M1 Mac
+
+https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/88#issuecomment-849338234
+
+To avoid installing x86_64 version, The following steps should be required.
+
+1. Clone [[https://github.com/tree-sitter/tree-sitter.git][tree-sitter]]
+   #+begin_src shell
+     cd cli && cargo install --path .
+   #+end_src
+   
+2. Clone [[https://github.com/emacs-tree-sitter/elisp-tree-sitter][emacs-tree-sitter]]
+   #+begin_src shell
+     file core/tsc-dyn.dylib | grep -q arm64 || rm -f core/tsc-dyn.dylib
+     grep -q LOCAL core/DYN-VERSION || printf LOCAL >core/DYN-VERSION
+     grep -q DYN-VERSION bin/build && sed -e '/DYN-VERSION/d' bin/build >bin/build.tmp && mv bin/build.tmp bin/build && chmod +x bin/build || :
+     EMACS=emacs ./bin/setup && EMACS=emacs ./bin/build
+   #+end_src
+    
+
+*** Configurations
+:PROPERTIES:
+:ID:       A58AD346-E923-4E20-BAAA-02B4E1A03A0D
+:END:
+
 #+begin_src emacs-lisp
   
   (leaf tree-sitter
-    :ensure t tree-sitter-langs
-    ;; :require tree-sitter-langs
-    :preface
-    (defun my/highlight-python-docstrings ()
-      (add-function
-       :before-until (local 'tree-sitter-hl-face-mapping-function)
-       (lambda (capture-name)
-         (pcase capture-name
-           ("doc" 'font-lock-comment-face)))))
+    :load-path `(,(mapcar (lambda (elm)
+                            (concat "~/.emacs.d/elisp/elisp-tree-sitter/" elm "/"))
+                          '("core" "langs" "lisp")))
+    :require t tree-sitter-langs
+    ;; If this isn't set then it'll download x86_64 dylibs over the arm64
+    ;; dylibs we built
+    :init (setf lyn--self-compiled-tsc t
+                tree-sitter-langs--testing lyn--self-compiled-tsc)
   
+  
+    ;; :preface
+    ;; (defun my/highlight-python-docstrings ()
+    ;;   (add-function
+    ;;    :before-until (local 'tree-sitter-hl-face-mapping-function)
+    ;;    (lambda (capture-name)
+    ;;      (pcase capture-name
+    ;;        ("doc" 'font-lock-comment-face)))))
     :hook ((python-mode-hook . tree-sitter-hl-mode)
            ;; Highlight Python docstrings with a different face.
-           (python-mode-hook . my/highlight-python-docstrings)))
+           ;; (python-mode-hook . my/highlight-python-docstrings)
+           ))
 #+end_src
 
 ** Solaire-Mode
