@@ -146,7 +146,8 @@
     :url "http://handlename.hatenablog.jp/entry/2011/12/11/214923"
     :leaf-defer nil
     :bind (("C-M-h" . delete-region)
-           ([remap eval-last-sexp] . pp-eval-last-sexp))
+           ([remap eval-last-sexp] . pp-eval-last-sexp)
+           ("C-x C-p" . switch-to-prev-buffer))
     :hook (after-init-hook . general-init-hook)
     :preface
     (defun general-init-hook nil
