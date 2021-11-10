@@ -2682,6 +2682,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf skk
   :ensure ddskk
   :hook ((text-mode-hook . (lambda nil
+                             (skk-mode)
                              (skk-latin-mode-on)
                              (context-skk-mode))))
   :custom ((default-input-method . "japanese-skk")
