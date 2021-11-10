@@ -740,9 +740,7 @@
                               (custom-set-variables
                                '(lsp-completion-provider :none))))))
   :custom `((lsp-keymap-prefix . "s-l")        
-            ;; (gcmh-low-cons-threshold . ,(* 512 1024 1024))  ;; 512MB
             (read-process-output-max . ,(* 1 1024 1024))  ;; 1MB
-            ;; (lsp-diagnostics-modeline-scope . :project)
             ;; debug
             (lsp-auto-guess-root . nil)
             (lsp-headerline-breadcrumb-enable . nil)
