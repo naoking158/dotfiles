@@ -267,13 +267,18 @@
   (add-to-list 'super-save-hook-triggers 'find-file-hook)
   (super-save-mode +1))
 
-(leaf undo-fu
-  :doc "Undo helper with redo"
-  :req "emacs-24.3"
-  :url "https://gitlab.com/ideasman42/emacs-undo-fu"
+(leaf undo-tree
   :ensure t
-  :bind* (("C-/" . undo-fu-only-undo)
-          ("C-?" . undo-fu-only-redo)))
+  :hook (emacs-startup-hook . global-undo-tree-mode)
+  :bind (("C-/" . undo-tree-undo)
+         ("C-?" . undo-tree-redo))
+  :custom
+  ((undo-tree-limit . 1000000)
+   (undo-tree-strong-limit . 4000000)
+   (undo-tree-outer-limit . 12000000)
+   (undo-tree-auto-save-history . t)
+   (undo-tree-history-directory-alist . `(("." . ,(no-littering-expand-etc-file-name
+                                                   "undo"))))))
 
 (defun my/toggle-modeline ()
   (interactive)

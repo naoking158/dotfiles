@@ -22,7 +22,7 @@ a bunch of resources I've found online.
   - [[#change-modifiers][Change modifiers]]
   - [[#auto-revert-buffer][Auto revert buffer]]
   - [[#auto-saving-changed-files][Auto-Saving Changed Files]]
-  - [[#undo-helper-with-undo-fu][Undo Helper with undo-fu]]
+  - [[#undo-helper][Undo Helper]]
 - [[#utility-functions][Utility Functions]]
   - [[#toggle-mode-line][Toggle Mode-line]]
   - [[#trim-newline-from-string][Trim newline from string]]
@@ -534,21 +534,24 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
   
 #+end_src
 
-** Undo Helper with undo-fu
+** Undo Helper
 :PROPERTIES:
 :ID:       C5CFEC97-06DC-4DEB-ADEF-F006CF72C3FF
 :END:
 
 #+begin_src emacs-lisp
-  
-  (leaf undo-fu
-    :doc "Undo helper with redo"
-    :req "emacs-24.3"
-    :url "https://gitlab.com/ideasman42/emacs-undo-fu"
+  (leaf undo-tree
     :ensure t
-    :bind* (("C-/" . undo-fu-only-undo)
-            ("C-?" . undo-fu-only-redo)))
-  
+    :hook (emacs-startup-hook . global-undo-tree-mode)
+    :bind (("C-/" . undo-tree-undo)
+           ("C-?" . undo-tree-redo))
+    :custom
+    ((undo-tree-limit . 1000000)
+     (undo-tree-strong-limit . 4000000)
+     (undo-tree-outer-limit . 12000000)
+     (undo-tree-auto-save-history . t)
+     (undo-tree-history-directory-alist . `(("." . ,(no-littering-expand-etc-file-name
+                                                     "undo"))))))
 #+end_src
 
 * Utility Functions
