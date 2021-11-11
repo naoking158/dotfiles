@@ -24,11 +24,12 @@
 (set-clipboard-coding-system 'utf-8)
 (set-selection-coding-system 'utf-8)
 (set-default 'buffer-file-coding-system 'utf-8)
-(setq debug-on-error nil
+(setq debug-on-error t
       init-file-debug t
       user-full-name "Naoki Sakamoto"
       user-mail-address "naoki@bbo.cs.tsukuba.ac.jp"
       user-login-name "naoking158"
+      package-enable-at-startup nil
       package-native-compile t)
 
 (when-let ((fish (executable-find "fish")))

@@ -9,8 +9,6 @@
 ;; this enables this running method
 ;;   emacs -q -l ~/.debug.emacs.d/{{pkg}}/init.el
 
-(setq comp-deferred-compilation-deny-list (list "jupyter"))
-
 (setq exec-profile nil)
 
 (when exec-profile
@@ -70,12 +68,12 @@
 
     (leaf leaf-keywords
       :ensure t
-      :config
-      (leaf-keywords-init)
+      :config (leaf-keywords-init)
       :init
       (leaf leaf-convert :ensure t)
       (leaf hydra :ensure t)
       (leaf blackout :ensure t)
+
       (leaf key-chord
         :ensure t
         :hook (emacs-startup-hook . (lambda () (key-chord-mode 1)))
@@ -86,7 +84,23 @@
         (key-chord-define-global "x1" '"\C-x1")
         (key-chord-define-global "x2" '"\C-x2")
         (key-chord-define-global "x3" '"\C-x3")
-        (key-chord-define-global "x5" '"\C-x52")))))
+        (key-chord-define-global "x5" '"\C-x52"))
+
+      ;; (leaf straight
+      ;;   :config
+      ;;   (defvar bootstrap-version)
+      ;;   (let ((bootstrap-file
+      ;;          (expand-file-name "straight/repos/straight.el/bootstrap.el" "~/.emacs.d/"))
+      ;;         (bootstrap-version 5))
+      ;;     (unless (file-exists-p bootstrap-file)
+      ;;       (with-current-buffer
+      ;;           (url-retrieve-synchronously
+      ;;            "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+      ;;            'silent 'inhibit-cookies)
+      ;;         (goto-char (point-max))
+      ;;         (eval-print-last-sexp)))
+      ;;     (load bootstrap-file nil 'nomessage)))
+      )))
 
 (leaf *keep-clean
   :config
