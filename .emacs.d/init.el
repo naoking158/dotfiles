@@ -861,9 +861,12 @@
   :doc "Python LSP client using Pyright"
   :req "emacs-26.1" "lsp-mode-7.0" "dash-2.18.0" "ht-2.0"
   :url "https://github.com/emacs-lsp/lsp-pyright"
-  :after lsp-mode
   :ensure t
-  :custom `(lsp-pyright-venv-path . ,(expand-file-name "envs" path-to-miniconda))
+  :custom
+  `((lsp-pyright-venv-path . ,(expand-file-name "envs"
+                                                path-to-miniconda))
+    (python-shell-virtualenv-root . ,(expand-file-name "envs/torch"
+                                                       path-to-miniconda)))
   :preface
   (defun my/lsp-pyright-setup-when-conda ()
     (setq-local lsp-pyright-venv-path python-shell-virtualenv-root)
@@ -874,7 +877,7 @@
           python-indent 4
           tab-width 4)
     (require 'lsp-pyright)
-    (lsp-deferred))
+    (lsp))
 
   :hook
   ((conda-postactivate-hook . my/lsp-pyright-setup-when-conda)
