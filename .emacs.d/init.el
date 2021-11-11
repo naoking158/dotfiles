@@ -1641,6 +1641,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :ensure t
   :bind* ("C-q" . avy-goto-migemo-timer)
   :init (add-to-list 'avy-styles-alist '(avy-goto-migemo-timer . pre))
+  :custom ((avy-timeout-seconds . 0.3)
+           (avy-keys . '(?q ?e ?r ?y ?u ?o ?p
+                           ?a ?s ?d ?f ?g ?h ?j
+                           ?k ?l ?' ?x ?c ?v ?b
+                           ?n ?, ?/)))
   :preface
   (defun avy-goto-migemo-timer (&optional arg)
     (interactive "P")
@@ -1649,7 +1654,118 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                              avy-all-windows)))
       (avy-with avy-goto-migemo-timer
         (setq avy--old-cands (avy--read-candidates #'migemo-get-pattern))
-        (avy-process avy--old-cands)))))
+        (avy-process avy--old-cands))))
+  :config
+  (defun avy-show-dispatch-help ()  
+    (let* ((len (length "avy-action-"))
+           (fw (frame-width))
+           (raw-strings (mapcar
+                         (lambda (x)
+                           (format "%2s: %-19s"
+                                   (propertize
+                                    (char-to-string (car x))
+                                    'face 'aw-key-face)
+                                   (substring (symbol-name (cdr x)) len)))
+                         avy-dispatch-alist))
+           (max-len (1+ (apply #'max (mapcar #'length raw-strings))))
+           (strings-len (length raw-strings))
+           (per-row (floor fw max-len))
+           display-strings)
+      (cl-loop for string in raw-strings
+               for N from 1 to strings-len do
+               (push (concat string " ") display-strings)
+               (when (= (mod N per-row) 0) (push "\n" display-strings)))
+      (message "%s" (apply #'concat (nreverse display-strings)))))
+
+  ;; Kill text
+  (defun avy-action-kill-whole-line (pt)
+    (save-excursion
+      (goto-char pt)
+      (kill-whole-line))
+    (select-window
+     (cdr
+      (ring-ref avy-ring 0)))
+    t)
+
+  (setf (alist-get ?k avy-dispatch-alist) 'avy-action-kill-stay
+        (alist-get ?K avy-dispatch-alist) 'avy-action-kill-whole-line)
+
+  ;; Copy text
+  (defun avy-action-copy-whole-line (pt)
+    (save-excursion
+      (goto-char pt)
+      (cl-destructuring-bind (start . end)
+          (bounds-of-thing-at-point 'line)
+        (copy-region-as-kill start end)))
+    (select-window
+     (cdr
+      (ring-ref avy-ring 0)))
+    t)
+
+  (setf (alist-get ?w avy-dispatch-alist) 'avy-action-copy
+        (alist-get ?W avy-dispatch-alist) 'avy-action-copy-whole-line)
+
+  ;; Yank text
+  (defun avy-action-yank-whole-line (pt)
+    (avy-action-copy-whole-line pt)
+    (save-excursion (yank))
+    t)
+
+  (setf (alist-get ?y avy-dispatch-alist) 'avy-action-yank
+        (alist-get ?Y avy-dispatch-alist) 'avy-action-yank-whole-line)
+
+  ;; Transpose/Move text
+  (defun avy-action-teleport-whole-line (pt)
+    (avy-action-kill-whole-line pt)
+    (save-excursion (yank)) t)
+
+  (setf (alist-get ?t avy-dispatch-alist) 'avy-action-teleport
+        (alist-get ?T avy-dispatch-alist) 'avy-action-teleport-whole-line)
+
+  ;; Mark text
+  (defun avy-action-mark-to-char (pt)
+    (activate-mark)
+    (goto-char pt))
+
+  (setf (alist-get ?  avy-dispatch-alist) 'avy-action-mark-to-char)
+
+  ;; Flyspell words
+  (defun avy-action-flyspell (pt)
+    (save-excursion
+      (goto-char pt)
+      (when (require 'flyspell nil t)
+        (flyspell-auto-correct-word)))
+    (select-window
+     (cdr (ring-ref avy-ring 0)))
+    t)
+
+  ;; Bind to semicolon (flyspell uses C-;)
+  (setf (alist-get ?\; avy-dispatch-alist) 'avy-action-flyspell)
+
+
+  ;; Get Elisp Help
+  ;; Replace with your package manager or help library of choice
+  (defun avy-action-helpful (pt)
+    (save-excursion
+      (goto-char pt)
+      (helpful-at-point))
+    (select-window
+     (cdr (ring-ref avy-ring 0)))
+    t)
+
+  (setf (alist-get ?H avy-dispatch-alist) 'avy-action-helpful)
+
+  ;; Embark
+  (defun avy-action-embark (pt)
+    (unwind-protect
+        (save-excursion
+          (goto-char pt)
+          (embark-act))
+      (select-window
+       (cdr (ring-ref avy-ring 0))))
+    t)
+
+  (setf (alist-get ?. avy-dispatch-alist) 'avy-action-embark))
 
 (leaf mwim
   :doc "Switch between the beginning/end of line or code"
@@ -1714,7 +1830,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf gcmh
   :ensure t
   :blackout
-  :custom (gcmh-verbose . t)
+  :custom (gcmh-verbose . nil)
   :hook after-init-hook)
 
 (leaf org
