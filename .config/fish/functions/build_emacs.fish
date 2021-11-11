@@ -6,10 +6,10 @@ function build_emacs --argument-names 'emacs_version'
     end
 
     set patch_dir ~/.emacs.d/emacs_patches
-    set patch_url "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/$emacs_version"
-    set patch_name "fix-window-role.patch"
-    set patch_name "system-appearance.patch" $patch_name
-
+    set patch_url "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/$emacs_version/fix-window-role.patch"
+    set patch_url "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/$emacs_version/system-appearance.patch" $patch_url
+    set patch_url "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-29/posix-spawn.patch" $patch_url
+    
     if test ! -e "configure"
         ./autogen.sh
     end
@@ -19,13 +19,13 @@ function build_emacs --argument-names 'emacs_version'
     end
 
     cd $patch_dir
-    for patch in $patch_name
-        curl -L $patch_url/$patch -o $patch_dir/$patch
+    for url in $patch_url
+        curl -LO $url
     end
     cd -
 
     for patch_file in $patch_dir/**
-        echo "Apply patch: $patch_file ..."
+        echo "Apply patch: $patch_file"
         patch -p1 < $patch_file
     end
 
@@ -34,6 +34,7 @@ function build_emacs --argument-names 'emacs_version'
         --with-modules \
         --with-xwidgets \
         --with-native-compilation \
+        --without-dbus \
         CPPFLAGS=-I/opt/homebrew/opt/ruby/include \
         LDFLAGS=-L/opt/homebrew/opt/ruby/lib
         
