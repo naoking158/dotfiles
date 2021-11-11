@@ -463,7 +463,7 @@
   (defun my/set-font-weight (weight)
     (interactive
      (list (intern (completing-read "Choose weight:"
-                                    '(light normal bold)))))
+                                    '(light normal medium bold)))))
     (set-face-attribute 'default nil :weight weight)
     (set-face-attribute 'fixed-pitch nil :weight weight)
     (set-face-attribute 'variable-pitch nil :weight weight))
@@ -471,9 +471,10 @@
   (defun my/set-font-weight-after-load-theme (&rest args)
     (let* ((str-theme (symbol-name (car args)))
            (weight (cond
-                    ((string-match "\\(light\\|operandi\\)" str-theme) 'normal)
+                    ((string-match "\\(light\\|operandi\\)" str-theme) 'medium)
                     ((and (string-match "bespoke" str-theme)
-                          (eq 'light bespoke-set-theme)) 'normal)
+                          (eq 'light bespoke-set-theme))
+                     'medium)
                     (t 'light))))
       (my/set-font-weight weight))))
 
