@@ -34,7 +34,6 @@ function build_emacs --argument-names 'emacs_version'
         --with-modules \
         --with-xwidgets \
         --with-native-compilation \
-        --without-dbus \
         CPPFLAGS=-I/opt/homebrew/opt/ruby/include \
         LDFLAGS=-L/opt/homebrew/opt/ruby/lib
         
