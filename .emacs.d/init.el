@@ -281,6 +281,12 @@
    (undo-tree-history-directory-alist . `(("." . ,(no-littering-expand-etc-file-name
                                                    "undo"))))))
 
+;; Compilation deny package
+(setq comp-deferred-compilation-deny-list (list "jupyter"))
+
+;; native-compile all Elisp files under a directory
+(native-compile-async (file-truename "~/.emacs.d/elisp/") 'recursively)
+
 (defun my/toggle-modeline ()
   (interactive)
   (if (null mode-line-format)

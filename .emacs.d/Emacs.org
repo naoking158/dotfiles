@@ -555,6 +555,19 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                                                      "undo"))))))
 #+end_src
 
+** Native Compilation
+:PROPERTIES:
+:ID:       6E4D21D3-E1F7-4681-AA48-2FA7799DE6D9
+:END:
+
+#+begin_src emacs-lisp
+  ;; Compilation deny package
+  (setq comp-deferred-compilation-deny-list (list "jupyter"))
+  
+  ;; native-compile all Elisp files under a directory
+  (native-compile-async (file-truename "~/.emacs.d/elisp/") 'recursively)
+#+end_src
+
 * Utility Functions
 :PROPERTIES:
 :ID:       87D7535C-5EBF-42CD-B733-2599F3494455
