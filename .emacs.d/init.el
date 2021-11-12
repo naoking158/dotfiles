@@ -1664,23 +1664,25 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :url "https://github.com/abo-abo/avy"
   :ensure t
   :bind* ("C-q" . avy-goto-migemo-timer)
-  :init (add-to-list 'avy-styles-alist '(avy-goto-migemo-timer . pre))
-  :custom ((avy-timeout-seconds . 0.3)
-           (avy-keys . '(?q ?e ?r ?y ?u ?o ?p
-                           ?a ?s ?d ?f ?g ?h ?j
-                           ?k ?l ?' ?x ?c ?v ?b
-                           ?n ?, ?/)))
+  :init (add-to-list 'avy-styles-alist '(avy-goto-char-timer . pre))
+  ;; :init (add-to-list 'avy-styles-alist '(avy-goto-migemo-timer . pre))
+  :custom ((avy-timeout-seconds . 0.5)
+           (avy-keys . '( ?q ?e ?r ?u ?o ?p
+                          ?a ?s ?d ?f ?g ?h ?j ?l ?'
+                          ?c ?v ?b ?n ?, ?/)))
   :preface
-  (defun avy-goto-migemo-timer (&optional arg)
-    (interactive "P")
-    (let ((avy-all-windows (if arg
-                               (not avy-all-windows)
-                             avy-all-windows)))
-      (avy-with avy-goto-migemo-timer
-        (setq avy--old-cands (avy--read-candidates #'migemo-get-pattern))
-        (avy-process avy--old-cands))))
+  ;; (defun avy-goto-migemo-timer (&optional arg)
+  ;;   (interactive "P")
+  ;;   (let ((avy-all-windows (if arg
+  ;;                              (not avy-all-windows)
+  ;;                            avy-all-windows)))
+  ;;     (avy-with avy-goto-migemo-timer
+  ;;       (setq avy--old-cands (avy--read-candidates #'migemo-get-pattern))
+  ;;       (avy-process avy--old-cands))))
   :config
-  (defun avy-show-dispatch-help ()  
+  ;; orverride avy function
+  (defun avy-show-dispatch-help ()
+    "Display action shortucts in echo area."
     (let* ((len (length "avy-action-"))
            (fw (frame-width))
            (raw-strings (mapcar
@@ -1787,9 +1789,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
           (embark-act))
       (select-window
        (cdr (ring-ref avy-ring 0))))
-    t)
-
-  (setf (alist-get ?. avy-dispatch-alist) 'avy-action-embark))
+    t))
 
 (leaf mwim
   :doc "Switch between the beginning/end of line or code"
