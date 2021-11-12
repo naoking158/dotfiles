@@ -3415,7 +3415,7 @@ Interactively, URL defaults to the string looking like a url around point."
   :init
   (require 'zmq)
   (leaf ob-jupyter
-    :ensure jupyter
+    :require t
     :commands (org-babel-execute:jupyter)))
 
 (leaf org-babel

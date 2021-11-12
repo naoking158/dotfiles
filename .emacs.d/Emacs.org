@@ -4825,8 +4825,10 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
     :init
     (require 'zmq)
     (leaf ob-jupyter
-      :ensure jupyter
+      :require t
       :commands (org-babel-execute:jupyter)))
+
+  
 #+end_src
 
 *** Enable lsp in org-code-block
