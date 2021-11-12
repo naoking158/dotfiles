@@ -538,8 +538,7 @@
       (custom-theme-set-faces
        `user
        `(org-agenda-clocking ((t :foreground ,bespoke-salient)))
-       `(org-agenda-done ((t :foreground ,bespoke-faded :strike-through nil))))
-))
+       `(org-agenda-done ((t :foreground ,bespoke-faded :strike-through nil))))))
 
     ;;; utils
   (setq my/theme-list '(doom-nord
@@ -580,12 +579,11 @@
   (setq inhibit-compacting-font-caches t))
 
 (leaf *modelines
-  :leaf-defer nil
-  :hook (emacs-startup-hook . my/modeline-bespoke)
+  :hook (emacs-startup-hook . my/modeline-moody)
   :preface
   (leaf moody
     :ensure t
-    :config (defun my/moody-modeline nil
+    :config (defun my/modeline-moody nil
               (interactive)
               (setq x-underline-at-descent-line t)
               (moody-replace-mode-line-buffer-identification)
@@ -593,16 +591,15 @@
               (moody-replace-eldoc-minibuffer-message-function)))
 
   (leaf doom-modeline
-    :disabled t
     :doc "A minimal and modern mode-line"
     :req "emacs-25.1" "all-the-icons-2.2.0" "shrink-path-0.2.0" "dash-2.11.0"
     :tag "mode-line" "faces" "emacs>=25.1"
     :url "https://github.com/seagle0128/doom-modeline"
     :ensure t
-    :custom-face ((mode-line . '((t (:height 0.9))))
-                  (mode-line-inactive . '((t (:height 0.9)))))
-    :custom ((doom-modeline-buffer-file-name-style . 'truncate-from-project)
-             (doom-modeline-project-detection . 'project)
+    ;; :custom-face ((mode-line . '((t (:height 0.9))))
+    ;;               (mode-line-inactive . '((t (:height 0.9)))))
+    :custom ((doom-modeline-buffer-file-name-style . 'truncate-except-project)
+             (doom-modeline-project-detection . 'auto)
              (doom-modeline-icon . t)
              (doom-modeline-major-mode-icon . nil)
              (doom-modeline-minor-modes . nil)
@@ -612,14 +609,22 @@
              (doom-modeline-bar-width . 7)
              (doom-modeline-lsp . t)
              (doom-modeline-github . nil)
-             (doom-modeline-persp-name . nil)))
+             (doom-modeline-persp-name . nil)
+             (doom-modeline-buffer-state-icon . t)
+             (doom-modeline-env-enable-python . t))
+    :config
+    (defun my/modeline-doom nil
+      (interactive)
+      (doom-modeline-mode)))
 
   (leaf minions
     :ensure t
+    :hook (emacs-startup-hook . minions-mode)
     :custom ((minions-mode-line-lighter . ";")
              (minions-direct . '(defining-kbd-macro flymake-mode))))
 
   (leaf bespoke-modeline
+    :disabled t
     :load-path "~/.emacs.d/elisp/bespoke-modeline/"
     :require t
     :custom ((bespoke-modeline-position . 'bottom)
