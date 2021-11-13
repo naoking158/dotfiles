@@ -1229,7 +1229,7 @@ respectively."
          ("C-x x r" . tab-bar-rename-tab)
          ("s-]" . tab-bar-switch-to-next-tab)
          ("s-[" . tab-bar-switch-to-prev-tab))
-  :custom (tab-bar-show . nil)
+  :custom (tab-bar-show . t)
   :hook (emacs-startup-hook . (lambda ()
                                 (tab-bar-mode)
                                 (tab-bar-new-tab))))
