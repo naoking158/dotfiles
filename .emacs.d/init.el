@@ -579,7 +579,10 @@
   (setq inhibit-compacting-font-caches t))
 
 (leaf *modelines
-  :hook (emacs-startup-hook . my/modeline-moody)
+  :hook (emacs-startup-hook . (lambda nil
+                                (my/modeline-moody)
+                                (line-number-mode 1)
+                                (column-number-mode 1)))
   :preface
   (leaf moody
     :ensure t

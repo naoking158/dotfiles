@@ -922,9 +922,16 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
   :config
   (column-number-mode)
   (setq inhibit-compacting-font-caches t))
+#+end_src
 
+** Modeline Configuration
+
+#+begin_src emacs-lisp
 (leaf *modelines
-  :hook (emacs-startup-hook . my/modeline-moody)
+  :hook (emacs-startup-hook . (lambda nil
+                                (my/modeline-moody)
+                                (line-number-mode 1)
+                                (column-number-mode 1)))
   :preface
   (leaf moody
     :ensure t
