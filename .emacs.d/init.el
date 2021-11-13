@@ -632,7 +632,7 @@
     :ensure t
     :hook (emacs-startup-hook . minions-mode)
     :custom ((minions-mode-line-lighter . ";")
-             (minions-direct . '(defining-kbd-macro flymake-mode))))
+             (minions-prominent-modes . '(defining-kbd-macro flymake-mode))))
 
   (leaf bespoke-modeline
     :disabled t

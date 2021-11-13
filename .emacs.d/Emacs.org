@@ -982,7 +982,7 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
     :ensure t
     :hook (emacs-startup-hook . minions-mode)
     :custom ((minions-mode-line-lighter . ";")
-             (minions-direct . '(defining-kbd-macro flymake-mode))))
+             (minions-prominent-modes . '(defining-kbd-macro flymake-mode))))
 
   (leaf bespoke-modeline
     :disabled t
