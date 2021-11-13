@@ -1183,7 +1183,13 @@ respectively."
   :custom-face
   ((aw-leading-char-face . '((t (:height 4.0 :foreground "#f1fa8c"))))))
 
-(leaf *my-window-resizer
+(leaf *windmove
+  :bind (("s-h" . windmove-left)
+         ("s-j" . windmove-up)
+         ("s-k" . windmove-down)
+         ("s-l" . windmove-right)))
+
+(leaf my-window-resizer
   :doc "Control window size and position."
   :bind ("C-x r" . my-window-resizer)
   :preface

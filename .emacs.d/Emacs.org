@@ -1782,13 +1782,23 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
   ((aw-leading-char-face . '((t (:height 4.0 :foreground "#f1fa8c"))))))
 #+end_src
 
+** Window Movement with windmove
+
+#+begin_src emacs-lisp
+(leaf *windmove
+  :bind (("s-h" . windmove-left)
+         ("s-j" . windmove-up)
+         ("s-k" . windmove-down)
+         ("s-l" . windmove-right)))
+#+end_src
+
 ** Resize Window
 :PROPERTIES:
 :ID:       66A46ED2-02C6-40B4-B9CA-901361FA7461
 :END:
 
 #+begin_src emacs-lisp
-(leaf *my-window-resizer
+(leaf my-window-resizer
   :doc "Control window size and position."
   :bind ("C-x r" . my-window-resizer)
   :preface
