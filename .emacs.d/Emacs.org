@@ -48,6 +48,7 @@ a bunch of resources I've found online.
 - [[#window-management][Window Management]]
   - [[#window-history-with-winner-mode][Window History with winner-mode]]
   - [[#window-selection-with-ace-window][Window Selection with ace-window]]
+  - [[#window-movement-with-windmove][Window Movement with windmove]]
   - [[#resize-window][Resize Window]]
   - [[#named-window-with-tab-bar][Named Window with tab-bar]]
   - [[#rotate-window-layout][Rotate Window Layout]]
@@ -555,7 +556,9 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
   :ensure t
   :hook (emacs-startup-hook . global-undo-tree-mode)
   :bind (("C-/" . undo-tree-undo)
-         ("C-?" . undo-tree-redo))
+         ("C-?" . undo-tree-redo)
+         ([remap undo-tree-restore-state-from-register] . nil)
+         ([remap undo-tree-save-state-to-register] . nil))
   :custom
   ((undo-tree-limit . 1000000)
    (undo-tree-strong-limit . 4000000)
@@ -755,7 +758,6 @@ Instead, I use *the compiled emoji fonts* uploaded in https://github.com/vXBaKeR
 For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-your-macbook-f99da72cf126.
 
 #+begin_src emacs-lisp
-
 (leaf font
   :leaf-defer nil
   :hook (emacs-startup-hook . (lambda () (my/set-font my-fontsize)))
@@ -1852,7 +1854,8 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
          ("C-x x r" . tab-bar-rename-tab)
          ("s-]" . tab-bar-switch-to-next-tab)
          ("s-[" . tab-bar-switch-to-prev-tab))
-  :custom (tab-bar-show . t)
+  :custom ((tab-bar-show . t)
+           (tab-bar-close-button-show . nil))
   :hook (emacs-startup-hook . (lambda ()
                                 (tab-bar-mode)
                                 (tab-bar-new-tab))))

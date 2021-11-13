@@ -286,7 +286,9 @@
   :ensure t
   :hook (emacs-startup-hook . global-undo-tree-mode)
   :bind (("C-/" . undo-tree-undo)
-         ("C-?" . undo-tree-redo))
+         ("C-?" . undo-tree-redo)
+         ([remap undo-tree-restore-state-from-register] . nil)
+         ([remap undo-tree-save-state-to-register] . nil))
   :custom
   ((undo-tree-limit . 1000000)
    (undo-tree-strong-limit . 4000000)
@@ -1235,7 +1237,8 @@ respectively."
          ("C-x x r" . tab-bar-rename-tab)
          ("s-]" . tab-bar-switch-to-next-tab)
          ("s-[" . tab-bar-switch-to-prev-tab))
-  :custom (tab-bar-show . t)
+  :custom ((tab-bar-show . t)
+           (tab-bar-close-button-show . nil))
   :hook (emacs-startup-hook . (lambda ()
                                 (tab-bar-mode)
                                 (tab-bar-new-tab))))
