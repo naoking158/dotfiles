@@ -14,7 +14,7 @@
           (lambda ()
             "Restore defalut values after startup."
             (setq file-name-handler-alist default-file-name-handler-alist
-          gc-cons-threshold (* 1024 1024 1024))))
+                  gc-cons-threshold (* 1024 1024 1024))))
 
 ;; basic
 (prefer-coding-system 'utf-8)

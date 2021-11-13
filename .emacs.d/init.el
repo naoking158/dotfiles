@@ -150,7 +150,7 @@
   (leaf *auto-save
     :config
     (setq auto-save-file-name-transforms
-      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
+          `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
 
 (leaf *general-configrations
   :config
@@ -1143,7 +1143,7 @@ respectively."
   :custom ((yas-indent-line . 'fixed)
            (yas-snippet-dirs . `(,(file-truename "~/.emacs.d/snippets/"))))
   :bind ((yas-keymap
-           ("<tab>" . nil))  ;; conflict with company/coruf
+          ("<tab>" . nil))  ;; conflict with company/coruf
          (yas-minor-mode-map
           ("C-c y i" . yas-insert-snippet)
           ("C-c y n" . yas-new-snippet)
@@ -1188,40 +1188,40 @@ respectively."
   :doc "Control window size and position."
   :bind ("C-x r" . my-window-resizer)
   :preface
-   (defun my-window-resizer()
-     "Control window size and position."
-     (interactive)
-     (let ((window-obj (selected-window))
-           (current-width (window-width))
-           (current-height (window-height))
-           (dx (if (= (nth 0 (window-edges)) 0) 1
-                 -1))
-           (dy (if (= (nth 1 (window-edges)) 0) 1
-                 -1))
-           action c)
-       (catch 'end-flag
-         (while t
-           (setq action
-                 (read-key-sequence-vector (format "size[%dx%d]"
-                                                   (window-width)
-                                                   (window-height))))
-           (setq c (aref action 0))
-           (cond ((= c ?l)
-                  (enlarge-window-horizontally dx))
-                 ((= c ?h)
-                  (shrink-window-horizontally dx))
-                 ((= c ?j)
-                  (enlarge-window dy))
-                 ((= c ?k)
-                  (shrink-window dy))
-                 ;; otherwise
-                 (t
-                  (let ((last-command-char (aref action 0))
-                        (command (key-binding action)))
-                    (when command
-                      (call-interactively command)))
-                  (message "Quit")
-                  (throw 'end-flag t))))))))
+  (defun my-window-resizer()
+    "Control window size and position."
+    (interactive)
+    (let ((window-obj (selected-window))
+          (current-width (window-width))
+          (current-height (window-height))
+          (dx (if (= (nth 0 (window-edges)) 0) 1
+                -1))
+          (dy (if (= (nth 1 (window-edges)) 0) 1
+                -1))
+          action c)
+      (catch 'end-flag
+        (while t
+          (setq action
+                (read-key-sequence-vector (format "size[%dx%d]"
+                                                  (window-width)
+                                                  (window-height))))
+          (setq c (aref action 0))
+          (cond ((= c ?l)
+                 (enlarge-window-horizontally dx))
+                ((= c ?h)
+                 (shrink-window-horizontally dx))
+                ((= c ?j)
+                 (enlarge-window dy))
+                ((= c ?k)
+                 (shrink-window dy))
+                ;; otherwise
+                (t
+                 (let ((last-command-char (aref action 0))
+                       (command (key-binding action)))
+                   (when command
+                     (call-interactively command)))
+                 (message "Quit")
+                 (throw 'end-flag t))))))))
 
 (leaf tab-bar
   :doc "frame-local tabs with named persistent window configurations"
@@ -1232,8 +1232,8 @@ respectively."
          ("s-[" . tab-bar-switch-to-prev-tab))
   :custom (tab-bar-show . nil)
   :hook (emacs-startup-hook . (lambda ()
-                             (tab-bar-mode)
-                             (tab-bar-new-tab))))
+                                (tab-bar-mode)
+                                (tab-bar-new-tab))))
 
 (leaf rotate
   :doc "Rotate the layout of emacs"
@@ -1474,12 +1474,12 @@ respectively."
    :preview-key (list :debounce 0.5 (kbd "M-.")))
 
   (leaf consult-dir
-  :after consult
-  :ensure t
-  :bind (("C-c d" . consult-dir)
-         (:vertico-map
-          ("C-c d" . consult-dir)
-          ("C-x j" . consult-dir-jump-file))))
+    :after consult
+    :ensure t
+    :bind (("C-c d" . consult-dir)
+           (:vertico-map
+            ("C-c d" . consult-dir)
+            ("C-x j" . consult-dir-jump-file))))
 
   (leaf consult-ghq
     :after consult
@@ -1649,18 +1649,18 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
           ("C-M-/" . dabbrev-completion)))
 
 (leaf *complete-path-at-point
-    :hook (completion-at-point-functions . my/complete-path-at-point)
-    :preface
-    (defun my/complete-path-at-point ()
-      "Return completion data for UNIX path at point."
-      (let ((fn (ffap-file-at-point))
-            (fap (thing-at-point 'filename)))
-        (when (and (or fn (equal "/" fap))
-                   (save-excursion
-                     (search-backward fap (line-beginning-position) t)))
-          (list (match-beginning 0)
-                (match-end 0)
-                #'completion-file-name-table :exclusive 'no)))))
+  :hook (completion-at-point-functions . my/complete-path-at-point)
+  :preface
+  (defun my/complete-path-at-point ()
+    "Return completion data for UNIX path at point."
+    (let ((fn (ffap-file-at-point))
+          (fap (thing-at-point 'filename)))
+      (when (and (or fn (equal "/" fap))
+                 (save-excursion
+                   (search-backward fap (line-beginning-position) t)))
+        (list (match-beginning 0)
+              (match-end 0)
+              #'completion-file-name-table :exclusive 'no)))))
 
 (leaf avy
   :doc "Jump to arbitrary positions in visible text and select text quickly."
@@ -1812,9 +1812,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     :require t
     :config
     (eshell-p10k-def-segment time
-      ""
-      (format-time-string "%H:%M" (current-time))
-      'eshell-p10k-distro-face)
+                             ""
+                             (format-time-string "%H:%M" (current-time))
+                             'eshell-p10k-distro-face)
     (defun eshell-p10k-prompt-function ()
       "Prompt defining function."
       (eshell-p10k-def-prompt '(distro dir git prompt-num time)))
@@ -1881,6 +1881,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
    (org-adapt-indentation . t)
    (org-indent-indentation-per-level . 1)
+   (org-edit-src-content-indentation . 0)
    (org-startup-indented . t)
    (org-use-speed-commands . t)
    (org-enforce-todo-dependencies . t)
@@ -2255,9 +2256,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf ob-shell
   :commands (org-babel-execute:sh
-              org-babel-expand-body:sh
-              org-babel-execute:bash
-              org-babel-expand-body:bash))
+             org-babel-expand-body:sh
+             org-babel-execute:bash
+             org-babel-expand-body:bash))
 
 (leaf org-pomodoro
   :disabled t
@@ -2379,23 +2380,23 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   ;;                     (format-time-string "[%Y-%m-%d %a %H:%M]")))
 
   ;; (leaf *ox-hugo-capture
-;;     :require org-capture
-;;     :after org
-;;     :defvar (org-capture-templates)
-;;     :config
-;;     (add-to-list 'org-capture-templates
-;;                  '("b" "Create new blog post" entry
-;;                    (file+headline "~/src/omgithub.com/naoking158/blog-src/org/naoki.org" "blog")
-;;                    "** TODO %?
-;; :PROPERTIES:
-;; :EXPORT_FILE_NAME: %(apply #'format \"%s-%s-%s\"
-;;         (format-time-string \"%Y %m %d\")
-;; :EXPORT_HUGO_TAGS:
-;; :EXPORT_HUGO_LASTMOD:
-;; :END:
-;; -
-;; ")
-;;                  'append))
+  ;;     :require org-capture
+  ;;     :after org
+  ;;     :defvar (org-capture-templates)
+  ;;     :config
+  ;;     (add-to-list 'org-capture-templates
+  ;;                  '("b" "Create new blog post" entry
+  ;;                    (file+headline "~/src/omgithub.com/naoking158/blog-src/org/naoki.org" "blog")
+  ;;                    "** TODO %?
+  ;; :PROPERTIES:
+  ;; :EXPORT_FILE_NAME: %(apply #'format \"%s-%s-%s\"
+  ;;         (format-time-string \"%Y %m %d\")
+  ;; :EXPORT_HUGO_TAGS:
+  ;; :EXPORT_HUGO_LASTMOD:
+  ;; :END:
+  ;; -
+  ;; ")
+  ;;                  'append))
   )
 
 (leaf ox-latex
@@ -2550,10 +2551,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :ensure simple-httpd websocket
   :commands (org-roam-ui-mode)
   :config
-    (setq org-roam-ui-sync-theme t
-          org-roam-ui-follow t
-          org-roam-ui-update-on-save t
-          org-roam-ui-open-on-start t))
+  (setq org-roam-ui-sync-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t
+        org-roam-ui-open-on-start t))
 
 (leaf orp-paperpile
   :doc "orp-paperpile; Org-Roam-Protocol Paperpile is an interface
@@ -3229,9 +3230,9 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
   :custom (browse-url-browser-function . 'xwidget-webkit-browse-url)
   :bind (("C-c s" . xwwp)
          (xwidget-webkit-mode-map
-         ("v" . xwwp-follow-link)
-         ([remap kill-ring-save] . xwidget-webkit-copy-selection-as-kill)
-         ([remap xwidget-webkit-browse-url] . xwwp)))
+          ("v" . xwwp-follow-link)
+          ([remap kill-ring-save] . xwidget-webkit-copy-selection-as-kill)
+          ([remap xwidget-webkit-browse-url] . xwwp)))
   :advice (:override xwwp-browse-url-other-window
                      my/xwwp-browse-url-other-window)
   :preface
@@ -3364,15 +3365,15 @@ Interactively, URL defaults to the string looking like a url around point."
 
   ;; These keys should always pass through to Emacs
   (setq exwm-input-prefix-keys
-    '(?\C-x
-      ?\C-u
-      ?\C-h
-      ?\M-x
-      ?\M-`
-      ?\M-&
-      ?\M-:
-      ?\C-\M-j  ;; Buffer list
-      ?\C-\ ))  ;; Ctrl+Space
+        '(?\C-x
+          ?\C-u
+          ?\C-h
+          ?\M-x
+          ?\M-`
+          ?\M-&
+          ?\M-:
+          ?\C-\M-j  ;; Buffer list
+          ?\C-\ ))  ;; Ctrl+Space
 
   ;; Ctrl+Q will enable the next key to be sent directly
   (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
@@ -3509,7 +3510,7 @@ Interactively, URL defaults to the string looking like a url around point."
   :commands
   (eaf-search-it eaf-open eaf-open-browser eaf-open-browser-with-history eaf-open-pdf-from-history)
   :custom
-  ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
+                                        ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
   ((eaf-python-command . "/usr/bin/python")
    (eaf-browser-continue-where-left-off . t)
    (eaf-browser-enable-adblocker . t)
