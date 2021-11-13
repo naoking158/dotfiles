@@ -588,12 +588,18 @@
   :preface
   (leaf moody
     :ensure t
-    :config (defun my/modeline-moody nil
-              (interactive)
-              (setq x-underline-at-descent-line t)
-              (moody-replace-mode-line-buffer-identification)
-              (moody-replace-vc-mode)
-              (moody-replace-eldoc-minibuffer-message-function)))
+    :config
+    (defun my/modeline-moody nil
+      (interactive)
+      (setq x-underline-at-descent-line t)
+      (moody-replace-mode-line-buffer-identification)
+      (moody-replace-vc-mode)
+      (moody-replace-eldoc-minibuffer-message-function)
+      (moody-replace-element 'mode-line-frame-identification
+                             '(:eval
+                               (propertize
+                                (alist-get 'name (tab-bar--current-tab))
+                                'face '(:weight bold))))))
 
   (leaf doom-modeline
     :doc "A minimal and modern mode-line"
