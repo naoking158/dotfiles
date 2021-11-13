@@ -32,6 +32,7 @@ a bunch of resources I've found online.
   - [[#appearance-and-formatting][Appearance and Formatting]]
   - [[#font-configuration][Font Configuration]]
   - [[#theme-configuration][Theme Configuration]]
+  - [[#modeline-configuration][Modeline Configuration]]
 - [[#keyboard-bindings][Keyboard Bindings]]
   - [[#keybinding-panel-which-key][Keybinding Panel (which-key)]]
   - [[#transient-commands][Transient Commands]]
