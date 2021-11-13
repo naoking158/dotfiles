@@ -726,10 +726,6 @@
   :req "emacs-24.3"
   :url "https://github.com/emacsorphanage/git-gutter"
   :ensure t
-  :bind (("C-x g" . git-gutter)
-         ;; ("C-x p" . git-gutter:previous-hunk)
-         ;; ("C-x n" . git-gutter:next-hunk)
-         ("C-x t" . git-gutter:toggle))
   :custom
   ((git-gutter:modified-sign . "~")
    (git-gutter:added-sign . "+")
