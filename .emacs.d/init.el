@@ -773,7 +773,8 @@
                               ;; This option need to avoid starting company-mode
                               (custom-set-variables
                                '(lsp-completion-provider :none))))))
-  :custom `((lsp-keymap-prefix . "s-l")        
+  ;; :bind (lsp-mode-map)
+  :custom `((lsp-keymap-prefix . "C-c l")        
             (read-process-output-max . ,(* 1 1024 1024))  ;; 1MB
             ;; debug
             (lsp-auto-guess-root . nil)
