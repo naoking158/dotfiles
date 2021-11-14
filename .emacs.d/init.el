@@ -852,11 +852,11 @@
 
 (leaf helpful
   :ensure t
-  :bind (("C-c h f" . helpful-function)
-         ("C-c h s" . helpful-symbol)
-         ("C-c h v" . helpful-variable)
-         ("C-c h c" . helpful-command)
-         ("C-c h k" . helpful-key)))
+  :bind* (("C-c h f" . helpful-function)
+          ("C-c h s" . helpful-symbol)
+          ("C-c h v" . helpful-variable)
+          ("C-c h c" . helpful-command)
+          ("C-c h k" . helpful-key)))
 
 (leaf macrostep
   :ensure t
@@ -1911,12 +1911,12 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (lazy-count-prefix-format . " (%s/%s) ")
    (isearch-yank-on-move . 'shift)
    (isearch-allow-scroll . 'unlimited)
-   (org-show-notification-handler . nil)
+   ;; (org-show-notification-handler . nil)
    (org-structure-template-alist . '(("sh" . "src shell")
                                      ("c" . "center")
                                      ("C" . "comment")
                                      ("el" . "src emacs-lisp")
-                                     ("E" . "export")
+                                     ("ex" . "example")
                                      ("ht" . "export html")
                                      ("tex" . "export latex")
                                      ("q" . "quote")
@@ -2850,7 +2850,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 ;;                               (warn "tree-sitter build will fail"))
 ;;                             (setf lyn--self-compiled-tsc t)
 ;;                             ;; get tree-sitter v0.19.5 - last to put files in a reasonable place
-;;                             '(("sh" "-c" "test -d rust-tree-sitter || git clone https://github.com/tree-sitter/tree-sitter rust-tree-sitter; cd rust-tree-sitter")
+;;                             '(("sh" "-c" "test -d rust-tree-sitter || git clone https://github.com/tree-sitter/tree-sitter rust-tree-sitter; cd rust-tree-sitter && git fetch && git checkout v0.19.5")
 ;;                               ("sh" "-c" "cd rust-tree-sitter/cli && cargo install --path .")
 ;;                               ;; needed or it will download x86_64 dylibs over the arm64 ones we just built
 ;;                               ("sh" "-c" "file core/tsc-dyn.dylib | grep -q arm64 || rm -f core/tsc-dyn.dylib")
@@ -2859,7 +2859,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 ;;                               ;; rebuild bindings
 ;;                               ("sh" "-c" "EMACS=emacs ./bin/setup && EMACS=emacs ./bin/build")
 ;;                               ;; ensure all language definitions
-;;                               ("find" "langs/repos" "-type" "f" "-name" "grammar.js" "-not" "-path" "*/node_modules/*" "-not" "-path" "*/ocaml/interface/*" "-exec" "sh" "-c" "targets=''; for grammar_file in \"$@\"; do grammar_dir=\"${grammar_file%/*}\"; targets=\"$targets ensure/${grammar_dir##*/}\"; done; EMACS=emacs make -j7 $targets" "sh" "{}" "+")))
+;;                               ("find" "langs/repos" "-type" "f" "-name" "grammar.js" "-not" "-path" "*/node_modules/*" "-not" "-path" "*/ocaml/interface/*" "-exec" "sh" "-c" "targets=''; for grammar_file in \"$@\"; do grammar_dir=\"${grammar_file%/*}\"; targets=\"$targets ensure/${grammar_dir##*/}\"; done; EMACS=emacs make -j(nproc) $targets" "sh" "{}" "+")))
 ;;               :files ("core/DYN-VERSION" "core/tsc-dyn.*" "core/*.el")))
 ;; (leaf tree-sitter
 ;;   :commands (tree-sitter-hl-mode)
