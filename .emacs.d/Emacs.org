@@ -1372,22 +1372,22 @@ Only in Neotree Buffer:
                                                 path-to-miniconda))
     (python-shell-virtualenv-root . ,(expand-file-name "envs/torch"
                                                        path-to-miniconda)))
+  :hook
+  ((conda-postactivate-hook . my/lsp-pyright-setup-when-conda)
+   (conda-postdeactivate-hook . my/lsp-pyright-setup-when-conda)
+   (python-mode-hook . my/python-basic-config))
   :preface
   (defun my/lsp-pyright-setup-when-conda ()
     (setq-local lsp-pyright-venv-path python-shell-virtualenv-root)
-    (lsp-restart-workspace))
+    (if (bound-and-true-p lsp-mode)
+        (lsp-restart-workspace)
+      (require 'lsp-pyright)
+      (lsp)))
 
   (defun my/python-basic-config ()
     (setq indent-tabs-mode nil
           python-indent 4
-          tab-width 4)
-    (require 'lsp-pyright)
-    (lsp))
-
-  :hook
-  ((conda-postactivate-hook . my/lsp-pyright-setup-when-conda)
-   (conda-postdeactivate-hook . my/lsp-pyright-setup-when-conda)
-   (python-mode-hook . my/python-basic-config)))
+          tab-width 4)))
 
 #+end_src
 
