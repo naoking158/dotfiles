@@ -431,9 +431,9 @@
   (defun my/set-font-size (fontsize)
     (interactive (list
                   (read-number "Fontsize: " my-fontsize)))
-    (set-face-attribute 'default nil :height (* fontsize 10))
-    (set-face-attribute 'fixed-pitch nil :height (* fontsize 10))
-    (set-face-attribute 'variable-pitch nil :height (* fontsize 10)))
+    (set-face-attribute 'default (selected-frame) :height (* fontsize 10))
+    (set-face-attribute 'fixed-pitch (selected-frame) :height (* fontsize 10))
+    (set-face-attribute 'variable-pitch (selected-frame) :height (* fontsize 10)))
 
   (defun my/set-font (&optional fontsize)
     (interactive)
