@@ -1,14 +1,9 @@
 
 function build_emacs --argument-names 'emacs_version'
-    
-    if test ! -n "$emacs_version"
-        set emacs_version "emacs-28"
-    end
 
     set patch_dir ~/.emacs.d/emacs_patches
-    set patch_url "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/$emacs_version/fix-window-role.patch"
-    set patch_url "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/$emacs_version/system-appearance.patch" $patch_url
-    set patch_url "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-29/posix-spawn.patch" $patch_url
+    set patch_url "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-28/fix-window-role.patch"
+    set patch_url "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-28/system-appearance.patch" $patch_url
     
     if test ! -e "configure"
         ./autogen.sh
