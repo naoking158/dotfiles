@@ -2727,69 +2727,53 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
 
   :defun my/set-org-face
   :preface
-  (when window-system
-
-    (create-fontset-from-ascii-font "Iosevka Aile-14"
-                                    nil
-                                    "myoutline")
-    (set-fontset-font "fontset-myoutline" 'unicode
-                      "Noto Sans CJK JP-14"
-                      nil 'append)
-
-    (defun my/set-org-face (&rest sym-theme)
-      ;; Increase the size of various headings
-      (interactive)
-      (set-face-attribute 'org-document-title nil
-                          :font "Iosevka Aile" :weight 'bold :height 1.6)
-      (set-face-attribute 'org-level-1 nil
-                          :font "fontset-myoutline"
-                          :weight 'bold
+  (defun my/set-org-face (&rest sym-theme)
+    ;; Increase the size of various headings
+    (interactive)
+    (set-face-attribute 'org-document-title nil
+                        :weight 'bold :height 1.6)
+    (set-face-attribute 'org-level-1 nil
+                        :weight 'bold :slant 'normal :height 1.35)
+    (dolist (face '((org-level-2 . 1.3)
+                    (org-level-3 . 1.2)
+                    (org-level-4 . 1.15)
+                    (org-level-5 . 1.1)
+                    (org-level-6 . 1.1)
+                    (org-level-7 . 1.1)
+                    (org-level-8 . 1.1)))
+      (set-face-attribute (car face) nil
+                          :weight 'medium
                           :slant 'normal
-                          :height 1.35)
-      (dolist (face '((org-level-2 . 1.3)
-                      (org-level-3 . 1.2)
-                      (org-level-4 . 1.15)
-                      (org-level-5 . 1.1)
-                      (org-level-6 . 1.1)
-                      (org-level-7 . 1.1)
-                      (org-level-8 . 1.1)))
-        (set-face-attribute (car face) nil
-                            :font "fontset-myoutline"
-                            :weight 'normal
-                            :slant 'normal
-                            :height (cdr face)))
+                          :height (cdr face)))
 
-      ;; variable pitch
-      (face-remap-add-relative 'default :inherit 'variable-pitch)
+    ;; variable pitch
+    (face-remap-add-relative 'default :inherit 'variable-pitch)
 
-      ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-      (require 'bespoke-theme
-               "~/.emacs.d/elisp/bespoke-themes/bespoke-theme.el")
-      (set-face-attribute 'org-block nil						:inherit 'fixed-pitch :foreground nil :background bespoke-subtle)
-      (set-face-attribute 'org-table nil						:inherit 'fixed-pitch)
-      (set-face-attribute 'org-formula nil					:inherit 'fixed-pitch)
-      (set-face-attribute 'org-code nil							:inherit '(shadow fixed-pitch))
-      (set-face-attribute 'org-indent t							:inherit '(org-hide fixed-pitch))
-      (set-face-attribute 'org-verbatim nil					:inherit '(shadow fixed-pitch))
-      (set-face-attribute 'org-special-keyword nil	:inherit '(font-lock-comment-face fixed-pitch))
-      (set-face-attribute 'org-meta-line nil				:inherit '(font-lock-comment-face fixed-pitch))
-      (set-face-attribute 'org-checkbox nil					:inherit 'fixed-pitch)
+    ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+    (require 'bespoke-theme
+             "~/.emacs.d/elisp/bespoke-themes/bespoke-theme.el")
+    (set-face-attribute 'org-block nil						:inherit 'fixed-pitch :foreground nil :background bespoke-subtle)
+    (set-face-attribute 'org-table nil						:inherit 'fixed-pitch)
+    (set-face-attribute 'org-formula nil					:inherit 'fixed-pitch)
+    (set-face-attribute 'org-code nil							:inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-indent t							:inherit '(org-hide fixed-pitch))
+    (set-face-attribute 'org-verbatim nil					:inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-special-keyword nil	:inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-meta-line nil				:inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-checkbox nil					:inherit 'fixed-pitch)
 
-      ;; Get rid of the background on column views
-      (set-face-attribute 'org-column nil :background nil)
-      (set-face-attribute 'org-column-title nil :background nil))
+    ;; Get rid of the background on column views
+    (set-face-attribute 'org-column nil :background nil)
+    (set-face-attribute 'org-column-title nil :background nil))
 
-    (setq org-format-latex-options
-          '( :foreground default
-             :background default
-             :scale 1.7
-             :html-foreground "Black"
-             :html-background "Transparent"
-             :html-scale 1.0
-             :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
-
-    (when (fboundp 'mac-toggle-input-method)
-      (run-with-idle-timer 1 t 'ns-org-heading-auto-ascii)))
+  (setq org-format-latex-options
+        '( :foreground default
+           :background default
+           :scale 1.7
+           :html-foreground "Black"
+           :html-background "Transparent"
+           :html-scale 1.0
+           :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
 
   (defun my/org-mode-hook ()
     ;; (add-hook 'completion-at-point-functions
