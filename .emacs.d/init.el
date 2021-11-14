@@ -1683,7 +1683,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :tag "location" "point" "emacs>=24.1"
   :url "https://github.com/abo-abo/avy"
   :ensure t
-  :bind* ("C-q" . avy-goto-migemo-timer)
+  :bind* ("C-q" . avy-goto-char-timer)
   :init (add-to-list 'avy-styles-alist '(avy-goto-char-timer . pre))
   ;; :init (add-to-list 'avy-styles-alist '(avy-goto-migemo-timer . pre))
   :custom ((avy-timeout-seconds . 0.5)
