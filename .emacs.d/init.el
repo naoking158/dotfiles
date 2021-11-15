@@ -1190,7 +1190,22 @@ respectively."
   :bind* ("C-t" . ace-window)
   :custom (aw-keys . '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
   :custom-face
-  ((aw-leading-char-face . '((t (:height 4.0 :foreground "#f1fa8c"))))))
+  ((aw-leading-char-face . '((t (:height 4.0 :foreground "#f1fa8c")))))
+  :config
+  (defun my--switch-window (num)
+    (let* ((wnd-list (aw-window-list))
+           (wnd-num (- (min num (length wnd-list)) 1))
+           (wnd (nth wnd-num wnd-list)))
+      (aw-switch-to-window wnd)))
+
+  (eval
+   `(progn
+      ,@(mapcar
+         (lambda (elm)
+           `(global-set-key
+             (kbd ,(format "s-%s" elm))
+             (lambda nil (interactive) (my--switch-window ,elm))))
+         (number-sequence 1 9)))))
 
 (leaf *windmove
   :bind (("s-h" . windmove-left)
