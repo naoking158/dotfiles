@@ -2874,7 +2874,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 ;;                               ;; rebuild bindings
 ;;                               ("sh" "-c" "EMACS=emacs ./bin/setup && EMACS=emacs ./bin/build")
 ;;                               ;; ensure all language definitions
-;;                               ("find" "langs/repos" "-type" "f" "-name" "grammar.js" "-not" "-path" "*/node_modules/*" "-not" "-path" "*/ocaml/interface/*" "-exec" "sh" "-c" "targets=''; for grammar_file in \"$@\"; do grammar_dir=\"${grammar_file%/*}\"; targets=\"$targets ensure/${grammar_dir##*/}\"; done; EMACS=emacs make -j(nproc) $targets" "sh" "{}" "+")))
+;;                               ("find" "langs/repos" "-type" "f" "-name" "grammar.js" "-not" "-path" "*/node_modules/*" "-not" "-path" "*/ocaml/interface/*" "-exec" "sh" "-c" "targets=''; for grammar_file in \"$@\"; do grammar_dir=\"${grammar_file%/*}\"; targets=\"$targets ensure/${grammar_dir##*/}\"; done; EMACS=emacs make -j7 $targets" "sh" "{}" "+")))
 ;;               :files ("core/DYN-VERSION" "core/tsc-dyn.*" "core/*.el")))
 ;; (leaf tree-sitter
 ;;   :commands (tree-sitter-hl-mode)

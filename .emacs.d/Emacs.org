@@ -111,6 +111,7 @@ a bunch of resources I've found online.
   - [[#browse-at-remote][Browse at remote]]
   - [[#elfeed][Elfeed]]
   - [[#lin-is-noticeable---linel][LIN Is Noticeable - lin.el]]
+  - [[#edit-with-emacs-using-hammerspoon][Edit with Emacs using Hammerspoon]]
 - [[#footer][Footer]]
 :END:
 
@@ -4165,7 +4166,7 @@ To avoid installing x86_64 version, The following steps should be required.
 ;;                               ;; rebuild bindings
 ;;                               ("sh" "-c" "EMACS=emacs ./bin/setup && EMACS=emacs ./bin/build")
 ;;                               ;; ensure all language definitions
-;;                               ("find" "langs/repos" "-type" "f" "-name" "grammar.js" "-not" "-path" "*/node_modules/*" "-not" "-path" "*/ocaml/interface/*" "-exec" "sh" "-c" "targets=''; for grammar_file in \"$@\"; do grammar_dir=\"${grammar_file%/*}\"; targets=\"$targets ensure/${grammar_dir##*/}\"; done; EMACS=emacs make -j(nproc) $targets" "sh" "{}" "+")))
+;;                               ("find" "langs/repos" "-type" "f" "-name" "grammar.js" "-not" "-path" "*/node_modules/*" "-not" "-path" "*/ocaml/interface/*" "-exec" "sh" "-c" "targets=''; for grammar_file in \"$@\"; do grammar_dir=\"${grammar_file%/*}\"; targets=\"$targets ensure/${grammar_dir##*/}\"; done; EMACS=emacs make -j7 $targets" "sh" "{}" "+")))
 ;;               :files ("core/DYN-VERSION" "core/tsc-dyn.*" "core/*.el")))
 ;; (leaf tree-sitter
 ;;   :commands (tree-sitter-hl-mode)
