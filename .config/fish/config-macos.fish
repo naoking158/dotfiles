@@ -1,7 +1,7 @@
 eval (/opt/homebrew/bin/brew shellenv)
 
 # Homebrew
-# set -xg HOMEBREW_EDITOR "emacs -q -nw"
+set -xg HOMEBREW_EDITOR "emacsclient -nw -a emacs"
 
 # set PATH /Library/Tex/texbin $PATH
 set PATH /usr/local/bin $PATH
