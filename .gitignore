@@ -22,7 +22,13 @@
 !/.config/alacritty/
 !/.config/alacritty/**
 !/.config/fish/
-!/.config/fish/**
+!/.config/fish/*.fish
+!/.config/fish/functions/
+!/.config/fish/functions/backup_homedir.fish
+!/.config/fish/functions/build_emacs.fish
+!/.config/fish/functions/fish_user_key_bindings.fish
+!/.config/fish/functions/my-*
+!/.config/fish/functions/peco_*
 /.config/fish/fish_variables
 !/.config/ranger/
 !/.config/ranger/**
