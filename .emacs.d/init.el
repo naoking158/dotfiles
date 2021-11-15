@@ -877,7 +877,16 @@
   :ensure t
   :mode "\\.py\\'"
   :custom ((python-indent-guess-indent-offset . t)
-           (python-indent-guess-indent-offset-verbose . nil)))
+           (python-indent-guess-indent-offset-verbose . nil))
+  :hook `((python-mode-hook . my/python-basic-config)
+          (python-shell-virtualenv-root . ,(expand-file-name "envs/torch"
+                                                             path-to-miniconda)))
+  :preface
+  (defun my/python-basic-config ()
+    (setq indent-tabs-mode nil
+          python-indent 4
+          tab-width 4)
+    (linum-mode)))
 
 (leaf conda
   :doc "Work with your conda environments"
@@ -898,25 +907,17 @@
   :ensure t
   :custom
   `((lsp-pyright-venv-path . ,(expand-file-name "envs"
-                                                path-to-miniconda))
-    (python-shell-virtualenv-root . ,(expand-file-name "envs/torch"
-                                                       path-to-miniconda)))
+                                                path-to-miniconda)))
   :hook
   ((conda-postactivate-hook . my/lsp-pyright-setup-when-conda)
-   (conda-postdeactivate-hook . my/lsp-pyright-setup-when-conda)
-   (python-mode-hook . my/python-basic-config))
+   (conda-postdeactivate-hook . my/lsp-pyright-setup-when-conda))
   :preface
   (defun my/lsp-pyright-setup-when-conda ()
     (setq-local lsp-pyright-venv-path python-shell-virtualenv-root)
     (if (bound-and-true-p lsp-mode)
         (lsp-restart-workspace)
       (require 'lsp-pyright)
-      (lsp)))
-
-  (defun my/python-basic-config ()
-    (setq indent-tabs-mode nil
-          python-indent 4
-          tab-width 4)))
+      (lsp))))
 
 (leaf web-mode
   :ensure t
