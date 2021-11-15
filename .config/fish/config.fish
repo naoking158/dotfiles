@@ -73,7 +73,6 @@ set -xg IS_MAC (string match 'Darwin' $SYSTEM)
 #To solve a locate problem happens in ipython notebook
 set -xg LC_ALL en_US.UTF-8
 set -xg LANG en_US.UTF-8
-# set -xg LANG ja_JP.UTF-8
 
 # github
 set -xg G_USER (string split -f2 = (git config -l | grep user.name))
