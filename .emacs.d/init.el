@@ -3593,4 +3593,12 @@ Interactively, URL defaults to the string looking like a url around point."
                       (t "#1C2835"))))
       (set-face-attribute 'lin-hl nil :background bg-color))))
 
+(leaf hammerspoon
+  :when
+  (file-exists-p "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el")
+  :hook
+  (emacs-startup-hook . (lambda nil
+                          (load-file
+                           "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))))
+
 (provide 'init)

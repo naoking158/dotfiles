@@ -5096,6 +5096,18 @@ From the search buffer there are a number of ways to interact with entries. Entr
       (set-face-attribute 'lin-hl nil :background bg-color))))
 #+end_src
 
+** Edit with Emacs using Hammerspoon
+
+#+begin_src emacs-lisp
+(leaf hammerspoon
+  :when
+  (file-exists-p "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el")
+  :hook
+  (emacs-startup-hook . (lambda nil
+                          (load-file
+                           "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))))
+#+end_src
+
 * Footer
 :PROPERTIES:
 :ID:       B2B50080-95ED-4DEC-B99E-B120D1A08233
