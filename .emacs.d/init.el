@@ -2823,75 +2823,30 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :bind ("C-x C-c" . server-edit)
   :hook (emacs-startup-hook . server-start))
 
-(leaf tree-sitter
-  :when (not (eq 'darwin system-type))
-  :ensure t
-  ;; :load-path `(,(mapcar (lambda (elm)
-  ;;                         (concat "~/.emacs.d/elisp/elisp-tree-sitter/" elm "/"))
-  ;;                       '("core" "langs" "lisp")))
-  :require t tree-sitter-langs
-  ;; If this isn't set then it'll download x86_64 dylibs over the arm64
-  ;; dylibs we built
-  ;; :init (setf lyn--self-compiled-tsc t
-  ;;             tree-sitter-langs--testing lyn--self-compiled-tsc)
-
-
-  ;; :preface
-  ;; (defun my/highlight-python-docstrings ()
-  ;;   (add-function
-  ;;    :before-until (local 'tree-sitter-hl-face-mapping-function)
-  ;;    (lambda (capture-name)
-  ;;      (pcase capture-name
-  ;;        ("doc" 'font-lock-comment-face)))))
-  :hook ((python-mode-hook . tree-sitter-hl-mode)
-         ;; Highlight Python docstrings with a different face.
-         ;; (python-mode-hook . my/highlight-python-docstrings)
-         ))
-
-
-;; (leaf tsc
-;;   :straight `(tsc
-;;               :pre-build ,(when (and (eq system-type 'darwin)
-;;                                      (string-match-p (rx string-start "aarch64-")
-;;                                                      system-configuration))
-;;                             ;; required for tree-sitter
-;;                             (unless (and (executable-find "cargo")
-;;                                          ;; required for building bindings
-;;                                          (executable-find "cask")
-;;                                          (executable-find "git")
-;;                                          ;; required for tree-sitter to generate
-;;                                          (executable-find "npm")
-;;                                          ;; required for bindings
-;;                                          (executable-find "llvm-gcc"))
-;;                               (warn "tree-sitter build will fail"))
-;;                             (setf lyn--self-compiled-tsc t)
-;;                             ;; get tree-sitter v0.19.5 - last to put files in a reasonable place
-;;                             '(("sh" "-c" "test -d rust-tree-sitter || git clone https://github.com/tree-sitter/tree-sitter rust-tree-sitter; cd rust-tree-sitter && git fetch && git checkout v0.19.5")
-;;                               ("sh" "-c" "cd rust-tree-sitter/cli && cargo install --path .")
-;;                               ;; needed or it will download x86_64 dylibs over the arm64 ones we just built
-;;                               ("sh" "-c" "file core/tsc-dyn.dylib | grep -q arm64 || rm -f core/tsc-dyn.dylib")
-;;                               ("sh" "-c" "grep -q LOCAL core/DYN-VERSION || printf LOCAL >core/DYN-VERSION")
-;;                               ("sh" "-c" "grep -q DYN-VERSION bin/build && sed -e '/DYN-VERSION/d' bin/build >bin/build.tmp && mv bin/build.tmp bin/build && chmod +x bin/build || :")
-;;                               ;; rebuild bindings
-;;                               ("sh" "-c" "EMACS=emacs ./bin/setup && EMACS=emacs ./bin/build")
-;;                               ;; ensure all language definitions
-;;                               ("find" "langs/repos" "-type" "f" "-name" "grammar.js" "-not" "-path" "*/node_modules/*" "-not" "-path" "*/ocaml/interface/*" "-exec" "sh" "-c" "targets=''; for grammar_file in \"$@\"; do grammar_dir=\"${grammar_file%/*}\"; targets=\"$targets ensure/${grammar_dir##*/}\"; done; EMACS=emacs make -j7 $targets" "sh" "{}" "+")))
-;;               :files ("core/DYN-VERSION" "core/tsc-dyn.*" "core/*.el")))
 ;; (leaf tree-sitter
-;;   :commands (tree-sitter-hl-mode)
-;;   :hook (python-mode-hook . tree-sitter-hl-mode))
-;; (leaf tree-sitter-langs
-;;   ;; Don't clone the separate tree-sitter-langs repo, use the dylibs we
-;;   ;; already built
-;;   :straight
-;;   (tree-sitter-langs
-;;    :host github
-;;    :repo "ubolonton/emacs-tree-sitter"
-;;    :files ("langs/*.el" ("bin" "langs/bin/*.dylib") ("queries" "langs/queries/*")))
-;;   :after tree-sitter
+;;   :when (not (eq 'darwin system-type))
+;;   :ensure t
+;;   ;; :load-path `(,(mapcar (lambda (elm)
+;;   ;;                         (concat "~/.emacs.d/elisp/elisp-tree-sitter/" elm "/"))
+;;   ;;                       '("core" "langs" "lisp")))
+;;   :require t tree-sitter-langs
 ;;   ;; If this isn't set then it'll download x86_64 dylibs over the arm64
 ;;   ;; dylibs we built
-;;   :init (setf tree-sitter-langs--testing lyn--self-compiled-tsc))
+;;   ;; :init (setf lyn--self-compiled-tsc t
+;;   ;;             tree-sitter-langs--testing lyn--self-compiled-tsc)
+
+
+;;   ;; :preface
+;;   ;; (defun my/highlight-python-docstrings ()
+;;   ;;   (add-function
+;;   ;;    :before-until (local 'tree-sitter-hl-face-mapping-function)
+;;   ;;    (lambda (capture-name)
+;;   ;;      (pcase capture-name
+;;   ;;        ("doc" 'font-lock-comment-face)))))
+;;   :hook ((python-mode-hook . tree-sitter-hl-mode)
+;;          ;; Highlight Python docstrings with a different face.
+;;          ;; (python-mode-hook . my/highlight-python-docstrings)
+;;          ))
 
 (leaf solaire-mode
   :ensure t
