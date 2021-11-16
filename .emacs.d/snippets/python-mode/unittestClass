@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: unittestClass
+# key: ct
+# --
+class Test$1(unittest.TestCase):
+
+    $0
