@@ -2634,8 +2634,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   ((org-superstar-remove-leading-stars . nil)
    (org-superstar-headline-bullets-list . '( "●" "○" "◉" "◇" "✿" "✸" " " ))
    (org-superstar-item-bullet-alist . '((?+ . ?➤)
-                                        (?* . ?•)
-                                        (?- . ?-)))
+                                        (?* . ?-)
+                                        (?- . ?•)))
    ))
 
 (setq paste-cmd (cond
