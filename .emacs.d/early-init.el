@@ -36,13 +36,13 @@
   (setq shell-file-name fish))
 
 ;; GUI
-(setq default-frame-alist (append '((line-spacing . 3)
-                                    (vertical-scroll-bars)
-                                    (menu-bar-lines . 0)
-                                    (tool-bar-lines . 0)
-                                    (left-fringe . 10)
-                                    (right-fringe . 10))
-                                  initial-frame-alist))
+(setq default-frame-alist '((line-spacing . 3)
+                            (vertical-scroll-bars)
+                            (menu-bar-lines . 0)
+                            (tool-bar-lines . 0)
+                            (left-fringe . 10)
+                            (right-fringe . 10)
+                            (font . "PlemolJP Console NF-14")))
 
 (setq inhibit-splash-screen t
       frame-inhibit-implied-resize t
