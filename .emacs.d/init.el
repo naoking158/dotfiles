@@ -3554,7 +3554,7 @@ Interactively, URL defaults to the string looking like a url around point."
   (file-exists-p "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el")
   :hook
   (emacs-startup-hook . (lambda nil
-                          (load-file
+                          (load
                            "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))))
 
 (provide 'init)

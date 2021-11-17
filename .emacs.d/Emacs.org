@@ -5061,7 +5061,7 @@ From the search buffer there are a number of ways to interact with entries. Entr
   (file-exists-p "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el")
   :hook
   (emacs-startup-hook . (lambda nil
-                          (load-file
+                          (load
                            "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))))
 #+end_src
 

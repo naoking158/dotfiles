@@ -11,6 +11,8 @@
 ## dotfiles
 !/.Brewfile
 !/.dir_colors
+!/.hammerspoon/
+!/.hammerspoon/init.lua
 !/.latexmkrc
 !/.mbsyncrc
 !/.tmux.conf
