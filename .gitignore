@@ -31,7 +31,6 @@
 !/.config/fish/functions/fish_user_key_bindings.fish
 !/.config/fish/functions/my-*
 !/.config/fish/functions/peco_*
-/.config/fish/fish_variables
 !/.config/ranger/
 !/.config/ranger/**
 !/.config/skhd/
