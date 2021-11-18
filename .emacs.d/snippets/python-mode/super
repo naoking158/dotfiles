@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: super
+# key: super
+# --
+super().__init__($0)
