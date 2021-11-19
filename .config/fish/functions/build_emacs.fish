@@ -33,7 +33,6 @@ function build_emacs --argument-names 'emacs_version'
         LDFLAGS=-L/opt/homebrew/opt/ruby/lib
         
     gmake -j(nproc) bootstrap
-    gmake install
 
     if test -e ~/src/github.com/emacsfodder/emacs-icons-project
         echo ""
@@ -49,6 +48,8 @@ function build_emacs --argument-names 'emacs_version'
             ~/src/github.com/emacs-mirror/emacs/nextstep/Emacs.app/Contents/Info.plist
         cd -
     end
+
+    gmake install
 
     echo ""
     echo "Build is Done!"
