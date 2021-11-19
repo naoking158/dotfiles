@@ -3540,7 +3540,6 @@ Interactively, URL defaults to the string looking like a url around point."
   :hook (emacs-startup-hook . (lambda nil
                                 (global-hl-line-mode)))
   :global-minor-mode global-lin-mode
-  :advice (:after load-theme my/advice-lin-face-after-load-theme)
   :init
   (define-globalized-minor-mode global-lin-mode lin-mode lin--on :group 'lin)
   (defun lin--on ()
@@ -3548,15 +3547,17 @@ Interactively, URL defaults to the string looking like a url around point."
     (unless (or noninteractive
                 (eq (aref (buffer-name) 0) ?\s))
       (lin-mode 1)))
-  :config
-  (defun my/advice-lin-face-after-load-theme (&rest args)
-    (let* ((str-theme (symbol-name (car args)))
-           (bg-color (cond
-                      ((string-match "\\(light\\|operandi\\)" str-theme) "#FAF2F0")
-                      ((and (string-match "bespoke" str-theme)
-                            (eq 'light bespoke-set-theme)) "#FAF2F0")
-                      (t "#1C2835"))))
-      (set-face-attribute 'lin-hl nil :background bg-color))))
+  ;; :advice (:after load-theme my/advice-lin-face-after-load-theme)
+  ;; :config
+  ;; (defun my/advice-lin-face-after-load-theme (&rest args)
+  ;;   (let* ((str-theme (symbol-name (car args)))
+  ;;          (bg-color (cond
+  ;;                     ((string-match "\\(light\\|operandi\\)" str-theme) "#FAF2F0")
+  ;;                     ((and (string-match "bespoke" str-theme)
+  ;;                           (eq 'light bespoke-set-theme)) "#FAF2F0")
+  ;;                     (t "#1C2835"))))
+  ;;     (set-face-attribute 'lin-hl nil :background bg-color)))
+  )
 
 (leaf hammerspoon
   :when
