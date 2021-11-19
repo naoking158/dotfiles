@@ -3384,17 +3384,23 @@ Interactively, URL defaults to the string looking like a url around point."
 (leaf applescript-mode :ensure t)
 
 (leaf jupyter
-  :ensure t websocket
-  :after python-mode
-  :bind (([remap jupyter-org-hydra/body] . nil)
-         (jupyter-org-interaction-mode-map
-          ([remap jupyter-org-hydra/body] . nil)
-          ("C-c C-." . jupyter-org-hydra/body)))
-  :init
-  (require 'zmq)
+  :ensure jupyter websocket
+  :after org
+  :config
   (leaf ob-jupyter
     :require t
-    :commands (org-babel-execute:jupyter)))
+    :preface (dolist (lang '(python jupyter))
+               (add-to-list 'org-babel-load-languages
+                            (cons lang t) t))
+    :advice ((:before org-babel-execute:jupyter (lambda (&rest args)
+                                                  (require 'zmq)))
+             (:before org-babel-expand-body:jupyter (lambda (&rest args)
+                                                      (require 'zmq))))
+    :config
+    (define-key jupyter-org-interaction-mode-map
+                [remap jupyter-org-hydra/body] nil)
+    (define-key jupyter-org-interaction-mode-map
+                (kbd "C-c C-.") #'jupyter-org-hydra/body)))
 
 (leaf org-babel
   :after org python-mode

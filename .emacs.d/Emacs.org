@@ -4795,19 +4795,23 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 
 #+begin_src emacs-lisp
 (leaf jupyter
-  :ensure t websocket
-  :after python-mode
-  :bind (([remap jupyter-org-hydra/body] . nil)
-         (jupyter-org-interaction-mode-map
-          ([remap jupyter-org-hydra/body] . nil)
-          ("C-c C-." . jupyter-org-hydra/body)))
-  :init
-  (require 'zmq)
+  :ensure jupyter websocket
+  :after org
+  :config
   (leaf ob-jupyter
     :require t
-    :commands (org-babel-execute:jupyter)))
-
-
+    :preface (dolist (lang '(python jupyter))
+               (add-to-list 'org-babel-load-languages
+                            (cons lang t) t))
+    :advice ((:before org-babel-execute:jupyter (lambda (&rest args)
+                                                  (require 'zmq)))
+             (:before org-babel-expand-body:jupyter (lambda (&rest args)
+                                                      (require 'zmq))))
+    :config
+    (define-key jupyter-org-interaction-mode-map
+                [remap jupyter-org-hydra/body] nil)
+    (define-key jupyter-org-interaction-mode-map
+                (kbd "C-c C-.") #'jupyter-org-hydra/body)))
 #+end_src
 
 *** Enable lsp in org-code-block
