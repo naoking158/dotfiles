@@ -509,6 +509,7 @@
     ((modus-themes-bold-constructs . t)
      (modus-themes-region . '(bg-only no-extend))
      (modus-themes-org-blocks . 'gray-background)
+     (modus-themes-mixed-fonts . t)
      (modus-themes-subtle-line-numbers . t)
      (modus-themes-variable-pitch-headings . t)
      (modus-themes-variable-pitch-ui . t)
