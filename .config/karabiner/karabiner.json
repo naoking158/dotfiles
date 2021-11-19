@@ -1391,7 +1391,7 @@
                     },
                     "to": [
                         {
-                            "consumer_key_code": "fastforward"
+                            "key_code": "f9"
                         }
                     ]
                 },
