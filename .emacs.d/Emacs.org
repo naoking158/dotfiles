@@ -762,7 +762,7 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
 (leaf font
   :leaf-defer nil
   :hook (emacs-startup-hook . (lambda () (my/set-font my-fontsize)))
-  :advice (:after load-theme my/set-font-weight-after-load-theme)
+  :advice (:after load-theme my/set-font-after-load-theme)
   :preface
   (setq-default text-scale-remap-header-line t)
   (setq-default my-fontsize (if (eq 'darwin system-type) 15 13))
@@ -809,7 +809,7 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
     (set-face-attribute 'fixed-pitch nil :weight weight)
     (set-face-attribute 'variable-pitch nil :weight weight))
 
-  (defun my/set-font-weight-after-load-theme (&rest args)
+  (defun my/set-font-after-load-theme (&rest args)
     (let* ((str-theme (symbol-name (car args)))
            (weight (cond
                     ((string-match "\\(light\\|operandi\\)" str-theme) 'medium)
@@ -817,7 +817,8 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
                           (eq 'light bespoke-set-theme))
                      'medium)
                     (t 'light))))
-      (my/set-font-weight weight))))
+      (my/set-font-weight weight))
+    (my/set-font-size my-fontsize)))
 #+end_src
 
 ** Theme Configuration

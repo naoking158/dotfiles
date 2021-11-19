@@ -423,7 +423,7 @@
 (leaf font
   :leaf-defer nil
   :hook (emacs-startup-hook . (lambda () (my/set-font my-fontsize)))
-  :advice (:after load-theme my/set-font-weight-after-load-theme)
+  :advice (:after load-theme my/set-font-after-load-theme)
   :preface
   (setq-default text-scale-remap-header-line t)
   (setq-default my-fontsize (if (eq 'darwin system-type) 15 13))
@@ -470,7 +470,7 @@
     (set-face-attribute 'fixed-pitch nil :weight weight)
     (set-face-attribute 'variable-pitch nil :weight weight))
 
-  (defun my/set-font-weight-after-load-theme (&rest args)
+  (defun my/set-font-after-load-theme (&rest args)
     (let* ((str-theme (symbol-name (car args)))
            (weight (cond
                     ((string-match "\\(light\\|operandi\\)" str-theme) 'medium)
@@ -478,7 +478,8 @@
                           (eq 'light bespoke-set-theme))
                      'medium)
                     (t 'light))))
-      (my/set-font-weight weight))))
+      (my/set-font-weight weight))
+    (my/set-font-size my-fontsize)))
 
 (leaf themes
   :hook (emacs-startup-hook . my/default-theme)
