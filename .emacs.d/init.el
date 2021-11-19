@@ -597,7 +597,8 @@
     :config
     (defun my/modeline-moody nil
       (interactive)
-      (setq x-underline-at-descent-line t)
+      (setq x-underline-at-descent-line t
+            moody-mode-line-height 16)
       (moody-replace-mode-line-buffer-identification)
       (moody-replace-vc-mode)
       (moody-replace-eldoc-minibuffer-message-function)
@@ -613,8 +614,6 @@
     :tag "mode-line" "faces" "emacs>=25.1"
     :url "https://github.com/seagle0128/doom-modeline"
     :ensure t
-    ;; :custom-face ((mode-line . '((t (:height 0.9))))
-    ;;               (mode-line-inactive . '((t (:height 0.9)))))
     :custom ((doom-modeline-buffer-file-name-style . 'truncate-except-project)
              (doom-modeline-project-detection . 'auto)
              (doom-modeline-icon . t)
