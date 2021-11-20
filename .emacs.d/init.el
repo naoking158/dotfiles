@@ -3399,6 +3399,7 @@ Interactively, URL defaults to the string looking like a url around point."
 (leaf applescript-mode :ensure t)
 
 (leaf jupyter
+  :disabled t
   :ensure jupyter websocket
   :after org
   :config

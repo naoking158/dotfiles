@@ -4807,6 +4807,8 @@ Interactively, URL defaults to the string looking like a url around point."
 :END:
 
 
+TODO: =ansi-color--find-face= is renamed to =ansi-color--face-vec-face= in emacs-29
+
 Disabling native compilation is for avoid the issue: https://github.com/nnicandro/emacs-jupyter/issues/297#issuecomment-778924175
 
 
@@ -4814,6 +4816,7 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 
 #+begin_src emacs-lisp
 (leaf jupyter
+  :disabled t
   :ensure jupyter websocket
   :after org
   :config
