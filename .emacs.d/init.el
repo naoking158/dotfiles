@@ -1198,20 +1198,35 @@ respectively."
   :custom-face
   ((aw-leading-char-face . '((t (:height 4.0 :foreground "#f1fa8c")))))
   :config
-  (defun my--switch-window (num)
+  (defun my--switch-window (&optional num)
+    (interactive "P")
+    (unless (integerp num)
+      (let ((key (event-basic-type last-command-event)))
+        (setq num (- key ?0))))
+
     (let* ((wnd-list (aw-window-list))
-           (wnd-num (- (min num (length wnd-list)) 1))
+           (wnd-num (1- (min num (length wnd-list))))
            (wnd (nth wnd-num wnd-list)))
       (aw-switch-to-window wnd)))
 
-  (eval
-   `(progn
-      ,@(mapcar
-         (lambda (elm)
-           `(global-set-key
-             (kbd ,(format "s-%s" elm))
-             (lambda nil (interactive) (my--switch-window ,elm))))
-         (number-sequence 1 9)))))
+  (dotimes (i 9)
+    (global-set-key (vector (append '(super) (list (+ i 1 ?0))))
+                    #'my--switch-window)))
+
+(defun my--switch-window (num)
+  (let* ((wnd-list (aw-window-list))
+         (wnd-num (- (min num (length wnd-list)) 1))
+         (wnd (nth wnd-num wnd-list)))
+    (aw-switch-to-window wnd)))
+
+(eval
+ `(progn
+    ,@(mapcar
+       (lambda (elm)
+         `(global-set-key
+           (kbd ,(format "s-%s" elm))
+           (lambda nil (interactive) (my--switch-window ,elm))))
+       (number-sequence 1 9))))
 
 (leaf *windmove
   :bind (("s-h" . windmove-left)
