@@ -1351,11 +1351,11 @@ Only in Neotree Buffer:
   :url "https://gitlab.com/groups/python-mode-devs"
   :ensure t
   :mode "\\.py\\'"
-  :custom ((python-indent-guess-indent-offset . t)
-           (python-indent-guess-indent-offset-verbose . nil))
-  :hook `((python-mode-hook . my/python-basic-config)
-          (python-shell-virtualenv-root . ,(expand-file-name "envs/torch"
-                                                             path-to-miniconda)))
+  :custom `((python-indent-guess-indent-offset . t)
+            (python-indent-guess-indent-offset-verbose . nil)
+            (python-shell-virtualenv-root . ,(expand-file-name "envs/torch"
+                                                               path-to-miniconda)))
+  :hook (python-mode-hook . my/python-basic-config)
   :preface
   (defun my/python-basic-config ()
     (setq indent-tabs-mode nil
