@@ -2272,25 +2272,23 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                                'deadline))))))))
   )
 
-;; (org-babel-load-languages . '((emacs-lisp . t)
-;;                                     (python . t)
-;;                                     (latex . t)
-;;                                     (shell . t)))
+(setq org-babel-load-languages '((emacs-lisp . t)
+                                 (python . t)
+                                 (latex . t)
+                                 (shell . t)))
 
 (leaf ob-emacs-lisp
   :commands (org-babel-execute:emacs-lisp))
 
 (leaf ob-python
-  :commands (org-babel-execute:python))
+  :commands (org-babel-execute:python org-babel-expand-body:python))
 
 (leaf ob-latex
   :commands (org-babel-execute:latex))
 
 (leaf ob-shell
-  :commands (org-babel-execute:sh
-             org-babel-expand-body:sh
-             org-babel-execute:bash
-             org-babel-expand-body:bash))
+  :commands (org-babel-execute:sh org-babel-expand-body:sh
+             org-babel-execute:bas org-babel-expand-body:bash))
 
 (leaf org-pomodoro
   :disabled t
