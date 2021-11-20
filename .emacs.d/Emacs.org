@@ -112,6 +112,7 @@ a bunch of resources I've found online.
   - [[#elfeed][Elfeed]]
   - [[#lin-is-noticeable---linel][LIN Is Noticeable - lin.el]]
   - [[#edit-with-emacs-using-hammerspoon][Edit with Emacs using Hammerspoon]]
+  - [[#colorful-icons-for-completion-with-kind-icon][Colorful icons for completion with kind-icon]]
 - [[#footer][Footer]]
 :END:
 
@@ -5090,6 +5091,20 @@ From the search buffer there are a number of ways to interact with entries. Entr
   (emacs-startup-hook . (lambda nil
                           (load
                            "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))))
+#+end_src
+
+** Colorful icons for completion with kind-icon
+
+#+begin_src emacs-lisp
+(leaf kind-icon
+  :ensure t
+  :require t
+  :after corfu
+  :custom
+  ;; to compute blended backgrounds correctly
+  (kind-icon-default-face . 'corfu-background)
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 #+end_src
 
 * Footer

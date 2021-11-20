@@ -3580,4 +3580,14 @@ Interactively, URL defaults to the string looking like a url around point."
                           (load
                            "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))))
 
+(leaf kind-icon
+  :ensure t
+  :require t
+  :after corfu
+  :custom
+  ;; to compute blended backgrounds correctly
+  (kind-icon-default-face . 'corfu-background)
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
 (provide 'init)
