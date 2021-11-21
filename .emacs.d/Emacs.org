@@ -1395,10 +1395,9 @@ Only in Neotree Buffer:
       (require 'lsp-pyright)
       (lsp))))
 
+(leaf python-isort :ensure t)
 #+end_src
 
-#+RESULTS:
-: lsp-pyright
 
 *** HTML
 :PROPERTIES:
@@ -5106,6 +5105,7 @@ From the search buffer there are a number of ways to interact with entries. Entr
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 #+end_src
+
 
 * Footer
 :PROPERTIES:

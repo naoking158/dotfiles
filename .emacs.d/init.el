@@ -924,6 +924,8 @@
       (require 'lsp-pyright)
       (lsp))))
 
+(leaf python-isort :ensure t)
+
 (leaf web-mode
   :ensure t
   :custom ((web-mode-markup-indent-offset . 2)
