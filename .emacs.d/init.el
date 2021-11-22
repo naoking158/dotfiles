@@ -2029,7 +2029,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     :hook (org-mode-hook . org-fragtog-mode)))
 
 (leaf org-agenda
-  :after org
   :bind* (("C-c C-a" . my/org-agenda-cache)
           ("C-c C-m" . jethro/org-inbox-capture))
   :bind (org-agenda-mode-map
@@ -2516,7 +2515,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf org-roam
   :doc "Roam Research replica with Org-mode"
   :url "https://github.com/org-roam/org-roam"
-  :after org
   :ensure t
   ;; This is necessary for variables to be initialized correctly.
   ;; :require t

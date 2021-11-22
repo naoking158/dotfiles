@@ -2832,7 +2832,6 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
 
 #+begin_src emacs-lisp
 (leaf org-agenda
-  :after org
   :bind* (("C-c C-a" . my/org-agenda-cache)
           ("C-c C-m" . jethro/org-inbox-capture))
   :bind (org-agenda-mode-map
@@ -3392,7 +3391,6 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
 (leaf org-roam
   :doc "Roam Research replica with Org-mode"
   :url "https://github.com/org-roam/org-roam"
-  :after org
   :ensure t
   ;; This is necessary for variables to be initialized correctly.
   ;; :require t
