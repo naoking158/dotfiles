@@ -92,7 +92,7 @@ end
 
 set MINICONDA (find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1) 
 if test -n "$MINICONDA"
-    eval $MINICONDA/condabin/conda "shell.fish" "hook" $argv | source
+    status is-interactive && eval $MINICONDA/condabin/conda "shell.fish" "hook" $argv | source
 end
 
 
