@@ -1238,7 +1238,7 @@ Only in Neotree Buffer:
             (read-process-output-max . ,(* 1 1024 1024))  ;; 1MB
             ;; debug
             (lsp-auto-guess-root . nil)
-            (lsp-headerline-breadcrumb-enable . nil)
+            (lsp-headerline-breadcrumb-enable . t)
             (lsp-log-io . nil)
             (lsp-trace . nil)
             (lsp-print-performance . nil)
