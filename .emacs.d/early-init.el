@@ -36,7 +36,7 @@
   (setq shell-file-name fish))
 
 ;; GUI
-(setq default-frame-alist '((line-spacing . 3)
+(setq default-frame-alist '(;; (line-spacing . 3)
                             (vertical-scroll-bars)
                             (menu-bar-lines . 0)
                             (tool-bar-lines . 0)
