@@ -2535,11 +2535,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (org-id-link-to-org-use-id . t)
     (org-roam-capture-templates
      quote
-     (("c" "concept" plain "%?"
+     (("c" "Concept" plain "%?"
        :target (file+head "concepts/${slug}.org"
                           "#+title: ${title}\n#+date: %U")
        :unnarrowed t)
-      ("l" "lit" plain
+      ("l" "Literature" plain
        (file "~/org/braindump/preferences/LiteratureTemplate.org")
        :target (file+head "lit/${slug}.org"
                           "#+title: ${title}\n#+date: %U\n#+filetags: Literature")
@@ -2552,7 +2552,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
        :target (file+head "work/${slug}.org"
                           "#+title: ${title}\n#+filetags: Working\n#+options: toc:nil")
        :unnarrowed t)
-      ("p" "private" plain "%?"
+      ("p" "Private" plain "%?"
        :target (file+head "private/${slug}.org"
                           "#+title: ${title}\n#+date: %U\n")
        :unnarrowed t))))
