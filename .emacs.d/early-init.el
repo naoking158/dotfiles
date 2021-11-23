@@ -42,6 +42,8 @@
                             (tool-bar-lines . 0)
                             (left-fringe . 10)
                             (right-fringe . 10)
+                            (width . 150)
+                            (height . 80)
                             (font . "PlemolJP Console NF-14")))
 
 (setq inhibit-splash-screen t
