@@ -1658,11 +1658,10 @@ respectively."
 (leaf corfu
   :ensure t
   :global-minor-mode corfu-global-mode
-  ;; :hook ((prog-mode-hook text-mode-hook org-mode-hook) . corfu-mode)
   :custom
   ((corfu-excluded-modes . '(shell-mode eshell-mode))
    (corfu-auto-prefix . 2)
-   (corfu-auto-delay . 0.3)
+   (corfu-auto-delay . 0.2)
    (corfu-cycle . t)
    (corfu-auto . t)
    (corfu-quit-no-match . t)
