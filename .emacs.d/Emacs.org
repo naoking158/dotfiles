@@ -736,16 +736,18 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 
 (leaf *frame-transparency
   :preface
-  (defun my/change-transparency (&optional alpha-num)
+  (defun my/change-transparency (&optional num)
     "Sets the transparency of the frame window. 0=transparent/100=opaque"
     (interactive (list
                   (read-number "Transparency Value 0 - 100 opaque: " 100)))
-    (set-frame-parameter nil 'alpha (cons alpha-num (- alpha-num 5)))
-    (add-to-list 'default-frame-alist
-                 `(alpha . (,alpha-num . ,(- alpha-num 5)))))
+    (let ((diff-active-and-inactive-frame 2))
+      (set-frame-parameter nil 'alpha
+                           (cons num (- num diff-active-and-inactive-frame)))
+      (add-to-list 'default-frame-alist
+                   `(alpha . (,num . ,(- num diff-active-and-inactive-frame))))))
 
   :config
-  (my/change-transparency 90))
+  (my/change-transparency 93))
 
 #+end_src
 
