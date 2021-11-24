@@ -1815,7 +1815,7 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
                     #'my--switch-window)))
 #+end_src
 
-*** Another implementation of my--swirth-window
+*** Another implementation of my--switch-window
 
 #+begin_src emacs-lisp
 (defun my--switch-window (num)
