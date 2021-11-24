@@ -1275,13 +1275,14 @@ Only in Neotree Buffer:
           (lsp-ui-doc-mode -1)
           (lsp-ui-doc--hide-frame))
       (lsp-ui-doc-mode 1)))
+
   :bind (lsp-mode-map
          :package lsp-mode
          ("C-c C-r" . lsp-ui-peek-find-references)
          ("C-c C-j" . lsp-ui-peek-find-definitions)
-         ("C-c i"   . lsp-ui-peek-find-implementation)
          ("C-c s"   . lsp-ui-sideline-mode)
-         ("C-c d"   . ladicle/toggle-lsp-ui-doc))
+         ("C-c d"   . ladicle/toggle-lsp-ui-doc)
+         ("C-c i"   . lsp-ui-doc-focus-frame))
   :custom (;; lsp-ui-doc
            (lsp-ui-doc-enable . t)
            (lsp-ui-doc-header . t)
