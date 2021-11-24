@@ -385,8 +385,7 @@
      '(dashboard-projects-backend (if (<= emacs-major-version 27)
                                       'projectile
                                     'project-el)))
-    :custom ((dashboard-items . '((agenda . 5)
-                                  (recents . 5)
+    :custom ((dashboard-items . '((recents . 5)
                                   (projects . 5)
                                   (bookmarks . 5))))
     :config
@@ -2031,21 +2030,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf org-agenda
   :bind* (("C-c C-a" . my/org-agenda-cache)
           ("C-c C-m" . jethro/org-inbox-capture))
-  :bind (org-agenda-mode-map
-         ("i" . org-agenda-clock-in)
-         ("r" . jethro/org-agenda-process-inbox-item)
-         ("R" . org-agenda-refile)
-         ("c" . jethro/org-inbox-capture)
-         ("q" . quit-window))
-  :hook ((kill-emacs-hook . ladicle/org-clock-out-and-save-when-exit)
-         (org-clock-in-hook . jethro/set-todo-state-next)
-         (org-clock-in-hook . (lambda ()
-                                (add-to-list 'frame-title-format
-                                             '(:eval org-mode-line-string) t)))
-         (org-capture-after-finalize-hook . (lambda ()
-                                              (setq org-agenda-files
-                                                    (directory-files-recursively
-                                                     org-directory "\\.org$")))))
   :custom
   `((org-agenda-window-setup . 'other-window)
     (org-agenda-block-separator . nil)
@@ -2083,195 +2067,212 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (interactive)
     "Capture a task in agenda mode."
     (org-capture))
+  
+  :defer-config
+  (leaf org-agenda
+    :hook ((kill-emacs-hook . ladicle/org-clock-out-and-save-when-exit)
+           (org-clock-in-hook . jethro/set-todo-state-next)
+           (org-clock-in-hook . (lambda ()
+                                  (add-to-list 'frame-title-format
+                                               '(:eval org-mode-line-string) t)))
+           (org-capture-after-finalize-hook . (lambda ()
+                                                (setq org-agenda-files
+                                                      (directory-files-recursively
+                                                       org-directory "\\.org$")))))
+    :bind (org-agenda-mode-map
+           ("i" . org-agenda-clock-in)
+           ("r" . jethro/org-agenda-process-inbox-item)
+           ("R" . org-agenda-refile)
+           ("c" . jethro/org-inbox-capture)
+           ("q" . quit-window))
+    :preface
+    (defvar jethro/org-current-effort "1:00"
+      "Current effort for agenda items.")
 
-  (defvar jethro/org-current-effort "1:00"
-    "Current effort for agenda items.")
+    (defun jethro/my-org-agenda-set-effort (effort)
+      "Set the effort property for the current headline."
+      (interactive
+       (list (read-string (format "Effort [%s]: " jethro/org-current-effort)
+                          nil nil jethro/org-current-effort)))
+      (setq jethro/org-current-effort effort)
+      (org-agenda-check-no-diary)
+      (let* ((hdmarker (or (org-get-at-bol 'org-hd-marker)
+                           (org-agenda-error)))
+             (buffer (marker-buffer hdmarker))
+             (pos (marker-position hdmarker))
+             (inhibit-read-only t)
+             newhead)
+        (org-with-remote-undo buffer
+          (with-current-buffer buffer
+            (widen)
+            (goto-char pos)
+            (org-show-context 'agenda)
+            (funcall-interactively 'org-set-effort nil jethro/org-current-effort)
+            (end-of-line 1)
+            (setq newhead (org-get-heading)))
+          (org-agenda-change-all-lines newhead hdmarker))))
 
-  (defun jethro/my-org-agenda-set-effort (effort)
-    "Set the effort property for the current headline."
-    (interactive
-     (list (read-string (format "Effort [%s]: " jethro/org-current-effort)
-                        nil nil jethro/org-current-effort)))
-    (setq jethro/org-current-effort effort)
-    (org-agenda-check-no-diary)
-    (let* ((hdmarker (or (org-get-at-bol 'org-hd-marker)
-                         (org-agenda-error)))
-           (buffer (marker-buffer hdmarker))
-           (pos (marker-position hdmarker))
-           (inhibit-read-only t)
-           newhead)
-      (org-with-remote-undo buffer
-        (with-current-buffer buffer
-          (widen)
-          (goto-char pos)
-          (org-show-context 'agenda)
-          (funcall-interactively 'org-set-effort nil jethro/org-current-effort)
-          (end-of-line 1)
-          (setq newhead (org-get-heading)))
-        (org-agenda-change-all-lines newhead hdmarker))))
+    (defun jethro/org-agenda-process-inbox-item ()
+      "Process a single item in the org-agenda."
+      (interactive)
+      (org-with-wide-buffer
+       (org-agenda-set-tags)
+       (org-agenda-priority)
+       (call-interactively 'jethro/my-org-agenda-set-effort)
+       (org-agenda-refile nil nil t)))
 
-  (defun jethro/org-agenda-process-inbox-item ()
-    "Process a single item in the org-agenda."
-    (interactive)
-    (org-with-wide-buffer
-     (org-agenda-set-tags)
-     (org-agenda-priority)
-     (call-interactively 'jethro/my-org-agenda-set-effort)
-     (org-agenda-refile nil nil t)))
+    (defvar jethro/org-agenda-bulk-process-key ?f
+      "Default key for bulk processing inbox items.")
 
-  (defvar jethro/org-agenda-bulk-process-key ?f
-    "Default key for bulk processing inbox items.")
+    (defun jethro/bulk-process-entries ()
+      (if (not (null org-agenda-bulk-marked-entries))
+          (let ((entries (reverse org-agenda-bulk-marked-entries))
+                (processed 0)
+                (skipped 0))
+            (dolist (e entries)
+              (let ((pos (text-property-any (point-min) (point-max) 'org-hd-marker e)))
+                (if (not pos)
+                    (progn (message "Skipping removed entry at %s" e)
+                           (cl-incf skipped))
+                  (goto-char pos)
+                  (let (org-loop-over-headlines-in-active-region) (funcall 'jethro/org-agenda-process-inbox-item))
+                  ;; `post-command-hook' is not run yet.  We make sure any
+                  ;; pending log note is processed.
+                  (when (or (memq 'org-add-log-note (default-value 'post-command-hook))
+                            (memq 'org-add-log-note post-command-hook))
+                    (org-add-log-note))
+                  (cl-incf processed))))
+            (org-agenda-redo)
+            (unless org-agenda-persistent-marks (org-agenda-bulk-unmark-all))
+            (message "Acted on %d entries%s%s"
+                     processed
+                     (if (= skipped 0)
+                         ""
+                       (format ", skipped %d (disappeared before their turn)"
+                               skipped))
+                     (if (not org-agenda-persistent-marks) "" " (kept marked)")))))
 
-  (defun jethro/bulk-process-entries ()
-    (if (not (null org-agenda-bulk-marked-entries))
-        (let ((entries (reverse org-agenda-bulk-marked-entries))
-              (processed 0)
-              (skipped 0))
-          (dolist (e entries)
-            (let ((pos (text-property-any (point-min) (point-max) 'org-hd-marker e)))
-              (if (not pos)
-                  (progn (message "Skipping removed entry at %s" e)
-                         (cl-incf skipped))
-                (goto-char pos)
-                (let (org-loop-over-headlines-in-active-region) (funcall 'jethro/org-agenda-process-inbox-item))
-                ;; `post-command-hook' is not run yet.  We make sure any
-                ;; pending log note is processed.
-                (when (or (memq 'org-add-log-note (default-value 'post-command-hook))
-                          (memq 'org-add-log-note post-command-hook))
-                  (org-add-log-note))
-                (cl-incf processed))))
-          (org-agenda-redo)
-          (unless org-agenda-persistent-marks (org-agenda-bulk-unmark-all))
-          (message "Acted on %d entries%s%s"
-                   processed
-                   (if (= skipped 0)
-                       ""
-                     (format ", skipped %d (disappeared before their turn)"
-                             skipped))
-                   (if (not org-agenda-persistent-marks) "" " (kept marked)")))))
+    (defun jethro/org-process-inbox ()
+      "Called in org-agenda-mode, processes all inbox items."
+      (interactive)
+      (org-agenda-bulk-mark-regexp "inbox:")
+      (jethro/bulk-process-entries))
 
-  (defun jethro/org-process-inbox ()
-    "Called in org-agenda-mode, processes all inbox items."
-    (interactive)
-    (org-agenda-bulk-mark-regexp "inbox:")
-    (jethro/bulk-process-entries))
+    (defun ladicle/org-clock-out-and-save-when-exit ()
+      "Save buffers and stop clocking when kill emacs."
+      (ignore-errors (org-clock-out) t)
+      (save-some-buffers t))
 
-  (defun ladicle/org-clock-out-and-save-when-exit ()
-    "Save buffers and stop clocking when kill emacs."
-    (ignore-errors (org-clock-out) t)
-    (save-some-buffers t))
+    :defvar (org-capture-templates)
+    :advice (:before org-agenda-redo-all
+                     (lambda (&rest args)
+                       (setq org-agenda-files
+                             (directory-files-recursively org-directory
+                                                          "\\.org$"))))
+    :config
+    (require 'org-habit)
+    (require 'org-capture)
+    (setq
+     jethro/org-agenda-directory (file-truename "~/org/gtd/")
+     org-agenda-files (directory-files-recursively org-directory "\\.org$")
+     org-outline-path-complete-in-steps nil
+     org-log-done 'time
+     org-log-into-drawer t
+     org-log-state-notes-insert-after-drawers nil
+     org-tag-alist '(("@errand" . ?e)
+                     ("@office" . ?o)
+                     ("@home" . ?h)
+                     ("@private" . ?p)
+                     (:newline)
+                     ("CANCELLED" . ?c))
+     org-fast-tag-selection-single-key nil
+     org-todo-keywords '((sequence
+                          "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                         (sequence
+                          "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)"))
+     org-refile-use-outline-path 'file
+     org-refile-allow-creating-parent-nodes 'confirm
+     org-refile-targets '((org-agenda-files . (:level . 1)))
+     org-agenda-bulk-custom-functions `((,jethro/org-agenda-bulk-process-key
+                                         jethro/org-agenda-process-inbox-item)))
 
-  :defvar (org-capture-templates)
-  :advice (:before org-agenda-redo-all
-                   (lambda (&rest args)
-                     (setq org-agenda-files
-                           (directory-files-recursively org-directory
-                                                        "\\.org$"))))
-  :config
-  (require 'org-habit)
-  (require 'org-capture)
-  (setq
-   jethro/org-agenda-directory (file-truename "~/org/gtd/")
-   org-agenda-files (directory-files-recursively org-directory "\\.org$")
-   org-outline-path-complete-in-steps nil
-   org-log-done 'time
-   org-log-into-drawer t
-   org-log-state-notes-insert-after-drawers nil
-   org-tag-alist '(("@errand" . ?e)
-                   ("@office" . ?o)
-                   ("@home" . ?h)
-                   ("@private" . ?p)
-                   (:newline)
-                   ("CANCELLED" . ?c))
-   org-fast-tag-selection-single-key nil
-   org-todo-keywords '((sequence
-                        "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-                       (sequence
-                        "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)"))
-   org-refile-use-outline-path 'file
-   org-refile-allow-creating-parent-nodes 'confirm
-   org-refile-targets '((org-agenda-files . (:level . 1)))
-   org-agenda-bulk-custom-functions `((,jethro/org-agenda-bulk-process-key
-                                       jethro/org-agenda-process-inbox-item)))
+    (add-to-list 'org-capture-templates
+                 `("i" "inbox" entry
+                   (file ,(concat jethro/org-agenda-directory "inbox.org"))
+                   "* TODO %?"))
 
-  (add-to-list 'org-capture-templates
-               `("i" "inbox" entry
-                 (file ,(concat jethro/org-agenda-directory "inbox.org"))
-                 "* TODO %?"))
+    (defun jethro/org-archive-done-tasks ()
+      "Archive all done tasks."
+      (interactive)
+      (org-map-entries 'org-archive-subtree "/DONE" 'file))
 
-  (defun jethro/org-archive-done-tasks ()
-    "Archive all done tasks."
-    (interactive)
-    (org-map-entries 'org-archive-subtree "/DONE" 'file))
+    (defun jethro/is-project-p ()
+      "Any task with a todo keyword subtask"
+      (save-restriction
+        (widen)
+        (let ((has-subtask)
+              (subtree-end (save-excursion (org-end-of-subtree t)))
+              (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
+          (save-excursion
+            (forward-line 1)
+            (while (and (not has-subtask)
+                        (< (point) subtree-end)
+                        (re-search-forward "^\*+ " subtree-end t))
+              (when (member (org-get-todo-state) org-todo-keywords-1)
+                (setq has-subtask t))))
+          (and is-a-task has-subtask))))
 
-  (defun jethro/is-project-p ()
-    "Any task with a todo keyword subtask"
-    (save-restriction
-      (widen)
-      (let ((has-subtask)
-            (subtree-end (save-excursion (org-end-of-subtree t)))
-            (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
-        (save-excursion
-          (forward-line 1)
-          (while (and (not has-subtask)
-                      (< (point) subtree-end)
-                      (re-search-forward "^\*+ " subtree-end t))
-            (when (member (org-get-todo-state) org-todo-keywords-1)
-              (setq has-subtask t))))
-        (and is-a-task has-subtask))))
+    (defun jethro/skip-projects ()
+      "Skip trees that are projects"
+      (save-restriction
+        (widen)
+        (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+          (cond
+           ((org-is-habit-p)
+            next-headline)
+           ((jethro/is-project-p)
+            next-headline)
+           (t
+            nil)))))
 
-  (defun jethro/skip-projects ()
-    "Skip trees that are projects"
-    (save-restriction
-      (widen)
-      (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-        (cond
-         ((org-is-habit-p)
-          next-headline)
-         ((jethro/is-project-p)
-          next-headline)
-         (t
-          nil)))))
-
-  (setq org-agenda-custom-commands
-        `(("a" "Agenda"
-           ((agenda ""
-                    ((org-agenda-span 'week)
-                     (org-deadline-warning-days 365)
-                     (org-agenda-prefix-format " %i %-12:c%?- t % s % e")
-                     ))
-            (todo "TODO"
-                  ((org-agenda-overriding-header "Inbox")
-                   (org-agenda-files '(,(concat jethro/org-agenda-directory
-                                                "inbox.org")))))
-            (todo "NEXT"
-                  ((org-agenda-overriding-header "In Progress")
-                   (org-agenda-files '(,(concat jethro/org-agenda-directory
-                                                "projects.org")
-                                       ,(concat org-directory
-                                                "braindump/concepts/research.org")
-                                       ,(concat org-directory
-                                                "braindump/concepts/journal2021.org")
-                                       ,(concat org-directory
-                                                "braindump/daily/")))))
-            (todo "TODO"
-                  ((org-agenda-overriding-header "Active Projects")
-                   (org-agenda-skip-function #'jethro/skip-projects)
-                   (org-agenda-files '(,(concat jethro/org-agenda-directory
-                                                "projects.org")
-                                       ,(concat org-directory
-                                                "braindump/concepts/research.org")
-                                       ,(concat org-directory
-                                                "braindump/concepts/journal2021.org")
-                                       ,(concat org-directory
-                                                "braindump/daily/")))))
-            (todo "TODO"
-                  ((org-agenda-overriding-header "One-off Tasks")
-                   (org-agenda-files '(,(concat jethro/org-agenda-directory
-                                                "next.org")))
-                   (org-agenda-skip-function '(org-agenda-skip-entry-if
-                                               'deadline))))))))
-  )
+    (setq org-agenda-custom-commands
+          `(("a" "Agenda"
+             ((agenda ""
+                      ((org-agenda-span 'week)
+                       (org-deadline-warning-days 365)
+                       (org-agenda-prefix-format " %i %-12:c%?- t % s % e")
+                       ))
+              (todo "TODO"
+                    ((org-agenda-overriding-header "Inbox")
+                     (org-agenda-files '(,(concat jethro/org-agenda-directory
+                                                  "inbox.org")))))
+              (todo "NEXT"
+                    ((org-agenda-overriding-header "In Progress")
+                     (org-agenda-files '(,(concat jethro/org-agenda-directory
+                                                  "projects.org")
+                                         ,(concat org-directory
+                                                  "braindump/concepts/research.org")
+                                         ,(concat org-directory
+                                                  "braindump/concepts/journal2021.org")
+                                         ,(concat org-directory
+                                                  "braindump/daily/")))))
+              (todo "TODO"
+                    ((org-agenda-overriding-header "Active Projects")
+                     (org-agenda-skip-function #'jethro/skip-projects)
+                     (org-agenda-files '(,(concat jethro/org-agenda-directory
+                                                  "projects.org")
+                                         ,(concat org-directory
+                                                  "braindump/concepts/research.org")
+                                         ,(concat org-directory
+                                                  "braindump/concepts/journal2021.org")
+                                         ,(concat org-directory
+                                                  "braindump/daily/")))))
+              (todo "TODO"
+                    ((org-agenda-overriding-header "One-off Tasks")
+                     (org-agenda-files '(,(concat jethro/org-agenda-directory
+                                                  "next.org")))
+                     (org-agenda-skip-function '(org-agenda-skip-entry-if
+                                                 'deadline))))))))))
 
 (setq org-babel-load-languages '((emacs-lisp . t)
                                  (python . t)
