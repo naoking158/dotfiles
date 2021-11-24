@@ -929,8 +929,8 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
            (string-to-number
             (format-time-string "%H"))))
       (if (and (> time 5) (< time 18))
-          (my/load-theme 'bespoke/light-theme)
-        (my/load-theme 'bespoke/dark-theme))))
+          (my/load-theme 'modus-light)
+        (my/load-theme 'modus-dark))))
 
   :config
   (column-number-mode)
@@ -3483,10 +3483,10 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
 
 #+begin_src applescript
 on open location this_URL
-set EC to "/usr/local/bin/emacsclient --no-wait "
-set filePath to quoted form of this_URL
-do shell script EC & filePath
-tell application "Emacs" to activate
+   set EC to "/usr/local/bin/emacsclient --no-wait "
+   set filePath to quoted form of this_URL
+   do shell script EC & filePath
+   tell application "Emacs" to activate
 end open location
 #+end_src
 

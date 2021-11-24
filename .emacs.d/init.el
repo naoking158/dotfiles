@@ -579,8 +579,8 @@
            (string-to-number
             (format-time-string "%H"))))
       (if (and (> time 5) (< time 18))
-          (my/load-theme 'bespoke/light-theme)
-        (my/load-theme 'bespoke/dark-theme))))
+          (my/load-theme 'modus-light)
+        (my/load-theme 'modus-dark))))
 
   :config
   (column-number-mode)
