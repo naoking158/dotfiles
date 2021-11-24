@@ -1654,7 +1654,6 @@ respectively."
 
 (leaf corfu
   :ensure t
-  :require t
   :global-minor-mode corfu-global-mode
   ;; :hook ((prog-mode-hook text-mode-hook org-mode-hook) . corfu-mode)
   :custom
@@ -1674,6 +1673,40 @@ respectively."
   :bind (corfu-map
          ("<tab>" . corfu-complete)))
 
+(leaf cape
+  :ensure t
+  :leaf-defer nil
+  :custom (cape-dict-file . "/usr/share/dict/words")
+  :bind (("C-c p p" . completion-at-point) ;; capf
+         ("C-c p d" . dabbrev-completion)  ;; dabbrev
+         ("C-c p t" . complete-tag)        ;; etags
+         ("C-c p f" . cape-file)
+         ("C-c p k" . cape-keyword)
+         ("C-c p s" . cape-symbol)
+         ("C-c p a" . cape-abbrev)
+         ("C-c p i" . cape-ispell)
+         ("C-c p w" . cape-dict))
+  :init
+  
+  (defun my--reset-capf (&rest args)
+    (delq t completion-at-point-functions)
+    (dolist (func '(cape-dabbrev-capf
+                    cape-dict-capf
+                    cape-keyword-capf
+                    cape-file-capf
+                    t))
+      (add-to-list 'completion-at-point-functions
+                   func t)))
+
+  (dolist (mode '(org-mode
+                  org-roam-mode
+                  emacs-lisp-mode
+                  lisp-interaction-mode
+                  lsp-completion-mode
+                  lsp-mode))
+    (advice-add mode :after #'my--reset-capf)))
+
+
 ;; Dabbrev works with Corfu
 (leaf dabbrev
   :doc """Cited from Sec. 3.1.8.2 at https://protesilaos.com/dotemacs/#h:675ebef4-d74d-41af-808d-f9579c2a5ec4
@@ -1686,7 +1719,6 @@ The dabbrev-abbrev-char-regexp is configured to match both regular words and sym
 While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words and symbols that start with any of these: $, *, /, =, ~, '. This regexp may be expanded in the future, but the idea is to be able to perform completion in contexts where the known word/symbol is preceded by a special character. For example, in the org-mode version of this document, all inline code must be placed between the equals sign. So now typing the =, then a letter, will still allow me to expand text based on that input.
 ```
   """
-  :require t
   :custom ((dabbrev-abbrev-char-regexp . "\\sw\\|\\s_")
            (dabbrev-abbrev-skip-leading-regexp . "[$*/=~']")
            (dabbrev-backward-only . nil)
@@ -1696,11 +1728,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (dabbrev-check-other-buffers . t)
            (dabbrev-eliminate-newlines . t)
            (dabbrev-upcase-means-case-search . t))
-
   :bind* (("M-/" . dabbrev-expand)
           ("C-M-/" . dabbrev-completion)))
 
 (leaf *complete-path-at-point
+  :disabled t
   :hook (completion-at-point-functions . my/complete-path-at-point)
   :preface
   (defun my/complete-path-at-point ()
@@ -2015,8 +2047,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
 
   (defun my/org-mode-hook ()
-    ;; (add-hook 'completion-at-point-functions
-    ;;           'pcomplete-completions-at-point nil t)
     (my/set-org-face))
 
   :config
@@ -3423,6 +3453,7 @@ Interactively, URL defaults to the string looking like a url around point."
     (my/python-basic-config)))
 
 (leaf sie-brow
+  :disabled t
   :doc "Sie-Brow; Search in external browser with keywords
           - at point with prefix `C-u',
           - in selected region,
@@ -3578,12 +3609,11 @@ Interactively, URL defaults to the string looking like a url around point."
 
 (leaf kind-icon
   :ensure t
-  :require t
   :after corfu
   :custom
   ;; to compute blended backgrounds correctly
-  (kind-icon-default-face . 'corfu-background)
-  :config
+  (kind-icon-default-face . 'corfu-default)
+  :defer-config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (provide 'init)
