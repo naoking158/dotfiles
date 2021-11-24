@@ -29,7 +29,7 @@ a bunch of resources I've found online.
   - [[#sort-sexpresions][Sort Sexpresions]]
 - [[#basic-ui-configuration][Basic UI Configuration]]
   - [[#user-interface][User Interface]]
-  - [[#appearance-and-formatting][Appearance and Formatting]]
+  - [[#frame-transparency][Frame Transparency]]
   - [[#font-configuration][Font Configuration]]
   - [[#theme-configuration][Theme Configuration]]
   - [[#modeline-configuration][Modeline Configuration]]
@@ -720,19 +720,19 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
     (setq display-time-string-forms '((format "%s %s %s" dayname monthname day)
                                       (format "  %s:%s" 24-hours minutes))
           frame-title-format '(" - " display-time-string " - "))
-    (display-time)))
+    (display-time))
+  
+  (leaf global-visual-line-mode
+    :tag "builtin"
+    :global-minor-mode t))
 #+end_src
 
-** Appearance and Formatting
+** Frame Transparency
 :PROPERTIES:
 :ID:       9DF6B944-43E5-402A-BE9F-AF4A23F79B73
 :END:
 
 #+begin_src emacs-lisp
-
-(leaf global-visual-line-mode
-  :tag "builtin"
-  :global-minor-mode t)
 
 (leaf *frame-transparency
   :preface
@@ -745,7 +745,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                  `(alpha . (,alpha-num . ,(- alpha-num 5)))))
 
   :config
-  (my/change-transparency 100))
+  (my/change-transparency 90))
 
 #+end_src
 
@@ -4218,9 +4218,10 @@ To avoid installing x86_64 version, The following steps should be required.
                                       :inherit 'normal)))
 
   :config
-  (leaf ddskk-posframe
-    :load-path "~/.emacs.d/elisp/ddskk-posframe/"
-    :custom (ddskk-posframe-mode . t)))
+  ;; (leaf ddskk-posframe
+  ;;   :load-path "~/.emacs.d/elisp/ddskk-posframe/"
+  ;;   :custom (ddskk-posframe-mode . t))
+  )
 
 #+end_src
 

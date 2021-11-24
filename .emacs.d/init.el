@@ -400,11 +400,11 @@
     (setq display-time-string-forms '((format "%s %s %s" dayname monthname day)
                                       (format "  %s:%s" 24-hours minutes))
           frame-title-format '(" - " display-time-string " - "))
-    (display-time)))
-
-(leaf global-visual-line-mode
-  :tag "builtin"
-  :global-minor-mode t)
+    (display-time))
+  
+  (leaf global-visual-line-mode
+    :tag "builtin"
+    :global-minor-mode t))
 
 (leaf *frame-transparency
   :preface
@@ -417,7 +417,7 @@
                  `(alpha . (,alpha-num . ,(- alpha-num 5)))))
 
   :config
-  (my/change-transparency 100))
+  (my/change-transparency 90))
 
 (leaf font
   :leaf-defer nil
@@ -2904,9 +2904,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                       :inherit 'normal)))
 
   :config
-  (leaf ddskk-posframe
-    :load-path "~/.emacs.d/elisp/ddskk-posframe/"
-    :custom (ddskk-posframe-mode . t)))
+  ;; (leaf ddskk-posframe
+  ;;   :load-path "~/.emacs.d/elisp/ddskk-posframe/"
+  ;;   :custom (ddskk-posframe-mode . t))
+  )
 
 (leaf dap-mode
   :ensure t
