@@ -4215,13 +4215,7 @@ To avoid installing x86_64 version, The following steps should be required.
            (skk-dcomp-multiple-activate . t)
            (skk-inline-show-face . '( :foreground "#ECEFF4"
                                       :background "#4C566A"
-                                      :inherit 'normal)))
-
-  :config
-  ;; (leaf ddskk-posframe
-  ;;   :load-path "~/.emacs.d/elisp/ddskk-posframe/"
-  ;;   :custom (ddskk-posframe-mode . t))
-  )
+                                      :inherit 'normal))))
 
 #+end_src
 

@@ -2901,13 +2901,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (skk-dcomp-multiple-activate . t)
            (skk-inline-show-face . '( :foreground "#ECEFF4"
                                       :background "#4C566A"
-                                      :inherit 'normal)))
-
-  :config
-  ;; (leaf ddskk-posframe
-  ;;   :load-path "~/.emacs.d/elisp/ddskk-posframe/"
-  ;;   :custom (ddskk-posframe-mode . t))
-  )
+                                      :inherit 'normal))))
 
 (leaf dap-mode
   :ensure t
