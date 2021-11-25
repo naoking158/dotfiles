@@ -1678,7 +1678,6 @@ respectively."
 (leaf cape
   :ensure t
   :leaf-defer nil
-  :custom (cape-dict-file . "/usr/share/dict/words")
   :bind (("C-c p p" . completion-at-point) ;; capf
          ("C-c p d" . dabbrev-completion)  ;; dabbrev
          ("C-c p t" . complete-tag)        ;; etags
@@ -1688,17 +1687,16 @@ respectively."
          ("C-c p a" . cape-abbrev)
          ("C-c p i" . cape-ispell)
          ("C-c p w" . cape-dict))
-  :init
-  
+  :config
   (defun my--reset-capf (&rest args)
-    (delq t completion-at-point-functions)
-    (dolist (func '(cape-dabbrev-capf
-                    cape-dict-capf
-                    cape-keyword-capf
-                    cape-file-capf
-                    t))
-      (add-to-list 'completion-at-point-functions
-                   func t)))
+    (let* ((capfs (remove t completion-at-point-functions)))  
+      (dolist (func '(cape-dabbrev-capf
+                      cape-ispell-capf
+                      cape-keyword-capf
+                      cape-file-capf))
+        (add-to-list 'capfs func t))
+      (setq-local completion-at-point-functions
+                  (list (apply #'cape-super-capf capfs)))))
 
   (dolist (mode '(org-mode
                   org-roam-mode
