@@ -771,15 +771,11 @@
   :url "https://github.com/MaskRay/ccls/wiki/lsp-mode#find-definitionsreferences"
   :emacs>= 25.1
   :ensure t
+  :after orderless cape
   :commands lsp lsp-deferred
   :hook ((lsp-mode-hook . lsp-enable-which-key-integration)
          (lsp-managed-mode-hook . lsp-modeline-diagnostics-mode)
-         (lsp-mode-hook . (lambda nil
-                            (when (featurep 'corfu)
-                              ;; This option need to avoid starting company-mode
-                              (custom-set-variables
-                               '(lsp-completion-provider :none))))))
-  ;; :bind (lsp-mode-map)
+         (lsp-completion-mode-hook . my/lsp-mode-setup-completion))
   :custom `((lsp-keymap-prefix . "C-c l")        
             (read-process-output-max . ,(* 1 1024 1024))  ;; 1MB
             ;; debug
@@ -795,7 +791,17 @@
             (lsp-prefer-flymake . t)
             (lsp-completion-enable . t)
             (lsp-enable-indentation . nil)
-            (lsp-restart . 'ignore)))
+            (lsp-restart . 'ignore)
+            (lsp-completion-provider . :none))
+  :preface
+  (defun my/orderless-dispatch-flex-first (pattern index _total)
+    (and (eq index 0) 'orderless-flex pattern))
+
+  (defun my/lsp-mode-setup-completion ()
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(orderless)))
+  ;; Optionally configure the first word as flex filtered.
+  (add-hook 'orderless-style-dispatchers #'my/orderless-dispatch-flex-first nil 'local))
 
 (leaf lsp-latex
   :doc "lsp-mode client for LaTeX, on texlab"
@@ -1450,7 +1456,7 @@ respectively."
   :bind (("C-c g" . affe-grep)
          ("C-c f" . affe-find))
   :custom
-  ;; Orderlessを利用する
+  ;; Use Orderless
   ((affe-highlight-function function orderless-highlight-matches)
    (affe-regexp-function function orderless-pattern-compiler)
    (affe-find-command . "fd --color=never --full-path")
@@ -1562,24 +1568,16 @@ respectively."
     (leaf orderless
       :ensure t
       :require t
-      ;; :advice (:around company-capf--candidates just-one-face)
       :custom
       '((completion-styles . '(orderless))
         (completion-category-defaults . nil)
-        (completion-category-overrides . ((file (styles partial-completion)))))
-
-      ;; :preface
-      ;; (defun just-one-face (fn &rest args)
-      ;;   (let ((orderless-match-faces [completions-common-part]))
-      ;;     (apply fn args)))
-      )
+        (completion-category-overrides . ((file (styles partial-completion))))))
 
   (leaf orderless
     :ensure t migemo
     :require t migemo
-    ;; :advice (:around company-capf--candidates just-one-face)
     :custom
-    '((completion-styles . '(orderless))
+    '((completion-styles . '(orderless partial-completion))
       (completion-category-defaults . nil)
       (completion-category-overrides
        quote ((file (styles orderless-migemo-style))
@@ -1588,15 +1586,13 @@ respectively."
               (unicode-name (styles orderless-migemo-style))
               (command (styles orderless-default-style))
               (org-roam-node (styles orderless-migemo-style)))))
-
-    :preface
+    :config
     (defun orderless-migemo (component)
       (let ((pattern (migemo-get-pattern component)))
         (condition-case nil
             (progn (string-match-p pattern "") pattern)
           (invalid-regexp nil))))
-
-    :config
+    
     (orderless-define-completion-style orderless-default-style
       (orderless-matching-styles '(orderless-prefixes
                                    orderless-literal
@@ -1662,12 +1658,12 @@ respectively."
   :global-minor-mode corfu-global-mode
   :custom
   ((corfu-excluded-modes . '(shell-mode eshell-mode))
+   (corfu-auto . t)
    (corfu-auto-prefix . 2)
    (corfu-auto-delay . 0.2)
    (corfu-cycle . t)
-   (corfu-auto . t)
    (corfu-quit-no-match . t)
-   (corfu-quit-at-boundary . nil)
+   (corfu-quit-at-boundary . t)
 
    ;; Enable indentation+completion using the TAB key.
    ;; `completion-at-point' is often bound to M-TAB.
@@ -1675,37 +1671,59 @@ respectively."
 
   ;; Optionally use TAB for cycling, default is `corfu-complete'.
   :bind (corfu-map
-         ("<tab>" . corfu-complete)))
+         ("<tab>" . corfu-complete))
+  :init
+  ;; https://github.com/minad/corfu/wiki#auto-commit
+  (defun my/corfu-commit-predicate ()
+    "Auto-commit candidates if:
+1. A `.' is typed, except after a SPACE.
+2. A selection was made, aside from entering SPACE.
+3. Just one candidate exists, and we continue to non-symbol info.
+4. The 1st match is exact."
+    (cond
+     ((seq-contains-p (this-command-keys-vector) ?.)
+      (or (string-empty-p (car corfu--input))
+          (not (string= (substring (car corfu--input) -1) " "))))
+
+     ((/= corfu--index corfu--preselect) ; a selection was made
+      (not (seq-contains-p (this-command-keys-vector) ? )))
+
+     ((eq corfu--total 1) ;just one candidate
+      (seq-intersection (this-command-keys-vector) [?: ?, ?\) ?\] ?\( ? ]))
+
+     ((and corfu--input ; exact 1st match
+           (string-equal (substring (car corfu--input) corfu--base)
+                         (car corfu--candidates)))
+      (seq-intersection (this-command-keys-vector) [?: ?. ?, ?\) ?\] ?\" ?' ? ]))))
+  (setq corfu-commit-predicate #'my/corfu-commit-predicate))
 
 (leaf cape
   :ensure t
+  :after dabbrev
   :leaf-defer nil
+  :custom (cape-dabbrev-min-length . 2)
   :bind (("C-c p p" . completion-at-point) ;; capf
-         ("C-c p d" . dabbrev-completion)  ;; dabbrev
          ("C-c p t" . complete-tag)        ;; etags
          ("C-c p f" . cape-file)
          ("C-c p k" . cape-keyword)
          ("C-c p s" . cape-symbol)
          ("C-c p a" . cape-abbrev)
          ("C-c p i" . cape-ispell)
-         ("C-c p w" . cape-dict))
+         ("C-c p l" . cape-line))
   :config
   (defun my--reset-capf (&rest args)
     (let* ((capfs (remove t completion-at-point-functions)))  
-      (dolist (func '(cape-dabbrev-capf
-                      cape-ispell-capf
-                      cape-keyword-capf
-                      cape-file-capf))
-        (add-to-list 'capfs func t))
+      (add-to-list 'capfs #'cape-dabbrev t)
       (setq-local completion-at-point-functions
-                  (list (apply #'cape-super-capf capfs)))))
+                  `(cape-file
+                    ,(apply #'cape-super-capf
+                            (mapcar #'cape-capf-buster capfs))))))
 
   (dolist (mode '(org-mode
                   org-roam-mode
                   emacs-lisp-mode
                   lisp-interaction-mode
-                  lsp-completion-mode
-                  lsp-mode))
+                  lsp-completion-mode))
     (advice-add mode :after #'my--reset-capf)))
 
 
@@ -1718,9 +1736,11 @@ Whereas dabbrev-completion benefits from minibuffer interactivity and the patter
 
 The dabbrev-abbrev-char-regexp is configured to match both regular words and symbols (e.g. words separated by hyphens). This makes it equally suitable for code and ordinary language.
 
-While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words and symbols that start with any of these: $, *, /, =, ~, '. This regexp may be expanded in the future, but the idea is to be able to perform completion in contexts where the known word/symbol is preceded by a special character. For example, in the org-mode version of this document, all inline code must be placed between the equals sign. So now typing the =, then a letter, will still allow me to expand text based on that input.
+While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words and symbols that start with any of these: $, *, /, =, ~, '. This regexp may be expanded in the future, but the idea is to be able to perform completion in contexts where the known word/symbol is preceded by a special character. For example, in the org-mode version of this document, all inline code must be placed between the equals sign. So now typing the =, then a letter, will still allow me to expand text based on that input.w
 ```
   """
+  :leaf-defer nil
+  :require t
   :custom ((dabbrev-abbrev-char-regexp . "\\sw\\|\\s_")
            (dabbrev-abbrev-skip-leading-regexp . "[$*/=~']")
            (dabbrev-backward-only . nil)
