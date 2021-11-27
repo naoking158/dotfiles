@@ -24,71 +24,6 @@
   :type 'string
   :group 'orp)
 
-(defcustom orp-paperpile-ref-templates
-  '(("r" "ref" plain "%?"
-     :target (file+head "${slug}.org"
-                        "#+title: ${title}")
-     :unnarrowed t))
-  "See org-roam-capture-ref-templates."
-  :group 'orp
-  :type '(repeat
-          (choice (list :tag "Multikey description"
-                        (string :tag "Keys       ")
-                        (string :tag "Description"))
-                  (list :tag "Template entry"
-                        (string :tag "Keys           ")
-                        (string :tag "Description    ")
-                        (choice :tag "Capture Type   " :value entry
-                                (const :tag "Org entry" entry)
-                                (const :tag "Plain list item" item)
-                                (const :tag "Checkbox item" checkitem)
-                                (const :tag "Plain text" plain)
-                                (const :tag "Table line" table-line))
-                        (choice :tag "Template       "
-                                (string)
-                                (list :tag "File"
-                                      (const :format "" file)
-                                      (file :tag "Template file"))
-                                (list :tag "Function"
-                                      (const :format "" function)
-                                      (function :tag "Template function")))
-                        (plist :inline t
-                               ;; Give the most common options as checkboxes
-                               :options (((const :format "%v " :target)
-                                          (choice :tag "Node location"
-                                                  (list :tag "File"
-                                                        (const :format "" file)
-                                                        (string :tag "  File"))
-                                                  (list :tag "File & Head Content"
-                                                        (const :format "" file+head)
-                                                        (string :tag "  File")
-                                                        (string :tag "  Head Content"))
-                                                  (list :tag "File & Outline path"
-                                                        (const :format "" file+olp)
-                                                        (string :tag "  File")
-                                                        (list :tag "Outline path"
-                                                              (repeat (string :tag "Headline"))))
-                                                  (list :tag "File & Head Content & Outline path"
-                                                        (const :format "" file+head+olp)
-                                                        (string :tag "  File")
-                                                        (string :tag "  Head Content")
-                                                        (list :tag "Outline path"
-                                                              (repeat (string :tag "Headline"))))))
-                                         ((const :format "%v " :prepend) (const t))
-                                         ((const :format "%v " :immediate-finish) (const t))
-                                         ((const :format "%v " :jump-to-captured) (const t))
-                                         ((const :format "%v " :empty-lines) (const 1))
-                                         ((const :format "%v " :empty-lines-before) (const 1))
-                                         ((const :format "%v " :empty-lines-after) (const 1))
-                                         ((const :format "%v " :clock-in) (const t))
-                                         ((const :format "%v " :clock-keep) (const t))
-                                         ((const :format "%v " :clock-resume) (const t))
-                                         ((const :format "%v " :time-prompt) (const t))
-                                         ((const :format "%v " :tree-type) (const week))
-                                         ((const :format "%v " :unnarrowed) (const t))
-                                         ((const :format "%v " :table-line-pos) (string))
-                                         ((const :format "%v " :kill-buffer) (const t))))))))
-
 (defun org-roam-visit-pdf-online ()
       (interactive)
       (setq pdf-string (replace-regexp-in-string "\"" "" (org-entry-get 0 "PDF")))
@@ -125,10 +60,9 @@
                :pdf (plist-get info :pdf)
                :permalink (plist-get info :permalink)
                :abstract (plist-get info :abstract))
-   :templates orp-paperpile-ref-templates)
+   :templates org-roam-capture-ref-templates)
   nil)
 
-;;;###autoload
 (defun orp-paperpile--try-capture-to-ref-h ()
   "Try to capture to an existing node that match the ref. This overrides org-roam-protocol--try-capture-to-ref-h"
   (when-let ((node (and (plist-get org-roam-capture--info :ref)
@@ -142,14 +76,12 @@
 
 
 ;; Capture implementation
-;;;###autoload
 (defun orp-paperpile--insert-captured-ref-h ()
   "This overrides org-roam-protocol--insert-captured-ref-h."
   (orp-paperpile--update-org-roam-paper org-roam-capture--info))
 
 
 ;; Capture implementation
-;;;###autoload
 (defun orp-paperpile--update-org-roam-paper (info)
   (message "%s" info)
 
@@ -178,12 +110,14 @@
       (let (this-command (inhibit-message t)) (org-cut-subtree)))
     (orp-paperpile-insert-abstract-to-top abstract)))
 
+;;;###autoload
 (defun orp-paperpile-insert-abstract-to-top (abstract)
   (interactive)
   (goto-char (point-min))
   (org-next-visible-heading 1)
   (insert (format "* Abstract\n%s\n\n" abstract)))
 
+;;;###autoload
 (defun orp-activate nil
   (interactive)
   (advice-add #'org-roam-protocol--try-capture-to-ref-h
@@ -202,6 +136,7 @@
                                     :protocol "roam-paper"
                                     :function orp-paperpile--open-paper)))))
 
+;;;###autoload
 (defun orp-deactivate nil
   (interactive)
   (advice-remove #'org-roam-protocol--try-capture-to-ref-h
