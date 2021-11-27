@@ -419,7 +419,7 @@
                    `(alpha . (,num . ,(- num diff-active-and-inactive-frame))))))
 
   :config
-  (my/change-transparency 93))
+  (my/change-transparency 100))
 
 (leaf font
   :leaf-defer nil
@@ -1489,16 +1489,18 @@ respectively."
   ((shell-mode-hook eshell-mode-hook) . (lambda ()
                                           (setq completion-in-region-function
                                                 #'consult-completion-in-region)))
-  :bind (([remap switch-to-buffer] . consult-buffer) ; C-x b
-         ([remap yank-pop] . consult-yank-pop)       ; M-y
-         ([remap goto-line] . consult-goto-line)     ; M-g g
-         ("C-s" . my-consult-line)
-         ("C-M-r" . consult-recent-file)
-         ("C-c o" . consult-outline)
-         ("C-x C-o" . consult-file-externally)
-         ("C-S-s" . consult-imenu)
-         ("C-c b j" . consult-bookmark)
-         ("C-c j" . consult-mark))
+  :bind
+  (([remap switch-to-buffer] . consult-buffer) ; C-x b
+   ([remap yank-pop] . consult-yank-pop)       ; M-y
+   ([remap goto-line] . consult-goto-line)     ; M-g g
+   ([remap repeat-complex-command] . consult-complex-command) ; C-x M-: or C-x Esc Esc
+   ("C-s" . my-consult-line)
+   ("C-M-r" . consult-recent-file)
+   ("C-c o" . consult-outline)
+   ("C-x C-o" . consult-file-externally)
+   ("C-S-s" . consult-imenu)
+   ("C-c b j" . consult-bookmark)
+   ("C-c j" . consult-mark))
   :preface
   (defun my-consult-line (&optional at-point)
     "Consult-line uses things-at-point if set C-u prefix."
@@ -2586,7 +2588,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                           "#+title: ${title}\n#+date: %U\n")
        :unnarrowed t))))
 
-  :config
+  :defer-config
   (leaf org-roam-dailies
     :require t
     :bind-keymap ("C-c n d" . org-roam-dailies-map)
@@ -2618,21 +2620,25 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
         org-roam-ui-open-on-start t))
 
 (leaf orp-paperpile
+  :after org-roam
   :doc "orp-paperpile; Org-Roam-Protocol Paperpile is an interface
         to comunicate between org-mode and paperpile using org-roam-protocol."
   :load-path "~/.emacs.d/elisp/orp-paperpile/"
-  ;; :require t
-  :hook (emacs-startup-hook . orp-activate)
+  :require t
+  ;; :hook (emacs-startup-hook . orp-activate)
+  :commands orp-activate
+  :config (orp-activate)
+  :advice (:around org-link-open advice-around-org-link-open)
   :custom
   ((orp-paperpile-local-pdf-dir . "~/drive/Paperpile/")
-   (orp-paperpile-ref-templates . '(("r" "ref" plain "%?"
-                                     :target (file+head "lit/${slug}.org"
-                                                        (concat
-                                                         "#+date: %U\n"
-                                                         "#+filetags: Literature\n"
-                                                         "#+title: ${title}"))
-                                     :unnarrowed t))))
-  :advice (:around org-link-open advice-around-org-link-open)
+   (org-roam-capture-ref-templates . '(("r" "ref" plain "%?"
+                                        :target (file+head "lit/${slug}.org"
+                                                           (concat
+                                                            "#+date: %U\n"
+                                                            "#+filetags: Literature\n"
+                                                            "#+title: ${title}"))
+                                        :unnarrowed t))))
+  
   :preface
   (defun open-external (path)
     (interactive)
