@@ -284,6 +284,7 @@
   (super-save-mode +1))
 
 (leaf undo-tree
+  :disabled t
   :ensure t
   :hook (emacs-startup-hook . global-undo-tree-mode)
   :bind (("C-/" . undo-tree-undo)
@@ -297,6 +298,10 @@
    (undo-tree-auto-save-history . t)
    (undo-tree-history-directory-alist . `(("." . ,(no-littering-expand-etc-file-name
                                                    "undo"))))))
+
+(leaf vundo
+  :load-path "~/.emacs.d/elisp/vundo/"
+  :require t)
 
 ;; Compilation deny package
 (setq comp-deferred-compilation-deny-list (list "jupyter"))
