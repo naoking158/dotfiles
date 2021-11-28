@@ -3648,4 +3648,12 @@ Interactively, URL defaults to the string looking like a url around point."
   :defer-config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
+(leaf citar
+  :ensure t
+  :bind (("C-c b" . citar-insert-citation)
+         (:minibuffer-local-map
+          ("M-b" . citar-insert-preset)))
+  :custom
+  (citar-bibliography . '("~/org/braindump/preferences/ref.bib")))
+
 (provide 'init)

@@ -113,6 +113,7 @@ a bunch of resources I've found online.
   - [[#lin-is-noticeable---linel][LIN Is Noticeable - lin.el]]
   - [[#edit-with-emacs-using-hammerspoon][Edit with Emacs using Hammerspoon]]
   - [[#colorful-icons-for-completion-with-kind-icon][Colorful icons for completion with kind-icon]]
+  - [[#front-end-for-citation-with-citar][Front-end for citation with Citar]]
 - [[#footer][Footer]]
 :END:
 
@@ -5162,6 +5163,18 @@ From the search buffer there are a number of ways to interact with entries. Entr
   (kind-icon-default-face . 'corfu-default)
   :defer-config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+#+end_src
+
+** Front-end for citation with Citar
+
+#+begin_src emacs-lisp
+(leaf citar
+  :ensure t
+  :bind (("C-c b" . citar-insert-citation)
+         (:minibuffer-local-map
+          ("M-b" . citar-insert-preset)))
+  :custom
+  (citar-bibliography . '("~/org/braindump/preferences/ref.bib")))
 #+end_src
 
 
