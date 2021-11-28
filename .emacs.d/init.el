@@ -714,7 +714,7 @@
 
 (leaf crux
   :ensure t
-  :bind (("C-S-k" . crux-top-join-line)))
+  :bind ("C-S-k" . crux-top-join-line))
 
 (leaf neotree
   :ensure t all-the-icons
@@ -1060,12 +1060,12 @@
 
 (leaf smartparens
   :ensure t
-  :require smartparens-config
+  :init (require 'smartparens-config)
   :hook ((prog-mode-hook LaTeX-mode-hook) . turn-on-smartparens-strict-mode)
   :bind (smartparens-mode-map
          ("C-M-a" . sp-beginning-of-sexp)
          ("C-M-e" . sp-end-of-sexp)
-
+         
          ("C-M-n" . sp-next-sexp)
          ("C-M-p" . sp-previous-sexp)
 
@@ -1141,6 +1141,7 @@ respectively."
   :url "http://elpa.gnu.org/packages/rainbow-mode.html"
   :ensure t
   :blackout t
+  :commands rainbow-mode
   :custom ((rainbow-html-colors-major-mode-list . '(css-mode
                                                     html-mode
                                                     php-mode
@@ -1154,7 +1155,7 @@ respectively."
            (rainbow-latex-colors-major-mode-list . '(latex-mode))
            (rainbow-ansi-colors-major-mode-list . '(sh-mode c-mode c++-mode))
            (rainbow-r-colors-major-mode-list . '(ess-mode)))
-  :hook (lisp-interaction-mode-hook emacs-lisp-mode-hook web-mode-hook))
+  :hook (prog-mode-hook))
 
 (leaf volatile-highlights
   :doc "Minor mode for visual feedback on some operations."
@@ -1183,13 +1184,15 @@ respectively."
 
 (leaf google-translate
   :ensure t
-  :require t
   :bind ("C-c t" . google-translate-smooth-translate)
   :custom
   (google-translate-translation-directions-alist . '(("en" . "ja")
                                                      ("ja" . "en")))
-  :config
-  (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
+  :advice (:override google-translate--search-tkk
+                     my--google-translate--search-tkk-override-advice)
+  :preface
+  (defun my--google-translate--search-tkk-override-advice ()
+    "Search TKK." (list 430675 2721866130)))
 
 (leaf wgrep
   :ensure t
@@ -1471,27 +1474,30 @@ respectively."
   (consult-customize affe-grep :preview-key (kbd "M-.")))
 
 (leaf embark
-  :ensure t
-  :require t
-  :after consult
+  :ensure t embark-consult
   :bind (("C-," . embark-act)
          ("C-;" . embark-dwim)
-         ("C-. b" . embark-bindings))
-  :init
+         ("C-. b" . embark-bindings)
+         (:minibuffer-local-map
+          ("C-c C-e" . embark-export)))
+  :hook (embark-collect-mode-hook . consult-preview-at-point-mode)
+  :init (require 'embark-consult)
+  :config
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
-  :config
+  
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                  nil
-                 (window-parameters (mode-line-format . none))))
-  (leaf embark-consult
-    :ensure t
-    :require t
-    :hook ((embark-collect-mode-hook . consult-preview-at-point-mode))
-    :bind (minibuffer-local-map
-           ("C-c C-e" . embark-export))))
+                 (window-parameters (mode-line-format . none)))))
+
+
+;; (leaf embark-consult
+;;   :ensure t
+;;   :after embark
+  
+;;   :bind )
 
 (leaf consult
   :ensure t
