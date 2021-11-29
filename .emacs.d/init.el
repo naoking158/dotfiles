@@ -822,12 +822,6 @@
   ;; Optionally configure the first word as flex filtered.
   (add-hook 'orderless-style-dispatchers #'my/orderless-dispatch-flex-first nil 'local))
 
-(leaf lsp-latex
-  :doc "lsp-mode client for LaTeX, on texlab"
-  :req "emacs-25.1" "lsp-mode-6.0"
-  :url "https://github.com/ROCKTAKEY/lsp-latex"
-  :ensure t
-  :hook (LaTeX-mode-hook . lsp-deferred))
 
 (leaf lsp-ui
   :doc "UI modules for lsp-mode"
