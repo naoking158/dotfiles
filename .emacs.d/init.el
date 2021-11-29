@@ -984,7 +984,17 @@
              (flymake-diagnostic-at-point-error-prefix . " ► ")
              (flymake-diagnostic-at-point-display-diagnostic-function
               quote flymake-diagnostic-at-point-display-minibuffer))
-    :hook (flymake-mode-hook . flymake-diagnostic-at-point-mode)))
+    :hook (flymake-mode-hook . flymake-diagnostic-at-point-mode))
+
+  
+  (leaf flymake-posframe
+    :load-path "~/.emacs.d/elisp/flymake-posframe/"
+    :hook (flymake-mode-hook . flymake-posframe-mode))
+
+  (leaf flymake-grammarly
+    :ensure t
+    :hook (LaTeX-mode-hook . flymake-grammarly-load)
+    :custom (flymake-grammarly-check-time . 1.1)))
 
 (leaf flyspell
   ;; :hook (LaTeX-mode-hook org-mode-hook markdown-mode-hook text-mode-hook)
@@ -1693,9 +1703,10 @@ respectively."
 
   (dolist (mode '(org-mode
                   org-roam-mode
-                  emacs-lisp-mode
                   lisp-interaction-mode
-                  lsp-completion-mode))
+                  emacs-lisp-mode
+                  lsp-completion-mode
+                  VirTeX-common-initialization))
     (advice-add mode :after #'my--reset-capf)))
 
 
