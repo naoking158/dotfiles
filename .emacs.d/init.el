@@ -989,7 +989,10 @@
   
   (leaf flymake-posframe
     :load-path "~/.emacs.d/elisp/flymake-posframe/"
-    :hook (flymake-mode-hook . flymake-posframe-mode))
+    :hook (flymake-mode-hook . flymake-posframe-mode)
+    :custom ((flymake-posframe-warning-prefix . "⚠️ ")
+             (flymake-posframe-error-prefix . "🚫 ")
+             (flymake-posframe-note-prefix . "✏️ ")))
 
   (leaf flymake-grammarly
     :ensure t
