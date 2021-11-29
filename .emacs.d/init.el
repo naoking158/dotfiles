@@ -1487,7 +1487,7 @@ respectively."
    ("C-c o" . consult-outline)
    ("C-x C-o" . consult-file-externally)
    ("C-S-s" . consult-imenu)
-   ("C-c b j" . consult-bookmark)
+   ("C-x C-b" . consult-bookmark)
    ("C-c j" . consult-mark))
   :preface
   (defun my-consult-line (&optional at-point)
