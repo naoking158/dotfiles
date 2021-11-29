@@ -368,6 +368,10 @@
                         (insert-before-markers real)
                         (delete-region (point) (marker-position end)))))))))
 
+(leaf command-log-mode
+  :ensure t
+  :commands command-log-mode)
+
 (leaf ui
   :leaf-defer nil
   :hook
@@ -644,22 +648,7 @@
     :ensure t
     :hook (emacs-startup-hook . minions-mode)
     :custom ((minions-mode-line-lighter . ";")
-             (minions-prominent-modes . '(defining-kbd-macro flymake-mode))))
-
-  (leaf bespoke-modeline
-    :disabled t
-    :load-path "~/.emacs.d/elisp/bespoke-modeline/"
-    :require t
-    :custom ((bespoke-modeline-position . 'bottom)
-             (bespoke-modeline-size . 1)
-             (bespoke-modeline-git-diff-mode-line . t)
-             (bespoke-modeline-cleaner . nil)
-             (bespoke-modeline-visual-bell . t))
-    :config
-    (defun my/modeline-bespoke nil
-      (interactive)
-      (bespoke-modeline-org-agenda-mode)
-      (bespoke-modeline-mode))))
+             (minions-prominent-modes . '(defining-kbd-macro flymake-mode)))))
 
 (leaf which-key
   :doc "Display available keybindings in popup"
@@ -754,6 +743,30 @@
   ((git-gutter:modified . '((t (:background "#f1fa8c"))))
    (git-gutter:added . '((t (:background "#50fa7b"))))
    (git-gutter:deleted . '((t (:background "#ff79c6"))))))
+
+(leaf dap-mode
+  :ensure t
+  ;; :after exec-path-from-shell
+  :custom (;; (dap-python-debugger . 'debugpy)
+           ;; (dap-python-executable . path-to-venv-python)
+           (dap-auto-configure-features . '(sessions locals tooltip))
+           ;; (lsp-enable-dap-auto-configure . nil)
+           )
+  :hook
+  (python-mode-hook . (lambda nil
+                        (require 'dap-mode)
+                        (require 'dap-python)
+                        (dap-mode)
+                        (dap-ui-mode)
+                        (dap-tooltip-mode)
+                        (add-hook 'dap-stopped-hook
+                                  #'(lambda (arg)
+                                      (call-interactively #'dap-hydra)))))
+  ;; ((dap-stopped-hook . (lambda (arg) (call-interactively #'dap-hydra)))
+  ;;  (python-mode-hook . dap-mode)
+  ;;  (python-mode-hook . dap-ui-mode)
+  ;;  (python-mode-hook . dap-tooltip-mode))
+  )
 
 (leaf projectile
   :when (version< emacs-version "28")
@@ -1167,6 +1180,20 @@ respectively."
   (vhl/default-face quote
                     ((nil (:foreground "#FF3333" :background "#FFCDCD")))))
 
+(leaf lin
+  :load-path "~/.emacs.d/elisp/lin/"
+  :require t
+  :hook (emacs-startup-hook . (lambda nil
+                                (global-hl-line-mode)
+                                (global-lin-mode)))
+  :init
+  (define-globalized-minor-mode global-lin-mode lin-mode lin--on :group 'lin)
+  (defun lin--on ()
+    "Turn `lin-mode' on."
+    (unless (or noninteractive
+                (eq (aref (buffer-name) 0) ?\s))
+      (lin-mode 1))))
+
 (leaf yasnippet
   :ensure t
   :hook (emacs-startup-hook . yas-global-mode)
@@ -1198,6 +1225,41 @@ respectively."
   :ensure t
   :bind (grep-mode-map
          ("e" . wgrep-change-to-wgrep-mode)))
+
+(leaf skk
+  :ensure ddskk
+  :hook ((text-mode-hook . (lambda nil
+                             (skk-mode)
+                             (skk-latin-mode-on)
+                             (context-skk-mode))))
+  :custom ((default-input-method . "japanese-skk")
+           (skk-jisyo-code . 'utf-8)
+           (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.Huge.utf8")
+           (skk-jisyo . "~/.skk-jisyo")
+           (skk-backup-jisyo . "~/.skk-jisyo.BAK")
+           (skk-save-jisyo-instantly . t)
+           (skk-share-private-jisyo . t)
+           ;; (skk-server-host . "localhost")
+           ;; (skk-server-portnum . 1178)
+           (skk-server-report-response . nil)
+           (skk-byte-compile-init-file . t)
+           (skk-preload . nil)
+           (skk-isearch-mode-enable . 'always)
+           (skk-kutouten-type . 'en)
+           (skk-use-auto-kutouten . t)
+           (skk-show-inline . 'vertical)
+           (skk-inline-show-face . nil)
+           (skk-egg-like-newline . t)  ;; skk-kakutei by RET
+           (skk-auto-okuri-process . nil)
+           (skk-henkan-strict-okuri-precedence . t)
+           (skk-auto-insert-paren . t)
+           (skk-use-auto-enclose-pair-of-region . t)
+           (skk-sticky-key . ";")
+           (skk-dcomp-activate . t)
+           (skk-dcomp-multiple-activate . t)
+           (skk-inline-show-face . '( :foreground "#ECEFF4"
+                                      :background "#4C566A"
+                                      :inherit 'normal))))
 
 (leaf winner
   :doc "Restore old window configurations"
@@ -1328,102 +1390,6 @@ respectively."
 
 ;; (setq split-height-threshold nil)
 ;; (setq split-width-threshold nil)
-
-(leaf company
-  :disabled t
-  :doc "Modular text completion framework"
-  :tag "matching" "convenience" "abbrev" "emacs>=24.3"
-  :url "http://company-mode.github.io/"
-  :when (not window-system)
-  :ensure t
-  :blackout t
-  :leaf-defer nil
-  :custom ((company-dabbrev-other-buffers . t)
-           (company-dabbrev-code-other-buffers . t)
-           ;; Do not downcase completions by default.
-           (company-dabbrev-downcase . nil)
-           ;; Even if I write something with the wrong case,
-           ;; provide the correct casing.
-           (company-dabbrev-ignore-case . t)
-           (company-minimum-prefix-length . 2)
-           (company-transformers . (company-sort-by-occurrence))
-           ;; (company-transformers . nil)
-           (company-require-match . 'never)
-           (completion-ignore-case . nil)
-           (company-math-allow-latex-symbols-in-faces . t)
-           (company-math-allow-unicode-symbols-in-faces
-            quote ((tex-math font-latex-math-face)))
-           ;; No company-mode in shell & eshell
-           (company-global-modes . '(not eshell-mode shell-mode)))
-  :global-minor-mode global-company-mode
-  :config
-  (leaf company-org-block
-    :ensure t
-    :custom
-    (company-org-block-edit-style . 'auto) ;; 'auto, 'prompt, or 'inline
-    :preface
-    :hook ((org-mode-hook . (lambda ()
-                              (setq-local company-backends
-                                          '(company-org-block
-                                            ;; company-tabnine
-                                            company-semantic
-                                            company-capf
-                                            company-dabbrev))
-                              (company-mode +1)))))
-
-  (leaf company-yasnippet
-    :doc "company-mode completion backend for Yasnippet"
-    :tag "out-of-MELPA"
-    :after yasnippet
-    :preface
-    (defun c/company-mode-with-yas nil
-      (setq company-backends (mapc
-                              (lambda (elm)
-                                (if (and
-                                     (listp elm)
-                                     (member 'company-yasnippet elm))
-                                    elm
-                                  (append
-                                   (if (consp elm)
-                                       elm
-                                     (list elm))
-                                   '(:with company-yasnippet))))
-                              company-backends)))
-    :hook ((prog-mode-hook . c/company-mode-with-yas)))
-
-  ;; using child frame
-  (leaf company-posframe
-    :when window-system
-    :doc "Use a posframe as company candidate menu"
-    :req "emacs-26.0" "company-0.9.0" "posframe-0.1.0"
-    :tag "matching" "convenience" "abbrev" "emacs>=26.0"
-    :url "https://github.com/tumashu/company-posframe"
-    :emacs>= 26.0
-    :ensure t
-    :hook emacs-startup-hook
-    :blackout t)
-
-  (leaf company-math
-    :doc "Completion backends for unicode math symbols and latex tags"
-    :req "company-0.8.0" "math-symbol-lists-1.3"
-    :tag "completion" "symbols" "unicode"
-    :url "https://github.com/vspinu/company-math"
-    :ensure t
-    :hook ((org-mode-hook . c/latex-mode-setup)
-           (LaTeX-mode-hook . c/latex-mode-setup))
-    :preface
-    (defun c/latex-mode-setup nil
-      (setq-local company-backends
-                  (append '((company-math-symbols-latex
-                             company-math-symbols-unicode
-                             company-latex-commands))
-                          company-backends))))
-
-  (leaf company-tabnine
-    :disabled t
-    :doc "Completion backends using NLP model GPT-2"
-    :ensure t
-    :config (add-to-list 'company-backends #'company-tabnine)))
 
 (leaf duplicate-thing
   :doc "Duplicate current line & selection"
@@ -1765,20 +1731,14 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :bind* (("M-/" . dabbrev-expand)
           ("C-M-/" . dabbrev-completion)))
 
-(leaf *complete-path-at-point
-  :disabled t
-  :hook (completion-at-point-functions . my/complete-path-at-point)
-  :preface
-  (defun my/complete-path-at-point ()
-    "Return completion data for UNIX path at point."
-    (let ((fn (ffap-file-at-point))
-          (fap (thing-at-point 'filename)))
-      (when (and (or fn (equal "/" fap))
-                 (save-excursion
-                   (search-backward fap (line-beginning-position) t)))
-        (list (match-beginning 0)
-              (match-end 0)
-              #'completion-file-name-table :exclusive 'no)))))
+(leaf kind-icon
+  :ensure t
+  :after corfu
+  :custom
+  ;; to compute blended backgrounds correctly
+  (kind-icon-default-face . 'corfu-default)
+  :defer-config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (leaf avy
   :doc "Jump to arbitrary positions in visible text and select text quickly."
@@ -2356,13 +2316,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :commands (org-babel-execute:sh org-babel-expand-body:sh
              org-babel-execute:bas org-babel-expand-body:bash))
 
-(leaf org-pomodoro
-  :disabled t
-  :ensure t
-  :custom (org-pomodoro-start-sound-p . t)
-  :hook ((org-clock-in-hook org-clock-out-hook) . org-pomodoro)
-  :config (add-to-list 'frame-title-format '(:eval org-pomodoro-mode-line)))
-
 (leaf org-present
   :ensure t
   :bind (org-present-mode-keymap
@@ -2700,16 +2653,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
             (message "Open: %s" path))
         (apply f link arg)))))
 
-(leaf org-bullets
-  :disabled t
-  :doc "Show bullets in org-mode as UTF-8 characters"
-  :url "https://github.com/integral-dw/org-bullets"
-  :ensure t
-  :custom
-  (org-bullets-bullet-list quote
-                           ("" "" "" "" "" "" "" "" "" ""))
-  :hook (org-mode-hook . org-bullets-mode))
-
 (leaf org-superstar
   :ensure t
   :after org
@@ -2719,8 +2662,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (org-superstar-headline-bullets-list . '( "●" "○" "◉" "◇" "✿" "✸" " " ))
    (org-superstar-item-bullet-alist . '((?+ . ?➤)
                                         (?* . ?-)
-                                        (?- . ?•)))
-   ))
+                                        (?- . ?•)))))
 
 (setq paste-cmd (cond
                  ((executable-find "pngpaste")
@@ -2803,17 +2745,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (interactive)
     (advice-remove #'create-image #'org-limit-image-size--create-image)
     (advice-remove #'org-display-inline-images #'org-limit-image-size--org-display-inline-images)))
-
-(leaf org-download
-  :disabled t
-  :when window-system
-  :doc "Image drag-and-drop for Org-mode."
-  :req "emacs-24.3" "async-1.2"
-  :url "https://github.com/abo-abo/org-download"
-  :ensure t
-  :hook (org-mode-hook . org-download-enable)
-  :custom
-  (org-download-image-dir . "imgs"))
 
 (leaf org-appear
   :ensure t
@@ -2900,100 +2831,39 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 					 (oj-submit-args quote
 													 ("-y" "--wait=0"))))
 
-(leaf server
-  :doc "Lisp code for GNU Emacs running as server process"
-  :tag "builtin"
-  :require t
-  :bind ("C-x C-c" . server-edit)
-  :hook (emacs-startup-hook . server-start))
-
-;; (leaf tree-sitter
-;;   :when (not (eq 'darwin system-type))
-;;   :ensure t
-;;   ;; :load-path `(,(mapcar (lambda (elm)
-;;   ;;                         (concat "~/.emacs.d/elisp/elisp-tree-sitter/" elm "/"))
-;;   ;;                       '("core" "langs" "lisp")))
-;;   :require t tree-sitter-langs
-;;   ;; If this isn't set then it'll download x86_64 dylibs over the arm64
-;;   ;; dylibs we built
-;;   ;; :init (setf lyn--self-compiled-tsc t
-;;   ;;             tree-sitter-langs--testing lyn--self-compiled-tsc)
-
-
-;;   ;; :preface
-;;   ;; (defun my/highlight-python-docstrings ()
-;;   ;;   (add-function
-;;   ;;    :before-until (local 'tree-sitter-hl-face-mapping-function)
-;;   ;;    (lambda (capture-name)
-;;   ;;      (pcase capture-name
-;;   ;;        ("doc" 'font-lock-comment-face)))))
-;;   :hook ((python-mode-hook . tree-sitter-hl-mode)
-;;          ;; Highlight Python docstrings with a different face.
-;;          ;; (python-mode-hook . my/highlight-python-docstrings)
-;;          ))
-
-(leaf solaire-mode
-  :ensure t
-  :global-minor-mode solaire-global-mode)
-
-(leaf skk
-  :ensure ddskk
-  :hook ((text-mode-hook . (lambda nil
-                             (skk-mode)
-                             (skk-latin-mode-on)
-                             (context-skk-mode))))
-  :custom ((default-input-method . "japanese-skk")
-           (skk-jisyo-code . 'utf-8)
-           (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.Huge.utf8")
-           (skk-jisyo . "~/.skk-jisyo")
-           (skk-backup-jisyo . "~/.skk-jisyo.BAK")
-           (skk-save-jisyo-instantly . t)
-           (skk-share-private-jisyo . t)
-           ;; (skk-server-host . "localhost")
-           ;; (skk-server-portnum . 1178)
-           (skk-server-report-response . nil)
-           (skk-byte-compile-init-file . t)
-           (skk-preload . nil)
-           (skk-isearch-mode-enable . 'always)
-           (skk-kutouten-type . 'en)
-           (skk-use-auto-kutouten . t)
-           (skk-show-inline . 'vertical)
-           (skk-inline-show-face . nil)
-           (skk-egg-like-newline . t)  ;; skk-kakutei by RET
-           (skk-auto-okuri-process . nil)
-           (skk-henkan-strict-okuri-precedence . t)
-           (skk-auto-insert-paren . t)
-           (skk-use-auto-enclose-pair-of-region . t)
-           (skk-sticky-key . ";")
-           (skk-dcomp-activate . t)
-           (skk-dcomp-multiple-activate . t)
-           (skk-inline-show-face . '( :foreground "#ECEFF4"
-                                      :background "#4C566A"
-                                      :inherit 'normal))))
-
-(leaf dap-mode
-  :ensure t
-  ;; :after exec-path-from-shell
-  :custom (;; (dap-python-debugger . 'debugpy)
-           ;; (dap-python-executable . path-to-venv-python)
-           (dap-auto-configure-features . '(sessions locals tooltip))
-           ;; (lsp-enable-dap-auto-configure . nil)
-           )
+(leaf hammerspoon
+  :when
+  (file-exists-p "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el")
   :hook
-  (python-mode-hook . (lambda nil
-                        (require 'dap-mode)
-                        (require 'dap-python)
-                        (dap-mode)
-                        (dap-ui-mode)
-                        (dap-tooltip-mode)
-                        (add-hook 'dap-stopped-hook
-                                  #'(lambda (arg)
-                                      (call-interactively #'dap-hydra)))))
-  ;; ((dap-stopped-hook . (lambda (arg) (call-interactively #'dap-hydra)))
-  ;;  (python-mode-hook . dap-mode)
-  ;;  (python-mode-hook . dap-ui-mode)
-  ;;  (python-mode-hook . dap-tooltip-mode))
-  )
+  (emacs-startup-hook . (lambda nil
+                          (load
+                           "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))))
+
+(leaf elfeed
+  :ensure t
+  :commands elfeed
+  :advice (:after elfeed (lambda nil (visual-line-mode -1)))
+  :custom
+  ((elfeed-search-filter . "@2-days-ago +unread")
+   (elfeed-search-title-max-width . 80)
+   (elfeed-search-title-min-width . 80)
+   (elfeed-feeds
+    quote
+    (;; programming
+     ("https://news.ycombinator.com/rss" Hacker)
+     ("https://www.reddit.com/r/programming.rss" Programming)
+     ("https://www.reddit.com/r/learnprogramming.rss" LearnProgramming)
+     ("https://www.reddit.com/r/emacs.rss" Emacs)
+     ("https://www.reddit.com/r/planetemacs.rss" PlanetEmacs)
+     ("https://www.reddit.com/r/orgmode.rss" Org-mode)
+
+     ;; programming languages
+     ("https://www.reddit.com/r/python.rss" Python)
+
+     ;; Apple
+     ("https://www.reddit.com/r/apple.rss" Apple)
+     ("https://www.reddit.com/r/mac.rss" Mac)
+     ("https://www.reddit.com/r/AppleWatch.rss" AppleWatch)))))
 
 (let* ((file-dir (cond
                   ((when (file-exists-p "/usr/share/emacs/")
@@ -3271,6 +3141,38 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
         `((,(lambda (msg) (mu4e-message-field msg :body-html)) . "html")
           (,(lambda (msg) (ignore msg) t) . "text"))))
 
+(leaf server
+  :doc "Lisp code for GNU Emacs running as server process"
+  :tag "builtin"
+  :require t
+  :bind ("C-x C-c" . server-edit)
+  :hook (emacs-startup-hook . server-start))
+
+;; (leaf tree-sitter
+;;   :when (not (eq 'darwin system-type))
+;;   :ensure t
+;;   ;; :load-path `(,(mapcar (lambda (elm)
+;;   ;;                         (concat "~/.emacs.d/elisp/elisp-tree-sitter/" elm "/"))
+;;   ;;                       '("core" "langs" "lisp")))
+;;   :require t tree-sitter-langs
+;;   ;; If this isn't set then it'll download x86_64 dylibs over the arm64
+;;   ;; dylibs we built
+;;   ;; :init (setf lyn--self-compiled-tsc t
+;;   ;;             tree-sitter-langs--testing lyn--self-compiled-tsc)
+
+
+;;   ;; :preface
+;;   ;; (defun my/highlight-python-docstrings ()
+;;   ;;   (add-function
+;;   ;;    :before-until (local 'tree-sitter-hl-face-mapping-function)
+;;   ;;    (lambda (capture-name)
+;;   ;;      (pcase capture-name
+;;   ;;        ("doc" 'font-lock-comment-face)))))
+;;   :hook ((python-mode-hook . tree-sitter-hl-mode)
+;;          ;; Highlight Python docstrings with a different face.
+;;          ;; (python-mode-hook . my/highlight-python-docstrings)
+;;          ))
+
 (leaf xwwp
   :disabled t
   :when (or (<= emacs-major-version 27)
@@ -3388,75 +3290,6 @@ Interactively, URL defaults to the string looking like a url around point."
      ("h" . pdf-annot-add-highlight-markup-annotation)
      ("s" . pdf-annot-add-strikeout-markup-annotation)
      ("u" . pdf-annot-add-underline-markup-annotation))))
-
-(leaf command-log-mode
-  :ensure t
-  :commands command-log-mode)
-
-(leaf exwm
-  :disabled t
-  :ensure t  
-  :when (eq 'x window-system)
-  :leaf-defer nil
-  ;; When window "class" updates, use it to set the buffer name
-  :hook (exwm-update-class-hook . my/exwm-update-class)
-  :preface
-  (defun my/exwm-update-class ()
-    (exwm-workspace-rename-buffer exwm-class-name))
-  :config
-  ;; Set the default number of workspaces
-  (setq exwm-workspace-number 5)
-
-  ;; Set the screen resolution
-  (require 'exwm-randr)
-  (exwm-randr-enable)
-  (start-process-shell-command "xrandr" nil "xrandr --output HDMI-A-0 --primary --mode 3440x1440 --pos 3840x720 --rotate normal --output HDMI-A-1 --mode 3840x2160 --pos 0x0 --rotate normal --output DisplayPort-0 --off --output DisplayPort-1 --off")
-
-  ;; These keys should always pass through to Emacs
-  (setq exwm-input-prefix-keys
-        '(?\C-x
-          ?\C-u
-          ?\C-h
-          ?\M-x
-          ?\M-`
-          ?\M-&
-          ?\M-:
-          ?\C-\M-j  ;; Buffer list
-          ?\C-\ ))  ;; Ctrl+Space
-
-  ;; Ctrl+Q will enable the next key to be sent directly
-  (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
-
-  ;; Set up global key bindings.  These always work, no matter the input state!
-  ;; Keep in mind that changing this list after EXWM initializes has no effect.
-  (setq exwm-input-global-keys
-        `(
-          ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
-          ([?\s-r] . exwm-reset)
-
-          ;; Move between windows
-          ([s-left] . windmove-left)
-          ([s-right] . windmove-right)
-          ([s-up] . windmove-up)
-          ([s-down] . windmove-down)
-
-          ;; Launch applications via shell command
-          ([?\C-&] . (lambda (command)
-                       (interactive (list (read-shell-command "$ ")))
-                       (start-process-shell-command command nil command)))
-
-          ;; Switch workspace
-          ([?\s-w] . exwm-workspace-switch)
-
-          ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
-          ,@(mapcar (lambda (i)
-                      `(,(kbd (format "s-%d" i)) .
-                        (lambda ()
-                          (interactive)
-                          (exwm-workspace-switch-create ,i))))
-                    (number-sequence 0 9))))
-
-  (exwm-enable))
 
 (leaf applescript-mode :ensure t)
 
@@ -3585,74 +3418,6 @@ Interactively, URL defaults to the string looking like a url around point."
   :commands browse-at-remote-get-url
   :custom (browse-at-remote-prefer-symbolic . nil)
   :bind ("M-g r" . browse-at-remote))
-
-(leaf elfeed
-  :ensure t
-  :commands elfeed
-  :advice (:after elfeed (lambda nil (visual-line-mode -1)))
-  :custom
-  ((elfeed-search-filter . "@2-days-ago +unread")
-   (elfeed-search-title-max-width . 80)
-   (elfeed-search-title-min-width . 80)
-   (elfeed-feeds
-    quote
-    (;; programming
-     ("https://news.ycombinator.com/rss" Hacker)
-     ("https://www.reddit.com/r/programming.rss" Programming)
-     ("https://www.reddit.com/r/learnprogramming.rss" LearnProgramming)
-     ("https://www.reddit.com/r/emacs.rss" Emacs)
-     ("https://www.reddit.com/r/planetemacs.rss" PlanetEmacs)
-     ("https://www.reddit.com/r/orgmode.rss" Org-mode)
-
-     ;; programming languages
-     ("https://www.reddit.com/r/python.rss" Python)
-
-     ;; Apple
-     ("https://www.reddit.com/r/apple.rss" Apple)
-     ("https://www.reddit.com/r/mac.rss" Mac)
-     ("https://www.reddit.com/r/AppleWatch.rss" AppleWatch)))))
-
-(leaf lin
-  :load-path "~/.emacs.d/elisp/lin/"
-  :require t
-  :hook (emacs-startup-hook . (lambda nil
-                                (global-hl-line-mode)))
-  :global-minor-mode global-lin-mode
-  :init
-  (define-globalized-minor-mode global-lin-mode lin-mode lin--on :group 'lin)
-  (defun lin--on ()
-    "Turn `lin-mode' on."
-    (unless (or noninteractive
-                (eq (aref (buffer-name) 0) ?\s))
-      (lin-mode 1)))
-  ;; :advice (:after load-theme my/advice-lin-face-after-load-theme)
-  ;; :config
-  ;; (defun my/advice-lin-face-after-load-theme (&rest args)
-  ;;   (let* ((str-theme (symbol-name (car args)))
-  ;;          (bg-color (cond
-  ;;                     ((string-match "\\(light\\|operandi\\)" str-theme) "#FAF2F0")
-  ;;                     ((and (string-match "bespoke" str-theme)
-  ;;                           (eq 'light bespoke-set-theme)) "#FAF2F0")
-  ;;                     (t "#1C2835"))))
-  ;;     (set-face-attribute 'lin-hl nil :background bg-color)))
-  )
-
-(leaf hammerspoon
-  :when
-  (file-exists-p "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el")
-  :hook
-  (emacs-startup-hook . (lambda nil
-                          (load
-                           "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))))
-
-(leaf kind-icon
-  :ensure t
-  :after corfu
-  :custom
-  ;; to compute blended backgrounds correctly
-  (kind-icon-default-face . 'corfu-default)
-  :defer-config
-  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (leaf citar
   :ensure t

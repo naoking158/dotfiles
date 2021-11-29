@@ -27,6 +27,7 @@ a bunch of resources I've found online.
   - [[#toggle-mode-line][Toggle Mode-line]]
   - [[#trim-newline-from-string][Trim newline from string]]
   - [[#sort-sexpresions][Sort Sexpresions]]
+  - [[#command-log-mode][Command Log Mode]]
 - [[#basic-ui-configuration][Basic UI Configuration]]
   - [[#user-interface][User Interface]]
   - [[#frame-transparency][Frame Transparency]]
@@ -42,6 +43,7 @@ a bunch of resources I've found online.
   - [[#neotree][NeoTree]]
 - [[#development][Development]]
   - [[#git][Git]]
+  - [[#debugger-with-dap-mode][Debugger with Dap Mode]]
   - [[#projects-management][Projects Management]]
   - [[#language][Language]]
   - [[#productivity][Productivity]]
@@ -55,7 +57,6 @@ a bunch of resources I've found online.
   - [[#set-margins][Set Margins]]
   - [[#control-buffer-placement][Control Buffer Placement]]
 - [[#completion-system][Completion System]]
-  - [[#completions-with-company][Completions with Company]]
   - [[#duplicate-line-or-selected-regions-with-duplicate-thing][Duplicate line or selected regions with Duplicate-thing]]
   - [[#multiple-cursors][Multiple cursors]]
   - [[#asynchronous-fuzzy-finder-with-affe][Asynchronous Fuzzy Finder with Affe]]
@@ -65,7 +66,7 @@ a bunch of resources I've found online.
   - [[#completion-annotations-with-marginalia][Completion Annotations with Marginalia]]
   - [[#vertical-minibuffer-ui-and-completion-with-vertico][Vertical Minibuffer UI and Completion with Vertico]]
   - [[#completions-in-regions-with-corfu][Completions in Regions with Corfu]]
-  - [[#file-path-completion-in-string][File path completion in string]]
+  - [[#colorful-icons-for-completion-with-kind-icon][Colorful icons for completion with kind-icon]]
 - [[#moving-in-buffer][Moving in buffer]]
   - [[#jumping-with-avy][Jumping with Avy]]
   - [[#jumping-beginningend-of-line-with-mwim][Jumping beginning/end of line with mwim]]
@@ -79,7 +80,6 @@ a bunch of resources I've found online.
   - [[#org-configuration][Org Configuration]]
   - [[#org-agenda][Org Agenda]]
   - [[#org-babel][Org Babel]]
-  - [[#org-pomodoro][Org Pomodoro]]
   - [[#presentations][Presentations]]
   - [[#cross-reference][Cross Reference]]
   - [[#outline-based-notes-management-and-organizer][Outline-based notes management and organizer]]
@@ -92,27 +92,20 @@ a bunch of resources I've found online.
 - [[#latex-mode][Latex Mode]]
 - [[#applications][Applications]]
   - [[#competitive-programming][Competitive Programming]]
+  - [[#edit-with-emacs-using-hammerspoon][Edit with Emacs using Hammerspoon]]
+  - [[#elfeed][Elfeed]]
+  - [[#mail-with-mu4e][Mail with mu4e]]
 - [[#server-mode][Server Mode]]
 - [[#trial-packages][Trial Packages]]
   - [[#web-browser-with-emacs-w3m][Web Browser with emacs-w3m]]
   - [[#tree-sitter][Tree Sitter]]
-  - [[#solaire-mode][Solaire-Mode]]
-  - [[#ddskk][DDSKK]]
-  - [[#dap-mode][Dap Mode]]
-  - [[#mail-with-mu4e][Mail with mu4e]]
   - [[#enhance-xwidget-webkit-browser][Enhance xwidget webkit browser]]
   - [[#pdf-tools][PDF Tools]]
-  - [[#command-log-mode][Command Log Mode]]
-  - [[#exwm][EXWM]]
   - [[#apple-script-mode][Apple Script Mode]]
   - [[#emacs-jupyter][Emacs Jupyter]]
   - [[#search-in-external-web-browser][Search in external web browser]]
   - [[#emacs-application-framework][Emacs Application Framework]]
   - [[#browse-at-remote][Browse at remote]]
-  - [[#elfeed][Elfeed]]
-  - [[#lin-is-noticeable---linel][LIN Is Noticeable - lin.el]]
-  - [[#edit-with-emacs-using-hammerspoon][Edit with Emacs using Hammerspoon]]
-  - [[#colorful-icons-for-completion-with-kind-icon][Colorful icons for completion with kind-icon]]
   - [[#front-end-for-citation-with-citar][Front-end for citation with Citar]]
 - [[#footer][Footer]]
 :END:
@@ -678,6 +671,18 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                         (delete-region (point) (marker-position end)))))))))
 #+end_src
 
+** Command Log Mode
+:PROPERTIES:
+:ID:       A06BF380-B5A0-4248-9110-CF1C080882ED
+:END:
+
+#+begin_src emacs-lisp
+(leaf command-log-mode
+  :ensure t
+  :commands command-log-mode)
+#+end_src
+
+
 * Basic UI Configuration
 :PROPERTIES:
 :ID:       55BAFA5B-FF42-4569-98F4-E85A27ACAE9A
@@ -999,22 +1004,7 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
     :ensure t
     :hook (emacs-startup-hook . minions-mode)
     :custom ((minions-mode-line-lighter . ";")
-             (minions-prominent-modes . '(defining-kbd-macro flymake-mode))))
-
-  (leaf bespoke-modeline
-    :disabled t
-    :load-path "~/.emacs.d/elisp/bespoke-modeline/"
-    :require t
-    :custom ((bespoke-modeline-position . 'bottom)
-             (bespoke-modeline-size . 1)
-             (bespoke-modeline-git-diff-mode-line . t)
-             (bespoke-modeline-cleaner . nil)
-             (bespoke-modeline-visual-bell . t))
-    :config
-    (defun my/modeline-bespoke nil
-      (interactive)
-      (bespoke-modeline-org-agenda-mode)
-      (bespoke-modeline-mode))))
+             (minions-prominent-modes . '(defining-kbd-macro flymake-mode)))))
 #+end_src
 
 * Keyboard Bindings
@@ -1197,6 +1187,54 @@ Only in Neotree Buffer:
    (git-gutter:deleted . '((t (:background "#ff79c6"))))))
 
 #+end_src
+
+** Debugger with Dap Mode
+
+#+begin_src emacs-lisp
+
+(leaf dap-mode
+  :ensure t
+  ;; :after exec-path-from-shell
+  :custom (;; (dap-python-debugger . 'debugpy)
+           ;; (dap-python-executable . path-to-venv-python)
+           (dap-auto-configure-features . '(sessions locals tooltip))
+           ;; (lsp-enable-dap-auto-configure . nil)
+           )
+  :hook
+  (python-mode-hook . (lambda nil
+                        (require 'dap-mode)
+                        (require 'dap-python)
+                        (dap-mode)
+                        (dap-ui-mode)
+                        (dap-tooltip-mode)
+                        (add-hook 'dap-stopped-hook
+                                  #'(lambda (arg)
+                                      (call-interactively #'dap-hydra)))))
+  ;; ((dap-stopped-hook . (lambda (arg) (call-interactively #'dap-hydra)))
+  ;;  (python-mode-hook . dap-mode)
+  ;;  (python-mode-hook . dap-ui-mode)
+  ;;  (python-mode-hook . dap-tooltip-mode))
+  )
+
+#+end_src
+
+*** Get Started
+- =dap-debug=: Select a template to execute
+- =dap-debug-last=: Run the most recent template
+- =dap-debug-recent=: Select a recent template to run
+- =dap-disconnect=: Disconnect from the debugging session (output buffer retained)
+- =dap-delete-session=: Delete the current session (output buffer will be deleted)
+- =dap-delete-all-sessions=: Clean up all debugging sessions
+
+*** Breakpoints
+- =dap-breakpoint-toggle=: Toggle a breakpoint on the current line
+- =dap-breakpoint-delete-all=: Delete all breakpoints in the workspace
+- =dap-breakpoint-condition=: Set condition for breakpoint
+- =dap-breakpoint-log-message=: Set hit condition, number of hits before breakpoint stops.
+- =dap-breakpoint-log-message=: Set log message for breakpoint (interpolate expressions with {})
+- =dap-ui-breakpoints=: Show breakpoints panel
+
+
 
 ** Projects Management
 :PROPERTIES:
@@ -1726,6 +1764,29 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 
 #+end_src
 
+*** Line Highlight with LIN
+
+:PROPERTIES:
+:ID:       FDAF3AFD-70D4-48BB-8A55-EFFD8EE7FF7B
+:END:
+
+#+begin_src emacs-lisp
+(leaf lin
+  :load-path "~/.emacs.d/elisp/lin/"
+  :require t
+  :hook (emacs-startup-hook . (lambda nil
+                                (global-hl-line-mode)
+                                (global-lin-mode)))
+  :init
+  (define-globalized-minor-mode global-lin-mode lin-mode lin--on :group 'lin)
+  (defun lin--on ()
+    "Turn `lin-mode' on."
+    (unless (or noninteractive
+                (eq (aref (buffer-name) 0) ?\s))
+      (lin-mode 1))))
+#+end_src
+
+
 *** Snippets
 :PROPERTIES:
 :ID:       A418447A-324A-4000-B617-52D45DB69CAE
@@ -1782,6 +1843,55 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
   :bind (grep-mode-map
          ("e" . wgrep-change-to-wgrep-mode)))
 #+end_src
+
+
+*** DDSKK
+:PROPERTIES:
+:ID:       D4DD8E44-349F-4870-B0F3-C434BFBA6222
+:END:
+
+- 個人辞書を =UTF-8= に変換しておく
+- =skk-auto-okuri-process= は =nil= にしておかないと， =いぞん (izonn)= など一部の文字の変換ができなくなる.
+
+#+begin_src emacs-lisp
+
+(leaf skk
+  :ensure ddskk
+  :hook ((text-mode-hook . (lambda nil
+                             (skk-mode)
+                             (skk-latin-mode-on)
+                             (context-skk-mode))))
+  :custom ((default-input-method . "japanese-skk")
+           (skk-jisyo-code . 'utf-8)
+           (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.Huge.utf8")
+           (skk-jisyo . "~/.skk-jisyo")
+           (skk-backup-jisyo . "~/.skk-jisyo.BAK")
+           (skk-save-jisyo-instantly . t)
+           (skk-share-private-jisyo . t)
+           ;; (skk-server-host . "localhost")
+           ;; (skk-server-portnum . 1178)
+           (skk-server-report-response . nil)
+           (skk-byte-compile-init-file . t)
+           (skk-preload . nil)
+           (skk-isearch-mode-enable . 'always)
+           (skk-kutouten-type . 'en)
+           (skk-use-auto-kutouten . t)
+           (skk-show-inline . 'vertical)
+           (skk-inline-show-face . nil)
+           (skk-egg-like-newline . t)  ;; skk-kakutei by RET
+           (skk-auto-okuri-process . nil)
+           (skk-henkan-strict-okuri-precedence . t)
+           (skk-auto-insert-paren . t)
+           (skk-use-auto-enclose-pair-of-region . t)
+           (skk-sticky-key . ";")
+           (skk-dcomp-activate . t)
+           (skk-dcomp-multiple-activate . t)
+           (skk-inline-show-face . '( :foreground "#ECEFF4"
+                                      :background "#4C566A"
+                                      :inherit 'normal))))
+
+#+end_src
+
 
 * Window Management
 ** Window History with winner-mode
@@ -1983,109 +2093,6 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 #+end_src
 
 * Completion System
-** Completions with Company
-:PROPERTIES:
-:ID:       0C6AEB66-85BB-44F8-88D4-44194501C947
-:END:
-
-#+begin_src emacs-lisp
-(leaf company
-  :disabled t
-  :doc "Modular text completion framework"
-  :tag "matching" "convenience" "abbrev" "emacs>=24.3"
-  :url "http://company-mode.github.io/"
-  :when (not window-system)
-  :ensure t
-  :blackout t
-  :leaf-defer nil
-  :custom ((company-dabbrev-other-buffers . t)
-           (company-dabbrev-code-other-buffers . t)
-           ;; Do not downcase completions by default.
-           (company-dabbrev-downcase . nil)
-           ;; Even if I write something with the wrong case,
-           ;; provide the correct casing.
-           (company-dabbrev-ignore-case . t)
-           (company-minimum-prefix-length . 2)
-           (company-transformers . (company-sort-by-occurrence))
-           ;; (company-transformers . nil)
-           (company-require-match . 'never)
-           (completion-ignore-case . nil)
-           (company-math-allow-latex-symbols-in-faces . t)
-           (company-math-allow-unicode-symbols-in-faces
-            quote ((tex-math font-latex-math-face)))
-           ;; No company-mode in shell & eshell
-           (company-global-modes . '(not eshell-mode shell-mode)))
-  :global-minor-mode global-company-mode
-  :config
-  (leaf company-org-block
-    :ensure t
-    :custom
-    (company-org-block-edit-style . 'auto) ;; 'auto, 'prompt, or 'inline
-    :preface
-    :hook ((org-mode-hook . (lambda ()
-                              (setq-local company-backends
-                                          '(company-org-block
-                                            ;; company-tabnine
-                                            company-semantic
-                                            company-capf
-                                            company-dabbrev))
-                              (company-mode +1)))))
-
-  (leaf company-yasnippet
-    :doc "company-mode completion backend for Yasnippet"
-    :tag "out-of-MELPA"
-    :after yasnippet
-    :preface
-    (defun c/company-mode-with-yas nil
-      (setq company-backends (mapc
-                              (lambda (elm)
-                                (if (and
-                                     (listp elm)
-                                     (member 'company-yasnippet elm))
-                                    elm
-                                  (append
-                                   (if (consp elm)
-                                       elm
-                                     (list elm))
-                                   '(:with company-yasnippet))))
-                              company-backends)))
-    :hook ((prog-mode-hook . c/company-mode-with-yas)))
-
-  ;; using child frame
-  (leaf company-posframe
-    :when window-system
-    :doc "Use a posframe as company candidate menu"
-    :req "emacs-26.0" "company-0.9.0" "posframe-0.1.0"
-    :tag "matching" "convenience" "abbrev" "emacs>=26.0"
-    :url "https://github.com/tumashu/company-posframe"
-    :emacs>= 26.0
-    :ensure t
-    :hook emacs-startup-hook
-    :blackout t)
-
-  (leaf company-math
-    :doc "Completion backends for unicode math symbols and latex tags"
-    :req "company-0.8.0" "math-symbol-lists-1.3"
-    :tag "completion" "symbols" "unicode"
-    :url "https://github.com/vspinu/company-math"
-    :ensure t
-    :hook ((org-mode-hook . c/latex-mode-setup)
-           (LaTeX-mode-hook . c/latex-mode-setup))
-    :preface
-    (defun c/latex-mode-setup nil
-      (setq-local company-backends
-                  (append '((company-math-symbols-latex
-                             company-math-symbols-unicode
-                             company-latex-commands))
-                          company-backends))))
-
-  (leaf company-tabnine
-    :disabled t
-    :doc "Completion backends using NLP model GPT-2"
-    :ensure t
-    :config (add-to-list 'company-backends #'company-tabnine)))
-#+end_src
-
 ** Duplicate line or selected regions with Duplicate-thing
 :PROPERTIES:
 :ID:       8C227C3B-7CCF-44D5-8D77-6928499CCDF4
@@ -2498,27 +2505,17 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
           ("C-M-/" . dabbrev-completion)))
 #+end_src
 
-** File path completion in string
-:PROPERTIES:
-:ID:       1634340B-AA9E-4380-B3CA-7A4E10023945
-:END:
-https://with-emacs.com/posts/tutorials/customize-completion-at-point/
+** Colorful icons for completion with kind-icon
 
 #+begin_src emacs-lisp
-(leaf *complete-path-at-point
-  :disabled t
-  :hook (completion-at-point-functions . my/complete-path-at-point)
-  :preface
-  (defun my/complete-path-at-point ()
-    "Return completion data for UNIX path at point."
-    (let ((fn (ffap-file-at-point))
-          (fap (thing-at-point 'filename)))
-      (when (and (or fn (equal "/" fap))
-                 (save-excursion
-                   (search-backward fap (line-beginning-position) t)))
-        (list (match-beginning 0)
-              (match-end 0)
-              #'completion-file-name-table :exclusive 'no)))))
+(leaf kind-icon
+  :ensure t
+  :after corfu
+  :custom
+  ;; to compute blended backgrounds correctly
+  (kind-icon-default-face . 'corfu-default)
+  :defer-config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 #+end_src
 
 
@@ -3169,22 +3166,6 @@ https://with-emacs.com/posts/tutorials/customize-completion-at-point/
              org-babel-execute:bas org-babel-expand-body:bash))
 #+end_src
 
-** Org Pomodoro
-:PROPERTIES:
-:ID:       F0B67B65-0D01-4684-89C2-4A42F4009459
-:END:
-
-#+begin_src emacs-lisp
-
-(leaf org-pomodoro
-  :disabled t
-  :ensure t
-  :custom (org-pomodoro-start-sound-p . t)
-  :hook ((org-clock-in-hook org-clock-out-hook) . org-pomodoro)
-  :config (add-to-list 'frame-title-format '(:eval org-pomodoro-mode-line)))
-
-#+end_src
-
 
 ** Presentations
 
@@ -3799,17 +3780,6 @@ get_citation(callback_fn);
 :END:
 
 #+begin_src emacs-lisp
-
-(leaf org-bullets
-  :disabled t
-  :doc "Show bullets in org-mode as UTF-8 characters"
-  :url "https://github.com/integral-dw/org-bullets"
-  :ensure t
-  :custom
-  (org-bullets-bullet-list quote
-                           ("" "" "" "" "" "" "" "" "" ""))
-  :hook (org-mode-hook . org-bullets-mode))
-
 (leaf org-superstar
   :ensure t
   :after org
@@ -3819,8 +3789,7 @@ get_citation(callback_fn);
    (org-superstar-headline-bullets-list . '( "●" "○" "◉" "◇" "✿" "✸" " " ))
    (org-superstar-item-bullet-alist . '((?+ . ?➤)
                                         (?* . ?-)
-                                        (?- . ?•)))
-   ))
+                                        (?- . ?•)))))
 #+end_src
 
 
@@ -3921,24 +3890,6 @@ get_citation(callback_fn);
     (advice-remove #'org-display-inline-images #'org-limit-image-size--org-display-inline-images)))
 #+end_src
 
-*** Image Drag-and-Drop for Org-Mode
-:PROPERTIES:
-:ID:       6971037E-7102-4A2E-94D1-3526BDA56862
-:END:
-
-#+begin_src emacs-lisp
-(leaf org-download
-  :disabled t
-  :when window-system
-  :doc "Image drag-and-drop for Org-mode."
-  :req "emacs-24.3" "async-1.2"
-  :url "https://github.com/abo-abo/org-download"
-  :ensure t
-  :hook (org-mode-hook . org-download-enable)
-  :custom
-  (org-download-image-dir . "imgs"))
-#+end_src
-
 ** Auto-show Markup Symbols
 :PROPERTIES:
 :ID:       3A1C4173-A2A0-4BAB-BCF2-34809552E796
@@ -3990,7 +3941,7 @@ It's nice to have a table of contents section for long literate configuration fi
 
 #+end_src
 
-* Latex Mode
+* LaTeX Mode
 :PROPERTIES:
 :ID:       D8E085BF-A7E1-48F4-B7F1-BD3B0F942A7F
 :END:
@@ -4068,273 +4019,72 @@ It's nice to have a table of contents section for long literate configuration fi
 													 ("-y" "--wait=0"))))
 #+end_src
 
-* Server Mode
-:PROPERTIES:
-:ID:       829CCBA5-3D95-42AE-8D68-4AACC53C2DF8
-:END:
+** Edit with Emacs using Hammerspoon
 
 #+begin_src emacs-lisp
-(leaf server
-  :doc "Lisp code for GNU Emacs running as server process"
-  :tag "builtin"
-  :require t
-  :bind ("C-x C-c" . server-edit)
-  :hook (emacs-startup-hook . server-start))
-#+end_src
-
-* Trial Packages
-** Web Browser with emacs-w3m
-:PROPERTIES:
-:ID:       9A644B4B-58DA-42CC-9B82-A891A204FA05
-:END:
-
-[[https://github.com/emacs-w3m/emacs-w3m][Emacs-w3m]] is an Emacs interface to w3m.
-
-While browsing, remember the following:
-
-- TAB to jump from link to link.
-- RETURN to follow a link
-- SPACE to move down the page
-- b to move up the page
-- B to move back in the history
-- M to open the URL in Firefox
-- I to open the image if it didn’t show up correctly
-- c to copy the URL of the current page in the kill ring.
-- u to copy the URL of the link in the kill ring.
-- a to bookmark this page
-- v to look at the bookmarks
-- s to look through the page history for this session.
-
-#+begin_src emacs-lisp :tangle no
-(leaf ace-link
-  :ensure t
-  :config (ace-link-setup-default))
-
-(leaf w3m
-  :disabled t
-  :ensure t
-  :require t ace-link
-  :init
-  (setq browse-url-browser-function 'w3m-browse-url)
-  (setq w3m-use-cookies t)
-  :hook (;; clean up the w3m buffers:
-         (w3m-display-functions-hook . w3m-hide-stuff)
-         (w3m-mode-hook . ace-link-mode))
-  :bind (("C-c w w" . w3m)
-         ("C-c w o" . browse-url-at-point)
-         ("C-c w s" . w3m-search)
-         (w3m-mode-map
-          ("q" . quit-window)
-          ("&" . w3m-view-url-with-external-browser)))
-  :config
-  ;; Web Page Cleanup
-
-  ;; Navigating some sites in a text browser is a bit painful, but we could have some functions that either move the cursor passed the header to the start of the content, or actually remove some of the content.
-
-  ;; Google Search
-  ;; Don’t need to actually remove stuff when search in Google, as I really just need to jump ahead and skip the header:
-  (defun w3m-skip-in-google ()
-    "For a Google Search, skip to the first result."
-    (beginning-of-buffer)
-    (search-forward-regexp "[0-9, ]+ results")
-    (forward-line 2)
-    (recenter-top-bottom 0))
-
-  ;; Stack Overflow
-  ;; Without a clear enough label, searching for the start of content will always be fragile. We’ll look for the start of the first column.
-
-  ;; Stack Overflow has a lot of text that isn’t helpful to someone in a text-based browser, so I would like to remove the voting and other parts. Not sure how to do it, since the columns are of variable width.
-  (defun w3m-skip-in-stackoverflow ()
-    (beginning-of-buffer)
-    (search-forward-regexp "^   ")
-    (forward-line -2)
-    (recenter-top-bottom 0))
-
-  ;; Web Site Dispatch Function
-  ;; Add a hook to the w3m-display-functions to match the URL to see which function we need to call:
-  (defun w3m-hide-stuff (url)
-    "Call screen cleaning functions for the W3M based on the URL."
-    (interactive)
-    (cond ((string-match "google\.com/search" url) (w3m-skip-in-google))
-          ((string-match "clojuredocs.org" url) (w3m-skip-in-clojuredocs))
-          ((string-match "stackoverflow.com" url) (w3m-skip-in-stackoverflow))
-          )))
-#+end_src
-
-#+RESULTS:
-: w3m
-
-** Tree Sitter
-:PROPERTIES:
-:ID:       2B53130F-3718-4EE5-9CF1-1E8C33996939
-:END:
-
-*** Prepare for M1 Mac
-
-https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/88#issuecomment-849338234
-
-To avoid installing x86_64 version, The following steps should be required.
-
-1. Clone [[https://github.com/tree-sitter/tree-sitter.git][tree-sitter]]
-   #+begin_src shell
-   cd cli && cargo install --path .
-   #+end_src
-   
-2. Clone [[https://github.com/emacs-tree-sitter/elisp-tree-sitter][emacs-tree-sitter]]
-   #+begin_src shell
-   # get tree-sitter v0.19.5 - last to put files in a reasonable place
-   sh -c "test -d rust-tree-sitter || git clone https://github.com/tree-sitter/tree-sitter rust-tree-sitter; cd rust-tree-sitter && git fetch && git checkout v0.19.5"
-   sh -c "cd rust-tree-sitter/cli && cargo install --path ."
-
-   sh -c "file core/tsc-dyn.dylib | grep -q arm64 || rm -f core/tsc-dyn.dylib"
-   sh -c "grep -q LOCAL core/DYN-VERSION || printf LOCAL >core/DYN-VERSION"
-   sh -c "grep -q DYN-VERSION bin/build && sed -e '/DYN-VERSION/d' bin/build >bin/build.tmp && mv bin/build.tmp bin/build && chmod +x bin/build || :"
-   sh -c "EMACS=emacs ./bin/setup && EMACS=emacs ./bin/build"
-
-   # ensure all language definitions
-   find langs/repos -type f -name grammar.js -not -path '*/node_modules/*' -not -path '*/ocaml/interface/*' -exec sh -c 'targets=; for grammar_file in "$@"; do grammar_dir="${grammar_file%/*}"; targets="$targets ensure/${grammar_dir##*/}"; done; EMACS=emacs make -j7 $targets' sh {} +
-   #+end_src
-    
-
-*** Configurations
-:PROPERTIES:
-:ID:       A58AD346-E923-4E20-BAAA-02B4E1A03A0D
-:END:
-
-#+begin_src emacs-lisp
-
-;; (leaf tree-sitter
-;;   :when (not (eq 'darwin system-type))
-;;   :ensure t
-;;   ;; :load-path `(,(mapcar (lambda (elm)
-;;   ;;                         (concat "~/.emacs.d/elisp/elisp-tree-sitter/" elm "/"))
-;;   ;;                       '("core" "langs" "lisp")))
-;;   :require t tree-sitter-langs
-;;   ;; If this isn't set then it'll download x86_64 dylibs over the arm64
-;;   ;; dylibs we built
-;;   ;; :init (setf lyn--self-compiled-tsc t
-;;   ;;             tree-sitter-langs--testing lyn--self-compiled-tsc)
-
-
-;;   ;; :preface
-;;   ;; (defun my/highlight-python-docstrings ()
-;;   ;;   (add-function
-;;   ;;    :before-until (local 'tree-sitter-hl-face-mapping-function)
-;;   ;;    (lambda (capture-name)
-;;   ;;      (pcase capture-name
-;;   ;;        ("doc" 'font-lock-comment-face)))))
-;;   :hook ((python-mode-hook . tree-sitter-hl-mode)
-;;          ;; Highlight Python docstrings with a different face.
-;;          ;; (python-mode-hook . my/highlight-python-docstrings)
-;;          ))
-#+end_src
-
-** Solaire-Mode
-:PROPERTIES:
-:ID:       CC1789FF-76CB-414E-A01B-6F0B53C0A022
-:END:
-
-#+begin_src emacs-lisp  
-(leaf solaire-mode
-  :ensure t
-  :global-minor-mode solaire-global-mode)
-#+end_src
-
-** DDSKK
-:PROPERTIES:
-:ID:       D4DD8E44-349F-4870-B0F3-C434BFBA6222
-:END:
-
-- 個人辞書を =UTF-8= に変換しておく
-- =skk-auto-okuri-process= は =nil= にしておかないと， =いぞん (izonn)= など一部の文字の変換ができなくなる.
-
-#+begin_src emacs-lisp
-
-(leaf skk
-  :ensure ddskk
-  :hook ((text-mode-hook . (lambda nil
-                             (skk-mode)
-                             (skk-latin-mode-on)
-                             (context-skk-mode))))
-  :custom ((default-input-method . "japanese-skk")
-           (skk-jisyo-code . 'utf-8)
-           (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.Huge.utf8")
-           (skk-jisyo . "~/.skk-jisyo")
-           (skk-backup-jisyo . "~/.skk-jisyo.BAK")
-           (skk-save-jisyo-instantly . t)
-           (skk-share-private-jisyo . t)
-           ;; (skk-server-host . "localhost")
-           ;; (skk-server-portnum . 1178)
-           (skk-server-report-response . nil)
-           (skk-byte-compile-init-file . t)
-           (skk-preload . nil)
-           (skk-isearch-mode-enable . 'always)
-           (skk-kutouten-type . 'en)
-           (skk-use-auto-kutouten . t)
-           (skk-show-inline . 'vertical)
-           (skk-inline-show-face . nil)
-           (skk-egg-like-newline . t)  ;; skk-kakutei by RET
-           (skk-auto-okuri-process . nil)
-           (skk-henkan-strict-okuri-precedence . t)
-           (skk-auto-insert-paren . t)
-           (skk-use-auto-enclose-pair-of-region . t)
-           (skk-sticky-key . ";")
-           (skk-dcomp-activate . t)
-           (skk-dcomp-multiple-activate . t)
-           (skk-inline-show-face . '( :foreground "#ECEFF4"
-                                      :background "#4C566A"
-                                      :inherit 'normal))))
-
-#+end_src
-
-** Dap Mode
-:PROPERTIES:
-:ID:       7C106EE5-EF79-4A6E-8A9E-82AF6D404543
-:END:
-
-#+begin_src emacs-lisp
-
-(leaf dap-mode
-  :ensure t
-  ;; :after exec-path-from-shell
-  :custom (;; (dap-python-debugger . 'debugpy)
-           ;; (dap-python-executable . path-to-venv-python)
-           (dap-auto-configure-features . '(sessions locals tooltip))
-           ;; (lsp-enable-dap-auto-configure . nil)
-           )
+(leaf hammerspoon
+  :when
+  (file-exists-p "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el")
   :hook
-  (python-mode-hook . (lambda nil
-                        (require 'dap-mode)
-                        (require 'dap-python)
-                        (dap-mode)
-                        (dap-ui-mode)
-                        (dap-tooltip-mode)
-                        (add-hook 'dap-stopped-hook
-                                  #'(lambda (arg)
-                                      (call-interactively #'dap-hydra)))))
-  ;; ((dap-stopped-hook . (lambda (arg) (call-interactively #'dap-hydra)))
-  ;;  (python-mode-hook . dap-mode)
-  ;;  (python-mode-hook . dap-ui-mode)
-  ;;  (python-mode-hook . dap-tooltip-mode))
-  )
-
+  (emacs-startup-hook . (lambda nil
+                          (load
+                           "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))))
 #+end_src
 
-*** Get Started
-- =dap-debug=: Select a template to execute
-- =dap-debug-last=: Run the most recent template
-- =dap-debug-recent=: Select a recent template to run
-- =dap-disconnect=: Disconnect from the debugging session (output buffer retained)
-- =dap-delete-session=: Delete the current session (output buffer will be deleted)
-- =dap-delete-all-sessions=: Clean up all debugging sessions
 
-*** Breakpoints
-- =dap-breakpoint-toggle=: Toggle a breakpoint on the current line
-- =dap-breakpoint-delete-all=: Delete all breakpoints in the workspace
-- =dap-breakpoint-condition=: Set condition for breakpoint
-- =dap-breakpoint-log-message=: Set hit condition, number of hits before breakpoint stops.
-- =dap-breakpoint-log-message=: Set log message for breakpoint (interpolate expressions with {})
-- =dap-ui-breakpoints=: Show breakpoints panel
+** Elfeed
+:PROPERTIES:
+:ID:       66D649D3-84C7-44D7-8F23-E549647FF0CE
+:END:
+
+For a complete documentation visit the official elfeed page: https://github.com/skeeto/elfeed
+
+Running the interactive function elfeed will pop up the *elfeed-search* buffer, which will display feed items.
+
++ =g=: refresh view of the feed listing
++ =G=: fetch feed updates from the servers
++ =s=: update the search filter (see tags)
++ =c=: clear the search filter
+
+From the search buffer there are a number of ways to interact with entries. Entries are selected by placing the point over an entry. Multiple entries are selected at once by using an active region.
+
++ =RET=: view selected entry in a buffer
++ =b=: open selected entries in your browser (browse-url)
++ =y=: copy selected entries URL to the clipboard
++ =r=: mark selected entries as read
++ =u=: mark selected entries as unread
++ =+=: add a specific tag to selected entries
++ =-=: remove a specific tag from selected entries
+
+
+#+begin_src emacs-lisp
+(leaf elfeed
+  :ensure t
+  :commands elfeed
+  :advice (:after elfeed (lambda nil (visual-line-mode -1)))
+  :custom
+  ((elfeed-search-filter . "@2-days-ago +unread")
+   (elfeed-search-title-max-width . 80)
+   (elfeed-search-title-min-width . 80)
+   (elfeed-feeds
+    quote
+    (;; programming
+     ("https://news.ycombinator.com/rss" Hacker)
+     ("https://www.reddit.com/r/programming.rss" Programming)
+     ("https://www.reddit.com/r/learnprogramming.rss" LearnProgramming)
+     ("https://www.reddit.com/r/emacs.rss" Emacs)
+     ("https://www.reddit.com/r/planetemacs.rss" PlanetEmacs)
+     ("https://www.reddit.com/r/orgmode.rss" Org-mode)
+
+     ;; programming languages
+     ("https://www.reddit.com/r/python.rss" Python)
+
+     ;; Apple
+     ("https://www.reddit.com/r/apple.rss" Apple)
+     ("https://www.reddit.com/r/mac.rss" Mac)
+     ("https://www.reddit.com/r/AppleWatch.rss" AppleWatch)))))
+#+end_src
+
 
 ** Mail with mu4e
 :PROPERTIES:
@@ -4639,6 +4389,170 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
           (,(lambda (msg) (ignore msg) t) . "text"))))
 #+end_src
 
+
+
+* Server Mode
+:PROPERTIES:
+:ID:       829CCBA5-3D95-42AE-8D68-4AACC53C2DF8
+:END:
+
+#+begin_src emacs-lisp
+(leaf server
+  :doc "Lisp code for GNU Emacs running as server process"
+  :tag "builtin"
+  :require t
+  :bind ("C-x C-c" . server-edit)
+  :hook (emacs-startup-hook . server-start))
+#+end_src
+
+* Trial Packages
+** Web Browser with emacs-w3m
+:PROPERTIES:
+:ID:       9A644B4B-58DA-42CC-9B82-A891A204FA05
+:END:
+
+[[https://github.com/emacs-w3m/emacs-w3m][Emacs-w3m]] is an Emacs interface to w3m.
+
+While browsing, remember the following:
+
+- TAB to jump from link to link.
+- RETURN to follow a link
+- SPACE to move down the page
+- b to move up the page
+- B to move back in the history
+- M to open the URL in Firefox
+- I to open the image if it didn’t show up correctly
+- c to copy the URL of the current page in the kill ring.
+- u to copy the URL of the link in the kill ring.
+- a to bookmark this page
+- v to look at the bookmarks
+- s to look through the page history for this session.
+
+#+begin_src emacs-lisp :tangle no
+(leaf ace-link
+  :ensure t
+  :config (ace-link-setup-default))
+
+(leaf w3m
+  :disabled t
+  :ensure t
+  :require t ace-link
+  :init
+  (setq browse-url-browser-function 'w3m-browse-url)
+  (setq w3m-use-cookies t)
+  :hook (;; clean up the w3m buffers:
+         (w3m-display-functions-hook . w3m-hide-stuff)
+         (w3m-mode-hook . ace-link-mode))
+  :bind (("C-c w w" . w3m)
+         ("C-c w o" . browse-url-at-point)
+         ("C-c w s" . w3m-search)
+         (w3m-mode-map
+          ("q" . quit-window)
+          ("&" . w3m-view-url-with-external-browser)))
+  :config
+  ;; Web Page Cleanup
+
+  ;; Navigating some sites in a text browser is a bit painful, but we could have some functions that either move the cursor passed the header to the start of the content, or actually remove some of the content.
+
+  ;; Google Search
+  ;; Don’t need to actually remove stuff when search in Google, as I really just need to jump ahead and skip the header:
+  (defun w3m-skip-in-google ()
+    "For a Google Search, skip to the first result."
+    (beginning-of-buffer)
+    (search-forward-regexp "[0-9, ]+ results")
+    (forward-line 2)
+    (recenter-top-bottom 0))
+
+  ;; Stack Overflow
+  ;; Without a clear enough label, searching for the start of content will always be fragile. We’ll look for the start of the first column.
+
+  ;; Stack Overflow has a lot of text that isn’t helpful to someone in a text-based browser, so I would like to remove the voting and other parts. Not sure how to do it, since the columns are of variable width.
+  (defun w3m-skip-in-stackoverflow ()
+    (beginning-of-buffer)
+    (search-forward-regexp "^   ")
+    (forward-line -2)
+    (recenter-top-bottom 0))
+
+  ;; Web Site Dispatch Function
+  ;; Add a hook to the w3m-display-functions to match the URL to see which function we need to call:
+  (defun w3m-hide-stuff (url)
+    "Call screen cleaning functions for the W3M based on the URL."
+    (interactive)
+    (cond ((string-match "google\.com/search" url) (w3m-skip-in-google))
+          ((string-match "clojuredocs.org" url) (w3m-skip-in-clojuredocs))
+          ((string-match "stackoverflow.com" url) (w3m-skip-in-stackoverflow))
+          )))
+#+end_src
+
+#+RESULTS:
+: w3m
+
+** Tree Sitter
+:PROPERTIES:
+:ID:       2B53130F-3718-4EE5-9CF1-1E8C33996939
+:END:
+
+*** Prepare for M1 Mac
+
+https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/88#issuecomment-849338234
+
+To avoid installing x86_64 version, The following steps should be required.
+
+1. Clone [[https://github.com/tree-sitter/tree-sitter.git][tree-sitter]]
+   #+begin_src shell
+   cd cli && cargo install --path .
+   #+end_src
+   
+2. Clone [[https://github.com/emacs-tree-sitter/elisp-tree-sitter][emacs-tree-sitter]]
+   #+begin_src shell
+   # get tree-sitter v0.19.5 - last to put files in a reasonable place
+   sh -c "test -d rust-tree-sitter || git clone https://github.com/tree-sitter/tree-sitter rust-tree-sitter; cd rust-tree-sitter && git fetch && git checkout v0.19.5"
+   sh -c "cd rust-tree-sitter/cli && cargo install --path ."
+
+   sh -c "file core/tsc-dyn.dylib | grep -q arm64 || rm -f core/tsc-dyn.dylib"
+   sh -c "grep -q LOCAL core/DYN-VERSION || printf LOCAL >core/DYN-VERSION"
+   sh -c "grep -q DYN-VERSION bin/build && sed -e '/DYN-VERSION/d' bin/build >bin/build.tmp && mv bin/build.tmp bin/build && chmod +x bin/build || :"
+   sh -c "EMACS=emacs ./bin/setup && EMACS=emacs ./bin/build"
+
+   # ensure all language definitions
+   find langs/repos -type f -name grammar.js -not -path '*/node_modules/*' -not -path '*/ocaml/interface/*' -exec sh -c 'targets=; for grammar_file in "$@"; do grammar_dir="${grammar_file%/*}"; targets="$targets ensure/${grammar_dir##*/}"; done; EMACS=emacs make -j7 $targets' sh {} +
+   #+end_src
+    
+
+*** Configurations
+:PROPERTIES:
+:ID:       A58AD346-E923-4E20-BAAA-02B4E1A03A0D
+:END:
+
+#+begin_src emacs-lisp
+
+;; (leaf tree-sitter
+;;   :when (not (eq 'darwin system-type))
+;;   :ensure t
+;;   ;; :load-path `(,(mapcar (lambda (elm)
+;;   ;;                         (concat "~/.emacs.d/elisp/elisp-tree-sitter/" elm "/"))
+;;   ;;                       '("core" "langs" "lisp")))
+;;   :require t tree-sitter-langs
+;;   ;; If this isn't set then it'll download x86_64 dylibs over the arm64
+;;   ;; dylibs we built
+;;   ;; :init (setf lyn--self-compiled-tsc t
+;;   ;;             tree-sitter-langs--testing lyn--self-compiled-tsc)
+
+
+;;   ;; :preface
+;;   ;; (defun my/highlight-python-docstrings ()
+;;   ;;   (add-function
+;;   ;;    :before-until (local 'tree-sitter-hl-face-mapping-function)
+;;   ;;    (lambda (capture-name)
+;;   ;;      (pcase capture-name
+;;   ;;        ("doc" 'font-lock-comment-face)))))
+;;   :hook ((python-mode-hook . tree-sitter-hl-mode)
+;;          ;; Highlight Python docstrings with a different face.
+;;          ;; (python-mode-hook . my/highlight-python-docstrings)
+;;          ))
+#+end_src
+
+
 ** Enhance xwidget webkit browser
 :PROPERTIES:
 :ID:       00E1AB83-81A1-4A8E-A58E-BEB657E8EDAF
@@ -4769,90 +4683,6 @@ Interactively, URL defaults to the string looking like a url around point."
      ("h" . pdf-annot-add-highlight-markup-annotation)
      ("s" . pdf-annot-add-strikeout-markup-annotation)
      ("u" . pdf-annot-add-underline-markup-annotation))))
-#+end_src
-
-
-** Command Log Mode
-:PROPERTIES:
-:ID:       A06BF380-B5A0-4248-9110-CF1C080882ED
-:END:
-
-#+begin_src emacs-lisp
-(leaf command-log-mode
-  :ensure t
-  :commands command-log-mode)
-#+end_src
-
-** EXWM
-:PROPERTIES:
-:ID:       cfe83546-f8a6-4cc8-907f-b61b13dd1d49
-:END:
-
-#+begin_src emacs-lisp
-(leaf exwm
-  :disabled t
-  :ensure t  
-  :when (eq 'x window-system)
-  :leaf-defer nil
-  ;; When window "class" updates, use it to set the buffer name
-  :hook (exwm-update-class-hook . my/exwm-update-class)
-  :preface
-  (defun my/exwm-update-class ()
-    (exwm-workspace-rename-buffer exwm-class-name))
-  :config
-  ;; Set the default number of workspaces
-  (setq exwm-workspace-number 5)
-
-  ;; Set the screen resolution
-  (require 'exwm-randr)
-  (exwm-randr-enable)
-  (start-process-shell-command "xrandr" nil "xrandr --output HDMI-A-0 --primary --mode 3440x1440 --pos 3840x720 --rotate normal --output HDMI-A-1 --mode 3840x2160 --pos 0x0 --rotate normal --output DisplayPort-0 --off --output DisplayPort-1 --off")
-
-  ;; These keys should always pass through to Emacs
-  (setq exwm-input-prefix-keys
-        '(?\C-x
-          ?\C-u
-          ?\C-h
-          ?\M-x
-          ?\M-`
-          ?\M-&
-          ?\M-:
-          ?\C-\M-j  ;; Buffer list
-          ?\C-\ ))  ;; Ctrl+Space
-
-  ;; Ctrl+Q will enable the next key to be sent directly
-  (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
-
-  ;; Set up global key bindings.  These always work, no matter the input state!
-  ;; Keep in mind that changing this list after EXWM initializes has no effect.
-  (setq exwm-input-global-keys
-        `(
-          ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
-          ([?\s-r] . exwm-reset)
-
-          ;; Move between windows
-          ([s-left] . windmove-left)
-          ([s-right] . windmove-right)
-          ([s-up] . windmove-up)
-          ([s-down] . windmove-down)
-
-          ;; Launch applications via shell command
-          ([?\C-&] . (lambda (command)
-                       (interactive (list (read-shell-command "$ ")))
-                       (start-process-shell-command command nil command)))
-
-          ;; Switch workspace
-          ([?\s-w] . exwm-workspace-switch)
-
-          ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
-          ,@(mapcar (lambda (i)
-                      `(,(kbd (format "s-%d" i)) .
-                        (lambda ()
-                          (interactive)
-                          (exwm-workspace-switch-create ,i))))
-                    (number-sequence 0 9))))
-
-  (exwm-enable))
 #+end_src
 
 ** Apple Script Mode
@@ -5060,115 +4890,6 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
   :bind ("M-g r" . browse-at-remote))
 #+end_src
 
-** Elfeed
-:PROPERTIES:
-:ID:       66D649D3-84C7-44D7-8F23-E549647FF0CE
-:END:
-
-For a complete documentation visit the official elfeed page: https://github.com/skeeto/elfeed
-
-Running the interactive function elfeed will pop up the *elfeed-search* buffer, which will display feed items.
-
-+ =g=: refresh view of the feed listing
-+ =G=: fetch feed updates from the servers
-+ =s=: update the search filter (see tags)
-+ =c=: clear the search filter
-
-From the search buffer there are a number of ways to interact with entries. Entries are selected by placing the point over an entry. Multiple entries are selected at once by using an active region.
-
-+ =RET=: view selected entry in a buffer
-+ =b=: open selected entries in your browser (browse-url)
-+ =y=: copy selected entries URL to the clipboard
-+ =r=: mark selected entries as read
-+ =u=: mark selected entries as unread
-+ =+=: add a specific tag to selected entries
-+ =-=: remove a specific tag from selected entries
-
-
-#+begin_src emacs-lisp
-(leaf elfeed
-  :ensure t
-  :commands elfeed
-  :advice (:after elfeed (lambda nil (visual-line-mode -1)))
-  :custom
-  ((elfeed-search-filter . "@2-days-ago +unread")
-   (elfeed-search-title-max-width . 80)
-   (elfeed-search-title-min-width . 80)
-   (elfeed-feeds
-    quote
-    (;; programming
-     ("https://news.ycombinator.com/rss" Hacker)
-     ("https://www.reddit.com/r/programming.rss" Programming)
-     ("https://www.reddit.com/r/learnprogramming.rss" LearnProgramming)
-     ("https://www.reddit.com/r/emacs.rss" Emacs)
-     ("https://www.reddit.com/r/planetemacs.rss" PlanetEmacs)
-     ("https://www.reddit.com/r/orgmode.rss" Org-mode)
-
-     ;; programming languages
-     ("https://www.reddit.com/r/python.rss" Python)
-
-     ;; Apple
-     ("https://www.reddit.com/r/apple.rss" Apple)
-     ("https://www.reddit.com/r/mac.rss" Mac)
-     ("https://www.reddit.com/r/AppleWatch.rss" AppleWatch)))))
-#+end_src
-
-** LIN Is Noticeable - lin.el
-:PROPERTIES:
-:ID:       FDAF3AFD-70D4-48BB-8A55-EFFD8EE7FF7B
-:END:
-
-#+begin_src emacs-lisp
-(leaf lin
-  :load-path "~/.emacs.d/elisp/lin/"
-  :require t
-  :hook (emacs-startup-hook . (lambda nil
-                                (global-hl-line-mode)))
-  :global-minor-mode global-lin-mode
-  :init
-  (define-globalized-minor-mode global-lin-mode lin-mode lin--on :group 'lin)
-  (defun lin--on ()
-    "Turn `lin-mode' on."
-    (unless (or noninteractive
-                (eq (aref (buffer-name) 0) ?\s))
-      (lin-mode 1)))
-  ;; :advice (:after load-theme my/advice-lin-face-after-load-theme)
-  ;; :config
-  ;; (defun my/advice-lin-face-after-load-theme (&rest args)
-  ;;   (let* ((str-theme (symbol-name (car args)))
-  ;;          (bg-color (cond
-  ;;                     ((string-match "\\(light\\|operandi\\)" str-theme) "#FAF2F0")
-  ;;                     ((and (string-match "bespoke" str-theme)
-  ;;                           (eq 'light bespoke-set-theme)) "#FAF2F0")
-  ;;                     (t "#1C2835"))))
-  ;;     (set-face-attribute 'lin-hl nil :background bg-color)))
-  )
-#+end_src
-
-** Edit with Emacs using Hammerspoon
-
-#+begin_src emacs-lisp
-(leaf hammerspoon
-  :when
-  (file-exists-p "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el")
-  :hook
-  (emacs-startup-hook . (lambda nil
-                          (load
-                           "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))))
-#+end_src
-
-** Colorful icons for completion with kind-icon
-
-#+begin_src emacs-lisp
-(leaf kind-icon
-  :ensure t
-  :after corfu
-  :custom
-  ;; to compute blended backgrounds correctly
-  (kind-icon-default-face . 'corfu-default)
-  :defer-config
-  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
-#+end_src
 
 ** Front-end for citation with Citar
 
