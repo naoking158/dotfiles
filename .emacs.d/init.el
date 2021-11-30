@@ -1677,12 +1677,6 @@ respectively."
   :global-minor-mode corfu-global-mode
   :custom
   ((corfu-excluded-modes . '(shell-mode eshell-mode))
-   (corfu-auto . t)
-   (corfu-auto-prefix . 2)
-   (corfu-auto-delay . 0.2)
-   (corfu-cycle . t)
-   (corfu-quit-no-match . t)
-   (corfu-quit-at-boundary . t)
 
    ;; Enable indentation+completion using the TAB key.
    ;; `completion-at-point' is often bound to M-TAB.
