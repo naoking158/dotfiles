@@ -1263,6 +1263,7 @@ respectively."
            (skk-sticky-key . ";")
            (skk-dcomp-activate . t)
            (skk-dcomp-multiple-activate . t)
+           (skk-status-indicator . 'minor-mode)
            (skk-inline-show-face . '( :foreground "#ECEFF4"
                                       :background "#4C566A"
                                       :inherit 'normal))))
