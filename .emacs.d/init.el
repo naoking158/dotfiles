@@ -1030,7 +1030,7 @@ modified (📖)/(**), or read-write (✏️)/(RW)"
   (leaf flymake-grammarly
     :ensure t
     :hook (LaTeX-mode-hook . flymake-grammarly-load)
-    :custom (flymake-grammarly-check-time . 1.1)))
+    :custom (flymake-grammarly-check-time . 2)))
 
 (leaf flyspell
   ;; :hook (LaTeX-mode-hook org-mode-hook markdown-mode-hook text-mode-hook)

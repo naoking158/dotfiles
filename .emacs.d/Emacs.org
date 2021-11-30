@@ -1547,7 +1547,7 @@ Only in Neotree Buffer:
   (leaf flymake-grammarly
     :ensure t
     :hook (LaTeX-mode-hook . flymake-grammarly-load)
-    :custom (flymake-grammarly-check-time . 1.1)))
+    :custom (flymake-grammarly-check-time . 2)))
 #+end_src
 *** Spell checking with flyspell
 :PROPERTIES:
