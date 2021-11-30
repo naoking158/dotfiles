@@ -598,25 +598,59 @@
 
 (leaf *modelines
   :hook (emacs-startup-hook . (lambda nil
-                                (my/modeline-moody)
                                 (line-number-mode 1)
-                                (column-number-mode 1)))
+                                (column-number-mode 1)
+                                (my/modeline-moody)))
   :preface
   (leaf moody
     :ensure t
     :config
+    (setq my--modeline-gui-rw-symbol "📖"
+          my--modeline-tty-rw-symbol "RW"
+
+          my--modeline-gui-ro-symbol "📙"
+          my--modeline-tty-ro-symbol "RO"
+          
+          my--modeline-gui-mod-symbol "✏️"
+          my--modeline-tty-mod-symbol "**")
+    
+    (defun my--modeline-status ()
+      "Return buffer status: default symbols are read-only (⛔)/(RO),
+modified (📖)/(**), or read-write (✏️)/(RW)"
+      (let ((read-only   buffer-read-only)
+            (modified    (and buffer-file-name (buffer-modified-p))))
+        ;; Use status letters for TTY display
+        (cond
+         (modified
+          (if (display-graphic-p)
+              my--modeline-gui-mod-symbol
+            my--modeline-tty-mod-symbol))
+         (read-only
+          (if (display-graphic-p)
+              my--modeline-gui-ro-symbol
+            my--modeline-tty-ro-symbol))
+         (t (if (display-graphic-p)
+                my--modeline-gui-rw-symbol
+              my--modeline-tty-rw-symbol)))))
+    
     (defun my/modeline-moody nil
       (interactive)
       (setq x-underline-at-descent-line t
-            moody-mode-line-height 16)
+            moody-mode-line-height 26)
       (moody-replace-mode-line-buffer-identification)
       (moody-replace-vc-mode)
       (moody-replace-eldoc-minibuffer-message-function)
       (moody-replace-element 'mode-line-frame-identification
                              '(:eval
                                (propertize
-                                (alist-get 'name (tab-bar--current-tab))
-                                'face '(:weight bold))))))
+                                (concat
+                                 " " (alist-get 'name (tab-bar--current-tab)) " ")
+                                'face '(:weight bold))))
+      (moody-replace-element 'mode-line-mule-info '(""))
+      (moody-replace-element 'mode-line-client '(""))
+      (moody-replace-element 'mode-line-remote '(""))
+      (moody-replace-element 'mode-line-modified
+                             '(:eval (my--modeline-status)))))
 
   (leaf doom-modeline
     :doc "A minimal and modern mode-line"
