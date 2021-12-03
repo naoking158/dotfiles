@@ -437,7 +437,7 @@
   :advice (:after load-theme my/set-font-after-load-theme)
   :preface
   (setq-default text-scale-remap-header-line t)
-  (setq-default my-fontsize (if (eq 'darwin system-type) 15 13))
+  (setq-default my-fontsize (if (eq 'darwin system-type) 16 13))
 
   (defun my/set-font-size (fontsize)
     (interactive (list
@@ -488,7 +488,7 @@
                     ((and (string-match "bespoke" str-theme)
                           (eq 'light bespoke-set-theme))
                      'medium)
-                    (t 'light))))
+                    (t 'normal))))
       (my/set-font-weight weight))
     (my/set-font-size my-fontsize)))
 
