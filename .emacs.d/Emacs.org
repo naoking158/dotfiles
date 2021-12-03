@@ -568,7 +568,8 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 
 (leaf vundo
   :load-path "~/.emacs.d/elisp/vundo/"
-  :require t)
+  :require t
+  :bind ("C-c u" . vundo))
 #+end_src
 
 ** Native Compilation

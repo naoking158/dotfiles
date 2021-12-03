@@ -300,7 +300,8 @@
 
 (leaf vundo
   :load-path "~/.emacs.d/elisp/vundo/"
-  :require t)
+  :require t
+  :bind ("C-c u" . vundo))
 
 ;; Compilation deny package
 (setq comp-deferred-compilation-deny-list (list "jupyter"))
