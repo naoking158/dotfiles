@@ -197,6 +197,8 @@ a bunch of resources I've found online.
 
 #+end_src
 
+#+RESULTS:
+
 
 * Startup Performance
 :PROPERTIES:
@@ -2257,9 +2259,9 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
    ([remap yank-pop] . consult-yank-pop)       ; M-y
    ([remap goto-line] . consult-goto-line)     ; M-g g
    ([remap repeat-complex-command] . consult-complex-command) ; C-x M-: or C-x Esc Esc
+   ([remap org-open-at-point] . consult-outline)
    ("C-s" . my-consult-line)
    ("C-M-r" . consult-recent-file)
-   ("C-c o" . consult-outline)
    ("C-x C-o" . consult-file-externally)
    ("C-S-s" . consult-imenu)
    ("C-x C-b" . consult-bookmark)
@@ -2322,6 +2324,9 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                                    '((tramp-parse-sconfig "~/.ssh/config")))))
 #+end_src
 
+#+RESULTS:
+: consult
+
 ** Improved Candidate Filtering with Orderless
 :PROPERTIES:
 :ID:       D7AA94B4-0150-454B-B68D-15C7F78D554D
@@ -2346,8 +2351,8 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
       (completion-category-defaults . nil)
       (completion-category-overrides
        quote ((file (styles orderless-migemo-style))
-              (consult-location (styles orderless-migemo-style))
-              (consult-multi (styles orderless-migemo-style))
+              (consult-location (styles orderless-default-style))
+              (consult-multi (styles orderless-default-style))
               (unicode-name (styles orderless-migemo-style))
               (command (styles orderless-default-style))
               (org-roam-node (styles orderless-migemo-style)))))
@@ -2551,6 +2556,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :defer-config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 #+end_src
+
+#+RESULTS:
+: kind-icon
 
 
 * Moving in buffer

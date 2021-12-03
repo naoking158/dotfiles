@@ -1514,9 +1514,9 @@ respectively."
    ([remap yank-pop] . consult-yank-pop)       ; M-y
    ([remap goto-line] . consult-goto-line)     ; M-g g
    ([remap repeat-complex-command] . consult-complex-command) ; C-x M-: or C-x Esc Esc
+   ([remap org-open-at-point] . consult-outline)
    ("C-s" . my-consult-line)
    ("C-M-r" . consult-recent-file)
-   ("C-c o" . consult-outline)
    ("C-x C-o" . consult-file-externally)
    ("C-S-s" . consult-imenu)
    ("C-x C-b" . consult-bookmark)
@@ -1595,8 +1595,8 @@ respectively."
       (completion-category-defaults . nil)
       (completion-category-overrides
        quote ((file (styles orderless-migemo-style))
-              (consult-location (styles orderless-migemo-style))
-              (consult-multi (styles orderless-migemo-style))
+              (consult-location (styles orderless-default-style))
+              (consult-multi (styles orderless-default-style))
               (unicode-name (styles orderless-migemo-style))
               (command (styles orderless-default-style))
               (org-roam-node (styles orderless-migemo-style)))))
