@@ -880,19 +880,13 @@ modified (📖)/(**), or read-write (✏️)/(RW)"
          ("C-c d"   . ladicle/toggle-lsp-ui-doc)
          ("C-c i"   . lsp-ui-doc-focus-frame))
   :custom (;; lsp-ui-doc
-           (lsp-ui-doc-enable . t)
            (lsp-ui-doc-header . t)
            (lsp-ui-doc-delay . 2)
            (lsp-ui-doc-include-signature . t)
-           (lsp-ui-doc-position . 'top) ;; top, bottom, or at-point
-           (lsp-ui-doc-max-width . 150)
+           (lsp-ui-doc-alignment . 'window)
            (lsp-ui-doc-max-height . 30)
-           (lsp-ui-doc-use-childframe . t)
-           (lsp-ui-doc-use-webkit . nil)
            (lsp-ui-doc-show-with-mouse . nil)
            (lsp-ui-doc-show-with-cursor . t)
-           ;; lsp-ui-flycheck
-           (lsp-ui-flycheck-enable . nil)
            ;; lsp-ui-sideline
            (lsp-ui-sideline-enable . nil)
            (lsp-ui-sideline-ignore-duplicate . t)
@@ -901,14 +895,7 @@ modified (📖)/(**), or read-write (✏️)/(RW)"
            (lsp-ui-sideline-show-diagnostics . nil)
            (lsp-ui-sideline-show-code-actions . nil)
            ;; lsp-ui-imenu
-           (lsp-ui-imenu-enable . nil)
-           (lsp-ui-imenu-kind-position . 'top)
-           ;; lsp-ui-peek
-           (lsp-ui-peek-enable . t)
-           (lsp-ui-peek-peek-height . 20)
-           (lsp-ui-peek-list-width . 50)
-           (lsp-ui-peek-fontify . 'on-demand) ;; never, on-demand, or always
-           ))
+           (lsp-ui-imenu-enable . nil)))
 
 (leaf helpful
   :ensure t
