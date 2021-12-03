@@ -3478,4 +3478,8 @@ Interactively, URL defaults to the string looking like a url around point."
                      (if skk-mode (skk-j-mode-on))
                      (meow-append))))))
 
+(leaf org-inline-anim
+  :ensure t
+  :hook (org-mode-hook . org-inline-anim-mode))
+
 (provide 'init)

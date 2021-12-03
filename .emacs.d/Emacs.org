@@ -108,6 +108,7 @@ a bunch of resources I've found online.
   - [[#browse-at-remote][Browse at remote]]
   - [[#front-end-for-citation-with-citar][Front-end for citation with Citar]]
   - [[#meow][Meow]]
+  - [[#org-inline-anim][Org-inline-anim]]
 - [[#footer][Footer]]
 :END:
 
@@ -4969,6 +4970,16 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
                      (if skk-mode (skk-j-mode-on))
                      (meow-append))))))
 #+end_src
+
+
+** Org-inline-anim
+
+#+begin_src emacs-lisp
+(leaf org-inline-anim
+  :ensure t
+  :hook (org-mode-hook . org-inline-anim-mode))
+#+end_src
+
 
 
 * Footer
