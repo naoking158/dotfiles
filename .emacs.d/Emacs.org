@@ -107,6 +107,7 @@ a bunch of resources I've found online.
   - [[#emacs-application-framework][Emacs Application Framework]]
   - [[#browse-at-remote][Browse at remote]]
   - [[#front-end-for-citation-with-citar][Front-end for citation with Citar]]
+  - [[#meow][Meow]]
 - [[#footer][Footer]]
 :END:
 
@@ -4943,6 +4944,30 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
           ("M-b" . citar-insert-preset)))
   :custom
   (citar-bibliography . '("~/org/braindump/preferences/ref.bib")))
+#+end_src
+
+** Meow
+
+#+begin_src emacs-lisp
+(leaf meow
+  :ensure t
+  :after consult
+  :init
+  (leaf *meow-configs
+    :load-path "~/.emacs.d/elisp/meow/"
+    :require meow-keybindings meow-tutorial)
+  :hook
+  ((emacs-startup-hook . (lambda nil
+                          (meow-setup)
+                          (meow-global-mode)))
+   (meow-insert-exit-hook . (lambda nil
+                              (if skk-mode (skk-latin-mode-on))))
+   (text-mode-hook . meow-append))
+  :bind ((meow-normal-state-keymap
+          ("C-j" . (lambda ()
+                     (interactive)
+                     (if skk-mode (skk-j-mode-on))
+                     (meow-append))))))
 #+end_src
 
 

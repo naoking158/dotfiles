@@ -3458,4 +3458,24 @@ Interactively, URL defaults to the string looking like a url around point."
   :custom
   (citar-bibliography . '("~/org/braindump/preferences/ref.bib")))
 
+(leaf meow
+  :ensure t
+  :after consult
+  :init
+  (leaf *meow-configs
+    :load-path "~/.emacs.d/elisp/meow/"
+    :require meow-keybindings meow-tutorial)
+  :hook
+  ((emacs-startup-hook . (lambda nil
+                          (meow-setup)
+                          (meow-global-mode)))
+   (meow-insert-exit-hook . (lambda nil
+                              (if skk-mode (skk-latin-mode-on))))
+   (text-mode-hook . meow-append))
+  :bind ((meow-normal-state-keymap
+          ("C-j" . (lambda ()
+                     (interactive)
+                     (if skk-mode (skk-j-mode-on))
+                     (meow-append))))))
+
 (provide 'init)
