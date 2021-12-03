@@ -1923,6 +1923,9 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 
 
 * Window Management
+
+Window management commands are accessible by prefix =C-x w=
+
 ** Window History with winner-mode
 :PROPERTIES:
 :ID:       E95C41F6-D98A-4489-80E6-298CDEB889A0
@@ -1933,7 +1936,9 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
   :doc "Restore old window configurations"
   :tag "builtin"
   :bind (("C-x <right>" . winner-redo)
-         ("C-x <left>" . winner-undo))
+         ("C-x <left>" . winner-undo)
+         ("C-x w r")
+         ("C-x w u"))
   :hook (emacs-startup-hook . winner-mode))
 #+end_src
 
@@ -2007,7 +2012,11 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 #+begin_src emacs-lisp
 (leaf my-window-resizer
   :doc "Control window size and position."
-  :bind ("C-x r" . my-window-resizer)
+  :bind (("C-x w s" . my-window-resizer)
+         ("C-x w m" . maximize-window)
+         ("C-x w b" . balance-windows)
+         ("C-x w d" . delete-frame)
+         ("C-x w t" . tear-off-window))
   :preface
   (defun my-window-resizer()
     "Control window size and position."
@@ -2078,6 +2087,7 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
   :doc "Rotate the layout of emacs"
   :url "https://github.com/daichirata/emacs-rotate"
   :ensure t
+  :bind (("C-x w l"))
   :chord (("rl" . rotate-layout)
           ("rw" . rotate-window)))
 

@@ -1294,7 +1294,9 @@ respectively."
   :doc "Restore old window configurations"
   :tag "builtin"
   :bind (("C-x <right>" . winner-redo)
-         ("C-x <left>" . winner-undo))
+         ("C-x <left>" . winner-undo)
+         ("C-x w r")
+         ("C-x w u"))
   :hook (emacs-startup-hook . winner-mode))
 
 (leaf ace-window
@@ -1346,7 +1348,11 @@ respectively."
 
 (leaf my-window-resizer
   :doc "Control window size and position."
-  :bind ("C-x r" . my-window-resizer)
+  :bind (("C-x w s" . my-window-resizer)
+         ("C-x w m" . maximize-window)
+         ("C-x w b" . balance-windows)
+         ("C-x w d" . delete-frame)
+         ("C-x w t" . tear-off-window))
   :preface
   (defun my-window-resizer()
     "Control window size and position."
@@ -1400,6 +1406,7 @@ respectively."
   :doc "Rotate the layout of emacs"
   :url "https://github.com/daichirata/emacs-rotate"
   :ensure t
+  :bind (("C-x w l"))
   :chord (("rl" . rotate-layout)
           ("rw" . rotate-window)))
 
