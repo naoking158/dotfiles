@@ -28,9 +28,9 @@ function build_emacs --argument-names 'emacs_version'
         --with-ns \
         --with-modules \
         --with-xwidgets \
-        --with-native-compilation \
-        CPPFLAGS=-I/opt/homebrew/opt/ruby/include \
-        LDFLAGS=-L/opt/homebrew/opt/ruby/lib
+        --with-native-compilation
+        # CPPFLAGS=-I/opt/homebrew/opt/ruby/include \
+        # LDFLAGS=-L/opt/homebrew/opt/ruby/lib
         
     gmake -j(nproc) bootstrap
 
