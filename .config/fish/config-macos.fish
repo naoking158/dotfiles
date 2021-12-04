@@ -1,5 +1,7 @@
-eval (/opt/homebrew/bin/brew shellenv)
+# Secondary: arm64 Homebrew
 fish_add_path /opt/homebrew/bin
+
+# Primary: x86_64 Homebrew
 fish_add_path /usr/local/bin
 
 # Homebrew
@@ -20,14 +22,14 @@ function brave
     '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser' $argv    
 end
 
-set -gx LDFLAGS "-L/opt/homebrew/opt/ruby/lib" $LDFLAGS
-set -gx CPPFLAGS "-I/opt/homebrew/opt/ruby/include" $CPPFLAGS
-set -gx PKG_CONFIG_PATH "/opt/homebrew/opt/ruby/lib/pkgconfig" $PKG_CONFIG_PATH
-set -gx PKG_CONFIG_PATH "/opt/homebrew/opt/cairo/lib/pkgconfig" $PKG_CONFIG_PATH
-set -gx PKG_CONFIG_PATH "/opt/homebrew/opt/gtk+3/lib/pkgconfig" $PKG_CONFIG_PATH
-set -gx PKG_CONFIG_PATH "/opt/homebrew/opt/pkgconfig" $PKG_CONFIG_PATH
-set -gx LDFLAGS "-L/opt/homebrew/opt/imagemagick@6/lib" $LDFLAGS
-set -gx CPPFLAGS "-I/opt/homebrew/opt/imagemagick@6/include" $CPPFLAGS
+# set -gx LDFLAGS "-L/opt/homebrew/opt/ruby/lib" $LDFLAGS
+# set -gx CPPFLAGS "-I/opt/homebrew/opt/ruby/include" $CPPFLAGS
+# set -gx PKG_CONFIG_PATH "/opt/homebrew/opt/ruby/lib/pkgconfig" $PKG_CONFIG_PATH
+# set -gx PKG_CONFIG_PATH "/opt/homebrew/opt/cairo/lib/pkgconfig" $PKG_CONFIG_PATH
+# set -gx PKG_CONFIG_PATH "/opt/homebrew/opt/gtk+3/lib/pkgconfig" $PKG_CONFIG_PATH
+# set -gx PKG_CONFIG_PATH "/opt/homebrew/opt/pkgconfig" $PKG_CONFIG_PATH
+# set -gx LDFLAGS "-L/opt/homebrew/opt/imagemagick@6/lib" $LDFLAGS
+# set -gx CPPFLAGS "-I/opt/homebrew/opt/imagemagick@6/include" $CPPFLAGS
 
 alias reformatpdftoeps='find . -name "*.pdf" -print0 | xargs -0 -I "{}" pdftops -f 1 -l 1 -eps "{}" "{}.eps"'
 alias renamepdfeps='find . -name "*.pdf.eps" -print0 | xargs -0 -I "{}" rename "s/(.*\\.)pdf.eps/$1eps/" "{}"'
