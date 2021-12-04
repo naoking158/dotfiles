@@ -528,7 +528,7 @@
             modus-themes-fringes nil
             modus-themes-prompts '(intense gray)
             modus-themes-completions 'opinionated
-            modus-themes-paren-match '(bold intense underline)
+            modus-themes-paren-match '(bold underline)
             ;; this is an alist: read the manual or its doc string
             modus-themes-org-agenda '((header-block . (variable-pitch scale-title))
                                       (header-date . (grayscale workaholic bold-today))
@@ -539,7 +539,33 @@
       ;; Load choiced theme
       (pcase sym-theme
         ('modus-dark (modus-themes-load-vivendi))
-        ('modus-light (modus-themes-load-operandi)))))
+        ('modus-light (modus-themes-load-operandi)))
+
+      (defvar my-rainbow-region-colors
+        (modus-themes-with-colors
+          `((red . ,red-subtle-bg)
+            (green . ,green-subtle-bg)
+            (yellow . ,yellow-subtle-bg)
+            (blue . ,blue-subtle-bg)
+            (magenta . ,magenta-subtle-bg)
+            (cyan . ,cyan-subtle-bg)))
+        "Sample list of color values for `my-rainbow-region'.")
+
+      (defun my-rainbow-region (color)
+        "Remap buffer-local attribute of `region' using COLOR."
+        (interactive
+         (list
+          (completing-read "Pick a color: " my-rainbow-region-colors)))
+        (face-remap-add-relative
+         'region
+         `( :background ,(alist-get (intern color) my-rainbow-region-colors)
+            :foreground ,(face-attribute 'default :foreground))))
+
+      (defun my-rainbow-region-red ()
+        (my-rainbow-region "red"))
+      
+      (add-hook 'prog-mode-hook #'my-rainbow-region-red)
+      (add-hook 'text-mode-hook #'my-rainbow-region-red)))
 
   (leaf bespoke-themes
     :load-path "~/.emacs.d/elisp/bespoke-themes/"
