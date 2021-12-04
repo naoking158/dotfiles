@@ -923,6 +923,8 @@ modified (📖)/(**), or read-write (✏️)/(RW)"
            ;; lsp-ui-imenu
            (lsp-ui-imenu-enable . nil)))
 
+(leaf lsp-latex :ensure t)
+
 (leaf helpful
   :ensure t
   :bind* (("C-c h f" . helpful-function)

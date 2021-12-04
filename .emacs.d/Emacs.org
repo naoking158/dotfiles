@@ -1409,6 +1409,8 @@ Only in Neotree Buffer:
            (lsp-ui-sideline-show-code-actions . nil)
            ;; lsp-ui-imenu
            (lsp-ui-imenu-enable . nil)))
+
+(leaf lsp-latex :ensure t)
 #+end_src
 
 
