@@ -50,7 +50,14 @@ function build_emacs --argument-names 'emacs_version'
     end
 
     gmake install
+    
+    echo \n"Build is Done!
 
-    echo ""
-    echo "Build is Done!"
+Finally, move `./nextstep/Emacs.app` into `/Applications/` and do bellow commands:
+    
+    echo '#!/bin/sh'\n'/Applications/Emacs.app/Contents/MacOS/Emacs \"\$@\"' > /Applications/Emacs.app/Contents/MacOS/bin/emacs
+    sudo ln -s /Applications/Emacs.app/Contents/MacOS/bin/emacs /usr/local/bin/emacs
+    sudo ln -s /Applications/Emacs.app/Contents/MacOS/bin/emacsclient /usr/local/bin/emacsclient
+
+    "
 end
