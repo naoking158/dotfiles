@@ -50,14 +50,41 @@ function build_emacs --argument-names 'emacs_version'
     end
 
     gmake install
+
+    echo '#!/usr/bin/env bash
+
+resolve_link() {
+  "$(type -p greadlink readlink | head -1)" "$1"
+}
+
+abs_dirname() {
+  local path="$1"
+  local name
+  local cwd
+  cwd="$(pwd)"
+
+  while [ -n "$path" ]; do
+    cd "${path%/*}" || exit 1
+    name="${path##*/}"
+    path="$(resolve_link "$name" || true)"
+  done
+
+  pwd
+  cd "$cwd" || exit 1
+}
+
+exec "$(dirname "$(abs_dirname "$0")")/Emacs" "$@"' > "./nextstep/Emacs.app/Contents/MacOS/bin/emacs"
     
     echo \n"Build is Done!
-
 Finally, move `./nextstep/Emacs.app` into `/Applications/` and do bellow commands:
-    
-    echo '#!/bin/sh'\n'/Applications/Emacs.app/Contents/MacOS/Emacs \"\$@\"' > /Applications/Emacs.app/Contents/MacOS/bin/emacs
+
     sudo ln -s /Applications/Emacs.app/Contents/MacOS/bin/emacs /usr/local/bin/emacs
     sudo ln -s /Applications/Emacs.app/Contents/MacOS/bin/emacsclient /usr/local/bin/emacsclient
 
     "
+end
+
+
+function cleate_emacs_cli_tool
+    
 end
