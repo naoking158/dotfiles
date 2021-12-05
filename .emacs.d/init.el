@@ -1370,8 +1370,8 @@ respectively."
 
 (leaf *windmove
   :bind (("s-h" . windmove-left)
-         ("s-j" . windmove-up)
-         ("s-k" . windmove-down)
+         ("s-j" . windmove-down)
+         ("s-k" . windmove-up)
          ("s-l" . windmove-right)))
 
 (leaf my-window-resizer

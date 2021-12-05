@@ -2031,8 +2031,8 @@ Window management commands are accessible by prefix =C-x w=
 #+begin_src emacs-lisp
 (leaf *windmove
   :bind (("s-h" . windmove-left)
-         ("s-j" . windmove-up)
-         ("s-k" . windmove-down)
+         ("s-j" . windmove-down)
+         ("s-k" . windmove-up)
          ("s-l" . windmove-right)))
 #+end_src
 
