@@ -4599,15 +4599,22 @@ To avoid installing x86_64 version, The following steps should be required.
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf tree-sitter
   :when (not (string-match "aarch64" system-configuration))
-  :ensure t tree-sitter-langs
-  :hook
-  ((python-mode-hook latex-mode-hook) . (lambda nil
-                                          (require 'tree-sitter)
-                                          (require 'tree-sitter-langs)
-                                          (tree-sitter-mode)
-                                          (tree-sitter-hl-mode))))
+  :load-path
+  `(,(mapcar (lambda (file)
+               (concat "~/.emacs.d/elisp/elisp-tree-sitter/" file "/"))
+             '("core" "lisp" "langs")))
+  :hook (prog-mode-hook . (lambda nil
+                            (require 'tree-sitter)
+                            (require 'tree-sitter-hl)
+                            (require 'tree-sitter-langs)
+                            (require 'tree-sitter-debug)
+                            (require 'tree-sitter-query)
+                            (tree-sitter-mode)
+                            (tree-sitter-hl-mode))))
+
 #+end_src
 
 
