@@ -176,6 +176,7 @@ a bunch of resources I've found online.
 (provide 'early-init)
 
 ;;; early-init.el ends here
+
 #+end_src
 
 
@@ -4573,11 +4574,13 @@ https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/88#issuecomment-84
 To avoid installing x86_64 version, The following steps should be required.
 
 1. Clone [[https://github.com/tree-sitter/tree-sitter.git][tree-sitter]]
+   
    #+begin_src shell
    cd cli && cargo install --path .
    #+end_src
    
 2. Clone [[https://github.com/emacs-tree-sitter/elisp-tree-sitter][emacs-tree-sitter]]
+
    #+begin_src shell
    # get tree-sitter v0.19.5 - last to put files in a reasonable place
    sh -c "test -d rust-tree-sitter || git clone https://github.com/tree-sitter/tree-sitter rust-tree-sitter; cd rust-tree-sitter && git fetch && git checkout v0.19.5"
