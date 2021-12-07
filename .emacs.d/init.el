@@ -710,6 +710,25 @@ modified (📖)/(**), or read-write (✏️)/(RW)"
     :custom ((minions-mode-line-lighter . ";")
              (minions-prominent-modes . '(defining-kbd-macro flymake-mode)))))
 
+(leaf meow
+  :after consult
+  :load-path
+  "~/.emacs.d/elisp/meow/"
+  "~/.emacs.d/elisp/meow-config/"
+  :hook ((emacs-startup-hook . (lambda nil
+                                 (require 'meow)
+                                 (require 'meow-keybindings)
+                                 (meow-setup)
+                                 (meow-global-mode)))
+         (meow-insert-exit-hook . (lambda nil
+                                    (if skk-mode (skk-latin-mode-on))))
+         ((text-mode-hook eshell-mode-hook) . meow-insert))
+  :bind ((meow-normal-state-keymap
+          ("C-j" . (lambda ()
+                     (interactive)
+                     (if skk-mode (skk-j-mode-on))
+                     (meow-append))))))
+
 (leaf which-key
   :doc "Display available keybindings in popup"
   :req "emacs-24.4"
@@ -2259,7 +2278,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (require 'org-capture)
     (setq
      jethro/org-agenda-directory (file-truename "~/org/gtd/")
-     org-agenda-files (directory-files-recursively org-directory "\\.org$")
+     ;; org-agenda-files (directory-files-recursively org-directory "\\.org$")
      org-outline-path-complete-in-steps nil
      org-log-done 'time
      org-log-into-drawer t
@@ -2335,23 +2354,23 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                     ((org-agenda-overriding-header "In Progress")
                      (org-agenda-files '(,(concat jethro/org-agenda-directory
                                                   "projects.org")
+                                         ,(concat jethro/org-agenda-directory
+                                                  "Dissertation.org")
                                          ,(concat org-directory
                                                   "braindump/concepts/research.org")
                                          ,(concat org-directory
-                                                  "braindump/concepts/journal2021.org")
-                                         ,(concat org-directory
-                                                  "braindump/daily/")))))
+                                                  "braindump/concepts/journal2021.org")))))
               (todo "TODO"
                     ((org-agenda-overriding-header "Active Projects")
                      (org-agenda-skip-function #'jethro/skip-projects)
                      (org-agenda-files '(,(concat jethro/org-agenda-directory
                                                   "projects.org")
+                                         ,(concat jethro/org-agenda-directory
+                                                  "Dissertation.org")
                                          ,(concat org-directory
                                                   "braindump/concepts/research.org")
                                          ,(concat org-directory
-                                                  "braindump/concepts/journal2021.org")
-                                         ,(concat org-directory
-                                                  "braindump/daily/")))))
+                                                  "braindump/concepts/journal2021.org")))))
               (todo "TODO"
                     ((org-agenda-overriding-header "One-off Tasks")
                      (org-agenda-files '(,(concat jethro/org-agenda-directory
