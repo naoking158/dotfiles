@@ -4994,9 +4994,11 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 ** Org-inline-anim
 
 #+begin_src emacs-lisp
+
 (leaf org-inline-anim
   :ensure t
   :hook (org-mode-hook . org-inline-anim-mode))
+
 #+end_src
 
 
