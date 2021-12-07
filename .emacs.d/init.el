@@ -1820,6 +1820,14 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :defer-config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
+(leaf citar
+  :ensure t
+  :bind (("C-c b" . citar-insert-citation)
+         (:minibuffer-local-map
+          ("M-b" . citar-insert-preset)))
+  :custom
+  (citar-bibliography . '("~/org/braindump/preferences/ref.bib")))
+
 (leaf avy
   :doc "Jump to arbitrary positions in visible text and select text quickly."
   :req "emacs-24.1" "cl-lib-0.5"
@@ -2438,39 +2446,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (interactive)
     (org-present-next)
     (dw/org-present-prepare-slide)))
-
-(leaf org-ref
-  :doc "citations, cross-references and bibliographies in org-mode"
-  :req "dash-2.11.0" "htmlize-1.51" "helm-1.5.5" "helm-bibtex-2.0.0" "ivy-0.8.0" "hydra-0.13.2" "key-chord-0" "s-1.10.0" "f-0.18.0" "pdf-tools-0.7"
-  :url "https://github.com/jkitchin/org-ref"
-  :ensure t
-  :after org
-  :bind (org-mode-map
-         ("C-c c" . org-ref-insert-cite-link))
-  :custom
-  `(;; RefTeX
-    (reftex-plug-into-AUCTeX . t)
-    (reftex-insert-label-flags . '("s" "sfte"))
-    (reftex-label-alist . '((nil ?e nil "\\eqref{%s}" nil nil)))
-    (reftex-default-bibliography . `(,(concat org-directory
-                                              "braindump/preferences/ref.bib")))
-    (reftex-bibliography-commands . '("bibliography"
-                                      "nobibliography"
-                                      "addbibresource"))
-    ;; org-ref
-    (bibtex-completion-notes-path . ,(concat org-directory
-                                             "braindump/lit/notes.org"))
-    (bibtex-completion-bibliography . `(,(concat org-directory
-                                                 "braindump/preferences/ref.bib")))
-    (bibtex-completion-library-path . ,(concat org-directory "braindump/lit/"))
-
-    ;;; They are deprecated since org-ref ver. 3
-    ;; (org-ref-bibliography-notes . ,(concat org-directory
-    ;;                                        "braindump/lit/notes.org"))
-    ;; (org-ref-default-bibliography . `(,(concat org-directory
-    ;;                                            "braindump/preferences/ref.bib")))
-    ;; (org-ref-pdf-directory . ,(concat org-directory "braindump/lit/"))
-    ))
 
 (leaf xref
   :doc "Cross-referencing commands"
@@ -3483,34 +3458,6 @@ Interactively, URL defaults to the string looking like a url around point."
   :commands browse-at-remote-get-url
   :custom (browse-at-remote-prefer-symbolic . nil)
   :bind ("M-g r" . browse-at-remote))
-
-(leaf citar
-  :ensure t
-  :bind (("C-c b" . citar-insert-citation)
-         (:minibuffer-local-map
-          ("M-b" . citar-insert-preset)))
-  :custom
-  (citar-bibliography . '("~/org/braindump/preferences/ref.bib")))
-
-(leaf meow
-  :ensure t
-  :after consult
-  :init
-  (leaf *meow-configs
-    :load-path "~/.emacs.d/elisp/meow/"
-    :require meow-keybindings meow-tutorial)
-  :hook
-  ((emacs-startup-hook . (lambda nil
-                          (meow-setup)
-                          (meow-global-mode)))
-   (meow-insert-exit-hook . (lambda nil
-                              (if skk-mode (skk-latin-mode-on))))
-   (text-mode-hook . meow-append))
-  :bind ((meow-normal-state-keymap
-          ("C-j" . (lambda ()
-                     (interactive)
-                     (if skk-mode (skk-j-mode-on))
-                     (meow-append))))))
 
 (leaf org-inline-anim
   :ensure t

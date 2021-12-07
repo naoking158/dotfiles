@@ -68,6 +68,7 @@ a bunch of resources I've found online.
   - [[#vertical-minibuffer-ui-and-completion-with-vertico][Vertical Minibuffer UI and Completion with Vertico]]
   - [[#completions-in-regions-with-corfu][Completions in Regions with Corfu]]
   - [[#colorful-icons-for-completion-with-kind-icon][Colorful icons for completion with kind-icon]]
+  - [[#front-end-for-citation-with-citar][Front-end for citation with Citar]]
 - [[#moving-in-buffer][Moving in buffer]]
   - [[#jumping-with-avy][Jumping with Avy]]
   - [[#jumping-beginningend-of-line-with-mwim][Jumping beginning/end of line with mwim]]
@@ -2619,6 +2620,21 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 : kind-icon
 
 
+** Front-end for citation with Citar
+
+#+begin_src emacs-lisp
+
+(leaf citar
+  :ensure t
+  :bind (("C-c b" . citar-insert-citation)
+         (:minibuffer-local-map
+          ("M-b" . citar-insert-preset)))
+  :custom
+  (citar-bibliography . '("~/org/braindump/preferences/ref.bib")))
+
+#+end_src
+
+
 * Moving in buffer
 ** Jumping with Avy
 :PROPERTIES:
@@ -3329,39 +3345,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 :END:
 
 #+begin_src emacs-lisp
-
-(leaf org-ref
-  :doc "citations, cross-references and bibliographies in org-mode"
-  :req "dash-2.11.0" "htmlize-1.51" "helm-1.5.5" "helm-bibtex-2.0.0" "ivy-0.8.0" "hydra-0.13.2" "key-chord-0" "s-1.10.0" "f-0.18.0" "pdf-tools-0.7"
-  :url "https://github.com/jkitchin/org-ref"
-  :ensure t
-  :after org
-  :bind (org-mode-map
-         ("C-c c" . org-ref-insert-cite-link))
-  :custom
-  `(;; RefTeX
-    (reftex-plug-into-AUCTeX . t)
-    (reftex-insert-label-flags . '("s" "sfte"))
-    (reftex-label-alist . '((nil ?e nil "\\eqref{%s}" nil nil)))
-    (reftex-default-bibliography . `(,(concat org-directory
-                                              "braindump/preferences/ref.bib")))
-    (reftex-bibliography-commands . '("bibliography"
-                                      "nobibliography"
-                                      "addbibresource"))
-    ;; org-ref
-    (bibtex-completion-notes-path . ,(concat org-directory
-                                             "braindump/lit/notes.org"))
-    (bibtex-completion-bibliography . `(,(concat org-directory
-                                                 "braindump/preferences/ref.bib")))
-    (bibtex-completion-library-path . ,(concat org-directory "braindump/lit/"))
-
-    ;;; They are deprecated since org-ref ver. 3
-    ;; (org-ref-bibliography-notes . ,(concat org-directory
-    ;;                                        "braindump/lit/notes.org"))
-    ;; (org-ref-default-bibliography . `(,(concat org-directory
-    ;;                                            "braindump/preferences/ref.bib")))
-    ;; (org-ref-pdf-directory . ,(concat org-directory "braindump/lit/"))
-    ))
 
 (leaf xref
   :doc "Cross-referencing commands"
