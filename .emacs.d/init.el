@@ -1542,13 +1542,6 @@ respectively."
                  nil
                  (window-parameters (mode-line-format . none)))))
 
-
-;; (leaf embark-consult
-;;   :ensure t
-;;   :after embark
-  
-;;   :bind )
-
 (leaf consult
   :ensure t
   :require t
@@ -1687,16 +1680,6 @@ respectively."
   :require t
   :after vertico
   :global-minor-mode t)
-
-;; (leaf marginalia
-;;   :ensure t
-;;   :require t
-;;   :after vertico
-;;   :init
-;;   (marginalia-mode)
-;;   :config
-;;   (add-to-list 'marginalia-prompt-categories
-;;                '("\\<File\\>" . file)))
 
 (leaf vertico
   :ensure t

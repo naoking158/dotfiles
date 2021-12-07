@@ -117,6 +117,7 @@ a bunch of resources I've found online.
 :ID:       4A8E2D78-CE01-4769-A784-49956617A4E5
 :END:
 #+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
+
 ;;; early-init.el --- Early Initialization. -*- lexical-binding: t no-byte-compile: t -*-
 ;;; Commentary:
 ;;
@@ -211,6 +212,7 @@ a bunch of resources I've found online.
 By setting ~exec-profile~ to ~t~, profiling startup time is executed.
 
 #+begin_src emacs-lisp
+
 (setq exec-profile nil)
 
 (when exec-profile
@@ -254,6 +256,7 @@ By setting ~exec-profile~ to ~t~, profiling startup time is executed.
                       (time-subtract after-init-time before-init-time)))
              gcs-done))
   (add-hook 'emacs-startup-hook #'efs/display-startup-time))
+
 #+end_src
 
 * Package Management with Leaf
@@ -316,6 +319,7 @@ By setting ~exec-profile~ to ~t~, profiling startup time is executed.
       ;;         (eval-print-last-sexp)))
       ;;     (load bootstrap-file nil 'nomessage)))
       )))
+
 #+end_src
 
 * Keep .emacs.d Clean
@@ -461,6 +465,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
     :doc "Show function arglist or variable docstring in echo area"
     :tag "builtin"
     :custom (eldoc-idle-delay . 0.1)))
+
 #+end_src
 
 ** Change modifiers
@@ -469,6 +474,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf change-system-configuration
   :leaf-defer nil
   :bind (("M-o" . finder-current-dir-open)
@@ -504,6 +510,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
              (ns-right-option-modifier . 'meta)
              (ns-right-command-modifier . 'super)
              (ns-use-proxy-icon . nil))))
+
 #+end_src
 
 ** Auto revert buffer
@@ -555,6 +562,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf undo-tree
   :disabled t
   :ensure t
@@ -575,6 +583,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
   :load-path "~/.emacs.d/elisp/vundo/"
   :require t
   :bind ("C-c u" . vundo))
+
 #+end_src
 
 ** Native Compilation
@@ -583,11 +592,13 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :END:
 
 #+begin_src emacs-lisp
+
 ;; Compilation deny package
 (setq comp-deferred-compilation-deny-list (list "jupyter"))
 
 ;; native-compile all Elisp files under a directory
 (native-compile-async (file-truename "~/.emacs.d/elisp/") 'recursively)
+
 #+end_src
 
 * Utility Functions
@@ -600,12 +611,14 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :ID:       5DDB2728-C9EC-49A9-BE1A-B37C517430B3
 :END:
 #+begin_src emacs-lisp
+
 (defun my/toggle-modeline ()
   (interactive)
   (if (null mode-line-format)
       (kill-local-variable 'mode-line-format)
     (setq-local mode-line-format nil)
     (force-mode-line-update)))
+
 #+end_src
 
 ** Trim newline from string
@@ -630,6 +643,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :END:
 
 #+begin_src emacs-lisp
+
 ;; https://github.com/alphapapa/unpackaged.el#sort-sexps
 (defun my-sort-sexps (beg end)
   "Sort sexps in region (from BEG to END)."
@@ -674,6 +688,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                         (goto-char (marker-position start))
                         (insert-before-markers real)
                         (delete-region (point) (marker-position end)))))))))
+
 #+end_src
 
 ** Command Log Mode
@@ -682,9 +697,11 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf command-log-mode
   :ensure t
   :commands command-log-mode)
+
 #+end_src
 
 
@@ -699,6 +716,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf ui
   :leaf-defer nil
   :hook
@@ -742,6 +760,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
   (leaf global-visual-line-mode
     :tag "builtin"
     :global-minor-mode t))
+
 #+end_src
 
 ** Frame Transparency
@@ -780,6 +799,7 @@ Instead, I use *the compiled emoji fonts* uploaded in https://github.com/vXBaKeR
 For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-your-macbook-f99da72cf126.
 
 #+begin_src emacs-lisp
+
 (leaf font
   :leaf-defer nil
   :hook (emacs-startup-hook . (lambda () (my/set-font my-fontsize)))
@@ -840,6 +860,7 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
                     (t 'normal))))
       (my/set-font-weight weight))
     (my/set-font-size my-fontsize)))
+
 #+end_src
 
 ** Theme Configuration
@@ -979,11 +1000,13 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
   :config
   (column-number-mode)
   (setq inhibit-compacting-font-caches t))
+
 #+end_src
 
 ** Modeline Configuration
 
 #+begin_src emacs-lisp
+
 (leaf *modelines
   :hook (emacs-startup-hook . (lambda nil
                                 (line-number-mode 1)
@@ -1070,6 +1093,7 @@ modified (📖)/(**), or read-write (✏️)/(RW)"
     :hook (emacs-startup-hook . minions-mode)
     :custom ((minions-mode-line-lighter . ";")
              (minions-prominent-modes . '(defining-kbd-macro flymake-mode)))))
+
 #+end_src
 
 * Keyboard Bindings
@@ -1179,9 +1203,6 @@ modified (📖)/(**), or read-write (✏️)/(RW)"
 
 #+end_src
 
-#+RESULTS:
-: dired
-
 
 ** Opening Files Externally
 :PROPERTIES:
@@ -1241,6 +1262,7 @@ Only in Neotree Buffer:
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf magit
   :doc "A Git porcelain inside Emacs."
   :req "emacs-25.1" "async-20200113" "dash-20200524" "git-commit-20200516" "transient-20200601" "with-editor-20200522"
@@ -1255,6 +1277,7 @@ Only in Neotree Buffer:
            (magit-remote-add-set-remote\.pushDefault quote ask)
            (magit-log-margin-show-committer-date . t)
            (magit-log-margin . '(t "%m/%d/%Y %H:%M " magit-log-margin-width t 12))))
+
 #+end_src
 
 *** Git Gutter
@@ -1263,6 +1286,7 @@ Only in Neotree Buffer:
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf git-gutter
   :doc "Port of Sublime Text plugin GitGutter"
   :req "emacs-24.3"
@@ -1347,6 +1371,7 @@ Only in Neotree Buffer:
 (leaf project
   :when (version<= "28" emacs-version)
   :ensure t)
+
 #+end_src
 
 ** Language
@@ -1356,6 +1381,7 @@ Only in Neotree Buffer:
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf lsp-mode
   :doc "LSP mode"
   :req "emacs-25.1" "dash-2.14.1" "dash-functional-2.14.1" "f-0.20.0" "ht-2.0" "spinner-1.7.3" "markdown-mode-2.3" "lv-0"
@@ -1438,6 +1464,7 @@ Only in Neotree Buffer:
            (lsp-ui-imenu-enable . nil)))
 
 (leaf lsp-latex :ensure t)
+
 #+end_src
 
 
@@ -1447,6 +1474,7 @@ Only in Neotree Buffer:
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf helpful
   :ensure t
   :bind* (("C-c h f" . helpful-function)
@@ -1458,6 +1486,7 @@ Only in Neotree Buffer:
 (leaf macrostep
   :ensure t
   :bind (("C-c e" . macrostep-expand)))
+
 #+end_src
 
 
@@ -1467,6 +1496,7 @@ Only in Neotree Buffer:
 :END:
 
 #+begin_src emacs-lisp
+
 (when-let* ((miniconda-path
              (my/trim-newline-from-string
               (shell-command-to-string
@@ -1525,6 +1555,7 @@ Only in Neotree Buffer:
       (lsp))))
 
 (leaf python-isort :ensure t)
+
 #+end_src
 
 
@@ -1557,6 +1588,7 @@ Only in Neotree Buffer:
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf flymake
   :doc "A universal on-the-fly syntax checker"
   :tag "builtin"
@@ -1595,13 +1627,16 @@ Only in Neotree Buffer:
     :ensure t
     :hook (LaTeX-mode-hook . flymake-grammarly-load)
     :custom (flymake-grammarly-check-time . 2)))
+
 #+end_src
+
 *** Spell checking with flyspell
 :PROPERTIES:
 :ID:       B9A58FDF-05D7-4727-BDCD-4907A11ABC13
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf flyspell
   ;; :hook (LaTeX-mode-hook org-mode-hook markdown-mode-hook text-mode-hook)
   :config
@@ -1614,6 +1649,7 @@ Only in Neotree Buffer:
                                   ;; for text mixed English and Japanese
                                   (add-to-list 'ispell-skip-region-alist
                                                '("[^\000-\377]+"))))))
+
 #+end_src
 
 
@@ -1625,6 +1661,7 @@ Only in Neotree Buffer:
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf highlight-indent-guides
   :blackout
   :doc "Minor mode to highlight indentation"
@@ -1680,6 +1717,7 @@ Only in Neotree Buffer:
             (indent-region-custom 4) ; region was selected, call indent-region-custom
           (insert "    ") ; else insert four spaces as expected
           )))))
+
 #+end_src
 
 
@@ -1858,6 +1896,7 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf lin
   :load-path "~/.emacs.d/elisp/lin/"
   :require t
@@ -1871,6 +1910,7 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
     (unless (or noninteractive
                 (eq (aref (buffer-name) 0) ?\s))
       (lin-mode 1))))
+
 #+end_src
 
 
@@ -1925,10 +1965,12 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf wgrep
   :ensure t
   :bind (grep-mode-map
          ("e" . wgrep-change-to-wgrep-mode)))
+
 #+end_src
 
 
@@ -1991,6 +2033,7 @@ Window management commands are accessible by prefix =C-x w=
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf winner
   :doc "Restore old window configurations"
   :tag "builtin"
@@ -1999,6 +2042,7 @@ Window management commands are accessible by prefix =C-x w=
          ("C-x w r")
          ("C-x w u"))
   :hook (emacs-startup-hook . winner-mode))
+
 #+end_src
 
 ** Window Selection with ace-window
@@ -2007,6 +2051,7 @@ Window management commands are accessible by prefix =C-x w=
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf ace-window
   :doc "Quickly switch windows."
   :req "avy-0.5.0"
@@ -2032,11 +2077,13 @@ Window management commands are accessible by prefix =C-x w=
   (dotimes (i 9)
     (global-set-key (vector (append '(super) (list (+ i 1 ?0))))
                     #'my--switch-window)))
+
 #+end_src
 
 *** Another implementation of my--switch-window
 
 #+begin_src emacs-lisp
+
 (defun my--switch-window (num)
   (let* ((wnd-list (aw-window-list))
          (wnd-num (- (min num (length wnd-list)) 1))
@@ -2051,16 +2098,19 @@ Window management commands are accessible by prefix =C-x w=
            (kbd ,(format "s-%s" elm))
            (lambda nil (interactive) (my--switch-window ,elm))))
        (number-sequence 1 9))))
+
 #+end_src
 
 ** Window Movement with windmove
 
 #+begin_src emacs-lisp
+
 (leaf *windmove
   :bind (("s-h" . windmove-left)
          ("s-j" . windmove-down)
          ("s-k" . windmove-up)
          ("s-l" . windmove-right)))
+
 #+end_src
 
 ** Resize Window
@@ -2069,6 +2119,7 @@ Window management commands are accessible by prefix =C-x w=
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf my-window-resizer
   :doc "Control window size and position."
   :bind (("C-x w s" . my-window-resizer)
@@ -2111,6 +2162,7 @@ Window management commands are accessible by prefix =C-x w=
                      (call-interactively command)))
                  (message "Quit")
                  (throw 'end-flag t))))))))
+
 #+end_src
 
 
@@ -2120,6 +2172,7 @@ Window management commands are accessible by prefix =C-x w=
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf tab-bar
   :doc "frame-local tabs with named persistent window configurations"
   :tag "builtin"
@@ -2132,6 +2185,7 @@ Window management commands are accessible by prefix =C-x w=
   :hook (emacs-startup-hook . (lambda ()
                                 (tab-bar-mode)
                                 (tab-bar-new-tab))))
+
 #+end_src
 
 
@@ -2197,12 +2251,14 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf duplicate-thing
   :doc "Duplicate current line & selection"
   :tag "selection" "line" "duplicate" "command" "convenience"
   :url "https://github.com/ongaeshi/duplicate-thing"
   :ensure t
   :bind ("M-c" . duplicate-thing))
+
 #+end_src
 
 ** Multiple cursors
@@ -2211,6 +2267,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf multiple-cursors
   :doc "Multiple cursors for Emacs."
   :req "cl-lib-0.5"
@@ -2236,6 +2293,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
       (16 (mc/mark-all-dwim t))
       (4 (mc/mark-all-dwim nil))
       (1 (mark-sexp 1)))))
+
 #+end_src
 
 ** Asynchronous Fuzzy Finder with Affe
@@ -2289,12 +2347,6 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                  nil
                  (window-parameters (mode-line-format . none)))))
 
-
-;; (leaf embark-consult
-;;   :ensure t
-;;   :after embark
-  
-;;   :bind )
 #+end_src
 
 ** Consult Commands
@@ -2381,10 +2433,9 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     :config
     (tramp-set-completion-function "ssh"
                                    '((tramp-parse-sconfig "~/.ssh/config")))))
+
 #+end_src
 
-#+RESULTS:
-: consult
 
 ** Improved Candidate Filtering with Orderless
 :PROPERTIES:
@@ -2447,6 +2498,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                            ((file-exists-p "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
                             "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")))
     (migemo-isearch-enable-p . t)))
+
 #+end_src
 
 ** Completion Annotations with Marginalia
@@ -2462,15 +2514,6 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   :after vertico
   :global-minor-mode t)
 
-;; (leaf marginalia
-;;   :ensure t
-;;   :require t
-;;   :after vertico
-;;   :init
-;;   (marginalia-mode)
-;;   :config
-;;   (add-to-list 'marginalia-prompt-categories
-;;                '("\\<File\\>" . file)))
 #+end_src
 
 ** Vertical Minibuffer UI and Completion with Vertico
@@ -2601,11 +2644,13 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (dabbrev-upcase-means-case-search . t))
   :bind* (("M-/" . dabbrev-expand)
           ("C-M-/" . dabbrev-completion)))
+
 #+end_src
 
 ** Colorful icons for completion with kind-icon
 
 #+begin_src emacs-lisp
+
 (leaf kind-icon
   :ensure t
   :after corfu
@@ -2614,6 +2659,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   (kind-icon-default-face . 'corfu-default)
   :defer-config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
 #+end_src
 
 #+RESULTS:
@@ -2642,6 +2688,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf avy
   :doc "Jump to arbitrary positions in visible text and select text quickly."
   :req "emacs-24.1" "cl-lib-0.5"
@@ -2775,6 +2822,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
       (select-window
        (cdr (ring-ref avy-ring 0))))
     t))
+
 #+end_src
 
 
@@ -2784,6 +2832,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf mwim
   :doc "Switch between the beginning/end of line or code"
   :tag "convenience"
@@ -2791,6 +2840,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :ensure t
   :bind (("C-a" . mwim-beginning-of-code-or-line)
          ("C-e" . mwim-end-of-code-or-line)))
+
 #+end_src
 
 * Shell
@@ -2801,6 +2851,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf eshell
   :bind* ("C-x m" . eshell)
   :config
@@ -2832,6 +2883,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   ;;       eshell-prompt-function 'my-eshell-prompt-function
   ;;       eshell-prompt-regexp "^$ ")
   )
+
 #+end_src
 
 ** Fish Mode
@@ -2840,11 +2892,13 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf fish-mode
   :doc "Major mode for fish shell scripts"
   :req "emacs-24"
   :tag "shell" "fish" "emacs>=24"
   :ensure t)
+
 #+end_src
 
 ** Vterm Mode
@@ -2877,11 +2931,13 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf gcmh
   :ensure t
   :blackout
   :custom (gcmh-verbose . nil)
   :hook after-init-hook)
+
 #+end_src
 
 * Org Mode
@@ -2891,6 +2947,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf org
   :doc "Export Framework for Org Mode"
   :tag "builtin"
@@ -3001,6 +3058,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   (leaf org-fragtog
     :ensure t
     :hook (org-mode-hook . org-fragtog-mode)))
+
 #+end_src
 
 ** Org Agenda
@@ -3009,6 +3067,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf org-agenda
   :bind* (("C-c C-a" . my/org-agenda-cache)
           ("C-c C-m" . jethro/org-inbox-capture))
@@ -3255,6 +3314,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                                   "next.org")))
                      (org-agenda-skip-function '(org-agenda-skip-entry-if
                                                  'deadline))))))))))
+
 #+end_src
 
 ** Org Babel
@@ -3263,6 +3323,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 :END:
 
 #+begin_src emacs-lisp
+
 (setq org-babel-load-languages '((emacs-lisp . t)
                                  (python . t)
                                  (latex . t)
@@ -3280,6 +3341,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf ob-shell
   :commands (org-babel-execute:sh org-babel-expand-body:sh
              org-babel-execute:bas org-babel-expand-body:bash))
+
 #+end_src
 
 
@@ -3363,6 +3425,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf ox
   :doc "Export Framework for Org Mode"
   :tag "out-of-MELPA" "wp" "calendar" "hypermedia" "outlines"
@@ -3385,6 +3448,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf ox-hugo
   :doc "Hugo Markdown Back-End for Org Export Engine"
   :req "emacs-24.4" "org-9.0"
@@ -3420,6 +3484,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   ;; ")
   ;;                  'append))
   )
+
 #+end_src
 
 
@@ -3429,6 +3494,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf ox-latex
   :doc "LaTeX Back-End for Org Export Engine"
   :tag "out-of-MELPA" "wp" "calendar" "hypermedia" "outlines"
@@ -3510,6 +3576,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
     (setq org-latex-pdf-process (list (my-latexmk-command TeX-engine "-pv" "%f" "%o")))
     ))
+
 #+end_src
 
 
@@ -3519,6 +3586,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf org-roam
   :doc "Roam Research replica with Org-mode"
   :url "https://github.com/org-roam/org-roam"
@@ -3592,6 +3660,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
         org-roam-ui-follow t
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
+
 #+end_src
 
 *** Org-Protocol
@@ -3645,6 +3714,7 @@ end open location
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf orp-paperpile
   :after org-roam
   :doc "orp-paperpile; Org-Roam-Protocol Paperpile is an interface
@@ -3693,6 +3763,7 @@ end open location
             (open-external path)
             (message "Open: %s" path))
         (apply f link arg)))))
+
 #+end_src
 
 **** Create Bookmark
@@ -3855,6 +3926,7 @@ function callback_fn(value, error) {
 }
 
 get_citation(callback_fn);
+
 #+end_src
 
 ** Bullets
@@ -3863,6 +3935,7 @@ get_citation(callback_fn);
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf org-superstar
   :ensure t
   :after org
@@ -3873,6 +3946,7 @@ get_citation(callback_fn);
    (org-superstar-item-bullet-alist . '((?+ . ?➤)
                                         (?* . ?-)
                                         (?- . ?•)))))
+
 #+end_src
 
 
@@ -3883,6 +3957,7 @@ get_citation(callback_fn);
 :END:
 
 #+begin_src emacs-lisp
+
 (setq paste-cmd (cond
                  ((executable-find "pngpaste")
                   "pngpaste ")
@@ -3910,6 +3985,7 @@ get_citation(callback_fn);
       (if (file-exists-p filename)
           (insert (concat "[[file:" filename "]]")))
       (org-display-inline-images))))
+
 #+end_src
   
 *** Adjust Inline Image Size
@@ -3918,6 +3994,7 @@ get_citation(callback_fn);
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf *org-image-size-adjuster
   :hook (org-mode-hook . org-limit-image-size-activate)
   :preface
@@ -3971,6 +4048,7 @@ get_citation(callback_fn);
     (interactive)
     (advice-remove #'create-image #'org-limit-image-size--create-image)
     (advice-remove #'org-display-inline-images #'org-limit-image-size--org-display-inline-images)))
+
 #+end_src
 
 ** Auto-show Markup Symbols
@@ -3981,9 +4059,11 @@ get_citation(callback_fn);
 This package makes it much easier to edit Org documents when =org-hide-emphasis-markers= is turned on.  It temporarily shows the emphasis markers around certain markup elements when you place your cursor inside of them.  No more fumbling around with ~=~ and ~*~ characters!
 
 #+begin_src emacs-lisp
+
 (leaf org-appear
   :ensure t
   :hook org-mode-hook)
+
 #+end_src
 
 ** Auto-tangle Configuration Files
