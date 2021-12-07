@@ -40,12 +40,6 @@
 [submodule ".emacs.d/elisp/lin"]
 	path = .emacs.d/elisp/lin
 	url = https://github.com/protesilaos/lin.git
-[submodule ".emacs.d/elisp/elisp-tree-sitter"]
-	path = .emacs.d/elisp/elisp-tree-sitter
-	url = https://github.com/emacs-tree-sitter/elisp-tree-sitter.git
 [submodule ".emacs.d/elisp/vundo"]
 	path = .emacs.d/elisp/vundo
 	url = https://github.com/casouri/vundo.git
-[submodule "elisp-tree-sitter"]
-	path = .emacs.d/elisp/elisp-tree-sitter
-	url = https://github.com/emacs-tree-sitter/elisp-tree-sitter.git
