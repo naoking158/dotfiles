@@ -4030,6 +4030,7 @@ It's nice to have a table of contents section for long literate configuration fi
 :END:
 
 #+begin_src emacs-lisp
+
 (leaf *latex
   :config
   (leaf auctex
@@ -4080,6 +4081,7 @@ It's nice to have a table of contents section for long literate configuration fi
     :custom
     ((reftex-ref-style-default-list . '("Cleveref"))
      (reftex-cite-format . 'natbib))))
+
 #+end_src
 
 * Applications
