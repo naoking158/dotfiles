@@ -3211,18 +3211,13 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
 
 (leaf tree-sitter
   :when (not (string-match "aarch64" system-configuration))
-  :load-path
-  `(,(mapcar (lambda (file)
-               (concat "~/.emacs.d/elisp/elisp-tree-sitter/" file "/"))
-             '("core" "lisp" "langs")))
-  :hook (prog-mode-hook . (lambda nil
-                            (require 'tree-sitter)
-                            (require 'tree-sitter-hl)
-                            (require 'tree-sitter-langs)
-                            (require 'tree-sitter-debug)
-                            (require 'tree-sitter-query)
-                            (tree-sitter-mode)
-                            (tree-sitter-hl-mode))))
+  :ensure t tree-sitter-langs
+  :hook
+  (python-mode-hook . (lambda nil
+                        (require 'tree-sitter)
+                        (require 'tree-sitter-langs)
+                        (tree-sitter-mode)
+                        (tree-sitter-hl-mode))))
 
 (leaf xwwp
   :disabled t
