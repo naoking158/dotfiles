@@ -1636,7 +1636,8 @@ respectively."
       (completion-category-defaults . nil)
       (completion-category-overrides
        quote ((file (styles orderless-migemo-style))
-              (consult-location (styles orderless-default-style))
+              ;; for consult-line
+              (consult-location (styles orderless-migemo-style))
               (consult-multi (styles orderless-default-style))
               (unicode-name (styles orderless-migemo-style))
               (command (styles orderless-default-style))
