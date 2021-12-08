@@ -2676,7 +2676,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
          (:minibuffer-local-map
           ("M-b" . citar-insert-preset)))
   :custom
-  (citar-bibliography . '("~/org/braindump/preferences/ref.bib")))
+  ((citar-bibliography . '("~/org/braindump/preferences/ref.bib"))
+   (citar-latex-cite-commands . '((("cite" "citet" "citep") . (t))))))
 
 #+end_src
 
@@ -4114,11 +4115,7 @@ It's nice to have a table of contents section for long literate configuration fi
 (leaf *latex
   :config
   (leaf auctex
-    :doc "Integrated environment for *TeX*"
-    :req "emacs-24.3" "cl-lib-1.0"
-    :tag "preview-latex" "doctex" "context" "texinfo" "latex" "tex" "emacs>=24.3"
     :ensure t
-    :hook (LaTeX-mode-hook . my/latex-mode-hook)
     :custom ((TeX-master . nil)
              (TeX-auto-save . t)
              (TeX-parse-self . t)
@@ -4126,25 +4123,35 @@ It's nice to have a table of contents section for long literate configuration fi
              (TeX-source-correlate-start-server . t)
              (TeX-source-correlate-mode . t)
              (TeX-PDF-mode . t))
-
-    :preface
+ 
+    :config
     (defun my/latex-mode-hook nil
       (visual-fill-column-mode t)
-      (let ((opts "latexmk -synctex=1 -interaction=nonstopmode -pv -f "))
-        (dolist (command-alist
-                 `(("ja-uptex" . ,(concat opts "%s.tex"))
-                   ("en-pdflatex" . ,(concat opts "-e $bibtex=q/bibtex/ -pdf %s.tex"))
-                   ("pdfview" . "open %s.pdf")
-                   ,(if (eq 'darwin system-type)
-                        '("Displayline" . "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b")
-                      '("Displayline" . "okular --unique %o#src:%n%b"))))
-          (add-to-list 'TeX-command-list `(,(car command-alist)
-                                           ,(cdr command-alist)
-                                           TeX-run-command t nil))))))
+      (let*
+          ((latexmk-cmd "latexmk -synctex=1 -interaction=nonstopmode -pv -f ")
+           (ja-compile-cmd (concat latexmk-cmd "%s.tex"))
+           (en-compile-cmd (concat latexmk-cmd "-e $bibtex=q/bibtex/ -pdf %s.tex"))
+           (displayline-cmd
+            (if (eq 'darwin system-type)
+                "/Applications/Skim.app/Contents/SharedSupport/displayline %n %s.pdf %b"
+              "okular --unique %o#src:%n%b")))
+        (setq TeX-command-list
+              `(("Clean" "TeX-clean" TeX-run-function nil t
+                 :help "Delete generated intermediate files")
+                ("Clean All" "(TeX-clean t)" TeX-run-function nil t
+                 :help "Delete generated intermediate and output files")
+                ("ja-uptex" ,ja-compile-cmd TeX-run-command t nil
+                 :help "Japanese compile with uptex")
+                ("en-pdflatex" ,en-compile-cmd TeX-run-command t nil
+                 :help "English compile with pdflatex")
+                ("PDF view" "open %s.pdf" TeX-run-command t nil
+                 :help "View in PDF")
+                ("Displayline" ,displayline-cmd TeX-run-command t nil
+                 :help "Show selected line in PDF")))))
+    (add-hook 'LaTeX-mode-hook  #'my/latex-mode-hook))
 
   (leaf latex-extra
     :doc "Adds several useful functionalities to LaTeX-mode."
-    :req "auctex-11.86.1" "cl-lib-0.5"
     :url "http://github.com/Malabarba/latex-extra"
     :ensure t
     :hook (LaTeX-mode-hook . latex-extra-mode)
@@ -4153,8 +4160,9 @@ It's nice to have a table of contents section for long literate configuration fi
            ("C-M-b" . backward-paragraph)))
 
   (leaf reftex
+    :doc "Built-in function"
     :hook (LaTeX-mode-hook . reftex-mode)
-    :bind (reftex-mode-map
+    :bind (:reftex-mode-map
            ("C-c r" . reftex-reference)
            ("C-c l" . reftex-label)
            ("C-c c" . reftex-citation))
