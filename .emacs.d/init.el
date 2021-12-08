@@ -712,9 +712,8 @@ modified (📖)/(**), or read-write (✏️)/(RW)"
 
 (leaf meow
   :after consult
-  :load-path
-  "~/.emacs.d/elisp/meow/"
-  "~/.emacs.d/elisp/meow-config/"
+  :ensure t
+  :load-path "~/.emacs.d/elisp/meow-config/"
   :hook ((emacs-startup-hook . (lambda nil
                                  (require 'meow)
                                  (require 'meow-keybindings)
