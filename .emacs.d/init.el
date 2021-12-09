@@ -2265,11 +2265,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
       (save-some-buffers t))
 
     :defvar (org-capture-templates)
-    :advice (:before org-agenda-redo-all
-                     (lambda (&rest args)
-                       (setq org-agenda-files
-                             (directory-files-recursively org-directory
-                                                          "\\.org$"))))
     :config
     (require 'org-habit)
     (require 'org-capture)
@@ -2450,6 +2445,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf ox-hugo
   :doc "Hugo Markdown Back-End for Org Export Engine"
   :ensure t
+  :require t
   :after ox
   :custom ((org-hugo-front-matter-format . "yaml")
            (org-hugo-link-desc-insert-type . t))
