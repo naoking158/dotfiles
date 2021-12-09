@@ -1105,14 +1105,19 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :after consult
   :ensure t
   :load-path "~/.emacs.d/elisp/meow-config/"
-  :hook ((emacs-startup-hook . (lambda nil
-                                 (require 'meow)
-                                 (require 'meow-keybindings)
-                                 (meow-setup)
-                                 (meow-global-mode)))
-         (meow-insert-exit-hook . (lambda nil
-                                    (if skk-mode (skk-latin-mode-on))))
-         ((text-mode-hook eshell-mode-hook) . meow-insert))
+  :hook
+  ((emacs-startup-hook . (lambda nil
+                           (require 'meow)
+                           (require 'meow-keybindings)
+                           (meow-setup)
+                           (meow-global-mode)))
+   (meow-insert-exit-hook . (lambda nil
+                              (if skk-mode (skk-latin-mode-on))))
+   (eshell-mode-hook . meow-insert)
+   (after-change-major-mode-hook . (lambda nil
+                                     (if (and (featurep 'magit)
+                                              (magit-commit-message-buffer))
+                                         (meow-insert)))))
   :bind ((meow-normal-state-keymap
           ("C-j" . (lambda ()
                      (interactive)
