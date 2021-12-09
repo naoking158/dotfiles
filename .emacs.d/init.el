@@ -642,8 +642,8 @@
           my--modeline-tty-mod-symbol "**")
     
     (defun my--modeline-status ()
-      "Return buffer status: default symbols are read-only (⛔)/(RO),
-modified (📖)/(**), or read-write (✏️)/(RW)"
+      "Return buffer status: default symbols are read-only (📙)/(RO),
+modified (✏️)/(**), or read-write (📖)/(RW)"
       (let ((read-only   buffer-read-only)
             (modified    (and buffer-file-name (buffer-modified-p))))
         ;; Use status letters for TTY display
@@ -1063,7 +1063,7 @@ modified (📖)/(**), or read-write (✏️)/(RW)"
 
   (leaf flymake-grammarly
     :ensure t
-    :hook (LaTeX-mode-hook . flymake-grammarly-load)
+    ;; :hook (LaTeX-mode-hook . flymake-grammarly-load)
     :custom (flymake-grammarly-check-time . 2)))
 
 (leaf flyspell
@@ -2440,24 +2440,12 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf ox
   :doc "Export Framework for Org Mode"
-  :tag "out-of-MELPA" "wp" "calendar" "hypermedia" "outlines"
-  :custom (org-export-backends . '(ascii html latex beamer odt org extra))
-  :config
-  (leaf ox-extra
-    :doc "Convenience functions for org export"
-    :tag "out-of-MELPA"
-    :added "2020-03-26"
-    :commands (ox-extras-activate)
-    :config
-    (ox-extras-activate '(latex-header-blocks ignore-headlines))))
+  :custom (org-export-backends . '(ascii html latex beamer odt org extra)))
 
 (leaf ox-hugo
   :doc "Hugo Markdown Back-End for Org Export Engine"
-  :req "emacs-24.4" "org-9.0"
-  :url "https://ox-hugo.scripter.co"
   :ensure t
-  :commands org-exports-dispatch
-  :defun (org-set-property)
+  :after ox
   :custom ((org-hugo-front-matter-format . "yaml")
            (org-hugo-link-desc-insert-type . t))
   ;; :defer-config
@@ -3203,6 +3191,21 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
                         (require 'tree-sitter-langs)
                         (tree-sitter-mode)
                         (tree-sitter-hl-mode))))
+
+
+
+;; (leaf tree-sitter
+;;   :load-path `(,(mapcar (lambda (elm)
+;;                           (concat "~/.emacs.d/elisp/elisp-tree-sitter/" elm "/"))
+;; 			                  '("core" "lisp" "langs")))
+;;   :hook (python-mode-hook . (lambda nil
+;;                               (require 'tree-sitter)
+;;                               (require 'tree-sitter-hl)
+;;                               (require 'tree-sitter-langs)
+;;                               (require 'tree-sitter-debug)
+;;                               (require 'tree-sitter-query)
+;;                               (tree-sitter-mode)
+;;                               (tree-sitter-hl-mode))))
 
 (leaf xwwp
   :disabled t
