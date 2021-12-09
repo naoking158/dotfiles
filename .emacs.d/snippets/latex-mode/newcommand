@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: newcommand
+# key: cmd
+# --
+\newcommand{$0}
