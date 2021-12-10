@@ -528,7 +528,7 @@
             modus-themes-fringes nil
             modus-themes-prompts '(intense gray)
             modus-themes-completions 'opinionated
-            modus-themes-paren-match '(bold underline)
+            modus-themes-paren-match '(underline)
             ;; this is an alist: read the manual or its doc string
             modus-themes-org-agenda '((header-block . (variable-pitch scale-title))
                                       (header-date . (grayscale workaholic bold-today))
@@ -540,6 +540,9 @@
       (pcase sym-theme
         ('modus-dark (modus-themes-load-vivendi))
         ('modus-light (modus-themes-load-operandi)))
+
+      (set-face-attribute 'lin-hl nil
+                          :background (modus-themes-color 'cyan-subtle-bg))
 
       (defvar my-rainbow-region-colors
         (modus-themes-with-colors
@@ -563,9 +566,10 @@
 
       (defun my-rainbow-region-red ()
         (my-rainbow-region "red"))
-      
+
       (add-hook 'prog-mode-hook #'my-rainbow-region-red)
-      (add-hook 'text-mode-hook #'my-rainbow-region-red)))
+      (add-hook 'text-mode-hook #'my-rainbow-region-red)
+      ))
 
   (leaf bespoke-themes
     :load-path "~/.emacs.d/elisp/bespoke-themes/"
@@ -577,7 +581,7 @@
     (defun my/load-bespoke-theme (sym-theme)
       (funcall sym-theme)
       (set-face-attribute 'org-block nil
-						              :inherit 'fixed-pitch
+                          :inherit 'fixed-pitch
                           :foreground nil
                           :background bespoke-subtle)
       (custom-theme-set-faces
@@ -1261,9 +1265,8 @@ respectively."
 
 (leaf lin
   :load-path "~/.emacs.d/elisp/lin/"
-  :require t
   :hook (emacs-startup-hook . (lambda nil
-                                (global-hl-line-mode)
+                                (require 'lin)
                                 (global-lin-mode)))
   :init
   (define-globalized-minor-mode global-lin-mode lin-mode lin--on :group 'lin)
@@ -1271,6 +1274,7 @@ respectively."
     "Turn `lin-mode' on."
     (unless (or noninteractive
                 (eq (aref (buffer-name) 0) ?\s))
+      (hl-line-mode 1)
       (lin-mode 1))))
 
 (leaf yasnippet
@@ -2176,10 +2180,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
            (org-clock-in-hook . (lambda ()
                                   (add-to-list 'frame-title-format
                                                '(:eval org-mode-line-string) t)))
-           (org-capture-after-finalize-hook . (lambda ()
-                                                (setq org-agenda-files
-                                                      (directory-files-recursively
-                                                       org-directory "\\.org$")))))
+           ;; (org-capture-after-finalize-hook . (lambda ()
+           ;;                                      (setq org-agenda-files
+           ;;                                            (directory-files-recursively
+           ;;                                             org-directory "\\.org$"))))
+           )
     :bind (org-agenda-mode-map
            ("i" . org-agenda-clock-in)
            ("r" . jethro/org-agenda-process-inbox-item)
@@ -2270,7 +2275,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (require 'org-capture)
     (setq
      jethro/org-agenda-directory (file-truename "~/org/gtd/")
-     ;; org-agenda-files (directory-files-recursively org-directory "\\.org$")
+     org-agenda-files (directory-files-recursively
+                       jethro/org-agenda-directory "\\.org")
      org-outline-path-complete-in-steps nil
      org-log-done 'time
      org-log-into-drawer t
