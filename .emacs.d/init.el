@@ -1036,6 +1036,13 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
          "\\.mustache\\'"
          "\\.djhtml\\'"))
 
+(leaf *javascript
+  :hook
+  (js-mode-hook . (lambda nil
+                    (make-local-variable 'js-indent-level)
+                    (setq js-indent-level 2)
+                    (linum-mode 1))))
+
 (leaf flymake
   :doc "A universal on-the-fly syntax checker"
   :tag "builtin"
