@@ -870,140 +870,140 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
 
 #+begin_src emacs-lisp
 
-  (leaf themes
-    :hook (emacs-startup-hook . my/default-theme)
-    :advice (:before load-theme (lambda (&rest args)
-                                  (mapc #'disable-theme custom-enabled-themes)))
-    :preface
-    (leaf doom-themes
-      :doc "an opinionated pack of modern color-themes"
-      :req "emacs-25.1" "cl-lib-0.5"
-      :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
-      :url "https://github.com/hlissner/emacs-doom-theme"
-      :ensure t neotree all-the-icons
-      :custom ((doom-themes-enable-italic . nil)
-               (doom-themes-enable-bold . t))
-      :config
-      (defun my/load-doom-theme (sym-theme)
-        (require 'neotree)
-        (require 'all-the-icons)
-        (load-theme sym-theme t)
-        (doom-themes-neotree-config)
-        (doom-themes-org-config)
-        (doom-themes-treemacs-config)))
-
-    (leaf modus-themes
-      :ensure t
-      :config
-      (defun my/load-modus-theme (sym-theme)
-        (setq modus-themes-bold-constructs t
-              modus-themes-region '(bg-only no-extend)
-              modus-themes-org-blocks 'gray-background
-              modus-themes-mixed-fonts t
-              modus-themes-subtle-line-numbers t
-              modus-themes-variable-pitch-headings t
-              modus-themes-variable-pitch-ui t
-              modus-themes-fringes nil
-              modus-themes-prompts '(intense gray)
-              modus-themes-completions 'opinionated
-              modus-themes-paren-match '(underline)
-              ;; this is an alist: read the manual or its doc string
-              modus-themes-org-agenda '((header-block . (variable-pitch scale-title))
-                                        (header-date . (grayscale workaholic bold-today))
-                                        (scheduled . uniform)
-                                        (habit . traffic-light-deuteranopia)))
-        ;; Load the theme files before enabling a theme
-        (modus-themes-load-themes)
-        ;; Load choiced theme
-        (pcase sym-theme
-          ('modus-dark (modus-themes-load-vivendi))
-          ('modus-light (modus-themes-load-operandi)))
-
-        (set-face-attribute 'lin-hl nil
-                            :background (modus-themes-color 'cyan-subtle-bg))
-
-        (defvar my-rainbow-region-colors
-          (modus-themes-with-colors
-            `((red . ,red-subtle-bg)
-              (green . ,green-subtle-bg)
-              (yellow . ,yellow-subtle-bg)
-              (blue . ,blue-subtle-bg)
-              (magenta . ,magenta-subtle-bg)
-              (cyan . ,cyan-subtle-bg)))
-          "Sample list of color values for `my-rainbow-region'.")
-
-        (defun my-rainbow-region (color)
-          "Remap buffer-local attribute of `region' using COLOR."
-          (interactive
-           (list
-            (completing-read "Pick a color: " my-rainbow-region-colors)))
-          (face-remap-add-relative
-           'region
-           `( :background ,(alist-get (intern color) my-rainbow-region-colors)
-              :foreground ,(face-attribute 'default :foreground))))
-
-        (defun my-rainbow-region-red ()
-          (my-rainbow-region "red"))
-      
-        (add-hook 'prog-mode-hook #'my-rainbow-region-red)
-        (add-hook 'text-mode-hook #'my-rainbow-region-red)
-        ))
-
-    (leaf bespoke-themes
-      :load-path "~/.emacs.d/elisp/bespoke-themes/"
-      :require t bespoke-theme
-      :custom ((bespoke-set-mode-line-size . 1)  ;; Set initial theme variant
-               (bespoke-set-italic-comments . nil)
-               (bespoke-set-italic-keywords . nil))
-      :config
-      (defun my/load-bespoke-theme (sym-theme)
-        (funcall sym-theme)
-        (set-face-attribute 'org-block nil
-                            :inherit 'fixed-pitch
-                            :foreground nil
-                            :background bespoke-subtle)
-        (custom-theme-set-faces
-         `user
-         `(org-agenda-clocking ((t :foreground ,bespoke-salient)))
-         `(org-agenda-done ((t :foreground ,bespoke-faded :strike-through nil))))))
-
-      ;;; utils
-    (setq my/theme-list '(doom-nord
-                          doom-solarized-light
-                          modus-light
-                          modus-dark
-                          bespoke/dark-theme
-                          bespoke/light-theme))
-
-    (defun my/load-theme-func-for (sym-theme)
-      (let* ((str-theme (symbol-name sym-theme)))
-        (cond
-         ((string-match "doom" str-theme) #'my/load-doom-theme)
-         ((string-match "modus" str-theme) #'my/load-modus-theme)
-         ((string-match "bespoke" str-theme) #'my/load-bespoke-theme)
-         (t #'(lambda (arg)
-                (message "The theme ``%s'' is not implemented." arg)
-                (message "Check the argument of ``my/load-theme''.")
-                nil)))))
-
-    (defun my/load-theme (sym-theme)
-      (interactive
-       (list
-        (intern (completing-read "Choose one:" my/theme-list))))
-      (setq my-load-theme-func (my/load-theme-func-for sym-theme))
-      (funcall my-load-theme-func sym-theme))
-
-    (defun my/default-theme nil
-      (let ((time
-             (string-to-number
-              (format-time-string "%H"))))
-        (if (and (> time 5) (< time 18))
-            (my/load-theme 'modus-light)
-          (my/load-theme 'modus-dark))))
-
+(leaf themes
+  :hook (emacs-startup-hook . my/default-theme)
+  :advice (:before load-theme (lambda (&rest args)
+                                (mapc #'disable-theme custom-enabled-themes)))
+  :preface
+  (leaf doom-themes
+    :doc "an opinionated pack of modern color-themes"
+    :req "emacs-25.1" "cl-lib-0.5"
+    :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
+    :url "https://github.com/hlissner/emacs-doom-theme"
+    :ensure t neotree all-the-icons
+    :custom ((doom-themes-enable-italic . nil)
+             (doom-themes-enable-bold . t))
     :config
-    (column-number-mode)
-    (setq inhibit-compacting-font-caches t))
+    (defun my/load-doom-theme (sym-theme)
+      (require 'neotree)
+      (require 'all-the-icons)
+      (load-theme sym-theme t)
+      (doom-themes-neotree-config)
+      (doom-themes-org-config)
+      (doom-themes-treemacs-config)))
+
+  (leaf modus-themes
+    :ensure t
+    :config
+    (defun my/load-modus-theme (sym-theme)
+      (setq modus-themes-bold-constructs t
+            modus-themes-region '(bg-only no-extend)
+            modus-themes-org-blocks 'gray-background
+            modus-themes-mixed-fonts t
+            modus-themes-subtle-line-numbers t
+            modus-themes-variable-pitch-headings t
+            modus-themes-variable-pitch-ui t
+            modus-themes-fringes nil
+            modus-themes-prompts '(intense gray)
+            modus-themes-completions 'opinionated
+            modus-themes-paren-match '(underline)
+            ;; this is an alist: read the manual or its doc string
+            modus-themes-org-agenda '((header-block . (variable-pitch scale-title))
+                                      (header-date . (grayscale workaholic bold-today))
+                                      (scheduled . uniform)
+                                      (habit . traffic-light-deuteranopia)))
+      ;; Load the theme files before enabling a theme
+      (modus-themes-load-themes)
+      ;; Load choiced theme
+      (pcase sym-theme
+        ('modus-dark (modus-themes-load-vivendi))
+        ('modus-light (modus-themes-load-operandi)))
+
+      (set-face-attribute 'lin-hl nil
+                          :background (modus-themes-color 'cyan-subtle-bg))
+
+      (defvar my-rainbow-region-colors
+        (modus-themes-with-colors
+          `((red . ,red-subtle-bg)
+            (green . ,green-subtle-bg)
+            (yellow . ,yellow-subtle-bg)
+            (blue . ,blue-subtle-bg)
+            (magenta . ,magenta-subtle-bg)
+            (cyan . ,cyan-subtle-bg)))
+        "Sample list of color values for `my-rainbow-region'.")
+
+      (defun my-rainbow-region (color)
+        "Remap buffer-local attribute of `region' using COLOR."
+        (interactive
+         (list
+          (completing-read "Pick a color: " my-rainbow-region-colors)))
+        (face-remap-add-relative
+         'region
+         `( :background ,(alist-get (intern color) my-rainbow-region-colors)
+            :foreground ,(face-attribute 'default :foreground))))
+
+      (defun my-rainbow-region-red ()
+        (my-rainbow-region "red"))
+
+      (add-hook 'prog-mode-hook #'my-rainbow-region-red)
+      (add-hook 'text-mode-hook #'my-rainbow-region-red)
+      ))
+
+  (leaf bespoke-themes
+    :load-path "~/.emacs.d/elisp/bespoke-themes/"
+    :require t bespoke-theme
+    :custom ((bespoke-set-mode-line-size . 1)  ;; Set initial theme variant
+             (bespoke-set-italic-comments . nil)
+             (bespoke-set-italic-keywords . nil))
+    :config
+    (defun my/load-bespoke-theme (sym-theme)
+      (funcall sym-theme)
+      (set-face-attribute 'org-block nil
+                          :inherit 'fixed-pitch
+                          :foreground nil
+                          :background bespoke-subtle)
+      (custom-theme-set-faces
+       `user
+       `(org-agenda-clocking ((t :foreground ,bespoke-salient)))
+       `(org-agenda-done ((t :foreground ,bespoke-faded :strike-through nil))))))
+
+    ;;; utils
+  (setq my/theme-list '(doom-nord
+                        doom-solarized-light
+                        modus-light
+                        modus-dark
+                        bespoke/dark-theme
+                        bespoke/light-theme))
+
+  (defun my/load-theme-func-for (sym-theme)
+    (let* ((str-theme (symbol-name sym-theme)))
+      (cond
+       ((string-match "doom" str-theme) #'my/load-doom-theme)
+       ((string-match "modus" str-theme) #'my/load-modus-theme)
+       ((string-match "bespoke" str-theme) #'my/load-bespoke-theme)
+       (t #'(lambda (arg)
+              (message "The theme ``%s'' is not implemented." arg)
+              (message "Check the argument of ``my/load-theme''.")
+              nil)))))
+
+  (defun my/load-theme (sym-theme)
+    (interactive
+     (list
+      (intern (completing-read "Choose one:" my/theme-list))))
+    (setq my-load-theme-func (my/load-theme-func-for sym-theme))
+    (funcall my-load-theme-func sym-theme))
+
+  (defun my/default-theme nil
+    (let ((time
+           (string-to-number
+            (format-time-string "%H"))))
+      (if (and (> time 5) (< time 18))
+          (my/load-theme 'modus-light)
+        (my/load-theme 'modus-dark))))
+
+  :config
+  (column-number-mode)
+  (setq inhibit-compacting-font-caches t))
 
 #+end_src
 
