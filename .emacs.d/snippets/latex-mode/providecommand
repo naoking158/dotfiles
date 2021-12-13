@@ -2,4 +2,4 @@
 # name: providecommand
 # key: prov
 # --
-\providecommand{$0}
+\providecommand{$1}{$2}$0
