@@ -29,6 +29,8 @@
 !/.config/ranger/**
 !/.config/skhd/
 !/.config/skhd/**
+!/.config/textlint/
+!/.config/textlint/**
 !/.config/yabai/
 !/.config/yabai/**
 

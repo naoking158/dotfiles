@@ -1,0 +1,11 @@
+{
+  "rules": {
+    "preset-ja-spacing": true,
+    "preset-ja-technical-writing": {
+      "max-comma": { max: 5 },
+      "max-ten": { max: 5 },
+      "max-kanji-continuous-len": { max: 10 },
+      "ja-no-mixed-period": { "periodMark": "．" },
+    },
+  }
+}
