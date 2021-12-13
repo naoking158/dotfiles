@@ -1095,6 +1095,33 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
                                   (add-to-list 'ispell-skip-region-alist
                                                '("[^\000-\377]+"))))))
 
+(leaf flycheck
+  :ensure t
+  :custom (flycheck-display-errors-delay . 0.3)
+  :config
+  (add-hook 'flycheck-mode-hook #'flycheck-set-indication-mode)
+  (leaf flycheck-inline
+    :ensure t
+    :hook (flycheck-mode-hook . flycheck-inline-mode))
+  
+  
+  ;; textlint用のチェッカー
+  (flycheck-define-checker textlint
+    "A linter for text."
+    :command ("~/.config/textlint/textlint.sh" source)
+    :error-patterns
+    ((warning line-start (file-name) ":" line ":" column ": "
+              (id (one-or-more (not (any " "))))
+              (message (one-or-more not-newline)
+                       (zero-or-more "
+" (any " ") (one-or-more not-newline)))
+              line-end))
+    :modes (latex-mode latex-extra-mode))
+  
+  (add-hook 'latex-extra-mode-hook #'(lambda nil
+                                       (setq flycheck-checker 'textlint)
+                                       (flycheck-mode 1))))
+
 (leaf highlight-indent-guides
   :blackout
   :doc "Minor mode to highlight indentation"
