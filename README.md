@@ -17,7 +17,7 @@ Note: You can clone or fork them freely, but I don't guarantee that they fit you
 
 1. Downloads this repository
 2. Deploy (i.e., *copy* or *create symlink*) dot files to your home directory; `make deploy`
-> If dot files exist, they are copied to `$HOME/bak_dotfiles/` directory and this repository's dot files are merged to original one.
+> If dot files exist, they are moved to `$HOME/bak_dotfiles/`.
 3. **Optional**: Run all programs for setup in `./etc/init/` directory; `make init`, when running the [installation command](#oneliner) specify `-s init` as an argument
 
 Also, you can do that by running the installation command below.
