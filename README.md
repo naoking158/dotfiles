@@ -17,7 +17,7 @@ Note: You can clone or fork them freely, but I don't guarantee that they fit you
 
 1. Downloads this repository
 2. Deploy (i.e., *copy* or *create symlink*) dot files to your home directory; `make deploy`
-> If dot files exist, they are copied to `$HOME/bak_dotfiles/` directory and this repository's dot files are merged to original one.
+> If dot files exist, they are moved to `$HOME/bak_dotfiles/`.
 3. **Optional**: Run all programs for setup in `./etc/init/` directory; `make init`, when running the [installation command](#oneliner) specify `-s init` as an argument
 
 Also, you can do that by running the installation command below.
@@ -69,18 +69,15 @@ bash -c "$(curl -fsSL raw.githubusercontent.com/naoking158/dotfiles/main/etc/ins
 
 ## 📸 Screen shots
 
-### terminal appearance (fish + tmux + tmux-powerline)
-- Simple
-- Show hostname, workspace
-![ 2021-06-22 at 16 10 35](https://user-images.githubusercontent.com/29372455/122880004-7951c080-d374-11eb-90a1-6d97cfe6a9c2.png)
-
 
 ### Emacs
 #### GUI
-![ 2021-06-22 at 16 00 28](https://user-images.githubusercontent.com/29372455/122879165-8f12b600-d373-11eb-9a8e-3b7a1a004477.png)
+![ 2021-12-13 at 10 50 40](https://user-images.githubusercontent.com/29372455/145740341-4789e63b-a39f-46c5-aaff-a36942b50c38.jpg)
 
-#### CLI
-![ 2021-06-22 at 15 55 39](https://user-images.githubusercontent.com/29372455/122879197-99cd4b00-d373-11eb-9eaa-e92e79fb76fb.png)
+
+#### CUI
+![ 2021-12-13 at 10 49 22](https://user-images.githubusercontent.com/29372455/145740371-dae99e43-09bf-4a9a-bfde-2ef0e13e6f36.jpg)
+
 
 
 ## License
