@@ -1036,14 +1036,12 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
             (modified    (and buffer-file-name (buffer-modified-p))))
         ;; Use status letters for TTY display
         (cond
-         (modified
-          (if (display-graphic-p)
-              my--modeline-gui-mod-symbol
-            my--modeline-tty-mod-symbol))
-         (read-only
-          (if (display-graphic-p)
-              my--modeline-gui-ro-symbol
-            my--modeline-tty-ro-symbol))
+         (modified (if (display-graphic-p)
+                       my--modeline-gui-mod-symbol
+                     my--modeline-tty-mod-symbol))
+         (read-only (if (display-graphic-p)
+                        my--modeline-gui-ro-symbol
+                      my--modeline-tty-ro-symbol))
          (t (if (display-graphic-p)
                 my--modeline-gui-rw-symbol
               my--modeline-tty-rw-symbol)))))
