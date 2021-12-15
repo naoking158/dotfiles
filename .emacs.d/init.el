@@ -770,21 +770,33 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
     :ensure t
     :bind ("M-=" . transient-dwim-dispatch)))
 
-(leaf dired
-  :ensure dired-collapse
-  :require dired-x
-  :hook (dired-mode-hook . (lambda ()
-                             (dired-collapse-mode 1)
-                             (dired-omit-mode)
-                             (dired-hide-details-mode 1)))
-  :bind (dired-mode-map
-         ("o" . dired-display-file))
-  :custom ((dired-listing-switches . "-agho --group-directories-first")
-           (dired-omit-files . "^\\.[^.].*")
-           (dired-omit-verbose . nil)
-           (dired-hide-details-hide-symlink-targets . nil)
-           (delete-by-moving-to-trash . t)
-           (dired-dwim-target . t)))
+;; (leaf dired
+;;   :ensure dired-collapse
+;;   :require dired-x
+;;   :hook (dired-mode-hook . (lambda ()
+;;                              (dired-collapse-mode 1)
+;;                              (dired-omit-mode)
+;;                              (dired-hide-details-mode 1)))
+;;   :bind (dired-mode-map
+;;          ("o" . dired-display-file))
+;;   :custom ((dired-listing-switches . "-agho --group-directories-first")
+;;            (dired-omit-files . "^\\.[^.].*")
+;;            (dired-omit-verbose . nil)
+;;            (dired-hide-details-hide-symlink-targets . nil)
+;;            (delete-by-moving-to-trash . t)
+;;            (dired-dwim-target . t)))
+
+(leaf dirvish
+  :ensure t
+  :custom
+  ((dired-kill-when-opening-new-dired-buffer . t) ; added in emacs 28
+   (dired-clean-confirm-killing-deleted-buffers . nil)
+   (dired-recursive-copies . 'always)
+   (dired-recursive-deletes . 'always)
+   (delete-by-moving-to-trash . t)
+   (dired-dwim-target . t)
+   dired-listing-switches . "-AGhlv --group-directories-first --time-style=long-iso")
+  )
 
 (leaf crux
   :ensure t
