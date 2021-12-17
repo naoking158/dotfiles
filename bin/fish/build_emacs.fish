@@ -1,38 +1,44 @@
 
 function build_emacs --argument-names 'emacs_version'
+    set emacs_dir ~/src/github.com/emacs-mirror/emacs/
+    cd $emacs_dir
+    git reset --hard HEAD
+    git pull origin master
 
-    set patch_dir ~/.emacs.d/emacs_patches
-    set patch_url "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-28/fix-window-role.patch"
-    set patch_url "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-28/system-appearance.patch" $patch_url
-    
     if test ! -e "configure"
         ./autogen.sh
     end
+    
+    if test -n "$IS_MAC"        
+        set patch_dir ~/.emacs.d/emacs_patches
+        set patch_url "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-28/fix-window-role.patch"
+        set patch_url "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-28/system-appearance.patch" $patch_url
 
-    if test ! -e $patch_dir
-        mkdir -p $patch_dir
+        if test ! -e $patch_dir
+            mkdir -p $patch_dir
+        end
+
+        cd $patch_dir
+        for url in $patch_url
+            curl -LO $url
+        end
+        cd $emacs_dir
+        
+        for patch_file in $patch_dir/**
+            echo "Apply patch: $patch_file"
+            patch -p1 < $patch_file
+        end
     end
 
-    cd $patch_dir
-    for url in $patch_url
-        curl -LO $url
-    end
-    cd -
-
-    for patch_file in $patch_dir/**
-        echo "Apply patch: $patch_file"
-        patch -p1 < $patch_file
-    end
-
+    
     ./configure \
-        --with-ns \
         --with-modules \
         --with-xwidgets \
         --with-native-compilation
         # CPPFLAGS=-I/opt/homebrew/opt/ruby/include \
         # LDFLAGS=-L/opt/homebrew/opt/ruby/lib
         
-    gmake -j(nproc) bootstrap
+    make -j(nproc) bootstrap
 
     if test -e ~/src/github.com/emacsfodder/emacs-icons-project
         echo ""
@@ -46,18 +52,21 @@ function build_emacs --argument-names 'emacs_version'
             ~/src/github.com/emacs-mirror/emacs/nextstep/Emacs.app/Contents/Info.plist.bak
         cp document-icons/Info.plist \
             ~/src/github.com/emacs-mirror/emacs/nextstep/Emacs.app/Contents/Info.plist
-        cd -
+        cd $emacs_dir
     end
 
-    gmake install
-    cp ~/.dotfiles/etc/helper/emacs-cli.bash ~/src/github.com/emacs-mirror/emacs/nextstep/Emacs.app/Contents/MacOS/bin/emacs
-    chmod +w ~/src/github.com/emacs-mirror/emacs/nextstep/Emacs.app/Contents/MacOS/bin/emacs
- 
-    echo \n"Build is Done!
-Finally, move `./nextstep/Emacs.app` into `/Applications/` and do bellow commands:
+    make install
 
-    sudo ln -s /Applications/Emacs.app/Contents/MacOS/bin/emacs /usr/local/bin/emacs
-    sudo ln -s /Applications/Emacs.app/Contents/MacOS/bin/emacsclient /usr/local/bin/emacsclient
+    if test -n "$IS_MAC"
+        cp ~/.dotfiles/etc/helper/emacs-cli.bash ~/src/github.com/emacs-mirror/emacs/nextstep/Emacs.app/Contents/MacOS/bin/emacs
+        chmod +w ~/src/github.com/emacs-mirror/emacs/nextstep/Emacs.app/Contents/MacOS/bin/emacs
+        
+        echo \n"Build is Done!
+        Finally, move `./nextstep/Emacs.app` into `/Applications/` and do bellow commands:
 
-    "
+        sudo ln -s /Applications/Emacs.app/Contents/MacOS/bin/emacs /usr/local/bin/emacs
+        sudo ln -s /Applications/Emacs.app/Contents/MacOS/bin/emacsclient /usr/local/bin/emacsclient
+
+        "
+    end
 end
