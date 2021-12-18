@@ -649,14 +649,14 @@
   (leaf moody
     :ensure t
     :config
-    (setq my--modeline-gui-rw-symbol "📖"
-          my--modeline-tty-rw-symbol "RW"
+    (setq my--modeline-gui-rw-symbol " 📖"
+          my--modeline-tty-rw-symbol " RW"
 
-          my--modeline-gui-ro-symbol "📙"
-          my--modeline-tty-ro-symbol "RO"
+          my--modeline-gui-ro-symbol " 📙"
+          my--modeline-tty-ro-symbol " RO"
           
-          my--modeline-gui-mod-symbol "✏️"
-          my--modeline-tty-mod-symbol "**")
+          my--modeline-gui-mod-symbol " ✏️"
+          my--modeline-tty-mod-symbol " **")
     
     (defun my--modeline-status ()
       "Return buffer status: default symbols are read-only (📙)/(RO),
@@ -682,12 +682,13 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
       (moody-replace-mode-line-buffer-identification)
       (moody-replace-vc-mode)
       (moody-replace-eldoc-minibuffer-message-function)
-      (moody-replace-element 'mode-line-frame-identification
-                             '(:eval
-                               (propertize
-                                (concat
-                                 " " (alist-get 'name (tab-bar--current-tab)) " ")
-                                'face '(:weight bold))))
+      (moody-replace-element 'mode-line-frame-identification '(" ")
+                             ;; '(:eval
+                             ;;   (propertize
+                             ;;    (concat
+                             ;;     " " (alist-get 'name (tab-bar--current-tab)) " ")
+                             ;;    'face '(:weight bold)))
+                             )
       (moody-replace-element 'mode-line-mule-info '(""))
       (moody-replace-element 'mode-line-client '(""))
       (moody-replace-element 'mode-line-remote '(""))
