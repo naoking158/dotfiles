@@ -569,7 +569,20 @@
 
       (add-hook 'prog-mode-hook #'my-rainbow-region-red)
       (add-hook 'text-mode-hook #'my-rainbow-region-red)
-      ))
+
+      (defun my--tab-bar-format (tab i)
+        (propertize
+         (format
+          (concat
+           (if (eq (car tab) 'current-tab)
+               "🔥 " "")
+           "%s")
+          (alist-get 'name tab))
+         'face (list (append
+                      (if (eq (car tab) 'current-tab)
+                          '(:inherit modus-themes-tab-active :box t)
+                        '(:inherit modus-themes-tab-inactive))))))
+      (setq tab-bar-tab-name-format-function #'my--tab-bar-format)))
 
   (leaf bespoke-themes
     :load-path "~/.emacs.d/elisp/bespoke-themes/"
@@ -1491,15 +1504,29 @@ respectively."
 (leaf tab-bar
   :doc "frame-local tabs with named persistent window configurations"
   :tag "builtin"
-  :bind (("C-x x n" . tab-next)
-         ("C-x x r" . tab-bar-rename-tab)
+  :bind (("C-x t n" . tab-new)
+         ("C-x t r" . tab-bar-rename-tab)
          ("s-]" . tab-bar-switch-to-next-tab)
          ("s-[" . tab-bar-switch-to-prev-tab))
-  :custom ((tab-bar-show . nil)
+  :custom ((tab-bar-show . 1)
+           (tab-bar-new-button-show . nil)
+           (tab-bar-close-button-show . nil)
            (tab-bar-select-tab-modifiers . '(meta)))
-  :hook (emacs-startup-hook . (lambda ()
-                                (tab-bar-mode)
-                                (tab-bar-new-tab))))
+
+  :hook (emacs-startup-hook . my--init-tab-bar)
+  :preface
+  (defun my/tab-new-with-name (&optional name)
+    (interactive "sName: ")
+    (tab-new)
+    (if name (tab-bar-rename-tab name)))
+
+  (defun my--init-tab-bar nil
+    (tab-bar-mode)
+    (tab-bar-rename-tab "Work")
+    
+    (my/tab-new-with-name "Env")
+    (my/tab-new-with-name "Mail")
+    (my/tab-new-with-name "Any")))
 
 (leaf rotate
   :doc "Rotate the layout of emacs"
