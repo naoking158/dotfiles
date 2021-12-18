@@ -372,6 +372,15 @@
   :ensure t
   :commands command-log-mode)
 
+(defun my/bibtex-indent-in-buffer nil
+  (interactive)
+  (setq bibtex-align-at-equal-sign t)
+  (goto-char (point-min))
+  (save-excursion
+    (while (not (eobp))
+      (re-search-forward "\@" nil t)
+      (bibtex-fill-entry))))
+
 (leaf ui
   :leaf-defer nil
   :hook

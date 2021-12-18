@@ -28,6 +28,7 @@ a bunch of resources I've found online.
   - [[#trim-newline-from-string][Trim newline from string]]
   - [[#sort-sexpresions][Sort Sexpresions]]
   - [[#command-log-mode][Command Log Mode]]
+  - [[#bibtex-indent][Bibtex Indent]]
 - [[#basic-ui-configuration][Basic UI Configuration]]
   - [[#user-interface][User Interface]]
   - [[#frame-transparency][Frame Transparency]]
@@ -704,6 +705,20 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 
 #+end_src
 
+** Bibtex Indent
+
+#+begin_src emacs-lisp
+
+(defun my/bibtex-indent-in-buffer nil
+  (interactive)
+  (setq bibtex-align-at-equal-sign t)
+  (goto-char (point-min))
+  (save-excursion
+    (while (not (eobp))
+      (re-search-forward "\@" nil t)
+      (bibtex-fill-entry))))
+
+#+end_src
 
 * Basic UI Configuration
 :PROPERTIES:
