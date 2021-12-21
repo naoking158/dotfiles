@@ -1721,8 +1721,14 @@ respectively."
   (leaf orderless
     :ensure t migemo
     :require t migemo
+    :leaf-defer nil
+    :bind (:minibuffer-local-completion-map
+           ("SPC" . nil)
+           ("?" . nil))
     :custom
-    '((completion-styles . '(orderless partial-completion))
+    '((completion-styles . '(basic substring initials flex partial-completion orderless))
+      (completion-cycle-threshold . 2)
+      (completion-flex-nospace . nil)
       (completion-category-defaults . nil)
       (completion-category-overrides
        quote ((file (styles orderless-migemo-style))
@@ -1733,22 +1739,58 @@ respectively."
               (command (styles orderless-default-style))
               (org-roam-node (styles orderless-migemo-style)))))
     :config
+    (setq my--orderless-default-styles
+          '(orderless-prefixes
+            orderless-strict-leading-initialism
+            orderless-regexp))
+
+    (defun my--orderless-literal-dispatcher (pattern _index _total)
+      "Literal style dispatcher using the equals sign as a suffix.
+It matches PATTERN _INDEX and _TOTAL according to how Orderless
+parses its input."
+      (when (string-suffix-p "=" pattern)
+        `(orderless-literal . ,(substring pattern 0 -1))))
+
+    (defun my--orderless-initialism-dispatcher (pattern _index _total)
+      "Leading initialism  dispatcher using the comma suffix.
+It matches PATTERN _INDEX and _TOTAL according to how Orderless
+parses its input."
+      (when (string-suffix-p "," pattern)
+        `(orderless-strict-initialism . ,(substring pattern 0 -1))))
+
+    (defun my--orderless-flex-dispatcher (pattern _index _total)
+      "Flex  dispatcher using the tilde suffix.
+It matches PATTERN _INDEX and _TOTAL according to how Orderless
+parses its input."
+      (when (string-suffix-p "~" pattern)
+        `(orderless-flex . ,(substring pattern 0 -1))))
+
+    (setq orderless-matching-styles my--orderless-default-styles)
+    (setq orderless-style-dispatchers '(my--orderless-literal-dispatcher
+                                        my--orderless-initialism-dispatcher
+                                        my--orderless-flex-dispatcher))
+
+    
     (defun orderless-migemo (component)
       (let ((pattern (migemo-get-pattern component)))
         (condition-case nil
             (progn (string-match-p pattern "") pattern)
           (invalid-regexp nil))))
     
-    (orderless-define-completion-style orderless-default-style
-      (orderless-matching-styles '(orderless-prefixes
-                                   orderless-literal
-                                   orderless-regexp)))
+    (orderless-define-completion-style
+     orderless-default-style
+     (orderless-matching-styles '(orderless-literal
+                                  orderless-prefixes
+                                  orderless-strict-initialism
+                                  orderless-regexp)))
 
-    (orderless-define-completion-style orderless-migemo-style
-      (orderless-matching-styles '(orderless-prefixes
-                                   orderless-literal
-                                   orderless-regexp
-                                   orderless-migemo)))))
+    (orderless-define-completion-style
+     orderless-migemo-style
+     (orderless-matching-styles '(orderless-literal
+                                  orderless-prefixes
+                                  orderless-strict-initialism
+                                  orderless-regexp
+                                  orderless-migemo)))))
 
 (leaf migemo
   :when (executable-find "cmigemo")
@@ -1800,7 +1842,7 @@ respectively."
    (tab-always-indent . 'complete))
 
   ;; Optionally use TAB for cycling, default is `corfu-complete'.
-  :bind (corfu-map
+  :bind (:corfu-map
          ("<tab>" . corfu-complete))
   :init
   ;; https://github.com/minad/corfu/wiki#auto-commit
@@ -1846,8 +1888,10 @@ respectively."
       (add-to-list 'capfs #'cape-dabbrev t)
       (setq-local completion-at-point-functions
                   `(cape-file
-                    ,(apply #'cape-super-capf
-                            (mapcar #'cape-capf-buster capfs))))))
+                    ,(cape-capf-buster (apply #'cape-super-capf capfs))
+                    ;; ,(apply #'cape-super-capf
+                    ;;         (mapcar #'cape-capf-buster capfs))
+                    ))))
 
   (dolist (mode '(org-mode
                   org-roam-mode
