@@ -47,6 +47,7 @@
 
 ## Emaacs
 !/.emacs.d/
+!/.emacs.d/README.org
 !/.emacs.d/banner/
 !/.emacs.d/banner/**
 !/.emacs.d/init.el
