@@ -110,6 +110,7 @@ a bunch of resources I've found online.
   - [[#emacs-application-framework][Emacs Application Framework]]
   - [[#browse-at-remote][Browse at remote]]
   - [[#org-inline-anim][Org-inline-anim]]
+  - [[#save-frame-and-window-configs-with-burly][Save frame and window configs with Burly]]
 - [[#footer][Footer]]
 :END:
 
@@ -5169,7 +5170,11 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 
 #+end_src
 
+** Save frame and window configs with Burly
 
+#+begin_src emacs-lisp
+(leaf burly :ensure t)
+#+end_src
 
 * Footer
 :PROPERTIES:

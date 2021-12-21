@@ -3545,4 +3545,6 @@ Interactively, URL defaults to the string looking like a url around point."
   :ensure t
   :hook (org-mode-hook . org-inline-anim-mode))
 
+(leaf burly :ensure t)
+
 (provide 'init)
