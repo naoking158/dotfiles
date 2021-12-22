@@ -655,9 +655,12 @@
   :hook (emacs-startup-hook . (lambda nil
                                 (line-number-mode 1)
                                 (column-number-mode 1)
-                                (my/modeline-moody)))
+                                (if window-system
+                                    (my/modeline-moody)
+                                  (my/modeline-doom))))
   :preface
   (leaf moody
+    :when window-system
     :ensure t
     :config
     (setq my--modeline-gui-rw-symbol " 📖"
@@ -707,6 +710,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
                              '(:eval (my--modeline-status)))))
 
   (leaf doom-modeline
+    :when (not window-system)
     :doc "A minimal and modern mode-line"
     :req "emacs-25.1" "all-the-icons-2.2.0" "shrink-path-0.2.0" "dash-2.11.0"
     :tag "mode-line" "faces" "emacs>=25.1"
