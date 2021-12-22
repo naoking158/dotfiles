@@ -787,6 +787,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 #+begin_src emacs-lisp
 
 (leaf *frame-transparency
+  :when window-system
   :preface
   (defun my/change-transparency (&optional num)
     "Sets the transparency of the frame window. 0=transparent/100=opaque"
@@ -817,6 +818,7 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
 #+begin_src emacs-lisp
 
 (leaf font
+  :when window-system
   :leaf-defer nil
   :hook (emacs-startup-hook . (lambda () (my/set-font my-fontsize)))
   :advice (:after load-theme my/set-font-after-load-theme)
@@ -1356,6 +1358,7 @@ Only in Neotree Buffer:
 #+begin_src emacs-lisp
 
 (leaf dap-mode
+  :when window-system
   :ensure t
   ;; :after exec-path-from-shell
   :custom (;; (dap-python-debugger . 'debugpy)
@@ -2765,6 +2768,7 @@ parses its input."
                   org-roam-mode
                   lisp-interaction-mode
                   emacs-lisp-mode
+                  fish-mode
                   lsp-completion-mode
                   VirTeX-common-initialization))
     (advice-add mode :after #'my--reset-capf)))
@@ -3101,6 +3105,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 #+begin_src emacs-lisp
 
 (leaf org
+  :when window-system
   :doc "Export Framework for Org Mode"
   :tag "builtin"
   ;; :ensure org-plus-contrib
@@ -3221,6 +3226,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 #+begin_src emacs-lisp
 
 (leaf org-agenda
+  :when window-system
   :bind* (("C-c C-a" . my/org-agenda-cache)
           ("C-c C-m" . jethro/org-inbox-capture))
   :custom
@@ -3506,6 +3512,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 #+begin_src emacs-lisp
 
 (leaf org-present
+  :when window-system
   :ensure t
   :bind (org-present-mode-keymap
          ("C-c C-n" . dw/org-present-next)
@@ -3590,6 +3597,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 #+begin_src emacs-lisp
 
 (leaf ox-hugo
+  :when window-system
   :doc "Hugo Markdown Back-End for Org Export Engine"
   :ensure t
   :require t
@@ -3634,6 +3642,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 #+begin_src emacs-lisp
 
 (leaf ox-latex
+  :when window-system
   :doc "LaTeX Back-End for Org Export Engine"
   :tag "out-of-MELPA" "wp" "calendar" "hypermedia" "outlines"
   :preface
@@ -3726,6 +3735,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 #+begin_src emacs-lisp
 
 (leaf org-roam
+  :when window-system
   :doc "Roam Research replica with Org-mode"
   :url "https://github.com/org-roam/org-roam"
   :ensure t
@@ -3854,6 +3864,7 @@ end open location
 #+begin_src emacs-lisp
 
 (leaf orp-paperpile
+  :when window-system
   :after org-roam
   :doc "orp-paperpile; Org-Roam-Protocol Paperpile is an interface
         to comunicate between org-mode and paperpile using org-roam-protocol."
@@ -4250,6 +4261,7 @@ It's nice to have a table of contents section for long literate configuration fi
 #+begin_src emacs-lisp
 
 (leaf *latex
+  :when window-system
   :config
   (leaf auctex
     :ensure t
@@ -4317,6 +4329,7 @@ It's nice to have a table of contents section for long literate configuration fi
 
 #+begin_src emacs-lisp
 (leaf oj
+  :when window-system
 	:doc "Competitive programming tools client for AtCoder, Codeforces"
 	:req "emacs-26.1" "quickrun-2.2"
 	:url "https://github.com/conao3/oj.el"
@@ -4334,7 +4347,8 @@ It's nice to have a table of contents section for long literate configuration fi
 #+begin_src emacs-lisp
 (leaf hammerspoon
   :when
-  (file-exists-p "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el")
+  (and window-system
+       (file-exists-p "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))
   :hook
   (emacs-startup-hook . (lambda nil
                           (load
@@ -4369,6 +4383,7 @@ From the search buffer there are a number of ways to interact with entries. Entr
 
 #+begin_src emacs-lisp
 (leaf elfeed
+  :when window-system
   :ensure t
   :commands elfeed
   :advice (:after elfeed (lambda nil (visual-line-mode -1)))
@@ -4436,7 +4451,7 @@ mu index
 
 
 (leaf mu4e
-  :when path-to-mu
+  :when (and window-system path-to-mu)
   :load-path path-to-mu
   :commands (mu4e)
   :hook (mu4e-headers-mode-hook . (lambda nil (visual-line-mode -1)))

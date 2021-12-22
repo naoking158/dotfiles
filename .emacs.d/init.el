@@ -426,6 +426,7 @@
     :global-minor-mode t))
 
 (leaf *frame-transparency
+  :when window-system
   :preface
   (defun my/change-transparency (&optional num)
     "Sets the transparency of the frame window. 0=transparent/100=opaque"
@@ -441,6 +442,7 @@
   (my/change-transparency 100))
 
 (leaf font
+  :when window-system
   :leaf-defer nil
   :hook (emacs-startup-hook . (lambda () (my/set-font my-fontsize)))
   :advice (:after load-theme my/set-font-after-load-theme)
@@ -865,6 +867,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
    (git-gutter:deleted . '((t (:background "#ff79c6"))))))
 
 (leaf dap-mode
+  :when window-system
   :ensure t
   ;; :after exec-path-from-shell
   :custom (;; (dap-python-debugger . 'debugpy)
@@ -1897,6 +1900,7 @@ parses its input."
                   org-roam-mode
                   lisp-interaction-mode
                   emacs-lisp-mode
+                  fish-mode
                   lsp-completion-mode
                   VirTeX-common-initialization))
     (advice-add mode :after #'my--reset-capf)))
@@ -2147,6 +2151,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :hook after-init-hook)
 
 (leaf org
+  :when window-system
   :doc "Export Framework for Org Mode"
   :tag "builtin"
   ;; :ensure org-plus-contrib
@@ -2258,6 +2263,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     :hook (org-mode-hook . org-fragtog-mode)))
 
 (leaf org-agenda
+  :when window-system
   :bind* (("C-c C-a" . my/org-agenda-cache)
           ("C-c C-m" . jethro/org-inbox-capture))
   :custom
@@ -2520,6 +2526,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
              org-babel-execute:bas org-babel-expand-body:bash))
 
 (leaf org-present
+  :when window-system
   :ensure t
   :bind (org-present-mode-keymap
          ("C-c C-n" . dw/org-present-next)
@@ -2574,6 +2581,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :custom (org-export-backends . '(ascii html latex beamer odt org extra)))
 
 (leaf ox-hugo
+  :when window-system
   :doc "Hugo Markdown Back-End for Org Export Engine"
   :ensure t
   :require t
@@ -2608,6 +2616,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   )
 
 (leaf ox-latex
+  :when window-system
   :doc "LaTeX Back-End for Org Export Engine"
   :tag "out-of-MELPA" "wp" "calendar" "hypermedia" "outlines"
   :preface
@@ -2690,6 +2699,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     ))
 
 (leaf org-roam
+  :when window-system
   :doc "Roam Research replica with Org-mode"
   :url "https://github.com/org-roam/org-roam"
   :ensure t
@@ -2764,6 +2774,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
         org-roam-ui-open-on-start t))
 
 (leaf orp-paperpile
+  :when window-system
   :after org-roam
   :doc "orp-paperpile; Org-Roam-Protocol Paperpile is an interface
         to comunicate between org-mode and paperpile using org-roam-protocol."
@@ -2928,6 +2939,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :hook (org-babel-pre-tangle-hook . org-make-toc-mode))
 
 (leaf *latex
+  :when window-system
   :config
   (leaf auctex
     :ensure t
@@ -2986,6 +2998,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
      (reftex-cite-format . 'natbib))))
 
 (leaf oj
+  :when window-system
 	:doc "Competitive programming tools client for AtCoder, Codeforces"
 	:req "emacs-26.1" "quickrun-2.2"
 	:url "https://github.com/conao3/oj.el"
@@ -2999,13 +3012,15 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf hammerspoon
   :when
-  (file-exists-p "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el")
+  (and window-system
+       (file-exists-p "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))
   :hook
   (emacs-startup-hook . (lambda nil
                           (load
                            "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))))
 
 (leaf elfeed
+  :when window-system
   :ensure t
   :commands elfeed
   :advice (:after elfeed (lambda nil (visual-line-mode -1)))
@@ -3045,7 +3060,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 
 (leaf mu4e
-  :when path-to-mu
+  :when (and window-system path-to-mu)
   :load-path path-to-mu
   :commands (mu4e)
   :hook (mu4e-headers-mode-hook . (lambda nil (visual-line-mode -1)))
