@@ -552,9 +552,14 @@
         ('modus-dark (modus-themes-load-vivendi))
         ('modus-light (modus-themes-load-operandi)))
 
-      (set-face-attribute 'lin-hl nil
-                          :background (modus-themes-color 'cyan-subtle-bg))
 
+      (leaf *lin-face
+        :load-path "~/.emacs.d/elisp/lin/"
+        :config
+        (set-face-attribute 'lin-hl nil
+                            :background (modus-themes-color 'cyan-subtle-bg)))
+
+      
       (defvar my-rainbow-region-colors
         (modus-themes-with-colors
           `((red . ,red-subtle-bg)
