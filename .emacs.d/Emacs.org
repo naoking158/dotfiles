@@ -2026,6 +2026,8 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 :ID:       7D0A5B1F-2E04-46C1-B40C-C4E89180EAB4
 :END:
 
+
+
 #+begin_src emacs-lisp
 
 (leaf volatile-highlights
@@ -2050,17 +2052,10 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 
 (leaf lin
   :load-path "~/.emacs.d/elisp/lin/"
-  :hook (emacs-startup-hook . (lambda nil
-                                (require 'lin)
-                                (global-lin-mode)))
-  :init
-  (define-globalized-minor-mode global-lin-mode lin-mode lin--on :group 'lin)
-  (defun lin--on ()
-    "Turn `lin-mode' on."
-    (unless (or noninteractive
-                (eq (aref (buffer-name) 0) ?\s))
-      (hl-line-mode 1)
-      (lin-mode 1))))
+  :require t
+  :config
+  (global-hl-line-mode)
+  (lin-add-to-many-modes))
 
 #+end_src
 

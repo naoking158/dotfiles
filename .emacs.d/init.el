@@ -1392,17 +1392,10 @@ respectively."
 
 (leaf lin
   :load-path "~/.emacs.d/elisp/lin/"
-  :hook (emacs-startup-hook . (lambda nil
-                                (require 'lin)
-                                (global-lin-mode)))
-  :init
-  (define-globalized-minor-mode global-lin-mode lin-mode lin--on :group 'lin)
-  (defun lin--on ()
-    "Turn `lin-mode' on."
-    (unless (or noninteractive
-                (eq (aref (buffer-name) 0) ?\s))
-      (hl-line-mode 1)
-      (lin-mode 1))))
+  :require t
+  :config
+  (global-hl-line-mode)
+  (lin-add-to-many-modes))
 
 (leaf yasnippet
   :ensure t
