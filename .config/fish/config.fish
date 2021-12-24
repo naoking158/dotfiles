@@ -117,6 +117,7 @@ alias ja_latex='latexmk -pvc'
 alias e='emacsclient'
 alias en='emacsclient -nw'
 alias ekill='emacsclient -e "(kill-emacs)"'
+alias ed='emacs -nw --daemon'
 
 if type -q exa
     alias ll "exa -l -g --icons"
