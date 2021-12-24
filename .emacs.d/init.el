@@ -598,7 +598,15 @@
                       (if (eq (car tab) 'current-tab)
                           '(:inherit modus-themes-tab-active :box t)
                         '(:inherit modus-themes-tab-inactive))))))
-      (setq tab-bar-tab-name-format-function #'my--tab-bar-format)))
+      (setq tab-bar-tab-name-format-function #'my--tab-bar-format)
+
+      (leaf *flycheck-set-face
+        :ensure flycheck-inline
+        :custom-face
+        ((flycheck-inline-info . '((t (:inherit modus-themes-intense-cyan))))
+         (flycheck-inline-warning . '((t (:inherit modus-themes-intense-yellow))))
+         (flycheck-inline-error . '((t (:inherit modus-themes-intense-red))))))
+      ))
 
   (leaf bespoke-themes
     :load-path "~/.emacs.d/elisp/bespoke-themes/"
@@ -744,7 +752,8 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
     :ensure t
     :hook (emacs-startup-hook . minions-mode)
     :custom ((minions-mode-line-lighter . ";")
-             (minions-prominent-modes . '(defining-kbd-macro flymake-mode)))))
+             (minions-prominent-modes . '(defining-kbd-macro ;; flymake-mode
+                                                             )))))
 
 (leaf meow
   :after consult
@@ -939,7 +948,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
             (lsp-idle-delay . 0.5)
             (lsp-document-sync-method . 2)
             (lsp-response-timeout . 5)
-            (lsp-prefer-flymake . t)
+            (lsp-prefer-flymake . nil)
             (lsp-completion-enable . t)
             (lsp-enable-indentation . nil)
             (lsp-restart . 'ignore)
@@ -1089,6 +1098,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
                     (linum-mode 1))))
 
 (leaf flymake
+  :disabled t
   :doc "A universal on-the-fly syntax checker"
   :tag "builtin"
   :custom (flymake-gui-warnings-enabled . t)
@@ -1096,10 +1106,10 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
          ("C-c C-n" . flymake-goto-next-error)
          ("C-c C-p" . flymake-goto-prev-error))
   :config
-  (leaf flymake-proselint
-    :ensure t
-    :hook
-    ((markdown-mode-hook org-mode-hook text-mode-hook) . flymake-proselint-setup))
+  ;; (leaf flymake-proselint
+  ;;   :ensure t
+  ;;   :hook
+  ;;   ((markdown-mode-hook org-mode-hook text-mode-hook) . flymake-proselint-setup))
 
   (leaf flymake-diagnostic-at-point
     :doc "Display flymake diagnostics at point"
@@ -1122,10 +1132,11 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
              (flymake-posframe-error-prefix . "🚫 ")
              (flymake-posframe-note-prefix . "✏️ ")))
 
-  (leaf flymake-grammarly
-    :ensure t
-    ;; :hook (LaTeX-mode-hook . flymake-grammarly-load)
-    :custom (flymake-grammarly-check-time . 2)))
+  ;; (leaf flymake-grammarly
+  ;;   :ensure t
+  ;;   ;; :hook (LaTeX-mode-hook . flymake-grammarly-load)
+  ;;   :custom (flymake-grammarly-check-time . 2))
+  )
 
 (leaf flyspell
   ;; :hook (LaTeX-mode-hook org-mode-hook markdown-mode-hook text-mode-hook)
@@ -1142,30 +1153,72 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 
 (leaf flycheck
   :ensure t
+  :bind (("C-c C-n" . flycheck-next-error)
+         ("C-c C-p" . flycheck-previous-error)
+         (:python-mode-map
+          :package python-mode
+          ("C-c C-n" . flycheck-next-error)
+          ("C-c C-p" . flycheck-previous-error)))
+  :hook (python-mode-hook . flycheck-mode)
   :custom (flycheck-display-errors-delay . 0.3)
   :config
-  (add-hook 'flycheck-mode-hook #'flycheck-set-indication-mode)
   (leaf flycheck-inline
     :ensure t
-    :hook (flycheck-mode-hook . flycheck-inline-mode))
+    :hook (flycheck-mode-hook . flycheck-inline-mode)
+    :advice
+    (:override flycheck-inline--error-face my--flycheck-inline--error-face)
+    (:override flycheck-inline--error-message my--flycheck-inline--error-message)
+    :preface
+    (defun my--flycheck-inline--error-face (err)
+      "Return the face used to display ERR."
+      (pcase (flycheck-error-level err)
+        (`info 'flycheck-inline-info)
+        (`warning 'flycheck-inline-warning)
+        (`error 'flycheck-inline-error)
+        (_ 'flycheck-inline-info)))
+
+    (defun my--flycheck-inline--error-message (err)
+      "Return the message to display for ERR."
+      (let ((filename (flycheck-error-filename err))
+            (id (flycheck-error-id err))
+            (prefix (pcase (flycheck-error-level err)
+                      (`info "✏️ ")
+                      (`warning "⚠️ ")
+                      (`error "🚫 ")
+                      (_ "✏️ "))))
+        (concat
+         prefix
+         (when (and filename (not (equal filename (buffer-file-name))))
+           (format "In \"%s\":\n" (file-relative-name filename default-directory)))
+         (flycheck-error-message err)
+         (when (and id flycheck-inline-display-error-id)
+           (format " [%s]" id))))))
   
-  
-  ;; textlint用のチェッカー
-  (flycheck-define-checker textlint
-    "A linter for text."
-    :command ("~/.config/textlint/textlint.sh" source)
-    :error-patterns
-    ((warning line-start (file-name) ":" line ":" column ": "
-              (id (one-or-more (not (any " "))))
-              (message (one-or-more not-newline)
-                       (zero-or-more "
+  (leaf *flycheck-gui
+    :when window-system
+    :config
+    ;; checker for textlint
+    (flycheck-define-checker textlint
+      "A linter for text."
+      :command ("~/.config/textlint/textlint.sh" source)
+      :error-patterns
+      ((warning line-start (file-name) ":" line ":" column ": "
+                (id (one-or-more (not (any " "))))
+                (message (one-or-more not-newline)
+                         (zero-or-more "
 " (any " ") (one-or-more not-newline)))
-              line-end))
-    :modes (latex-mode latex-extra-mode))
-  
-  (add-hook 'latex-extra-mode-hook #'(lambda nil
-                                       (setq flycheck-checker 'textlint)
-                                       (flycheck-mode 1))))
+                line-end))
+      :modes (latex-mode latex-extra-mode))
+    
+    (add-hook 'latex-extra-mode-hook #'(lambda nil
+                                         (setq flycheck-checker 'textlint)
+                                         (flycheck-mode 1))))
+
+  (leaf *flycheck-tty
+    :when (not window-system)
+    :custom (flycheck-indication-mode . 'left-margin)
+    :config
+    (add-hook 'flycheck-mode-hook #'flycheck-set-indication-mode)))
 
 (leaf highlight-indent-guides
   :blackout
