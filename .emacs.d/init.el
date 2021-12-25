@@ -2794,7 +2794,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
   :defer-config
   (leaf org-roam-dailies
-    :require t
     :bind-keymap ("C-c n d" . org-roam-dailies-map)
     :bind
     (:org-roam-dailies-map
