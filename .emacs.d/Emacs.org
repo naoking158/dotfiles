@@ -1150,17 +1150,19 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 
 (leaf meow
   :after consult
-  :ensure t
+  :leaf-defer nil
   :load-path "~/.emacs.d/elisp/meow-config/"
+  :preface (if (file-exists-p "~/.emacs.d/elisp/meow/")
+               (leaf meow :load-path "~/.emacs.d/elisp/meow/")
+             (leaf meow :ensure t))
+  :config
+  (require 'meow-keybindings)
+  (meow-setup)
+  (meow-global-mode)
   :hook
-  ((emacs-startup-hook . (lambda nil
-                           (require 'meow)
-                           (require 'meow-keybindings)
-                           (meow-setup)
-                           (meow-global-mode)))
-   (meow-insert-exit-hook . (lambda nil
+  ((meow-insert-exit-hook . (lambda nil
                               (if skk-mode (skk-latin-mode-on))))
-   (eshell-mode-hook . meow-insert)
+   (eshell-mode-hook . meow-append)
    (after-change-major-mode-hook . (lambda nil
                                      (if (and (featurep 'magit)
                                               (magit-commit-message-buffer))
@@ -4809,11 +4811,10 @@ While browsing, remember the following:
   :config (ace-link-setup-default))
 
 (leaf w3m
-  :disabled t
-  :ensure t
-  :require t ace-link
+  :ensure t ace-link
+  :require t
   :init
-  (setq browse-url-browser-function 'w3m-browse-url)
+  ;; (setq browse-url-browser-function 'w3m-browse-url)
   (setq w3m-use-cookies t)
   :hook (;; clean up the w3m buffers:
          (w3m-display-functions-hook . w3m-hide-stuff)
@@ -4824,39 +4825,40 @@ While browsing, remember the following:
          (w3m-mode-map
           ("q" . quit-window)
           ("&" . w3m-view-url-with-external-browser)))
-  :config
+  ;; :config
   ;; Web Page Cleanup
 
   ;; Navigating some sites in a text browser is a bit painful, but we could have some functions that either move the cursor passed the header to the start of the content, or actually remove some of the content.
 
   ;; Google Search
   ;; Don’t need to actually remove stuff when search in Google, as I really just need to jump ahead and skip the header:
-  (defun w3m-skip-in-google ()
-    "For a Google Search, skip to the first result."
-    (beginning-of-buffer)
-    (search-forward-regexp "[0-9, ]+ results")
-    (forward-line 2)
-    (recenter-top-bottom 0))
+  ;; (defun w3m-skip-in-google ()
+  ;;   "For a Google Search, skip to the first result."
+  ;;   (beginning-of-buffer)
+  ;;   (search-forward-regexp "[0-9, ]+ results")
+  ;;   (forward-line 2)
+  ;;   (recenter-top-bottom 0))
 
   ;; Stack Overflow
   ;; Without a clear enough label, searching for the start of content will always be fragile. We’ll look for the start of the first column.
 
   ;; Stack Overflow has a lot of text that isn’t helpful to someone in a text-based browser, so I would like to remove the voting and other parts. Not sure how to do it, since the columns are of variable width.
-  (defun w3m-skip-in-stackoverflow ()
-    (beginning-of-buffer)
-    (search-forward-regexp "^   ")
-    (forward-line -2)
-    (recenter-top-bottom 0))
+  ;; (defun w3m-skip-in-stackoverflow ()
+  ;;   (beginning-of-buffer)
+  ;;   (search-forward-regexp "^   ")
+  ;;   (forward-line -2)
+  ;;   (recenter-top-bottom 0))
 
   ;; Web Site Dispatch Function
   ;; Add a hook to the w3m-display-functions to match the URL to see which function we need to call:
-  (defun w3m-hide-stuff (url)
-    "Call screen cleaning functions for the W3M based on the URL."
-    (interactive)
-    (cond ((string-match "google\.com/search" url) (w3m-skip-in-google))
-          ((string-match "clojuredocs.org" url) (w3m-skip-in-clojuredocs))
-          ((string-match "stackoverflow.com" url) (w3m-skip-in-stackoverflow))
-          )))
+  ;; (defun w3m-hide-stuff (url)
+  ;;   "Call screen cleaning functions for the W3M based on the URL."
+  ;;   (interactive)
+  ;;   (cond ((string-match "google\.com/search" url) (w3m-skip-in-google))
+  ;;         ((string-match "clojuredocs.org" url) (w3m-skip-in-clojuredocs))
+  ;;         ((string-match "stackoverflow.com" url) (w3m-skip-in-stackoverflow))
+  ;;         ))
+  )
 #+end_src
 
 #+RESULTS:

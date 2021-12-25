@@ -56,12 +56,6 @@ This will affect how selection is displayed."
   :group 'meow
   :type 'list)
 
-(defcustom meow-extend-syntax
-  "^-><()"
-  "Syntax description for thing `extend'."
-  :group 'meow
-  :type 'string)
-
 (defcustom meow-replace-state-name-list
   '((normal . "NORMAL")
     (motion . "MOTION")
@@ -109,17 +103,24 @@ This will affect how selection is displayed."
     (?p . paragraph)
     (?l . line)
     (?d . defun)
-    (?i . indent)
-    (?x . extend)
     (?. . sentence))
   "Mapping from char to thing."
+  :group 'meow
+  :type 'list)
+
+(defcustom meow-thing-selection-directions
+  '((inner . forward)
+    (bounds . backward)
+    (beginning . backward)
+    (end . forward))
+  "Selection directions for each thing command."
   :group 'meow
   :type 'list)
 
 (defcustom meow-display-thing-help t
   "Whether to display the help prompt for meow-inner/bounds/begin/end-of-thing."
   :group 'meow
-  :type :boolean)
+  :type 'boolean)
 
 (defcustom meow-keypad-describe-delay
   0.5
@@ -161,34 +162,33 @@ This option will affect the color of position hint and fake region cursor."
   :type 'boolean)
 
 (defcustom meow-mode-state-list
-  '((beancount-mode . normal)
-    (fundamental-mode . normal)
-    (occur-edit-mode . normal)
-    (text-mode . normal)
-    (prog-mode . normal)
-    (conf-mode . normal)
-    (authinfo-mode . normal)
+  '((authinfo-mode . normal)
+    (beancount-mode . normal)
+    (bibtex-mode . normal)
     (cider-repl-mode . normal)
     (cider-test-report-mode . normal)
     (cider-browse-spec-view-mode . motion)
     (cargo-process-mode . normal)
-    (shell-mode . normal)
-    (eshell-mode . normal)
-    (vterm-mode . normal)
-    (json-mode . normal)
-    (deft-mode . normal)
-    (pass-view-mode . normal)
-    (telega-chat-mode . normal)
-    (restclient-mode . normal)
-    (help-mode . normal)
+    (conf-mode . normal)
     (deadgrep-edit-mode . normal)
-    (mix-mode . normal)
-    (py-shell-mode . normal)
-    (term-mode . normal)
-    (Custom-mode . normal)
-    (edmacro-mode . normal)
+    (deft-mode . normal)
+    (ediff-mode . motion)
+    (gud-mode . normal)
+    (haskell-interactive-mode . normal)
+    (help-mode . normal)
+    (json-mode . normal)
     (jupyter-repl-mode . normal)
-    (comint-mode . normal))
+    (mix-mode . normal)
+    (occur-edit-mode . normal)
+    (pass-view-mode . normal)
+    (prog-mode . normal)
+    (py-shell-mode . normal)
+    (restclient-mode . normal)
+    (telega-chat-mode . normal)
+    (term-mode . normal)
+    (text-mode . normal)
+    (vterm-mode . normal)
+    (Custom-mode . normal))
   "A list of rules, each is (major-mode . init-state).
 
 The init-state can only be `motion' or `normal',
@@ -231,6 +231,15 @@ Set to `t' to always update.
   "The prefix represent no modifier in KEYPAD state."
   :group 'meow
   :type 'character)
+
+(defcustom meow-motion-remap-prefix "H-"
+  "The prefix string used when remapping an occupied key in MOTION state.
+
+For examples:
+  \"C-x C-v\" will remap the occupied j to C-x C-v j.
+  \"C-M-\" will remap the occupied j to C-M-j."
+  :group 'meow
+  :type 'string)
 
 (defvar meow-keypad-describe-keymap-function 'meow-describe-keymap
   "The function used to describe (KEYMAP) during keypad execution.

@@ -10,81 +10,43 @@ More than half of commands are about movement, they can be classified into 4 gro
 Char & Word movement have explicit direction.
 Current selection's direction will always be ignored.
 
-*** meow-left
+*** meow-left/right
 
-Move cursor left.
+Move cursor left/right.
 
-*** meow-left-expand
-
-Selection type: ~expand char~
-
-Move cursor left and select, the selection can be expand by other char movements.
-
-*** meow-right
-
-Move cursor right.
-
-*** meow-right-expand
+*** meow-left/right-expand
 
 Selection type: ~expand char~
 
-Move cursor right and select, the selection can be expand by other char movements.
+Move cursor left/right and select, the selection can be expand by other char movements.
 
-*** meow-prev
+*** meow-prev/next
 
-Move cursor to previous line.
+Move cursor to previous/next line.
 
-*** meow-prev-expand
-
-Selection type: ~expand char~
-
-Move cursor prev and select, the selection can be expand by other char movements.
-
-*** meow-next
-
-Move cursor to next line.
-
-*** meow-next-expand
+*** meow-prev/next-expand
 
 Selection type: ~expand char~
 
-Move cursor next and select, the selection can be expand by other char movements.
+Move cursor prev/next and select, the selection can be expand by other char movements.
 
-*** meow-mark-word
+*** meow-mark-word/symbol
 
 Selection Type: ~expand word~
 
-Select current word(from its beginning to end), push the content into ~regexp-search-ring~.
+Select current word/symbol(from its beginning to end), push the content into ~regexp-search-ring~.
 
-*** meow-mark-symbol
-
-Selection Type: ~expand word~
-
-Select current symbol(from its beginning to end), push the content into ~regexp-search-ring~.
-
-*** meow-next-word
+*** meow-next-word/symbol
 
 Selection Type: ~no-expand word~
 
-Select to the back of next word.
+Forward select to the word/symbol end.
 
-*** meow-back-word
-
-Selection type: ~no-expand word~
-
-Select to the front of previous word.
-
-*** meow-next-symbol
-
-Selection Type: ~no-expand word~
-
-Select to the back of next symbol.
-
-*** meow-back-symbol
+*** meow-back-word/symbol
 
 Selection type: ~no-expand word~
 
-Select to the front of previous symbol.
+Backward select to the word/symbol beginning.
 
 ** common movements
 For command in these group, reverse movement can be done with negative argument.
@@ -101,17 +63,21 @@ Use this command to expand quickly.
 
 Selection type: ~no-expand visit~
 
-Read the text from minibuffer, search and select.
-The input will be pushed into ~regexp-search-ring~.
+Read a regexp from minibuffer, search and select it.
+The input will be pushed into ~regexp-search-ring~.  So
+~meow-search~ can be used for further searching with the same condition.
 
-The search should be a regexp, by default the list will be displayed as sanitized text.
-If you preper to see them in regexp format, ~(setq meow-visit-sanitize-completion nil)~.
+A list of occurred regexps will be provided for completion, the regexps will
+be sanitized by default. To display them in raw format, set
+~meow-visit-sanitize-completion~ to nil.
 
 *** meow-search
 
 Selection type: ~no-expand visit~
 
-Search and select with the head of current ~regexp-search-ring~.
+Search and select with the car of current ~regexp-search-ring~.
+
+If the contents of selection doesn't match the regexp, will push it to ~regexp-search-ring~ before searching.
 
 *** meow-line
 
@@ -135,13 +101,13 @@ Select from current point, to the next block.
 
 Selection type: ~no-expand find~
 
-Select from current point, to the back of a specific character.
+Select from current point, to the far end of a specific character.
 
 *** meow-till
 
 Selection type: ~no-expand till~
 
-Select from current point, to the front of a specific charater.
+Select from current point, to the near end of a specific charater.
 
 *** meow-join
 
@@ -214,7 +180,12 @@ Insert a new line below, switch to INSERT state at that line.
 
 Kill current region.
 
-This command support fallback behaviour, default to ~meow-C-k~.
+Depending on the current selection type, there are two special cases:
+- for ~line~ selection, the whole line plus the newline character will be
+  added to the killed content;
+- for ~join~ selection, selected region will be deleted, not killed.
+
+This command supports fallback behaviour. Default to ~meow-C-k~.
 
 *** meow-C-k
 
@@ -256,7 +227,7 @@ This command support fallback behaviour.
 
 *** meow-undo
 
-Undo. Unlike built-in, this command will always cancel selection.
+Undo. Unlike builtin ~undo~, this command will always cancel selection.
 
 *** meow-undo-in-selection
 
@@ -264,7 +235,7 @@ Undo in current selection.
 
 *** meow-pop-selection
 
-Pop one selection
+Pop one selection.
 
 This command support fallback behaviour, default to ~meow-pop-grab~.
 
@@ -274,12 +245,18 @@ Turn current selection into secondary selection.
 
 *** meow-sync-grab
 
-Sync secondary selection with current selection.
+Sychronize the contents of secondary selection to the contents of current region.
+
+Additionally, grab current position(thus you can come back later with ~meow-pop-grab~).
 
 *** meow-swap-grab
 
-Swap secondary selection with current selection.
+Swap the contents of secondary selection with the contents of current region.
+
+Additionally, grab current position.
 
 *** meow-pop-grab
 
-Pop secondary selection.
+Cancel secondary selection.
+
+This command is used as a fallback behavior for ~meow-pop-selection~ by default.

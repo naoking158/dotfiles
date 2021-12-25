@@ -41,7 +41,7 @@ Optional argument ARGS key definitions."
   (mapcar (lambda (key-def)
             (define-key meow-leader-keymap
               (kbd (car key-def))
-              (meow--parse-key-def (cdr key-def))))
+              (meow--parse-def (cdr key-def))))
           args))
 
 (defun meow-normal-define-key (&rest args)
@@ -54,7 +54,7 @@ Optional argument ARGS key definitions."
   (mapcar (lambda (key-def)
             (define-key meow-normal-state-keymap
               (kbd (car key-def))
-              (meow--parse-key-def (cdr key-def))))
+              (meow--parse-def (cdr key-def))))
           args))
 
 (defun meow-motion-overwrite-define-key (&rest args)
@@ -62,7 +62,7 @@ Optional argument ARGS key definitions."
   (mapc (lambda (key-def)
           (define-key meow-motion-state-keymap
             (kbd (car key-def))
-            (meow--parse-key-def (cdr key-def))))
+            (meow--parse-def (cdr key-def))))
         args)
   (cl-loop for arg in args do
            (add-to-list 'meow--motion-overwrite-keys (car arg))))
@@ -81,8 +81,8 @@ This function should be called after you setup other parts of the mode-line
 If this function is not enough for your requirements,
 use `meow-indicator' to get the raw text for indicator
 and put it anywhere you want."
-  (unless (-contains? mode-line-format '(:eval (meow-indicator)))
-    (setq-default mode-line-format (append '((:eval (meow-indicator)) " ") mode-line-format))))
+  (unless (cl-find '(:eval (meow-indicator)) mode-line-format :test 'equal)
+    (setq-default mode-line-format (append '((:eval (meow-indicator))) mode-line-format))))
 
 (provide 'meow-helpers)
 ;;; meow-helpers.el ends here

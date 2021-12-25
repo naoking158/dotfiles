@@ -3,7 +3,49 @@
 ## Master (Unreleased)
 
 ### Enhancements
+* Remap `describe-key` to `meow-describe-key` which handles the dispatched keybinds.
+* Allow leader in beacon state(still can not switch to keypad).
+
+### Bugs fixed
+* [#148](https://github.com/meow-edit/meow/issues/148) Wrap `regexp-quote` for raw search in `meow-search`.
+* [#144](https://github.com/meow-edit/meow/pull/144) [#145](https://github.com/meow-edit/meow/pull/145) [#151](https://github.com/meow-edit/meow/pull/151) Improve wording in `meow-tutor`.
+* [#153](https://github.com/meow-edit/meow/pull/153) Avoid executing symbol-name w.r.t lambda func.
+
+## 1.2.1 (2021-12-22)
+
+### Bugs fixed
+* `hl-line-mode` is not restored correctly after beacon state.
+* Using `meow-grab` in beacon kmacro recording causes residual overlays.
+* [#138](https://github.com/meow-edit/meow/issues/138) meow-global-mode does not work after being turned off.
+* Wrong count in search indicator when searching same contents cross buffers.
+* Better initial state detection.
+* [#143](https://github.com/meow-edit/meow/issues/143) Wrong column beacon positions when secondary selection is not started with line beginning.
+
+## 1.2.0 (2021-12-16)
+
+### Breaking Changes
+
+#### Changes for THING register
+The built-in thing definition shipped by meow should be more close to what Emacs gives us.
+So two previously added, complex things are removed. A helper function is added, so you can easily
+register new thing with Emacs things, functions, syntax descriptions or regexp pairs.
+
+- A helper function `meow-thing-register` is provided, check its document for usage.
+- Thing `indent` and `extend` has been removed.
+- Variable `meow-extend-syntax`(undocumented) has been removed.
+- Add custom variable `meow-thing-selection-directions`.
+- `meow-bounds-of-thing` will create a backward selection by default.
+
+### Enhancements
 * Remove paredit shims, no longer needed.
+* [#110](https://github.com/meow-edit/meow/issues/110) Only disable hint overlay for modes in `meow-expand-exclude-mode-list`.
+* Add custom variable `meow-motion-remap-prefix.`
+* Remove `dash.el` and `s.el` from dependencies.
+* Add more defaults to `meow-mode-state-list`.
+* `meow-swap/sync-grab` will grab on current position, thus you can go
+  back to previous position with `meow-pop-grab` later.
+* Improve char-thing table format for thing-commands.
+* Improve default state detection.
 
 ## 1.1.1 (2021-12-06)
 

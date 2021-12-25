@@ -1,9 +1,23 @@
 #+title: TUTORIAL
 
-Meow is a modal editing with 5 states: NORMAL, INSERT, MOTION, KEYPAD and BEACON.
+* Keybindings Cheat Sheet
+
+We have created some recommended configs for specific keyboard layouts that you can re-use for a quick setup.
+
+[[https://github.com/meow-edit/meow/blob/master/KEYBINDING_QWERTY.org][QWERTY]] - [[https://github.com/meow-edit/meow/blob/master/KEYBINDING_DVORAK.org][DVORAK]] - [[https://github.com/meow-edit/meow/blob/master/KEYBINDING_DVP.org][PROGRAMMER DVORAK]] - [[https://github.com/meow-edit/meow/blob/master/KEYBINDING_COLEMAK.org][COLEMAK]]
+
+You can very easily change any of these when you setup Meow.
+
+* Tutor inside Emacs
+
+There is a tutor inside Emacs after installing Meow. Open it with ~M-x meow-tutor~.
+
+* States
+
+Meow's modal editing has 5 states: NORMAL, INSERT, MOTION, KEYPAD and BEACON.
 In this tutorial, we will walk through these states and basic operations.
 
-* INSERT
+** INSERT
 
 You can switch to INSERT state with ~meow-insert/append/change/open-below/open-above~.
 
@@ -13,7 +27,7 @@ NOTE:
 
 If you enter INSERT state by ~meow-change~, the inserted content will be selected when you exit.
 
-* NORMAL
+** NORMAL
 
 NORMAL state is the default state for text editing.
 
@@ -21,9 +35,14 @@ For commands in NORMAL state is defined via ~meow-normal-define-key~.
 
 [[file:COMMANDS.org][Check here for command documents]]
 
-* MOTION
+** MOTION
 
 MOTION state is the default state for special modes, like ~dired~, ~proced~, etc.
+
+By default, MOTION state has no keybindings, except ~SPC~ is used as the leader key. The original command on ~SPC~ can be access via ~SPC SPC~.
+
+Users may want a consistent keybindings for movement globally, for example: k/j to move up/down. Usually, you can bind k/j in MOTION state,
+however the original command on k/j is not accessible. To solve the problem, Meow introduce a simple solution.
 
 For any keybinding you defined with ~meow-motion-overwrite-define-key~, the overwrited command will be bound to the key with ~hyper~ modifier.
 
@@ -34,11 +53,21 @@ Here's an example: you want use ~j~ as ~next-line~ globally.
   (meow-leader-define-key '("j" . "H-j"))
 #+end_src
 
-Now ~j~ will act as ~next-line~, the original command on ~j~ (e.g. ~dired-goto-file~ in ~dired~) can be access via ~SPC j~.
+Now ~j~ will act as ~next-line~, the original command on ~j~ (e.g. ~dired-goto-file~ in ~dired~) will be bound to ~H-j~.
+Since we use ~j~ in the leader for ~H-j~, now we can call it via ~SPC j~.
 
-Of course, you can access the original command on ~SPC~ via ~SPC SPC~ (Default behaviour, no config needed).
+It is also possible to route the original command(e.g. ~j~) to original motion key(e.g. ~n~).
 
-* KEYPAD
+#+begin_src emacs-lisp
+  (meow-motion-overwrite-define-key '("j" . next-line))
+  (meow-motion-overwrite-define-key '("n" . "H-j"))
+#+end_src
+
+Now you have swapped ~j~ and ~n~.
+
+The settings we made has nothing to do with the name of a command. Thus, it works in all special modes.
+
+** KEYPAD
 
 KEYPAD is the state used for executing commands without modifier keys.
 
@@ -63,7 +92,7 @@ For example, to execute ~C-M-x C-a M-b c d~, press ~g x a m b SPC c SPC d~, or m
 
 After command execution, no matter succeed or failed, KEYPAD state will be disabled.
 
-* BEACON
+** BEACON
 
 #+begin_quote
 BEACON - Batch KMacro

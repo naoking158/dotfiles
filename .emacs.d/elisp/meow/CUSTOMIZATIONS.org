@@ -52,6 +52,12 @@ Example usage:
   (setq-default mode-line-format '((:eval (meow-indicator)) ...))
 #+end_src
 
+** meow-thing-register
+
+Register a thing which can be used for ~meow-beginning/end/inner/bounds-of-thing~.  To bind it to a key, check variable ~meow-char-thing-table~.
+
+Check function's documentation for usage examples.
+
 * Variables
 
 ** meow-mode-state-list
@@ -109,7 +115,8 @@ Default:
   ((meow-change . meow-change-char)
    (meow-kill . meow-C-k)
    (meow-cancel-selection . keyboard-quit)
-   (meow-pop-selection . meow-pop-grab))
+   (meow-pop-selection . meow-pop-grab)
+   (meow-beacon-change . meow-beacon-change-char))
 #+end_src
 
 Fallback behaviours for selection-only commands when there's no selection.
@@ -134,8 +141,7 @@ Default:
    (?p . paragraph)
    (?l . line)
    (?d . defun)
-   (?i . indent)
-   (?x . extend))
+   (?. . sentence))
 #+end_src
 
 Mapping from char to thing.
@@ -220,3 +226,15 @@ The prefix represent no modifier in KEYPAD state.
 Default: ~select~
 
 The type of selection activated by ~meow-expand-*~ commands.
+
+** meow-motion-remap-prefix
+
+Default: "H-"
+
+The prefix string used when remapping an occupied key in MOTION state.
+
+For examples:
+#+begin_example
+  "C-x C-v" will remap the occupied j to C-x C-v j.
+  "C-M-" will remap the occupied j to C-M-j.
+#+end_example

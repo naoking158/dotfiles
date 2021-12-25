@@ -29,6 +29,7 @@
 
 (defvar meow-keymap
   (let ((keymap (make-sparse-keymap)))
+    (define-key keymap [remap describe-key] #'meow-describe-key)
     keymap)
   "Global keymap for Meow.")
 
@@ -114,7 +115,7 @@
       (define-key map (kbd "DEL") 'meow-keypad-undo)
       (define-key map (kbd "<backspace>") 'meow-keypad-undo)
       (define-key map (kbd "<escape>") 'meow-keypad-quit)
-      (define-key map (kbd "C-g") 'meow-keypad-quit)
+      (define-key map [remap keyboard-quit] 'meow-keypad-quit)
       (define-key map (kbd "<tab>") 'meow-keypad-self-insert)
       (define-key map (kbd "TAB") 'meow-keypad-self-insert)
       (define-key map (kbd "<return>") 'meow-keypad-self-insert)
@@ -134,6 +135,7 @@
 (defvar meow-beacon-state-keymap
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map meow-normal-state-keymap)
+    (suppress-keymap map t)
 
     ;; kmacros
     (define-key map [remap meow-insert] 'meow-beacon-insert)
@@ -162,7 +164,6 @@
     (define-key map [remap meow-swap-grab] 'meow-beacon-noop)
     (define-key map [remap meow-sync-grab] 'meow-beacon-noop)
     (define-key map [remap meow-keypad-start] 'meow-beacon-disallow-keypad-start)
-    (define-key map (kbd "SPC") 'meow-beacon-noop)
     map)
   "Keymap for Meow cursor state.")
 

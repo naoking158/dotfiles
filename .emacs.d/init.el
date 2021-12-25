@@ -752,17 +752,19 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 
 (leaf meow
   :after consult
-  :ensure t
+  :leaf-defer nil
   :load-path "~/.emacs.d/elisp/meow-config/"
+  :preface (if (file-exists-p "~/.emacs.d/elisp/meow/")
+               (leaf meow :load-path "~/.emacs.d/elisp/meow/")
+             (leaf meow :ensure t))
+  :config
+  (require 'meow-keybindings)
+  (meow-setup)
+  (meow-global-mode)
   :hook
-  ((emacs-startup-hook . (lambda nil
-                           (require 'meow)
-                           (require 'meow-keybindings)
-                           (meow-setup)
-                           (meow-global-mode)))
-   (meow-insert-exit-hook . (lambda nil
+  ((meow-insert-exit-hook . (lambda nil
                               (if skk-mode (skk-latin-mode-on))))
-   (eshell-mode-hook . meow-insert)
+   (eshell-mode-hook . meow-append)
    (after-change-major-mode-hook . (lambda nil
                                      (if (and (featurep 'magit)
                                               (magit-commit-message-buffer))
