@@ -958,7 +958,13 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
           '(orderless)))
   ;; Optionally configure the first word as flex filtered.
-  (add-hook 'orderless-style-dispatchers #'my/orderless-dispatch-flex-first nil 'local))
+  (add-hook 'orderless-style-dispatchers #'my/orderless-dispatch-flex-first nil 'local)
+  :config
+  (dolist (regexp '("[\\d\\D]*\\.dat\\'"
+                    "[\\d\\D]*\\.pth\\'"
+                    "[\\d\\D]*\\.npy\\'"
+                    "[/\\\\]\\output\\'"))
+    (add-to-list 'lsp-file-watch-ignored-directories regexp)))
 
 
 (leaf lsp-ui
