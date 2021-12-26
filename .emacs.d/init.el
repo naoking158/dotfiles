@@ -1694,6 +1694,7 @@ respectively."
   ((shell-mode-hook eshell-mode-hook) . (lambda ()
                                           (setq completion-in-region-function
                                                 #'consult-completion-in-region)))
+  :bind* ("C-x C-b b" . consult-bookmark)
   :bind
   (([remap switch-to-buffer] . consult-buffer) ; C-x b
    ([remap yank-pop] . consult-yank-pop)       ; M-y
@@ -1704,7 +1705,6 @@ respectively."
    ("C-M-r" . consult-recent-file)
    ("C-x C-o" . consult-file-externally)
    ("C-S-s" . consult-imenu)
-   ("C-x C-b" . consult-bookmark)
    ("C-c C-g" . consult-grep)
    ("C-c C-j" . consult-mark))
   :preface
@@ -3655,6 +3655,9 @@ Interactively, URL defaults to the string looking like a url around point."
   :ensure t
   :hook (org-mode-hook . org-inline-anim-mode))
 
-(leaf burly :ensure t)
+(leaf burly
+  :ensure t
+  :bind* (("C-x C-b w" . burly-bookmark-windows)
+          ("C-x C-b f" . burly-bookmark-frames)))
 
 (provide 'init)

@@ -2526,6 +2526,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   ((shell-mode-hook eshell-mode-hook) . (lambda ()
                                           (setq completion-in-region-function
                                                 #'consult-completion-in-region)))
+  :bind* ("C-x C-b b" . consult-bookmark)
   :bind
   (([remap switch-to-buffer] . consult-buffer) ; C-x b
    ([remap yank-pop] . consult-yank-pop)       ; M-y
@@ -2536,7 +2537,6 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
    ("C-M-r" . consult-recent-file)
    ("C-x C-o" . consult-file-externally)
    ("C-S-s" . consult-imenu)
-   ("C-x C-b" . consult-bookmark)
    ("C-c C-g" . consult-grep)
    ("C-c C-j" . consult-mark))
   :preface
@@ -5284,7 +5284,12 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 ** Save frame and window configs with Burly
 
 #+begin_src emacs-lisp
-(leaf burly :ensure t)
+
+(leaf burly
+  :ensure t
+  :bind* (("C-x C-b w" . burly-bookmark-windows)
+          ("C-x C-b f" . burly-bookmark-frames)))
+
 #+end_src
 
 * Footer
