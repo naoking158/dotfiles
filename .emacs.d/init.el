@@ -1035,7 +1035,8 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :url "https://gitlab.com/groups/python-mode-devs"
   :ensure t
   :mode "\\.py\\'"
-  :custom `((python-indent-guess-indent-offset . t)
+  :custom `((py-keep-windows-configuration . t)
+            (python-indent-guess-indent-offset . t)
             (python-indent-guess-indent-offset-verbose . nil)
             (python-shell-virtualenv-root . ,(expand-file-name "envs/torch"
                                                                path-to-miniconda)))
@@ -1900,7 +1901,11 @@ parses its input."
 
    ;; Enable indentation+completion using the TAB key.
    ;; `completion-at-point' is often bound to M-TAB.
-   (tab-always-indent . 'complete))
+   (tab-always-indent . 'complete)
+   (tab-first-completion . 'word))
+  :hook (python-mode-hook . (lambda nil
+                              (setq-local corfu-auto t
+                                          corfu-auto-delay 0.4)))
 
   ;; Optionally use TAB for cycling, default is `corfu-complete'.
   :bind (:corfu-map
