@@ -9,7 +9,8 @@ function build_emacs --argument-names 'emacs_version'
         ./autogen.sh
     end
     
-    if test -n "$IS_MAC"        
+    if test -n "$IS_MAC"
+        set MAKE_CMD gmake
         set patch_dir ~/.emacs.d/emacs_patches
         set patch_url "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-28/fix-window-role.patch"
         set patch_url "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-28/system-appearance.patch" $patch_url
@@ -28,6 +29,8 @@ function build_emacs --argument-names 'emacs_version'
             echo "Apply patch: $patch_file"
             patch -p1 < $patch_file
         end
+    else
+        set MAKE_CMD make
     end
 
     
@@ -37,9 +40,9 @@ function build_emacs --argument-names 'emacs_version'
         --with-native-compilation
         # CPPFLAGS=-I/opt/homebrew/opt/ruby/include \
         # LDFLAGS=-L/opt/homebrew/opt/ruby/lib
-        
-    make -j(nproc) bootstrap
 
+    $MAKE_CMD -j(nproc) bootstrap
+    
     if test -e ~/src/github.com/emacsfodder/emacs-icons-project
         echo ""
         echo "Change Emacs icons ..."
@@ -62,11 +65,17 @@ function build_emacs --argument-names 'emacs_version'
         chmod +w ~/src/github.com/emacs-mirror/emacs/nextstep/Emacs.app/Contents/MacOS/bin/emacs
         
         echo \n"Build is Done!
-        Finally, move `./nextstep/Emacs.app` into `/Applications/` and do bellow commands:
+        
+        Finally, recommend following steps:
 
+        mv $emacs_dir/nextstep/Emacs.app /Applications/
         sudo ln -s /Applications/Emacs.app/Contents/MacOS/bin/emacs /usr/local/bin/emacs
         sudo ln -s /Applications/Emacs.app/Contents/MacOS/bin/emacsclient /usr/local/bin/emacsclient
 
+        If necessary, execute following steps before create symlinks:
+
+        sudo unlink /usr/local/bin/emacs
+        sudo unlink /usr/local/bin/emacsclient
         "
     end
 end
