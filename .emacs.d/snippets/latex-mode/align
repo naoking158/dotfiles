@@ -1,6 +1,6 @@
 # key: ali
-# name: ali
+# name: align
 # --
-\begin{align${1:*}}
-$0
+\begin{align$1}
+  $0
 \end{align$1}
