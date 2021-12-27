@@ -1422,7 +1422,7 @@ respectively."
           ("C-c y g" . yas-reload-all))))
 
 (leaf google-translate
-  :ensure t
+  :ensure t popup
   :bind ("C-c t" . google-translate-smooth-translate)
   :custom
   (google-translate-translation-directions-alist . '(("en" . "ja")
