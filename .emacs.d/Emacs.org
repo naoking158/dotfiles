@@ -4934,19 +4934,21 @@ To avoid installing x86_64 version, The following steps should be required.
                         (tree-sitter-hl-mode))))
 
 
+(leaf tree-sitter-aarch64
+  :when (string-match "aarch64" system-configuration)
+  :load-path `(,(mapcar (lambda (elm)
+                          (concat "~/.emacs.d/elisp/elisp-tree-sitter/" elm "/"))
+			                  '("core" "lisp" "langs")))
+  :hook (python-mode-hook . (lambda nil
+                              (require 'tree-sitter)
+                              (require 'tree-sitter-hl)
+                              (require 'tree-sitter-langs)
+                              (require 'tree-sitter-debug)
+                              (require 'tree-sitter-query)
+                              (tree-sitter-mode)
+                              (tree-sitter-hl-mode)))
+  :init (setq tsc-dyn-get-from '(:compilation)))
 
-;; (leaf tree-sitter
-;;   :load-path `(,(mapcar (lambda (elm)
-;;                           (concat "~/.emacs.d/elisp/elisp-tree-sitter/" elm "/"))
-;; 			                  '("core" "lisp" "langs")))
-;;   :hook (python-mode-hook . (lambda nil
-;;                               (require 'tree-sitter)
-;;                               (require 'tree-sitter-hl)
-;;                               (require 'tree-sitter-langs)
-;;                               (require 'tree-sitter-debug)
-;;                               (require 'tree-sitter-query)
-;;                               (tree-sitter-mode)
-;;                               (tree-sitter-hl-mode))))
 #+end_src
 
 

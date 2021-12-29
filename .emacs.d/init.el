@@ -3409,19 +3409,20 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
                         (tree-sitter-hl-mode))))
 
 
-
-;; (leaf tree-sitter
-;;   :load-path `(,(mapcar (lambda (elm)
-;;                           (concat "~/.emacs.d/elisp/elisp-tree-sitter/" elm "/"))
-;; 			                  '("core" "lisp" "langs")))
-;;   :hook (python-mode-hook . (lambda nil
-;;                               (require 'tree-sitter)
-;;                               (require 'tree-sitter-hl)
-;;                               (require 'tree-sitter-langs)
-;;                               (require 'tree-sitter-debug)
-;;                               (require 'tree-sitter-query)
-;;                               (tree-sitter-mode)
-;;                               (tree-sitter-hl-mode))))
+(leaf tree-sitter-aarch64
+  :when (string-match "aarch64" system-configuration)
+  :load-path `(,(mapcar (lambda (elm)
+                          (concat "~/.emacs.d/elisp/elisp-tree-sitter/" elm "/"))
+			                  '("core" "lisp" "langs")))
+  :hook (python-mode-hook . (lambda nil
+                              (require 'tree-sitter)
+                              (require 'tree-sitter-hl)
+                              (require 'tree-sitter-langs)
+                              (require 'tree-sitter-debug)
+                              (require 'tree-sitter-query)
+                              (tree-sitter-mode)
+                              (tree-sitter-hl-mode)))
+  :init (setq tsc-dyn-get-from '(:compilation)))
 
 (leaf xwwp
   :disabled t
