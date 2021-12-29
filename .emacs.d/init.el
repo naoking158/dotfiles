@@ -1797,6 +1797,7 @@ respectively."
               ;; for consult-line
               (consult-location (styles orderless-migemo-style))
               (consult-multi (styles orderless-default-style))
+              (citar-reference (styles orderless-migemo-style))
               (unicode-name (styles orderless-migemo-style))
               (command (styles orderless-default-style))
               (org-roam-node (styles orderless-migemo-style)))))
