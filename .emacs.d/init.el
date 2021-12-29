@@ -544,7 +544,12 @@
             modus-themes-org-agenda '((header-block . (variable-pitch scale-title))
                                       (header-date . (grayscale workaholic bold-today))
                                       (scheduled . uniform)
-                                      (habit . traffic-light-deuteranopia)))
+                                      (habit . traffic-light-deuteranopia))
+            modus-themes-headings '((1 . (bold overline variable-pitch background 1.4))
+                                    (2 . (bold overline variable-pitch 1.3))
+                                    (3 . (bold variable-pitch 1.2))
+                                    (4 . (bold variable-pitch 1.15))
+                                    (t . (bold variable-pitch 1.1))))
       ;; Load the theme files before enabling a theme
       (modus-themes-load-themes)
       ;; Load choiced theme
@@ -2220,7 +2225,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :tag "builtin"
   ;; :ensure org-plus-contrib
   :mode "\\.org\\'"
-  :hook (org-mode-hook . my/org-mode-hook)
+  ;; :hook (org-mode-hook . my/org-mode-hook)
   :custom
   ((org-directory . "~/org/")
    (org-ellipsis . " ▼ ")
@@ -2268,6 +2273,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                      ("mt" . "todo")
                                      ("ms" . "summary"))))
 
+  :custom-face (org-document-title . '((t (:inherit t :weight bold :height 1.6))))
   :defun my/set-org-face
   :preface
   (defun my/set-org-face (&rest sym-theme)
