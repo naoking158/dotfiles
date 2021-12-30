@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: inner
+# key: inn
+# --
+\inner{$1}{$2}
