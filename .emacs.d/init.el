@@ -2164,6 +2164,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf eshell
   :bind* ("C-x m" . eshell)
   :config
+  (eshell/alias "dua" "du -shc * | sort -h")
+  (eshell/alias "ll" "ls -l")
+  (eshell/alias "bd" "cd ../")
+  
   (leaf eshell-p10k
     :load-path "~/.emacs.d/elisp/eshell-p10k/"
     :require t
