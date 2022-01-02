@@ -373,13 +373,18 @@
   :commands command-log-mode)
 
 (defun my/bibtex-indent-in-buffer nil
+  "Align indent and equal symbol"
   (interactive)
   (setq bibtex-align-at-equal-sign t)
-  (goto-char (point-min))
   (save-excursion
-    (while (not (eobp))
-      (re-search-forward "\@" nil t)
-      (bibtex-fill-entry))))
+    (goto-char (point-min))
+    (let ((is-failed nil))
+      (while (not is-failed)
+        (condition-case nil
+            (progn
+              (re-search-forward "\@")
+              (bibtex-fill-entry))
+          (error (setq is-failed t)))))))
 
 (leaf ui
   :leaf-defer nil
