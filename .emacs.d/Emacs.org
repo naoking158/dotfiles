@@ -3084,6 +3084,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   (eshell/alias "dua" "du -shc * | sort -h")
   (eshell/alias "ll" "ls -l")
   (eshell/alias "bd" "cd ../")
+  (eshell/alias "e" "emacsclient $1")
   
   (leaf eshell-p10k
     :load-path "~/.emacs.d/elisp/eshell-p10k/"
