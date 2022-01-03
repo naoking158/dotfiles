@@ -3086,10 +3086,12 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf eshell
   :bind* ("C-x m" . eshell)
   :config
-  (eshell/alias "dua" "du -shc * | sort -h")
-  (eshell/alias "ll" "ls -l")
-  (eshell/alias "bd" "cd ../")
-  (eshell/alias "e" "emacsclient $1")
+  (leaf em-alias
+    :defer-config
+    (eshell/alias "dua" "du -shc * | sort -h")
+    (eshell/alias "ll" "ls -l")
+    (eshell/alias "bd" "cd ../")
+    (eshell/alias "e" "emacsclient $1"))
   
   (leaf eshell-p10k
     :load-path "~/.emacs.d/elisp/eshell-p10k/"
@@ -3104,21 +3106,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
       (eshell-p10k-def-prompt '(distro dir git prompt-num time)))
 
     (setq eshell-prompt-function #'eshell-p10k-prompt-function
-          eshell-prompt-regexp eshell-p10k-prompt-string))
-
-
-  ;; (defun my-eshell-prompt-function ()
-  ;;   (require 'magit)
-  ;;   (concat
-  ;;    "\n"
-  ;;    (propertize (abbreviate-file-name (eshell/pwd)) 'face '(:foreground "#A3BE8C"))
-  ;;    (and (magit-get-current-branch)
-  ;;         (concat " on " (propertize (magit-get-current-branch) 'face '(:foreground "#EBCB8B")))) "\n$ "))
-
-  ;; (setq eshell-highlight-prompt nil
-  ;;       eshell-prompt-function 'my-eshell-prompt-function
-  ;;       eshell-prompt-regexp "^$ ")
-  )
+          eshell-prompt-regexp eshell-p10k-prompt-string)))
 
 #+end_src
 
