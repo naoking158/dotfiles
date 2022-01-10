@@ -9,6 +9,9 @@
 !/README.md
 
 ## dotfiles
+!/.bashrc
+!/.bash_profile
+!/.profile
 !/.Brewfile
 !/.dir_colors
 !/.hammerspoon/
@@ -23,6 +26,8 @@
 !/.config/
 !/.config/alacritty/
 !/.config/alacritty/**
+!/.config/bash/
+!/.config/bash/**
 !/.config/fish/
 !/.config/fish/*.fish
 !/.config/ranger/

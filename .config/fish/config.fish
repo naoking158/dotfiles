@@ -56,45 +56,45 @@ set -g theme_hostname always
 
 
 set fish_greeting ""
-set -gx TERM xterm-256color
+# set -gx TERM xterm-256color
 
-set -xg USER naoki    # A local network user
-set -xg HOST gateway.mdl.cs.tsukuba.ac.jp    # Host Name for GIP
-set -xg MDL ssh-user@$HOST
+# set -xg USER naoki    # A local network user
+# set -xg HOST gateway.mdl.cs.tsukuba.ac.jp    # Host Name for GIP
+# set -xg MDL ssh-user@$HOST
 
-set -xg OS (uname -r)
-set -xg SYSTEM (uname -s)
-set -xg IS_MANJARO (string match '*MANJARO' $OS)
-set -xg IS_MAC (string match 'Darwin' $SYSTEM)
+# set -xg OS (uname -r)
+# set -xg SYSTEM (uname -s)
+# set -xg IS_MANJARO (string match '*MANJARO' $OS)
+# set -xg IS_MAC (string match 'Darwin' $SYSTEM)
 
-################################################################
-# PATH
-################################################################
-#To solve a locate problem happens in ipython notebook
-set -xg LC_ALL en_US.UTF-8
-set -xg LANG en_US.UTF-8
+# ################################################################
+# # PATH
+# ################################################################
+# #To solve a locate problem happens in ipython notebook
+# set -xg LC_ALL en_US.UTF-8
+# set -xg LANG en_US.UTF-8
 
-# github
-set -xg G_USER (string split -f2 = (git config -l | grep user.name))
-set -xg G_ROOT (string split -f2 = (git config -l | grep ghq.root))
-set -xg G_REPO $HOME/src/github.com/naoking158
+# # github
+# set -xg G_USER (string split -f2 = (git config -l | grep user.name))
+# set -xg G_ROOT (string split -f2 = (git config -l | grep ghq.root))
+# set -xg G_REPO $HOME/src/github.com/naoking158
 
-if test -e $G_REPO
-    set -xg PYTHONPATH $G_REPO $PYTHONPATH
-end
-if test -e $G_REPO/envs/neptune_api_token
-    set -xg NEPTUNE_API_TOKEN (cat $G_REPO/envs/neptune_api_token)
-end
+# if test -e $G_REPO
+#     set -xg PYTHONPATH $G_REPO $PYTHONPATH
+# end
+# if test -e $G_REPO/envs/neptune_api_token
+#     set -xg NEPTUNE_API_TOKEN (cat $G_REPO/envs/neptune_api_token)
+# end
 
-if test -e /usr/lib/w3m/w3mimagedisplay
-    set PATH /usr/lib/w3m/w3mimagedisplay $PATH
-end
+# if test -e /usr/lib/w3m/w3mimagedisplay
+#     set PATH /usr/lib/w3m/w3mimagedisplay $PATH
+# end
 
-set MINICONDA (find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1) 
+# set MINICONDA (find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1)
+
 if test -n "$MINICONDA"
     status is-interactive && eval $MINICONDA/condabin/conda "shell.fish" "hook" $argv | source
 end
-
 
 ################################################################
 # Functions and Aliases
@@ -131,14 +131,16 @@ if [ "$INSIDE_EMACS" = 'vterm' ]
     end
 end
 
+alias bash='FISH_VERSION="$FISH_VERSION" bash'
+
 
 ################################################################
 # Local Config
 ################################################################
-if test -n "$IS_MANJARO"
-    source (dirname (status --current-filename))/config-manjaro.fish
-else if test -n "$IS_MAC"
-    source (dirname (status --current-filename))/config-macos.fish
-end
-source (dirname (status --current-filename))/functions/my-utility-functions.fish
-source (dirname (status --current-filename))/functions/my-server-util.fish
+# if test -n "$IS_MANJARO"
+#     source (dirname (status --current-filename))/config-manjaro.fish
+# else if test -n "$IS_MAC"
+#     source (dirname (status --current-filename))/config-macos.fish
+# end
+# source (dirname (status --current-filename))/functions/my-utility-functions.fish
+# source (dirname (status --current-filename))/functions/my-server-util.fish

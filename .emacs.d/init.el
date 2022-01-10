@@ -58,7 +58,6 @@
     (custom-set-variables
      '(warning-suppress-types '((comp)))
      '(package-archives '(("celpa" . "https://celpa.conao3.com/packages/")
-                          ("org" . "https://orgmode.org/elpa/")
                           ("melpa" . "https://melpa.org/packages/")
                           ("gnu" . "https://elpa.gnu.org/packages/"))))
     (package-initialize)
@@ -210,9 +209,19 @@
     :url "https://github.com/purcell/exec-path-from-shell"
     :ensure t
     :leaf-defer nil
-    :when (memq window-system '(mac ns x))
-    :custom ((exec-path-from-shell-check-startup-files)
-             (exec-path-from-shell-variables . '("PATH" "PYTHONPATH" "NEPTUNE_API_TOKEN")))
+    :when window-system
+    :custom
+    (;; (exec-path-from-shell-check-startup-files)
+     (exec-path-from-shell-variables . '("PATH"
+                                         "SSH_AUTH_SOCK"
+                                         "SSH_AGENT_PID"
+                                         "GPG_AGENT_INFO"
+                                         "LANG"
+                                         "LC_CTYPE"
+                                         "NIX_SSL_CERT_FILE"
+                                         "NIX_PATH"
+                                         "PYTHONPATH"
+                                         "NEPTUNE_API_TOKEN")))
     :config
     (exec-path-from-shell-initialize))
 
@@ -2254,6 +2263,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (isearch-allow-scroll . 'unlimited)
    ;; (org-show-notification-handler . nil)
    (org-structure-template-alist . '(("sh" . "src shell")
+                                     ("bash" . "src bash")
                                      ("c" . "center")
                                      ("C" . "comment")
                                      ("el" . "src emacs-lisp")

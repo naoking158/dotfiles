@@ -32,8 +32,8 @@
       package-enable-at-startup nil
       package-native-compile t)
 
-(when-let ((fish (executable-find "fish")))
-  (setq shell-file-name fish))
+;; (when-let ((fish (executable-find "fish")))
+;;   (setq shell-file-name fish))
 
 ;; GUI
 (setq default-frame-alist '((line-spacing . 2)

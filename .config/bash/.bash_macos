@@ -1,0 +1,32 @@
+#!/bin/bash
+
+export HOMEBREW_EDITOR="emacsclient -nw -a emacs"
+
+# Node
+[[ -e $HOME/.nodebrew/current/bin ]] && {
+    PATH="$HOME/.nodebrew/current/bin:$PATH";
+}
+
+# Homebrew
+[[ -e /opt/homebrew ]] && {
+    BREW_PATH="/opt/homebrew"
+
+    PATH="$BREW_PATH/bin:$PATH"
+
+    PKG_CONFIG_PATH="$BREW_PATH/opt/ruby/lib/pkgconfig"
+    PKG_CONFIG_PATH="$BREW_PATH/opt/cairo/lib/pkgconfig:$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$BREW_PATH/opt/gtk+3/lib/pkgconfig:$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$BREW_PATH/opt/pkgconfig:$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+
+    LDFLAGS="-L$BREW_PATH/opt/ruby/lib"
+    LDFLAGS="-L$BREW_PATH/opt/imagemagick@6/lib:$LDFLAGS"
+    export LDFLAGS
+
+    CPPFLAGS="-I$BREW_PATH/opt/ruby/include"
+    CPPFLAGS="-I$BREW_PATH/opt/imagemagick@6/include:$CPPFLAGS"
+    export CPPFLAGS
+}
+
+# local
+export PATH="/usr/local/bin:$PATH"
