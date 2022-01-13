@@ -30,6 +30,8 @@
 !/.config/bash/**
 !/.config/fish/
 !/.config/fish/*.fish
+!/.config/nixpkgs/
+!/.config/nixpkgs/**
 !/.config/ranger/
 !/.config/ranger/**
 !/.config/skhd/

@@ -2206,6 +2206,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :tag "shell" "fish" "emacs>=24"
   :ensure t)
 
+(leaf nix-mode
+  :ensure t
+  :mode "\\.nix\\'")
+
 (leaf vterm
   :ensure t
   :custom (vterm-max-scrollback . 10000)

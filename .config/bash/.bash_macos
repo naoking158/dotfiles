@@ -11,7 +11,8 @@ export HOMEBREW_EDITOR="emacsclient -nw -a emacs"
 [[ -e /opt/homebrew ]] && {
     BREW_PATH="/opt/homebrew"
 
-    PATH="$BREW_PATH/bin:$PATH"
+    # PATH="$BREW_PATH/bin:$PATH"
+    PATH="$PATH:$BREW_PATH/bin"
 
     PKG_CONFIG_PATH="$BREW_PATH/opt/ruby/lib/pkgconfig"
     PKG_CONFIG_PATH="$BREW_PATH/opt/cairo/lib/pkgconfig:$PKG_CONFIG_PATH"
@@ -29,4 +30,4 @@ export HOMEBREW_EDITOR="emacsclient -nw -a emacs"
 }
 
 # local
-export PATH="/usr/local/bin:$PATH"
+# export PATH="/usr/local/bin:$PATH"

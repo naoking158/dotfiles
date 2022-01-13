@@ -3134,6 +3134,14 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 #+end_src
 
+** Nix Mode
+
+#+begin_src emacs-lisp
+(leaf nix-mode
+  :ensure t
+  :mode "\\.nix\\'")
+#+end_src
+
 ** Vterm Mode
 :PROPERTIES:
 :ID:       112E45C3-62F0-4088-B8AC-43003F942FEA

@@ -131,8 +131,6 @@ if [ "$INSIDE_EMACS" = 'vterm' ]
     end
 end
 
-alias bash='FISH_VERSION="$FISH_VERSION" bash'
-
 
 ################################################################
 # Local Config
