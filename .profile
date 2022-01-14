@@ -42,14 +42,14 @@ fi
 # Set cargo path
 [[ -e $HOME/.cargo/env ]] && . "$HOME/.cargo/env"
 
-if [[ "$OS" = 'macos' ]]; then
-    [[ -e $MY_BASH_PATH/.bash_macos ]] && {
-        . "$MY_BASH_PATH/.bash_macos"
-    }
-elif [[ "$OS" = 'manjaro' ]]; then
-    [[ -e $MY_BASH_PATH/.bash_manjaro ]] && {
-        . "$MY_BASH_PATH/.bash_manjaro"
-    }
-fi
+# if [[ "$OS" = 'macos' ]]; then
+#     [[ -e $MY_BASH_PATH/.bash_macos ]] && {
+#         . "$MY_BASH_PATH/.bash_macos"
+#     }
+# elif [[ "$OS" = 'manjaro' ]]; then
+#     [[ -e $MY_BASH_PATH/.bash_manjaro ]] && {
+#         . "$MY_BASH_PATH/.bash_manjaro"
+#     }
+# fi
 
 export PATH

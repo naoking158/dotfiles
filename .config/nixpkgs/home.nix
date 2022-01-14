@@ -25,6 +25,8 @@
     # Packages
     packages = with pkgs; [
       gtk3-x11
+      xcode-install
+      xcodebuild
     ];
   };
 
