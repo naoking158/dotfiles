@@ -3134,22 +3134,22 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
      ("https://www.reddit.com/r/mac.rss" Mac)
      ("https://www.reddit.com/r/AppleWatch.rss" AppleWatch)))))
 
-(let* ((file-dir (cond
-                  ((when (file-exists-p "/usr/share/emacs/")
-                     "/usr/share/emacs/"))
-                  ((when (file-exists-p "/opt/homebrew/Cellar/mu/")
-                     "/opt/homebrew/Cellar/mu/"))
-                  ((when (file-exists-p "/usr/local/Cellar/mu/")
-                     "/usr/local/Cellar/mu/")))))
-  (setq path-to-mu
-        (car (last (split-string
-                    (shell-command-to-string
-                     (concat "find " file-dir " -type d -name mu4e")))))))
+;; (let* ((file-dir (cond
+;;                   ((when (file-exists-p "/usr/share/emacs/")
+;;                      "/usr/share/emacs/"))
+;;                   ((when (file-exists-p "/opt/homebrew/Cellar/mu/")
+;;                      "/opt/homebrew/Cellar/mu/"))
+;;                   ((when (file-exists-p "/usr/local/Cellar/mu/")
+;;                      "/usr/local/Cellar/mu/")))))
+;;   (setq path-to-mu
+;;         (car (last (split-string
+;;                     (shell-command-to-string
+;;                      (concat "find " file-dir " -type d -name mu4e")))))))
 
 
 (leaf mu4e
-  :when (and window-system path-to-mu)
-  :load-path path-to-mu
+  ;; :when (and window-system path-to-mu)
+  ;; :load-path path-to-mu
   :commands (mu4e)
   :hook (mu4e-headers-mode-hook . (lambda nil (visual-line-mode -1)))
   :config

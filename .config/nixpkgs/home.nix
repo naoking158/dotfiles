@@ -27,6 +27,7 @@
       gtk3-x11
       xcode-install
       xcodebuild
+      (import ./emacs/build_emacs.nix)
     ];
   };
 

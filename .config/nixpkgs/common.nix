@@ -46,5 +46,10 @@
     wget
     zlib
     zstd
-  ]; 
+  ];
+
+  xdg.configFile.fish = {
+    source = ./config/fish;
+    recursive = true;
+  }
 }
