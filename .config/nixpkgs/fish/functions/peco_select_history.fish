@@ -1,0 +1,1 @@
+/Users/naoki/.dotfiles/bin/fish/peco_select_history.fish

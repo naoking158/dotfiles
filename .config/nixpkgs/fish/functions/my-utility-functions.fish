@@ -1,0 +1,1 @@
+/Users/naoki/.dotfiles/bin/fish/my-utility-functions.fish

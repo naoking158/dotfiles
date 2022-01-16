@@ -25,13 +25,13 @@
     # Packages
     packages = with pkgs; [
       gtk3-x11
-      xcode-install
-      xcodebuild
       (import ./emacs/build_emacs.nix)
     ];
   };
 
   programs = {
+    zsh = import ./zsh/zsh.nix { config=config; pkgs=pkgs; }; 
+    
     # Let Home Manager install and manage itself.
     home-manager.enable = true;
   };

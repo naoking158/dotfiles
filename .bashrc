@@ -16,18 +16,6 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
-[[ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]] && {
-    . "$HOME/.nix-profile/etc/profile.d/nix.sh"
-}
-
-[[ -e $HOME/.nix-defexpr ]] && {
-    export NIX_PATH=$HOME/.nix-defexpr/channels${NIX_PATH:+:}$NIX_PATH
-}
-
-[[ -e $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh ]] && {
-    . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
-}
-
 case $- in
     *i*) ;;
     *) return;;

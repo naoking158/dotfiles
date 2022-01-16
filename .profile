@@ -1,4 +1,11 @@
+# export XDG_CONFIG_HOME=$HOME/.config
+
 export TERM=xterm-256color
+
+export XDG_CONFIG_HOME=$HOME/.config
+export XDG_CACHE_HOME=$HOME/.cache
+export XDG_DATA_HOME=$HOME/.local/share
+export XDG_STATE_HOME=$HOME/.local/state
 
 export USER=naoki    # A local network user
 export HOST=gateway.mdl.cs.tsukuba.ac.jp    # Host Name for GIP
@@ -22,7 +29,7 @@ export LANG=en_US.UTF-8
 # github
 G_USER=$(git config user.name)
 G_ROOT=$(git config ghq.root)
-G_REPO=${G_ROOT}/github.com/${G_USER}
+G_REPO=$(eval echo ${G_ROOT}/github.com/${G_USER})
 
 # Python path
 [[ -e $G_REPO ]] && export PYTHONPATH=$G_REPO
@@ -51,5 +58,17 @@ fi
 #         . "$MY_BASH_PATH/.bash_manjaro"
 #     }
 # fi
+
+[[ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]] && {
+    . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+}
+
+[[ -e $HOME/.nix-defexpr ]] && {
+    export NIX_PATH=$HOME/.nix-defexpr/channels${NIX_PATH:+:}$NIX_PATH
+}
+
+[[ -e $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh ]] && {
+    . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+}
 
 export PATH

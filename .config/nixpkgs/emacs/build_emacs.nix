@@ -33,8 +33,8 @@ let
       # rev = "${emacs-source.rev}";
       # sha256 = "${emacs-source.narHash}";
       
-      rev = "8df828e40522b7696cde6ec22a4657173c9f02a1";
-      sha256 = "sha256-A+14OIir7f6Jog5FJmAneX1td+A/fea1fDVkolQgCvQ=";
+      rev = "015d881b6dbdd527e309d8337daaf22d192a3c70";
+      sha256 = "sha256-a36MJb/M4Iyxxw8hGhOv/j5xA/KCE02XiqZObOQXqk0=";
     };
 
     patches = if stdenv.isDarwin
@@ -49,7 +49,7 @@ let
     postPatch = lib.concatStringsSep "\n" [
       ''
       substituteInPlace src/Makefile.in --replace 'RUN_TEMACS = ./temacs' 'RUN_TEMACS = env -i ./temacs'
-      substituteInPlace lisp/international/mule-cmds.el --replace /usr/share/locale ${gettext}/share/locale
+      substituteInPlace lisp/international/mule-cmds.el --replace /usr/share/locale ${pkgs.gettext}/share/locale
       for makefile_in in $(find . -name Makefile.in -print); do
           substituteInPlace $makefile_in --replace /bin/pwd pwd
       done
@@ -60,8 +60,8 @@ let
         backendPath = (lib.concatStringsSep " "
           (builtins.map (x: ''\"-B${x}\"'') [
             # Paths necessary so the JIT compiler finds its libraries:
-            "${lib.getLib libgccjit}/lib"
-            "${lib.getLib libgccjit}/lib/gcc"
+            "${lib.getLib pkgs.libgccjit}/lib"
+            "${lib.getLib pkgs.libgccjit}/lib/gcc"
             "${lib.getLib stdenv.cc.libc}/lib"
 
             # Executable paths necessary for compilation (ld, as):

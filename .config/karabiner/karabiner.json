@@ -993,7 +993,7 @@
                                 },
                                 "to": [
                                     {
-                                        "shell_command": "open -a Emacs.app"
+                                        "shell_command": "open ~/.nix-profile/Applications/Emacs.app"
                                     }
                                 ],
                                 "type": "basic"

@@ -8,7 +8,6 @@
     coreutils
     curl
     exa
-    fish
     fd
     fzf
     gcc
@@ -46,11 +45,5 @@
     wget
     zlib
     zstd
-    iosevka
   ];
-
-  xdg.configFile.fish = {
-    source = ./fish;
-    recursive = true;
-  };
 }

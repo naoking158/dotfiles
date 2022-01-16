@@ -20,42 +20,42 @@
 #     子プロセスにexport されない ようにする。
 
 # --- set Nord color ---
-set -U fish_color_normal normal
-set -U fish_color_command 81a1c1
-set -U fish_color_quote a3be8c
-set -U fish_color_error ebcb8b
-set -U fish_color_redirection b48ead
-set -U fish_color_end 88c0d0
-set -U fish_color_param eceff4
-set -U fish_color_comment 434c5e
-set -U fish_color_match --background=brblue
-set -U fish_color_selection white --bold --background=brblack
-set -U fish_color_search_match bryellow --background=brblack
-set -U fish_color_history_current --bold
-set -U fish_color_operator 00a6b2
-set -U fish_color_escape 00a6b2
-set -U fish_color_cwd green
-set -U fish_color_cwd_root red
-set -U fish_color_valid_path --underline
-set -U fish_color_autosuggestion 4c566a
-set -U fish_color_user brgreen
-set -U fish_color_host normal
-set -U fish_color_cancel -r
-set -U fish_pager_color_completion normal
-set -U fish_pager_color_description B3A06D yellow
-set -U fish_pager_color_prefix normal --bold --underline
-set -U fish_pager_color_progress brwhite --background=cyan
+# set -U fish_color_normal normal
+# set -U fish_color_command 81a1c1
+# set -U fish_color_quote a3be8c
+# set -U fish_color_error ebcb8b
+# set -U fish_color_redirection b48ead
+# set -U fish_color_end 88c0d0
+# set -U fish_color_param eceff4
+# set -U fish_color_comment 434c5e
+# set -U fish_color_match --background=brblue
+# set -U fish_color_selection white --bold --background=brblack
+# set -U fish_color_search_match bryellow --background=brblack
+# set -U fish_color_history_current --bold
+# set -U fish_color_operator 00a6b2
+# set -U fish_color_escape 00a6b2
+# set -U fish_color_cwd green
+# set -U fish_color_cwd_root red
+# set -U fish_color_valid_path --underline
+# set -U fish_color_autosuggestion 4c566a
+# set -U fish_color_user brgreen
+# set -U fish_color_host normal
+# set -U fish_color_cancel -r
+# set -U fish_pager_color_completion normal
+# set -U fish_pager_color_description B3A06D yellow
+# set -U fish_pager_color_prefix normal --bold --underline
+# set -U fish_pager_color_progress brwhite --background=cyan
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 # Theme
-set -g theme_color_scheme terminal-dark
-set -g fish_prompt_pwd_dir_length 1
-set -g theme_display_user yes
-set -g theme_hide_hostname no
-set -g theme_hostname always
+# set -g theme_color_scheme terminal-dark
+# set -g fish_prompt_pwd_dir_length 1
+# set -g theme_display_user yes
+# set -g theme_hide_hostname no
+# set -g theme_hostname always
 
 
-set fish_greeting ""
+# set fish_greeting ""
 # set -gx TERM xterm-256color
 
 # set -xg USER naoki    # A local network user
@@ -92,44 +92,44 @@ set fish_greeting ""
 
 # set MINICONDA (find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1)
 
-if test -n "$MINICONDA"
-    status is-interactive && eval $MINICONDA/condabin/conda "shell.fish" "hook" $argv | source
-end
+# if test -n "$MINICONDA"
+#     status is-interactive && eval $MINICONDA/condabin/conda "shell.fish" "hook" $argv | source
+# end
 
 ################################################################
 # Functions and Aliases
 ################################################################
-alias _sirius='ssh sirius'
-alias _kingkong='ssh kingkong'
-alias __kingkong='ssh _kingkong'
-alias _mdl='ssh _mdl'
-alias _gorilla1='ssh gorilla1'
-alias _gorilla2='ssh gorilla2'
-alias _gorilla3='ssh gorilla3'
-alias _zeus='ssh zeus'
-alias _koike='ssh koike'
-alias _tanabe='ssh tanabe'
+# alias _sirius='ssh sirius'
+# alias _kingkong='ssh kingkong'
+# alias __kingkong='ssh _kingkong'
+# alias _mdl='ssh _mdl'
+# alias _gorilla1='ssh gorilla1'
+# alias _gorilla2='ssh gorilla2'
+# alias _gorilla3='ssh gorilla3'
+# alias _zeus='ssh zeus'
+# alias _koike='ssh koike'
+# alias _tanabe='ssh tanabe'
 
-alias dua='/usr/bin/du -shc * | sort -h'
-alias en_latex='latexmk -e "$bibtex=q/bibtex/" -pdf -pvc'
-alias ja_latex='latexmk -pvc'
+# alias dua='/usr/bin/du -shc * | sort -h'
+# alias en_latex='latexmk -e "$bibtex=q/bibtex/" -pdf -pvc'
+# alias ja_latex='latexmk -pvc'
 
-alias e='emacsclient'
-alias en='emacsclient -nw'
-alias ekill='emacsclient -e "(kill-emacs)"'
-alias ed='emacs -nw --daemon'
+# alias e='emacsclient'
+# alias en='emacsclient -nw'
+# alias ekill='emacsclient -e "(kill-emacs)"'
+# alias ed='emacs -nw --daemon'
 
-if type -q exa
-    alias ll "exa -l -g --icons"
-    alias lla "ll -a"
-end
+# if type -q exa
+#     alias ll "exa -l -g --icons"
+#     alias lla "ll -a"
+# end
 
-if [ "$INSIDE_EMACS" = 'vterm' ]
-    function clear
-        vterm_printf "51;Evterm-clear-scrollback";
-        tput clear;
-    end
-end
+# if [ "$INSIDE_EMACS" = 'vterm' ]
+#     function clear
+#         vterm_printf "51;Evterm-clear-scrollback";
+#         tput clear;
+#     end
+# end
 
 
 ################################################################
