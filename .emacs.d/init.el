@@ -2595,19 +2595,19 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                  (shell . t)))
 
 (leaf ob-emacs-lisp
-  :ensure org-plus-contrib
+  :ensure org
   :commands (org-babel-execute:emacs-lisp))
 
 (leaf ob-python
-  :ensure org-plus-contrib
+  :ensure org
   :commands (org-babel-execute:python org-babel-expand-body:python))
 
 (leaf ob-latex
-  :ensure org-plus-contrib
+  :ensure org
   :commands (org-babel-execute:latex))
 
 (leaf ob-shell
-  :ensure org-plus-contrib
+  :ensure org
   :commands
   org-babel-execute:sh
   org-babel-expand-body:sh
