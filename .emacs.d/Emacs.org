@@ -76,6 +76,7 @@ a bunch of resources I've found online.
 - [[#shell][Shell]]
   - [[#eshell][Eshell]]
   - [[#fish-mode][Fish Mode]]
+  - [[#nix-mode][Nix Mode]]
   - [[#vterm-mode][Vterm Mode]]
 - [[#runtime-performance][Runtime Performance]]
   - [[#silent-garbage-collection-with-gcmh][Silent Garbage collection with gcmh]]
@@ -321,6 +322,9 @@ By setting ~exec-profile~ to ~t~, profiling startup time is executed.
       )))
 
 #+end_src
+
+#+RESULTS:
+: leaf-setup
 
 * Keep .emacs.d Clean
 :PROPERTIES:
