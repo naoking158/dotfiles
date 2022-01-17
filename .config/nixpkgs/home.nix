@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 {
-  imports = [ ./common.nix ];
+  imports = [ ./common.nix ./mail/mail.nix ];
 
   home = {
     # Home Manager needs a bit of information about you and the

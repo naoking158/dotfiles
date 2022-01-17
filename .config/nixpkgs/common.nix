@@ -25,8 +25,6 @@
     librsvg
     llvm
     mailutils
-    msmtp
-    mu
     nkf
     nodejs
     peco
