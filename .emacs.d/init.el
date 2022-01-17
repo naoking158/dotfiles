@@ -1823,7 +1823,7 @@ respectively."
     :config
     (setq my--orderless-default-styles
           '(orderless-prefixes
-            orderless-strict-leading-initialism
+            orderless-initialism
             orderless-regexp))
 
     (defun my--orderless-literal-dispatcher (pattern _index _total)
@@ -1838,7 +1838,7 @@ parses its input."
 It matches PATTERN _INDEX and _TOTAL according to how Orderless
 parses its input."
       (when (string-suffix-p "," pattern)
-        `(orderless-strict-initialism . ,(substring pattern 0 -1))))
+        `(orderless-initialism . ,(substring pattern 0 -1))))
 
     (defun my--orderless-flex-dispatcher (pattern _index _total)
       "Flex  dispatcher using the tilde suffix.
@@ -1863,14 +1863,14 @@ parses its input."
      orderless-default-style
      (orderless-matching-styles '(orderless-literal
                                   orderless-prefixes
-                                  orderless-strict-initialism
+                                  orderless-initialism
                                   orderless-regexp)))
 
     (orderless-define-completion-style
      orderless-migemo-style
      (orderless-matching-styles '(orderless-literal
                                   orderless-prefixes
-                                  orderless-strict-initialism
+                                  orderless-initialism
                                   orderless-regexp
                                   orderless-migemo)))))
 
