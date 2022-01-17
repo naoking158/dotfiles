@@ -57,9 +57,9 @@
   (eval-and-compile
     (custom-set-variables
      '(warning-suppress-types '((comp)))
-     '(package-archives '(("celpa" . "https://celpa.conao3.com/packages/")
-                          ("melpa" . "https://melpa.org/packages/")
-                          ("gnu" . "https://elpa.gnu.org/packages/"))))
+     '(package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                          ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+                          ("melpa" . "https://melpa.org/packages/"))))
     (package-initialize)
     (unless (package-installed-p 'leaf)
       (package-refresh-contents)
