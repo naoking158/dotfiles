@@ -12,7 +12,7 @@ least specific (the system profile)"
 (require 'seq)
 (let* ((subdirectory-sites (lambda (site-lisp)
                              (when (file-exists-p site-lisp)
-                               (seq-filter (lambda (f) (file-directory-p (file-truename f)))
+                               (seq-filter (lambda (f) (file-directory-p f))
                                            ;; Returns all files in `site-lisp', excluding `.' and `..'
                                            (directory-files site-lisp 'full "^\\([^.]\\|\\.[^.]\\|\\.\\..\\)")))))
        (paths (apply #'append

@@ -770,12 +770,13 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
                                                              )))))
 
 (leaf meow
+  :ensure t
   :after consult
   :leaf-defer nil
   :load-path "~/.emacs.d/elisp/meow-config/"
-  :preface (if (file-exists-p "~/.emacs.d/elisp/meow/")
-               (leaf meow :load-path "~/.emacs.d/elisp/meow/")
-             (leaf meow :ensure t))
+  ;; :preface (if (file-exists-p "~/.emacs.d/elisp/meow/")
+  ;;              (leaf meow :load-path "~/.emacs.d/elisp/meow/")
+  ;;            (leaf meow :ensure t))
   :config
   (require 'meow-keybindings)
   (meow-setup)
@@ -2278,6 +2279,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                      ("s" . "src")
                                      ("py" . "src python :session py :async yes")
                                      ("jp" . "src jupyter-python :session py :async yes :kernel torch")
+                                     ("js" . "src javascript")
                                      ("d" . "definition")
                                      ("t" . "theorem")
                                      ("mc" . "quoting")
@@ -3134,6 +3136,35 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
      ("https://www.reddit.com/r/mac.rss" Mac)
      ("https://www.reddit.com/r/AppleWatch.rss" AppleWatch)))))
 
+(setq user-full-name "Naoki Sakamoto"
+      user-mail-address "naoki@bbo.cs.tsukuba.ac.jp"
+      mail-header-separator (purecopy "*****")
+      message-kill-buffer-on-exit t
+      message-wide-reply-confirm-recipients t
+      mail-specify-envelope-from t
+      message-sendmail-envelope-from 'header
+      mail-envelope-from 'header
+      mail-user-agent 'notmuch-user-agent
+      message-send-mail-function 'smtpmail-send-it
+      )
+
+(leaf org-msg
+  :ensure t org-contrib
+  :after notmuch
+  :config
+  (require 'ox-extra)
+  (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
+        ;; org-msg-startup "hidestars indent inlineimages"
+        org-msg-recipient-names '(("naoki@bbo.cs.tsukuba.ac.jp" . "Naoki Sakamoto")
+                                  ("nok.skmt.snow@gmail.com" . "Naoki Sakamoto")
+                                  ("s1930160@s.tsukuba.ac.jp". "Naoki Sakamoto"))
+        ;; org-msg-greeting-name-limit 3
+        org-msg-default-alternatives '((new		. (text html))
+                                       (reply-to-html	. (text html))
+                                       (reply-to-text	. (text)))
+        org-msg-convert-citation t)
+  (org-msg-mode))
+
 ;; (let* ((file-dir (cond
 ;;                   ((when (file-exists-p "/usr/share/emacs/")
 ;;                      "/usr/share/emacs/"))
@@ -3272,21 +3303,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                  (file ,(concat jethro/org-agenda-directory "inbox.org"))
                  "* TODO %^{Description}\n%A\n%?\n"))
 
-  (leaf org-msg
-    :ensure t
-    :config
-    (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
-          ;; org-msg-startup "hidestars indent inlineimages"
-          org-msg-recipient-names '(("naoki@bbo.cs.tsukuba.ac.jp" . "Naoki Sakamoto")
-                                    ("nok.skmt.snow@gmail.com" . "Naoki Sakamoto"))
-          ;; org-msg-greeting-name-limit 3
-          org-msg-default-alternatives '((new		. (text html))
-                                         (reply-to-html	. (text html))
-                                         (reply-to-text	. (text)))
-          org-msg-convert-citation t)
-    (org-msg-mode))
-
-  :advice
+    :advice
   ;; disable fancy characters only for flags
   (:around mu4e~headers-flags-str (lambda (f &rest args)
                                     (let* ((mu4e-use-fancy-chars nil))
@@ -3705,6 +3722,7 @@ Interactively, URL defaults to the string looking like a url around point."
 ;; (add-to-list 'load-path "/usr/share/emacs/site-lisp/")
 (leaf notmuch
   :ensure t
+  :commands notmuch notmuch-hello
   :config
 ;;; Account settings
   ;; (setq notmuch-identities
@@ -3722,9 +3740,9 @@ Interactively, URL defaults to the string looking like a url around point."
 ;;; General UI
   (setq notmuch-show-logo nil)
   (setq notmuch-column-control t)
-  ;; (setq notmuch-hello-auto-refresh t)
-  ;; (setq notmuch-hello-recent-searches-max 50)
-  ;; (setq notmuch-hello-thousands-separator "")
+  (setq notmuch-hello-auto-refresh t)
+  (setq notmuch-hello-recent-searches-max 50)
+  (setq notmuch-hello-thousands-separator "")
   (setq notmuch-show-all-tags-list nil)
 
 ;;; Search
@@ -3781,18 +3799,6 @@ Interactively, URL defaults to the string looking like a url around point."
   (setq notmuch-draft-tags '("+draft"))
   (setq notmuch-draft-folder "drafts")
   (setq notmuch-draft-save-plaintext 'ask)
-  ;; ;; NOTE 2021-06-18: See an updated version in the `prot-notmuch'
-  ;; ;; section below.
-  ;; (setq notmuch-tagging-keys
-  ;;       `((,(kbd "a") notmuch-archive-tags "Archive (remove from inbox)")
-  ;;         (,(kbd "c") ("+archived" "-inbox" "-list" "-todo" "-ref" "-unread") "Complete and archive")
-  ;;         (,(kbd "d") ("+del" "-inbox" "-archived" "-unread") "Mark for deletion")
-  ;;         (,(kbd "f") ("+flag" "-unread") "Flag as important")
-  ;;         ;; (,(kbd "r") notmuch-show-mark-read-tags "Mark as read")
-  ;;         (,(kbd "r") ("+ref" "-unread") "Reference for the future")
-  ;;         (,(kbd "s") ("+spam" "+del" "-inbox" "-unread") "Mark as spam")
-  ;;         (,(kbd "t") ("+todo" "-unread") "To-do")
-  ;;         (,(kbd "u") ("+unread") "Mark as unread")))
   (setq notmuch-tag-formats
         '(("unread" (propertize tag 'face 'notmuch-tag-unread))
           ("flag" (propertize tag 'face 'notmuch-tag-flagged))))
@@ -3803,7 +3809,9 @@ Interactively, URL defaults to the string looking like a url around point."
 ;;; Email composition
   (setq notmuch-mua-compose-in 'current-window)
   (setq notmuch-mua-hidden-headers nil) ; TODO 2021-05-12: Review hidden headers
-  (setq notmuch-address-command nil)    ; FIXME 2021-05-13: Make it work with EBDB
+  ;; (setq notmuch-address-command nil)    ; FIXME 2021-05-13: Make it work with EBDB
+  (setq notmuch-address-use-company nil)
+  (setq notmuch-address-internal-completion '(received nil))
   (setq notmuch-always-prompt-for-sender t)
   (setq notmuch-mua-cite-function 'message-cite-original-without-signature)
   (setq notmuch-mua-reply-insert-header-p-function 'notmuch-show-reply-insert-header-p-never)
@@ -3811,10 +3819,6 @@ Interactively, URL defaults to the string looking like a url around point."
   (setq notmuch-maildir-use-notmuch-insert t)
   (setq notmuch-crypto-process-mime t)
   (setq notmuch-crypto-get-keys-asynchronously t)
-  ;; (setq notmuch-mua-attachment-regexp   ; see `notmuch-mua-send-hook'
-  ;;       (concat "\\b\\(attache\?ment\\|attached\\|attach\\|"
-  ;;               "pi[èe]ce\s+jointe?\\|"
-  ;;               "συνημμ[εέ]νο\\|επισυν[αά]πτω\\)\\b"))
 
 ;;; Reading messages
   (setq notmuch-show-relative-dates t)
@@ -3841,76 +3845,175 @@ Interactively, URL defaults to the string looking like a url around point."
                                         ; override `compose-mail'
   ;; (define-key notmuch-search-mode-map (kbd "/") #'notmuch-search-filter) ; alias for l
   ;; (define-key notmuch-hello-mode-map (kbd "C-<tab>") nil)
+
+  (leaf *notmuch-config
+    :leaf-defer nil
+    :advice
+    (:after notmuch-show-mode meow-insert-mode)
+    (:after notmuch-tree-mode meow-insert-mode)
+    (:after notmuch-hello-mode meow-insert-mode)
+    (:after notmuch-search-mode meow-insert-mode)
+    (:after notmuch-message-mode meow-insert-mode)
+    
+    ;; :hook ((notmuch-show-mode-hook
+    ;;         notmuch-tree-mode-hook
+    ;;         notmuch-hello-mode-hook
+    ;;         notmuch-search-mode-hook
+    ;;         notmuch-message-mode-hook) . meow-insert-mode)
+    :bind (:notmuch-search-mode-map
+           :package notmuch
+           ("." . nil)
+           ("." . notmuch-tag-jump))
+    :config
+    (add-to-list 'corfu-excluded-modes 'notmuch-message-mode)
+    (add-to-list 'corfu-excluded-modes 'org-msg-edit-mode)
+    
+    ;; Those are for the actions that are available after pressing 'k'
+    ;; (`notmuch-tag-jump').  For direct actions, refer to the key
+    ;; bindings below.
+
+    (setq mark-complete-tags '("+archived" "-inbox" "-todo" "-unread")
+          mark-delete-tags '("+del" "-inbox" "-archived" "-unread")
+          mark-flag-tags '("+flag" "-unread")
+          mark-spam-tags '("+spam" "+del" "-inbox" "-unread")
+          mark-todo-tags '("+todo" "-unread"))
+
+    (setq notmuch-tagging-keys
+          `((,(kbd "a") notmuch-archive-tags "Archive (remove from inbox)")
+            (,(kbd "c") mark-complete-tags "Complete and archive")
+            (,(kbd "d") mark-delete-tags "Mark for deletion")
+            (,(kbd "f") mark-flag-tags "Flag as important")
+            (,(kbd "s") mark-spam-tags "Mark as spam")
+            (,(kbd "t") mark-todo-tags "To-do")
+            (,(kbd "r") ("-unread") "Mark as read")
+            (,(kbd "u") ("+unread") "Mark as unread")))
+
+    ;; (setq notmuch-hello-sections '(prot-notmuch-hello-insert-saved-searches
+    ;;                                ;; prot-notmuch-hello-insert-recent-searches
+    ;;                                ))
+
+    ;; (add-to-list 'notmuch-tag-formats
+    ;;              '("encrypted" (propertize tag 'face 'prot-notmuch-encrypted-tag)))
+    ;; (add-to-list 'notmuch-tag-formats
+    ;;              '("sent" (propertize tag 'face 'prot-notmuch-sent-tag)))
+    ;; (add-to-list 'notmuch-tag-formats
+    ;;              '("ref" (propertize tag 'face 'prot-notmuch-ref-tag)))
+    ;; (add-to-list 'notmuch-tag-formats
+    ;;              '("todo" (propertize tag 'face 'prot-notmuch-todo-tag)))
+    ;; (add-to-list 'notmuch-tag-formats
+    ;;              '("spam" (propertize tag 'face 'prot-notmuch-spam-tag)))
+
+    ;; NOTE 2021-05-14: I have an alternative method of finding new mail
+    ;; in a maildir tree by using the find command.  It is somewhat
+    ;; simplistic, though it worked just fine: see prot-mail.el.  I prefer
+    ;; this implementation instead, as it leverages notmuch and so I can
+    ;; pass arbitrary search terms to it.
+    ;; (setq prot-notmuch-mode-line-count-args "tag:unread and tag:inbox")
+    ;; (setq prot-notmuch-mode-line-indicator-commands
+    ;; '(notmuch notmuch-refresh-this-buffer))
+    ;; Mode line indicator with the number of new mails.
+    ;; (prot-notmuch-mail-indicator 1)
+
+    ;; (add-hook 'notmuch-hello-mode-hook #'prot-notmuch-widget-field-face-remap)
+
+    ;; (let ((map notmuch-search-mode-map))
+    ;;   (define-key map (kbd "a") nil) ; the default is too easy to hit accidentally
+    ;;   (define-key map (kbd "A") #'notmuch-search-archive-thread)
+    ;;   (define-key map (kbd "D") #'prot-notmuch-search-delete-thread)
+    ;;   (define-key map (kbd "T") #'prot-notmuch-search-todo-thread)
+    ;;   (define-key map (kbd "X") #'prot-notmuch-search-reference-thread)
+    ;;   (define-key map (kbd "C") #'prot-notmuch-search-complete-thread)
+    ;;   (define-key map (kbd "S") #'prot-notmuch-search-spam-thread)
+    ;;   (define-key map (kbd "g") #'prot-notmuch-refresh-buffer))
+    ;; (let ((map notmuch-show-mode-map))
+    ;;   (define-key map (kbd "a") nil) ; the default is too easy to hit accidentally
+    ;;   (define-key map (kbd "A") #'notmuch-show-archive-message-then-next-or-next-thread)
+    ;;   (define-key map (kbd "D") #'prot-notmuch-show-delete-message)
+    ;;   (define-key map (kbd "T") #'prot-notmuch-show-todo-message)
+    ;;   (define-key map (kbd "X") #'prot-notmuch-show-reference-message)
+    ;;   (define-key map (kbd "C") #'prot-notmuch-show-complete-message)
+    ;;   (define-key map (kbd "S") #'prot-notmuch-show-spam-message))
+    )
   )
 
-(leaf *notmuch-config
+(leaf notmuch-transient
+  :ensure t
   :after notmuch
-  :config
-  ;; Those are for the actions that are available after pressing 'k'
-  ;; (`notmuch-tag-jump').  For direct actions, refer to the key
-                            ;; bindings below.
-
-  (setq mark-complete-tags '("+archived" "-inbox" "-todo" "-unread")
-        mark-delete-tags '("+del" "-inbox" "-archived" "-unread")
-        mark-flag-tags '("+flag" "-unread")
-        mark-spam-tags '("+spam" "+del" "-inbox" "-unread")
-        mark-todo-tags '("+todo" "-unread"))
-                            
-  (setq notmuch-tagging-keys
-        `((,(kbd "a") notmuch-archive-tags "Archive (remove from inbox)")
-          (,(kbd "c") mark-complete-tags "Complete and archive")
-          (,(kbd "d") mark-delete-tags "Mark for deletion")
-          (,(kbd "f") mark-flag-tags "Flag as important")
-          (,(kbd "s") mark-spam-tags "Mark as spam")
-          (,(kbd "t") mark-todo-tags "To-do")
-          (,(kbd "r") ("-unread") "Mark as read")
-          (,(kbd "u") ("+unread") "Mark as unread")))
-
-  ;; (setq notmuch-hello-sections '(prot-notmuch-hello-insert-saved-searches
-  ;;                                ;; prot-notmuch-hello-insert-recent-searches
-  ;;                                ))
-
-  ;; (add-to-list 'notmuch-tag-formats
-  ;;              '("encrypted" (propertize tag 'face 'prot-notmuch-encrypted-tag)))
-  ;; (add-to-list 'notmuch-tag-formats
-  ;;              '("sent" (propertize tag 'face 'prot-notmuch-sent-tag)))
-  ;; (add-to-list 'notmuch-tag-formats
-  ;;              '("ref" (propertize tag 'face 'prot-notmuch-ref-tag)))
-  ;; (add-to-list 'notmuch-tag-formats
-  ;;              '("todo" (propertize tag 'face 'prot-notmuch-todo-tag)))
-  ;; (add-to-list 'notmuch-tag-formats
-  ;;              '("spam" (propertize tag 'face 'prot-notmuch-spam-tag)))
-
-  ;; NOTE 2021-05-14: I have an alternative method of finding new mail
-  ;; in a maildir tree by using the find command.  It is somewhat
-  ;; simplistic, though it worked just fine: see prot-mail.el.  I prefer
-  ;; this implementation instead, as it leverages notmuch and so I can
-  ;; pass arbitrary search terms to it.
-  ;; (setq prot-notmuch-mode-line-count-args "tag:unread and tag:inbox")
-  ;; (setq prot-notmuch-mode-line-indicator-commands
-        ;; '(notmuch notmuch-refresh-this-buffer))
-  ;; Mode line indicator with the number of new mails.
-  ;; (prot-notmuch-mail-indicator 1)
-
-  ;; (add-hook 'notmuch-hello-mode-hook #'prot-notmuch-widget-field-face-remap)
-
-  ;; (let ((map notmuch-search-mode-map))
-  ;;   (define-key map (kbd "a") nil) ; the default is too easy to hit accidentally
-  ;;   (define-key map (kbd "A") #'notmuch-search-archive-thread)
-  ;;   (define-key map (kbd "D") #'prot-notmuch-search-delete-thread)
-  ;;   (define-key map (kbd "T") #'prot-notmuch-search-todo-thread)
-  ;;   (define-key map (kbd "X") #'prot-notmuch-search-reference-thread)
-  ;;   (define-key map (kbd "C") #'prot-notmuch-search-complete-thread)
-  ;;   (define-key map (kbd "S") #'prot-notmuch-search-spam-thread)
-  ;;   (define-key map (kbd "g") #'prot-notmuch-refresh-buffer))
-  ;; (let ((map notmuch-show-mode-map))
-  ;;   (define-key map (kbd "a") nil) ; the default is too easy to hit accidentally
-  ;;   (define-key map (kbd "A") #'notmuch-show-archive-message-then-next-or-next-thread)
-  ;;   (define-key map (kbd "D") #'prot-notmuch-show-delete-message)
-  ;;   (define-key map (kbd "T") #'prot-notmuch-show-todo-message)
-  ;;   (define-key map (kbd "X") #'prot-notmuch-show-reference-message)
-  ;;   (define-key map (kbd "C") #'prot-notmuch-show-complete-message)
-  ;;   (define-key map (kbd "S") #'prot-notmuch-show-spam-message))
+  :bind
+  ((:notmuch-search-mode-map :package notmuch
+                             ("=" . nil)
+                             ("=" . notmuch-search-mode-transient))
+   (:notmuch-tree-mode-map :package notmuch
+                           ("=" . nil)
+                           ("=" . notmuch-tree-mode-transient))
+   (:notmuch-hello-mode-map :package notmuch
+                            ("=" . nil)
+                            ("=" . notmuch-hello-mode-transient))
+   (:notmuch-show-mode-map :package notmuch
+                           ("=" . nil)
+                           ("=" . notmuch-show-mode-transient)))
+  
+  ;; :advice
+  ;; (:after notmuch-show-mode (lambda nil (setq notmuch-transient-prefix (kbd "="))))
+  ;; (:after notmuch-tree-mode (lambda nil (setq notmuch-transient-prefix (kbd "="))))
+  ;; (:after notmuch-hello-mode (lambda nil (setq notmuch-transient-prefix (kbd "="))))
+  ;; (:after notmuch-search-mode (lambda nil (setq notmuch-transient-prefix (kbd "="))))
+  ;; (:after notmuch-message-mode (lambda nil (setq notmuch-transient-prefix (kbd "="))))
   )
+
+(leaf ol-notmuch
+  :load-path "~/.emacs.d/elisp/notmuch/"
+  :after notmuch
+  :require t)
+
+;;;
+;;; prodigy.el
+;; https://github.com/rejeep/prodigy.el
+;; Handling Email with Emacs
+;; https://martinralbrecht.wordpress.com/2016/05/30/handling-email-with-emacs/
+
+(leaf prodigy
+  :ensure t
+  :commands (prodigy
+             prodigy-start-service
+             prodigy-find-service)
+  :hook
+  ;; prodigy-find-service obtains a property list object by name
+  (emacs-startup-hook . (lambda nil
+                          (prodigy-start-service
+                           (prodigy-find-service "imapnotify-bbo"))
+                          (prodigy-start-service
+                           (prodigy-find-service "imapnotify-private"))
+                          (prodigy-start-service
+                           (prodigy-find-service "imapnotify-univ"))))
+  :config
+  (setq my--imapnotify-home (expand-file-name "imapnotify"
+                                              (getenv "XDG_CONFIG_HOME")))
+  
+  ;; Tag
+  ;; Define a new tag with ARGS.
+  (prodigy-define-tag
+   :name 'email
+   :ready-message "Checking Email using IMAP IDLE. Ctrl-C to shutdown.")
+  ;; Service
+  ;; Define a new service with ARGS.
+  (prodigy-define-service
+   :name "imapnotify-bbo"
+   :command "~/.nix-profile/bin/imapnotify"
+   :args (list "-c" (expand-file-name "imapnotify_bbo.js" my--imapnotify-home))
+   :tags '(email)
+   :kill-signal 'sigkill)
+  (prodigy-define-service
+   :name "imapnotify-private"
+   :command "~/.nix-profile/bin/imapnotify"
+   :args (list "-c" (expand-file-name "imapnotify_private.js" my--imapnotify-home))
+   :tags '(email)
+   :kill-signal 'sigkill)
+  (prodigy-define-service
+   :name "imapnotify-univ"
+   :command "~/.nix-profile/bin/imapnotify"
+   :args (list "-c" (expand-file-name "imapnotify_univ.js" my--imapnotify-home))
+   :tags '(email)
+   :kill-signal 'sigkill))
 
 (provide 'init)

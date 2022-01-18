@@ -20,6 +20,7 @@
     htop
     hugo
     imagemagick
+    imapnotify
     jq
     libgccjit
     librsvg
