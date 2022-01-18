@@ -1,0 +1,89 @@
+#!/bin/bash
+#
+# Usage:
+#     $0 [OPTION]... SRC [SRC]... DEST
+#
+# Options:
+#     -h, --help           
+#     -n, --dry-run        
+#     -i, --include ARG            rsync only `--include` file included in SRC
+#     -e, --exclude ARG            rsync all file included in SRC exept for `--exclude` pattern
+#
+
+help () {
+    awk 'NR > 2 {
+    if (/^#/) { sub("^# ?", ""); sub("\\$0", FILENAME); print }
+    else { exit }
+    }' $0
+    exit 1
+}
+
+set -Ceu
+
+ARGS=()
+IsDryRun=""
+[[ $# = 0 ]] && help
+while (( $# > 0 )); do
+    case $1 in
+        -h | --help)
+            help
+            ;;
+        -n | --dry-run)
+            IsDryRun=$1
+            ;;
+        -e | --exclude | --exclude=*)
+            if [[ "$1" =~ ^--exclude= ]]; then
+                exclude="$1 $exclude"
+            elif [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+                echo "'-e/--exclude' require an argument." 1>&2
+                exit 1
+            else
+                exclude="--exclude=$2 $exclude"
+                shift
+            fi
+            ;;
+        -i | --include | --include=*)
+            if [[ "$1" =~ ^--include= ]]; then
+                include="$1 $include"
+            elif [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+                echo "'-i/--include' require an argument." 1>&2
+                exit 1
+            else
+                include="--include=$2 $include"
+                shift
+            fi
+            ;;
+        -*)
+            echo "Illegal option -- '$(echo $1 | sed 's/^-*//')'." 1>&2
+            help
+            ;;
+        *)
+            ARGS=("${ARGS[@]} $1")
+            ;;
+    esac
+    shift
+done
+
+if [[ $include ]] && [[ $exclude ]]; then
+    echo "Only one of `--include` and `--exclude` can be used." 1>&2
+    exit 1
+elif [[ $include ]]; then
+    include="$include --exclude=*"
+    exclude=""
+elif [[ $exclude ]]; then
+    include=""
+else
+    exclude=""
+    include="--include=*"
+fi
+
+local host=$(hostname_of $(get_nth 1 "${ARGS[@]}"))
+local port=$(port_of $(get_nth 1 "${ARGS[@]}"))
+ARGS=("${ARGS[@]:1}")
+
+last=$((${#ARGS[@]} - 1))
+local localpath="${ARGS[@]:0:${last}}"
+local remotepath=$(echo ${ARGS[last]} | sed 's/\~/${HOME}/')
+
+rsync $IsDryRun -avz --copy-unsafe-links -e "ssh -p $port" $localpath "${USER}@${host}:${remotepath}" --include="*/" $include $exclude
+

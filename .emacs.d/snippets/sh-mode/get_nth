@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: get_nth
+# key: get
+# --
+function get_nth () {
+  local n=$1
+  shift
+  eval echo \$${n}
+}

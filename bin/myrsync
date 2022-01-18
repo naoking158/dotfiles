@@ -1,0 +1,225 @@
+#!/bin/bash
+#
+#
+# ================
+# $0 is a modified rsync program to download and upload SRC files
+# to and from MDL's HOST machine.
+#
+# Usage:
+#   HOST machine is in local network:
+#
+#     Download: $0 [OPTION]... HOST SRC DEST
+#            or $0 [-d|--download] [OPTION]... HOST SRC DEST
+#     Upload:   $0 [-u|--upload] [OPTION]... HOST SRC [SRC]... DEST
+#
+#
+#   HOST machine is NOT in local network:
+#
+#     Download: $0 [-p|--port-forward] [OPTION]... HOST SRC DEST
+#            or $0 [-d|--download] [-p|--port-forward] [OPTION]... HOST SRC DEST
+#     Upload:   $0 [-u|--upload] [-p|--port-forward] [OPTION]... HOST SRC [SRC]... DEST
+#
+# Example:
+#   case1: Upload $HOME/foo to $HOME/tmp/ on kingkong (defined in $HOME/.ssh/config)
+#     $0 -u kingkong "~/foo" "~/tmp/"
+#
+#   case2: case1 over global network with port forwarding through MDL's gateway
+#     $0 -u -p kingkong "~/foo" "~/tmp/"
+# To avoid expansion of arguments such as `~`, `*`, and `$HOME` before pass to `rsync` command,
+# such arguments are required to be quoted.
+#
+# Options:
+#   -h, --help
+#   -n, --dry-run
+#   -d, --download           download SRC from HOST and put it into DEST
+#   -u, --upload             upload SRC to HOST and put it into DEST
+#   -p, --port-forward       rsync with port forwarding through MDL's gateway
+#   -e, --exclude=PATTERN    exclude files matching PATTERN
+#   -i, --include=PATTERN    don't exclude files matching PATTERN
+#
+
+function help () {
+    awk -v CMD="$(basename $0)" 'NR > 2 {
+    if (/^#/) { sub("^# ?", ""); sub("\\$0", CMD); sub("NOT", "\033[1;31mNOT\033[0m"); print }
+    else { exit }
+    }' $0
+    exit 1
+}
+
+set -Cu  # remove -e to close ssh tunnel when rsync is failed
+set -f
+MDL="ssh-user@gateway.mdl.cs.tsukuba.ac.jp"
+
+[[ $# = 0 ]] && help
+while (( $# > 0 )); do
+    case $1 in
+        -h | --help)
+            help
+            ;;
+        -n | --dry-run)
+            IsDryRun=$1
+            ;;
+        -p | --port-forward)
+            IsPortForward=$1
+            ;;
+        -d | --download)
+            IsDownload=$1
+            ;;
+        -u | --upload)
+            IsUpload=$1
+            ;;
+        -e | --exclude | --exclude=*)
+            if [[ -n ${exclude+x} ]]; then
+                echo "Too many --exclude option." 1>&2
+                exit 1
+            elif [[ "$1" =~ ^--exclude= ]]; then
+                exclude=$1
+            elif [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+                echo "'-e/--exclude' require an argument." 1>&2
+                exit 1
+            else
+                exclude="--exclude=$2"
+                shift
+            fi
+            ;;
+        -i | --include | --include=*)
+            if [[ -n ${include+x} ]]; then
+                echo "Too many --include option." 1>&2
+                exit 1
+            elif [[ "$1" =~ ^--include= ]]; then
+                include="$1"
+            elif [[ -z "${2+x}" ]] || [[ "$2" =~ ^-+ ]]; then
+                echo "'-i/--include' require an argument." 1>&2
+                exit 1
+            else
+                include="--include=$2"
+                shift
+            fi
+            ;;
+        -*)
+            echo "Illegal option -- '$(echo $1 | sed 's/^-*//')'." 1>&2
+            help
+            ;;
+        *)
+            if [[ -z ${ARGS+x} ]]; then
+                ARGS=($1)
+            else
+                ARGS=("${ARGS[@]}" $1)
+            fi
+            ;;
+    esac
+    shift
+done
+
+[[ -z ${ARGS+x} ]] && help
+
+if [[ -n ${include+x} ]] && [[ -n ${exclude+x} ]]; then
+    echo "Only one of `--include` and `--exclude` can be used." 1>&2
+    exit 1
+elif [[ -n ${include+x} ]]; then
+    exclude="--exclude=*"    
+elif [[ -n ${exclude+x} ]]; then
+    include="--include=''"
+else
+    exclude="--exclude=''"
+    include="--include=*"
+fi
+
+function hostname_of() {
+    ssh -G $1 | awk '/^hostname / { print $2 }'
+}
+
+function port_of() {
+    ssh -G $1 | awk '/^port / { print $2 }'
+}
+
+function sshtunnel() {
+    if [[ $# -ne 3 ]]; then
+        echo "Usage: sshtunnel HOST HOSTPORT LOCALPORT"
+    else
+        local host=$(hostname_of $1)
+        local port=$2
+        local hostport=$3
+
+        ssh -M -S mdlssh-socket -fNL ${hostport}:${host}:${port} ${MDL} -l ${USER}
+        echo "Tunnel from localhost:$hostport to $host:$port has been created."
+        echo "Be sure to kill the tunnel after you finish your job, by sshexit $hostport"
+    fi
+}
+
+function sshexit() {
+    local hostport=$1
+
+    if [[ $(ps aux | grep "mdlssh-socket" | grep ${hostport} -c) ]]; then
+        ssh -S mdlssh-socket -O exit $MDL
+        echo "All SSH tunnels closed"
+    else
+        echo "No running tunnels"
+    fi
+}
+
+function get_nth() {
+  local n=$1
+  shift
+  eval echo \$${n}
+}
+
+function mdlrsyncfrom() {
+    local host=$1
+    local remotepath=$2
+    local remotepath=$(echo $2 | sed 's/\~/$HOME/')
+
+    sshtunnel $host 22 10022
+    rsync -n -avz --copy-unsafe-links --progress --bwlimit=5120 --rsh="ssh -p 10022" "${USER}@localhost:${remotepath}" "$localpath" --include='*/' "$include" "$exclude"
+    sshexit 10022
+}
+
+function mdlrsyncto() {
+    local host=$1
+    shift
+    local localpath=${@:0:$#}
+    local remotepath=$(echo ${@:$#} | sed 's/\~/$HOME/')
+
+    sshtunnel $host 22 10022
+    rsync $IsDryRun -avz --copy-unsafe-links --progress --bwlimit=5120 --rsh="ssh -p 10022" $localpath ${USER}@localhost:${remotepath} --include="*/" "$include" "$exclude"
+    sshexit 10022
+}
+
+function rsyncfrom() {
+    local host=$(hostname_of $1)
+    local port=$(port_of $1)
+    local remotepath=$(echo $2 | sed 's/\~/$HOME/')
+    local localpath=$3
+    rsync $IsDryRun -avz --copy-unsafe-links -e "ssh -p $port" ${USER}@${host}:${remotepath} $localpath --include='*/' "$include" "$exclude"
+}
+
+function rsyncto() {
+    local host=$(hostname_of $1)
+    local port=$(port_of $1)
+    shift
+    local localpath=${@:0:$#}
+    local remotepath=$(echo ${@:$#} | sed 's/\~/$HOME/')
+    rsync $IsDryRun -avz --copy-unsafe-links -e "ssh -p $port" $localpath ${USER}@${host}:${remotepath} --include='*/' "$include" "$exclude"
+}
+
+# main
+[[ ${#ARGS} < 3 ]] && {
+    echo "Too few arguments -- ${ARGS}";
+    echo "Check help -- $(basename $0) --help";
+    exit 1;
+}
+
+if [[ -n ${IsPortForward+x} ]]; then
+    if [[ -n ${IsUpload+x} ]]; then
+        mdlrsyncto ${ARGS[@]}
+    else
+        mdlrsyncfrom ${ARGS[@]}
+    fi
+else
+    if [[ -n ${IsUpload+x} ]]; then
+        rsyncto ${ARGS[@]}
+    else
+        rsyncfrom ${ARGS[@]}
+    fi
+fi
+

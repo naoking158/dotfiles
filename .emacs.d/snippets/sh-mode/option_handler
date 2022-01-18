@@ -1,0 +1,26 @@
+# key: opt
+# name: option_handler
+# --
+while (( \$# > 0 )); do
+    case $1 in
+        -h | --help)
+            help
+            ;;
+        -*)
+            echo
+            echo "Illegal option -- '\$(echo \$1 | sed 's/^-*//')'." 1>&2
+            help
+            ;;
+        *)
+            if [[ -z \${ARGS+x} ]]; then
+                ARGS=(\$1)
+            else
+                ARGS=("\${ARGS[@]} \$1")
+            fi
+            ARGS=("\${ARGS[@]} \$1")
+            ;;
+    esac
+    shift
+done
+[[ \$# = 0 ]] && help
+[[ -z \${ARGS+x} ]] && help

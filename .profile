@@ -71,4 +71,4 @@ fi
     . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
 }
 
-export PATH
+export PATH="$HOME/.local/bin:$PATH"
