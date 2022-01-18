@@ -4530,6 +4530,7 @@ From the search buffer there are a number of ways to interact with entries. Entr
       mail-envelope-from 'header
       mail-user-agent 'notmuch-user-agent
       message-send-mail-function 'smtpmail-send-it
+      mm-default-directory "~/Maildir/attachment/"
       )
 #+end_src
 
@@ -5662,9 +5663,9 @@ exports.host = "imap.gmail.com";
 exports.port = 993;
 exports.tls = true;
 exports.tlsOptions = { "rejectUnauthorized": false };
-exports.onNewMail = "timelimit -t 120 mbsync inbox-only";
-exports.onNewMailPost = {"mail": "notmuch new && notify-send 'New mail arrived'"};
-exports.boxes = [ "INBOX" "*Gmail*" "![Gmail]/Spam" ];
+exports.onNewMail = "timelimit -t 120 ~/.nix-profile/bin/mbsync inbox-only";
+exports.onNewMailPost = {"mail": "~/.nix-profile/bin/notmuch new && notify-send 'New mail arrived'"};
+exports.boxes = [ "Inbox" ];
 
 #+end_src
 
@@ -5688,15 +5689,15 @@ function getStdout(cmd) {
     return stdout.toString().trim();
 }
 
-exports.username = "nok.skmt.snow@gmai.com";
+exports.username = "nok.skmt.snow@gmail.com";
 exports.password = getStdout("cat ~/src/github.com/naoking158/envs/.nok-mail-pw");
 exports.host = "imap.gmail.com";
 exports.port = 993;
 exports.tls = true;
 exports.tlsOptions = { "rejectUnauthorized": false };
-exports.onNewMail = "timelimit -t 120 mbsync inbox-only";
-exports.onNewMailPost = {"mail": "notmuch new && notify-send 'New mail arrived'"};
-exports.boxes = [ "INBOX" "*Gmail*" "![Gmail]/Spam" ];
+exports.onNewMail = "timelimit -t 120 ~/.nix-profile/bin/mbsync inbox-only";
+exports.onNewMailPost = {"mail": "~/.nix-profile/bin/notmuch new && notify-send 'New mail arrived'"};
+exports.boxes = [ "Inbox"];
 
 #+end_src
 
@@ -5726,9 +5727,9 @@ exports.host = "smtp.office365.com";
 exports.port = 993;
 exports.tls = true;
 exports.tlsOptions = { "rejectUnauthorized": false };
-exports.onNewMail = "timelimit -t 120 mbsync inbox-only";
-exports.onNewMailPost = {"mail": "notmuch new && notify-send 'New mail arrived'"};
-exports.boxes = [ "*" ];
+exports.onNewMail = "timelimit -t 120 ~/.nix-profile/bin/mbsync inbox-only";
+exports.onNewMailPost = {"mail": "~/.nix-profile/bin/notmuch new && notify-send 'New mail arrived'"};
+exports.boxes = [ "Inbox" ];
 
 #+end_src
 

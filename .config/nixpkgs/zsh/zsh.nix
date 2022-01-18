@@ -17,6 +17,9 @@
   defaultKeymap = "emacs";
 
   history = {
+    expireDuplicatesFirst = true;
+    ignoreDups = true;
+    ignoreSpace = false;
     size = 10000;
     path = "${config.xdg.dataHome}/zsh/history";
   };
@@ -57,11 +60,16 @@
   };
 
   initExtraFirst = ''
+    # Set global environment variables
+    [[ -f "''${HOME}/.profile" ]] && source "''${HOME}/.profile"
+
     # powerlevel10k-instant-prompt
     if [[ -r "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
         source "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
     fi
     '';
+
+  initExtra="source $HOME/.dotfiles/bin/my-server-util.bash";
   
   initExtraBeforeCompInit = ''
     declare -A ZINIT

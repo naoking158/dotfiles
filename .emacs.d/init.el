@@ -3146,6 +3146,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
       mail-envelope-from 'header
       mail-user-agent 'notmuch-user-agent
       message-send-mail-function 'smtpmail-send-it
+      mm-default-directory "~/Maildir/attachment/"
       )
 
 (leaf org-msg
