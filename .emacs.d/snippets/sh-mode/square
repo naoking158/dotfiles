@@ -1,0 +1,4 @@
+# key: ss
+# name: square
+# --
+[[ $1 ]]$0

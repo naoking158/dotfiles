@@ -1,7 +1,9 @@
-# -*- mode: snippet -*-
+# key: sb
 # name: shebang
-# key: sh
 # --
-#!/bin/sh
+#!/bin/bash
+
+
+set -Ceu
 
 $0
