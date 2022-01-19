@@ -397,12 +397,14 @@
 
 (leaf ui
   :leaf-defer nil
+  :global-minor-mode global-display-line-numbers-mode
   :hook
   ((org-mode-hook
+    text-mode-hook
     shell-mode-hook
     eshell-mode-hook
     vterm-mode-hook) . (lambda ()
-    (display-line-numbers-mode 0)))
+                         (display-line-numbers-mode 0)))
 
   :config
   (leaf dashboard
@@ -1065,8 +1067,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   (defun my/python-basic-config ()
     (setq indent-tabs-mode nil
           python-indent 4
-          tab-width 4)
-    (linum-mode)))
+          tab-width 4)))
 
 (leaf conda
   :doc "Work with your conda environments"
@@ -1118,8 +1119,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :hook
   (js-mode-hook . (lambda nil
                     (make-local-variable 'js-indent-level)
-                    (setq js-indent-level 2)
-                    (linum-mode 1))))
+                    (setq js-indent-level 2))))
 
 (leaf flymake
   :disabled t
@@ -1313,7 +1313,11 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 (leaf smartparens
   :ensure t
   :init (require 'smartparens-config)
-  :hook ((prog-mode-hook LaTeX-mode-hook) . turn-on-smartparens-strict-mode)
+  :hook ((prog-mode-hook . turn-on-smartparens-mode)
+         ((python-mode-hook
+           emacs-lisp-mode
+           lisp-interaction-mode
+           LaTeX-mode-hook) . turn-on-smartparens-strict-mode))
   :bind (smartparens-mode-map
          ("C-M-a" . sp-beginning-of-sexp)
          ("C-M-e" . sp-end-of-sexp)
