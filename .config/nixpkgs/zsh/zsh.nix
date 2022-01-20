@@ -5,6 +5,7 @@
 # deeply inspired by
 # https://github.com/ahmedelgabri/dotfiles/blob/40d2941e36f680dde1a7f736f00cf9636dfbc003/config/zsh.d/.zshrc
 # https://github.com/xeres/dotfiles/blob/3c7ca493e12d25ccecb588e992f30b5325fa9889/dot_zshrc
+# https://zenn.dev/kis9a/scraps/02f3ec438d93d1
 
 { config, pkgs, ... }:
 
@@ -25,11 +26,18 @@
   };
   
   shellAliases = {
+    # move
+    ".." = "cd ..";
+    "..." = "cd ../..";
+    "...." = "cd ../../..";
+    
     # file
     ls = "ls --color=auto --file-type";
     ll = "exa -l -g --icons";
     lla = "ll -a";
     dua = "/usr/bin/du -shc * | sort -h";
+    grep = "grep --color=auto";
+    diff = "diff --color=auto";
     
     # latex compile command
     en_latex = "latexmk -e \"$bibtex=q/bibtex/\" -pdf -pvc";
@@ -62,14 +70,16 @@
   initExtraFirst = ''
     # Set global environment variables
     [[ -f "''${HOME}/.profile" ]] && source "''${HOME}/.profile"
+    '';
+
+  initExtra = ''
+    source $HOME/.dotfiles/bin/my-server-util.bash
 
     # powerlevel10k-instant-prompt
     if [[ -r "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
         source "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
     fi
     '';
-
-  initExtra="source $HOME/.dotfiles/bin/my-server-util.bash";
   
   initExtraBeforeCompInit = ''
     declare -A ZINIT
@@ -122,6 +132,10 @@
       bindkey '^[[B' history-substring-search-down
     # }}}
 
+    # zinit plugins
+    autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
+    add-zsh-hook chpwd chpwd_recent_dirs
+
     zinit wait lucid for \
           atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay" \
               zdharma-continuum/fast-syntax-highlighting \
@@ -167,7 +181,7 @@
     zstyle ":anyframe:selector:" use fzf-tmux
 
 
-    # peco の設定（リポジトリ間の移動を行う）
+    # move repositories with peco
     function peco-src () {
       local selected_dir=$(ghq list -p | peco --query "$LBUFFER")
       if [ -n "$selected_dir" ]; then
@@ -179,7 +193,7 @@
     zle -N peco-src
     bindkey '^o' peco-src
 
-    # peco の設定 （履歴を検索する）
+    # search history with peco
     function peco-history-selection() {
         BUFFER=`history -n 1 | tac | awk '!a[$0]++' | peco`
         CURSOR=$#BUFFER
@@ -188,5 +202,17 @@
 
     zle -N peco-history-selection
     bindkey '^R' peco-history-selection
- '';
+
+    # cdr with peco
+    function peco-cdr () {
+        local selected_dir="$(cdr -l | sed 's/^[0-9]\+ \+//' | peco --prompt="cdr >" --query "$LBUFFER")"
+        if [ -n "$selected_dir" ]; then
+            BUFFER="cd `echo $selected_dir | awk '{print$2}'`"
+            CURSOR=$#BUFFER
+            zle reset-prompt
+        fi
+    }
+    zle -N peco-cdr
+    bindkey '^[^R' peco-cdr
+    '';
 }
