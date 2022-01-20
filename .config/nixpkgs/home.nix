@@ -26,6 +26,7 @@
     packages = with pkgs; [
       gtk3-x11
       (import ./emacs/build_emacs.nix)
+      (import ./pngpaste.nix)
     ];
   };
 
