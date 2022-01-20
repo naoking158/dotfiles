@@ -15,11 +15,11 @@ export MY_CONFIG_PATH=".dotfiles/.config"
 export MY_BASH_PATH="${MY_CONFIG_PATH}/bash"
 
 if [[ $(uname -r) =~ .*MANJARO ]]; then
-    export OS='manjaro';
+    export SYSTEM='manjaro';
 elif [[ $(uname -s) =~ Darwin ]]; then
-    export OS='macos';
+    export SYSTEM='macos';
 else
-    export OS='ubuntu';
+    export SYSTEM='ubuntu';
 fi
 
 #To solve a locate problem happens in ipython notebook

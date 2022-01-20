@@ -214,5 +214,21 @@
     }
     zle -N peco-cdr
     bindkey '^[^R' peco-cdr
+
+    # nix home-manager functions
+    function home-update () {
+        case "$SYSTEM" in
+            "macos" ) home-manager switch -f $XDG_CONFIG_HOME/nixpkgs/macos.nix ;;
+            * ) home-manager switch -f $XDG_CONFIG_HOME/nixpkgs/linux.nix ;;
+        esac
+     }
+
+     function home-package () {
+         if [[ $# = 0 ]]; then
+            home-manager packages
+        else
+            home-manager packages | grep $@
+        fi
+    }
     '';
 }

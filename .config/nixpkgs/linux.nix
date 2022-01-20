@@ -20,11 +20,10 @@
     # Home Manager needs a bit of information about you and the
     # paths it should manage.
     username = "naoki";
-    homeDirectory = "/Users/naoki";
+    homeDirectory = "/home/naoki";
     
-    packages = with pkgs; [
-      gtk3-x11
-      (import ./pngpaste.nix)
-    ];
+    # packages = with pkgs; [
+    # ];
   };
 }
+    
