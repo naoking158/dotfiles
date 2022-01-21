@@ -3860,11 +3860,7 @@ Interactively, URL defaults to the string looking like a url around point."
     (:after notmuch-search-mode meow-insert-mode)
     (:after notmuch-message-mode meow-insert-mode)
     
-    ;; :hook ((notmuch-show-mode-hook
-    ;;         notmuch-tree-mode-hook
-    ;;         notmuch-hello-mode-hook
-    ;;         notmuch-search-mode-hook
-    ;;         notmuch-message-mode-hook) . meow-insert-mode)
+    :hook (notmuch-mua-send-hook . notmuch-mua-attachment-check)
     :bind (:notmuch-search-mode-map
            :package notmuch
            ("." . nil)
@@ -3978,6 +3974,7 @@ Interactively, URL defaults to the string looking like a url around point."
 ;; https://martinralbrecht.wordpress.com/2016/05/30/handling-email-with-emacs/
 
 (leaf prodigy
+  :disabled t
   :ensure t
   :commands (prodigy
              prodigy-start-service

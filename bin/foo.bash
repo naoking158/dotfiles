@@ -1,5 +1,10 @@
 #!/bin/bash
 
-ARGS=($*)
+set -f
 
-echo $((${#ARGS[@]} - 1))
+function hoge() {
+    echo "all" $@
+    echo $(echo $@ | sed 's/\~/$HOME/')
+}
+
+hoge $@

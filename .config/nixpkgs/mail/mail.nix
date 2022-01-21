@@ -6,9 +6,8 @@
   programs.notmuch = {
     enable = true;
     search.excludeTags = [ "del" "spam" ];
-    hooks = {
-      preNew = "mbsync --all";
-    };
+    new.tags = [ "new" ];
+    hooks.preNew = "mbsync --all";
   };
   accounts.email.accounts = {
     bbo = {

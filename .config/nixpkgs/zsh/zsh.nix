@@ -109,17 +109,6 @@
     autoload -Uz _zinit
     (( ''${+_comps} )) && _comps[zinit]=_zinit
 
-    # Shell {{{
-      PURE_SYMBOLS=("λ" "ϟ" "▲" "∴" "→" "»" "৸" "◗")
-      # Arrays in zsh starts from 1
-      export PURE_PROMPT_SYMBOL="''${PURE_SYMBOLS[$RANDOM % ''${#PURE_SYMBOLS[@]} + 1]}"
-      zstyle :prompt:pure:path color 240
-      zstyle :prompt:pure:git:branch color blue
-      zstyle :prompt:pure:git:dirty color red
-      zstyle :prompt:pure:git:action color 005
-      zstyle :prompt:pure:prompt:success color 003
-    # }}}
-
     # Utilities & enhancements {{{
       zinit ice wait lucid
       zinit light https://github.com/zsh-users/zsh-history-substring-search
@@ -132,10 +121,16 @@
       bindkey '^[[B' history-substring-search-down
     # }}}
 
-    # zinit plugins
+    # builtins
+    function chpwd() {
+        if [[ $(pwd) != $HOME ]]; then;
+            ls --color=auto --file-type
+        fi
+    }
     autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
     add-zsh-hook chpwd chpwd_recent_dirs
 
+    # zinit plugins
     zinit wait lucid for \
           atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay" \
               zdharma-continuum/fast-syntax-highlighting \

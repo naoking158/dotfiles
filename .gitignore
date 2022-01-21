@@ -28,10 +28,14 @@
 !/.config/alacritty/**
 !/.config/bash/
 !/.config/bash/**
+!/.config/cron/
+!/.config/cron/**
 !/.config/fish/
 !/.config/fish/*.fish
 !/.config/nixpkgs/
 !/.config/nixpkgs/**
+!/.config/notmuch/
+!/.config/notmuch/**
 !/.config/ranger/
 !/.config/ranger/**
 !/.config/skhd/

@@ -1,0 +1,4 @@
+LANG="en_US.UTF-8"
+
+* * * * * source ~/.profile && notmuch new >> ~/output.log 2>> error.log
+

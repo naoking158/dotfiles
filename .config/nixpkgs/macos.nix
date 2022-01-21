@@ -14,7 +14,7 @@
     # changes in each release.
     stateVersion = "22.05";
     sessionVariables = {
-      EDITOR = "emacs";
+      EDITOR = "vim";
     };
 
     # Home Manager needs a bit of information about you and the
