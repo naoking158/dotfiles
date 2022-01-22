@@ -397,14 +397,9 @@
 
 (leaf ui
   :leaf-defer nil
-  :global-minor-mode global-display-line-numbers-mode
   :hook
-  ((org-mode-hook
-    text-mode-hook
-    shell-mode-hook
-    eshell-mode-hook
-    vterm-mode-hook) . (lambda ()
-                         (display-line-numbers-mode 0)))
+  ((prog-mode-hook latex-mode-hook) . (lambda ()
+                                        (display-line-numbers-mode 1)))
 
   :config
   (leaf dashboard

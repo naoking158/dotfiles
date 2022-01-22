@@ -1,4 +1,4 @@
 LANG="en_US.UTF-8"
 
-* * * * * source ~/.profile && notmuch new >> ~/output.log 2>> error.log
-
+0/10 * * * * source ~/.profile && notmuch new >> ~/.cache/notmuch_new.log 2>> ~/.cache/notmuch_new_error.log
+5/10 * * * * source ~/.profile && bash ~/.config/notmuch/move.bash >> ~/.cache/notmuch_move.log 2>> ~/.cache/notmuch_move_error.log

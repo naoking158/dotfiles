@@ -42,6 +42,7 @@
       ruby
       texlab
       tmux
+      tree
       tree-sitter
       w3m
       wget

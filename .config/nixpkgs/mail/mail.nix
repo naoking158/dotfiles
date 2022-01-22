@@ -6,7 +6,7 @@
   programs.notmuch = {
     enable = true;
     search.excludeTags = [ "del" "spam" ];
-    new.tags = [ "new" ];
+    new.tags = [ "inbox" ];
     hooks.preNew = "mbsync --all";
   };
   accounts.email.accounts = {
@@ -31,12 +31,6 @@
         create = "both"; # Automatically create missing mailboxes within the given mail store. ["none", "maildir", "both"]
         patterns = [ "INBOX" "*Gmail*" "![Gmail]/Spam" ];
       };
-
-      # imapnotify = {
-      #   enable = true;
-      #   boxes = [ "INBOX" "*Gmail*" "![Gmail]/Spam" ];
-      #   onNotify = "mbsync --all";
-      # };
     };
     
     private = {
@@ -59,12 +53,6 @@
         create = "both"; # Automatically create missing mailboxes within the given mail store. ["none", "maildir", "both"]
         patterns = [ "INBOX" "*Gmail*" "![Gmail]/Spam" ];
       };
-
-      # imapnotify = {
-      #   enable = true;
-      #   boxes = [ "INBOX" "*Gmail*" "![Gmail]/Spam" ];
-      #   onNotify = "mbsync --all";
-      # };
     };
 
     univ = {
@@ -87,13 +75,6 @@
         create = "both"; # Automatically create missing mailboxes within the given mail store. ["none", "maildir", "both"]
         patterns = [ "*" ];
       };
-
-      # imapnotify = {
-      #   enable = true;
-      #   boxes = [ "*" ];
-      #   onNotify = "mbsync --all";
-      # };
     };
-    
   };
 }
