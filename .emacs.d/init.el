@@ -3099,15 +3099,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 					 (oj-submit-args quote
 													 ("-y" "--wait=0"))))
 
-(leaf hammerspoon
-  :when
-  (and window-system
-       (file-exists-p "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))
-  :hook
-  (emacs-startup-hook . (lambda nil
-                          (load
-                           "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))))
-
 (leaf elfeed
   :when window-system
   :ensure t
@@ -3961,56 +3952,5 @@ Interactively, URL defaults to the string looking like a url around point."
   :load-path "~/.emacs.d/elisp/notmuch/"
   :after notmuch
   :require t)
-
-;;;
-;;; prodigy.el
-;; https://github.com/rejeep/prodigy.el
-;; Handling Email with Emacs
-;; https://martinralbrecht.wordpress.com/2016/05/30/handling-email-with-emacs/
-
-(leaf prodigy
-  :disabled t
-  :ensure t
-  :commands (prodigy
-             prodigy-start-service
-             prodigy-find-service)
-  :hook
-  ;; prodigy-find-service obtains a property list object by name
-  (emacs-startup-hook . (lambda nil
-                          (prodigy-start-service
-                           (prodigy-find-service "imapnotify-bbo"))
-                          (prodigy-start-service
-                           (prodigy-find-service "imapnotify-private"))
-                          (prodigy-start-service
-                           (prodigy-find-service "imapnotify-univ"))))
-  :config
-  (setq my--imapnotify-home (expand-file-name "imapnotify"
-                                              (getenv "XDG_CONFIG_HOME")))
-  
-  ;; Tag
-  ;; Define a new tag with ARGS.
-  (prodigy-define-tag
-   :name 'email
-   :ready-message "Checking Email using IMAP IDLE. Ctrl-C to shutdown.")
-  ;; Service
-  ;; Define a new service with ARGS.
-  (prodigy-define-service
-   :name "imapnotify-bbo"
-   :command "~/.nix-profile/bin/imapnotify"
-   :args (list "-c" (expand-file-name "imapnotify_bbo.js" my--imapnotify-home))
-   :tags '(email)
-   :kill-signal 'sigkill)
-  (prodigy-define-service
-   :name "imapnotify-private"
-   :command "~/.nix-profile/bin/imapnotify"
-   :args (list "-c" (expand-file-name "imapnotify_private.js" my--imapnotify-home))
-   :tags '(email)
-   :kill-signal 'sigkill)
-  (prodigy-define-service
-   :name "imapnotify-univ"
-   :command "~/.nix-profile/bin/imapnotify"
-   :args (list "-c" (expand-file-name "imapnotify_univ.js" my--imapnotify-home))
-   :tags '(email)
-   :kill-signal 'sigkill))
 
 (provide 'init)

@@ -184,7 +184,7 @@ dotfiles_logo='
   3. Execute all sh files within `etc/init/` (optional)
 
   See the README for documentation.
-  https://github.com/b4b4r07/dotfiles
+  https://github.com/naoking158/dotfiles
 
   Copyright (c) 2021 Naoki Sakamoto
   Licensed under the MIT license.
@@ -222,7 +222,7 @@ dotfiles_download() {
                 log_fail "dotfiles-main: not found"
                 exit 1
             fi
-            command mv -f dotfiles-master "$DOTPATH"
+            command mv -f dotfiles-main "$DOTPATH"
 
         else
             log_fail "curl or wget required"

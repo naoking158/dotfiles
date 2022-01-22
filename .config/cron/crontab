@@ -1,4 +1,4 @@
 LANG="en_US.UTF-8"
 PATH="~/.nix-profile/bin:/usr/bin:/bin"
 
-* * * * * source ~/.profile && bash ~/.config/notmuch/move.bash >> ~/cron_notmuch.log 2>> ~/cron_notmuch_error.log
+*/5 * * * * source ~/.profile && bash ~/.config/notmuch/move.bash >> ~/.cache/cron_notmuch.log 2>> ~/.cache/cron_notmuch_error.log

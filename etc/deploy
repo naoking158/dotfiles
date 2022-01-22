@@ -1,0 +1,132 @@
+#!/bin/bash
+
+set -Ceu
+
+MANJARO_FILE=("i3" "mimeapps.list" "polybar")
+MAC_FILE=("karabiner" "skhd" "yabai")
+EXCLUDE_CONFIG_DIR=("bash/" "fish" "iterm2")
+EXCLUDE_DOTFILES=(".dir_colors" ".DS_Store" ".emacs.d" ".git/" ".gitmodules" ".ssh" ".tmux/" ".Brewfile")
+DOTPATH=$(cd ../ && pwd)
+
+[[ -z ${XDG_CONFIG_HOME:-} ]] && {
+    export XDG_CONFIG_HOME="${HOME}/.config";
+}
+
+function is_macos() { [[ $(uname -s) =~ Darwin ]]; }
+function is_manjaro() { [[ $(uname -r) =~ .*MANJARO ]]; }
+
+
+function is_allowed() {
+    fullpath=$1
+    EXCLUSION=()
+    
+    # Check if the file is in the exclusion list
+    if [[ $fullpath =~ \.config ]]; then
+        EXCLUSION=("${EXCLUDE_CONFIG_DIR[@]}")
+    else
+        EXCLUSION=("${EXCLUDE_DOTFILES[@]}")
+    fi
+    
+    # Check if the file is relevant to the current OS
+    if is_macos; then
+        EXCLUSION=("${MANJARO_FILE[@]}" "${EXCLUSION[@]}")
+    elif is_manjaro; then
+        EXCLUSION=("${MAC_FILE[@]}" "${EXCLUSION[@]}")
+    else
+        EXCLUSION=("${MANJARO_FILE[@]}" "${MAC_FILE[@]}" "${EXCLUSION[@]}")
+    fi
+
+    [[ ! "${EXCLUSION[@]}" =~ "$(basename $fullpath)" ]]
+    return $?
+}
+
+SKIP_LIST=()
+CREATE_LIST=()
+
+function _symlink_safely() {
+    DEST=$(echo $1 | awk -v home=$HOME -v dothome=$DOTPATH '{ sub(dothome, home); print; }')
+    if [[ -e $DEST ]]; then
+        SKIP_LIST+=("${1},${DEST}")
+    else
+        CREATE_LIST+=("${1},${DEST}")
+    fi
+}
+
+function create_symlink_list() {
+    if [[ -f $1 ]]; then
+        _symlink_safely "$1"
+    else
+        for fullpath in $(find $1 -type f); do
+            if [[ -f $fullpath ]]; then
+                _symlink_safely "$fullpath"
+            fi
+        done
+    fi
+}
+
+function store_symlink_for_home() {
+    for i in $(ls -a $DOTPATH | grep "^\.[a-zA-Z]"); do
+        fullpath="${DOTPATH}/${i}"
+        if [[ -f $fullpath ]] && $(is_allowed $fullpath); then
+            create_symlink_list "$fullpath"
+        else
+            continue
+        fi
+    done
+}
+
+function store_symlink_for_config() {
+    for i in $(ls -a $DOTPATH/.config | grep "[a-zA-Z]"); do
+        fullpath="${DOTPATH}/.config/${i}"
+        if $(is_allowed $fullpath) ; then
+            create_symlink_list "$fullpath"
+        else
+            continue
+        fi
+    done
+}
+
+function deploy() {
+    store_symlink_for_home
+    store_symlink_for_config
+
+    if [[ -z ${CREATE_LIST:-} ]]; then
+        echo "No symlinks are created."
+    else
+        echo "These symlinks are created."
+        echo
+        for i in "${CREATE_LIST[@]}"; do
+            SRC=${i%%,*}
+            DEST=${i##*,}
+            echo -e "\033[1;31mfrom\033[0m $SRC \033[1;31mto\033[0m $DEST"
+            [[ -n ${1:-} ]] && {
+                ln -s $SRC $DEST;
+            }
+        done
+    fi
+    echo
+    if [[ -n ${SKIP_LIST:-} ]]; then
+        echo "These are skipped."
+        echo
+        for i in "${SKIP_LIST[@]}"; do
+            SRC=${i%%,*}
+            DEST=${i##*,}
+            echo -e "\033[1;31mfrom\033[0m $SRC \033[1;31mto\033[0m $DEST"
+        done
+    fi
+    echo
+    echo "======== Summary ======== "
+    echo "  Created: ${#CREATE_LIST[@]}"
+    echo "  Skipped: ${#SKIP_LIST[@]}"
+    [[ -z ${1:-} ]] && {
+        echo
+        echo "This is dry run.";
+        echo "To create symlinks, run following command: deploy run"
+    }
+}
+
+if [[ -n ${1:-} ]] && [[ ${1} = run ]]; then
+    deploy $1
+else
+    deploy
+fi

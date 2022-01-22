@@ -96,7 +96,6 @@ a bunch of resources I've found online.
 - [[#latex-mode][LaTeX Mode]]
 - [[#applications][Applications]]
   - [[#competitive-programming][Competitive Programming]]
-  - [[#edit-with-emacs-using-hammerspoon][Edit with Emacs using Hammerspoon]]
   - [[#elfeed][Elfeed]]
   - [[#mail][Mail]]
 - [[#server-mode][Server Mode]]
@@ -4441,19 +4440,6 @@ It's nice to have a table of contents section for long literate configuration fi
 													 ("-y" "--wait=0"))))
 #+end_src
 
-** Edit with Emacs using Hammerspoon
-
-#+begin_src emacs-lisp
-(leaf hammerspoon
-  :when
-  (and window-system
-       (file-exists-p "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))
-  :hook
-  (emacs-startup-hook . (lambda nil
-                          (load
-                           "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))))
-#+end_src
-
 
 ** Elfeed
 :PROPERTIES:
@@ -5629,7 +5615,7 @@ Manual is [[https://notmuchmail.org/emacstips/][here]]
   :require t)
 #+end_src
 
-*** imapnotify
+*** COMMENT imapnotify
 
 https://qiita.com/kaz-yos/items/164f03c7bba401646783#imapnotify-1
 
