@@ -15,6 +15,52 @@ DOTPATH=$(cd ../ && pwd)
 function is_macos() { [[ $(uname -s) =~ Darwin ]]; }
 function is_manjaro() { [[ $(uname -r) =~ .*MANJARO ]]; }
 
+function e_newline() {
+    printf "\n"
+}
+
+function e_header() {
+    printf " \033[37;1m%s\033[m\n" "$*"
+}
+
+function e_done() {
+    printf " \033[37;1m%s\033[m...\033[32mOK\033[m\n" "✔ $*"
+}
+
+function ink() {
+    if [ "$#" -eq 0 -o "$#" -gt 2 ]; then
+        echo "Usage: ink <color> <text>"
+        echo "Colors:"
+        echo "  black, white, red, green, yellow, blue, purple, cyan, gray"
+        return 1
+    fi
+
+    local open="\033["
+    local close="${open}0m"
+    local black="0;30m"
+    local red="1;31m"
+    local green="1;32m"
+    local yellow="1;33m"
+    local blue="1;34m"
+    local purple="1;35m"
+    local cyan="1;36m"
+    local gray="0;37m"
+    local white="$close"
+
+    local text="$1"
+    local color="$close"
+
+    if [ "$#" -eq 2 ]; then
+        text="$2"
+        case "$1" in
+            black | red | green | yellow | blue | purple | cyan | gray | white)
+            eval color="\$$1"
+            ;;
+        esac
+    fi
+
+    printf "${open}${color}${text}${close}"
+}
 
 function is_allowed() {
     fullpath=$1
@@ -45,7 +91,7 @@ CREATE_LIST=()
 
 function _symlink_safely() {
     DEST=$(echo $1 | awk -v home=$HOME -v dothome=$DOTPATH '{ sub(dothome, home); print; }')
-    if [[ -e $DEST ]]; then
+    if [[ -e $DEST ]] && [[ ! $(readlink $DEST) = $1 ]]; then
         SKIP_LIST+=("${1},${DEST}")
     else
         CREATE_LIST+=("${1},${DEST}")
@@ -91,37 +137,35 @@ function deploy() {
     store_symlink_for_config
 
     if [[ -z ${CREATE_LIST:-} ]]; then
-        echo "No symlinks are created."
+        e_header "No symlinks are created."
     else
-        echo "These symlinks are created."
-        echo
+        e_header "These symlinks are created."
         for i in "${CREATE_LIST[@]}"; do
             SRC=${i%%,*}
             DEST=${i##*,}
-            echo -e "\033[1;31mfrom\033[0m $SRC \033[1;31mto\033[0m $DEST"
+            ink cyan "from"; ink gray " $SRC"; ink cyan " to"; ink gray " $DEST\n";
             [[ -n ${1:-} ]] && {
+                [[ $(readlink $DEST) = $SRC ]] && { unlink $DEST; }
                 ln -s $SRC $DEST;
             }
         done
     fi
-    echo
     if [[ -n ${SKIP_LIST:-} ]]; then
-        echo "These are skipped."
-        echo
+        e_newline; e_header "These are skipped."
         for i in "${SKIP_LIST[@]}"; do
             SRC=${i%%,*}
             DEST=${i##*,}
-            echo -e "\033[1;31mfrom\033[0m $SRC \033[1;31mto\033[0m $DEST"
+            ink cyan "from"; ink gray " $SRC"; ink cyan " to"; ink gray " $DEST\n"
         done
     fi
-    echo
-    echo "======== Summary ======== "
-    echo "  Created: ${#CREATE_LIST[@]}"
-    echo "  Skipped: ${#SKIP_LIST[@]}"
+    e_newline
+    e_header "======== Summary ======== "
+    e_header "  Created: ${#CREATE_LIST[@]}"
+    e_header "  Skipped: ${#SKIP_LIST[@]}"
     [[ -z ${1:-} ]] && {
-        echo
-        echo "This is dry run.";
-        echo "To create symlinks, run following command: deploy run"
+        e_newline
+        ink red "This is dry run.\n"
+        ink red "To create symlinks, run following command: deploy run\n"
     }
 }
 
