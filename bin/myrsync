@@ -47,7 +47,7 @@ function help () {
 }
 
 set -Cu  # remove -e to close ssh tunnel when rsync is failed
-set -f
+set -f   # avoid wildcard expansion
 MDL="ssh-user@gateway.mdl.cs.tsukuba.ac.jp"
 
 [[ $# = 0 ]] && help
@@ -69,7 +69,7 @@ while (( $# > 0 )); do
             IsUpload=$1
             ;;
         -e | --exclude | --exclude=*)
-            if [[ -n ${exclude+x} ]]; then
+            if [[ -n ${exclude:-} ]]; then
                 echo "Too many --exclude option." 1>&2
                 exit 1
             elif [[ "$1" =~ ^--exclude= ]]; then
@@ -83,12 +83,12 @@ while (( $# > 0 )); do
             fi
             ;;
         -i | --include | --include=*)
-            if [[ -n ${include+x} ]]; then
+            if [[ -n ${include:-} ]]; then
                 echo "Too many --include option." 1>&2
                 exit 1
             elif [[ "$1" =~ ^--include= ]]; then
                 include="$1"
-            elif [[ -z "${2+x}" ]] || [[ "$2" =~ ^-+ ]]; then
+            elif [[ -z "${2:-}" ]] || [[ "$2" =~ ^-+ ]]; then
                 echo "'-i/--include' require an argument." 1>&2
                 exit 1
             else
@@ -101,7 +101,7 @@ while (( $# > 0 )); do
             help
             ;;
         *)
-            if [[ -z ${ARGS+x} ]]; then
+            if [[ -z ${ARGS:-} ]]; then
                 ARGS=($1)
             else
                 ARGS=("${ARGS[@]}" $1)
@@ -111,14 +111,14 @@ while (( $# > 0 )); do
     shift
 done
 
-[[ -z ${ARGS+x} ]] && help
+[[ -z ${ARGS:-} ]] && help
 
-if [[ -n ${include+x} ]] && [[ -n ${exclude+x} ]]; then
+if [[ -n ${include:-} ]] && [[ -n ${exclude:-} ]]; then
     echo "Only one of `--include` and `--exclude` can be used." 1>&2
     exit 1
-elif [[ -n ${include+x} ]]; then
+elif [[ -n ${include:-} ]]; then
     exclude="--exclude=*"    
-elif [[ -n ${exclude+x} ]]; then
+elif [[ -n ${exclude:-} ]]; then
     include="--include=''"
 else
     exclude="--exclude=''"
@@ -209,14 +209,14 @@ function rsyncto() {
     exit 1;
 }
 
-if [[ -n ${IsPortForward+x} ]]; then
-    if [[ -n ${IsUpload+x} ]]; then
+if [[ -n ${IsPortForward:-} ]]; then
+    if [[ -n ${IsUpload:-} ]]; then
         mdlrsyncto ${ARGS[@]}
     else
         mdlrsyncfrom ${ARGS[@]}
     fi
 else
-    if [[ -n ${IsUpload+x} ]]; then
+    if [[ -n ${IsUpload:-} ]]; then
         rsyncto ${ARGS[@]}
     else
         rsyncfrom ${ARGS[@]}
