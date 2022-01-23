@@ -10,6 +10,7 @@
 # Options:
 #     -h, --help
 #     -n, --dry-run
+#     -f                   Use system `rm` program instead of this program
 #
 
 help () {
@@ -82,6 +83,9 @@ while (( $# > 0 )); do
         -n | --dry-run)
             isDryRun=$1
             ;;
+        -f)
+            isSystem=$1
+            ;;
         -*)
             echo
             echo "Illegal option -- '$(echo $1 | sed 's/^-*//')'." 1>&2
@@ -106,34 +110,40 @@ TRASH="$HOME/.myTrash"
 
 function move_to_trash() {
     SRC="$1"
-    DEST="${TRASH}/$(basename $SRC)"
+    FNAME="$(basename $1)"
+    DEST="${TRASH}/${FNAME}"
 
-    if [[ "$isDryRun" ]]; then
+    if [[ "${isDryRun:-}" ]]; then
         ink cyan "Move"; ink gray " $SRC"; ink cyan " to"; ink gray " $DEST\n"
     else
-        mv "$SRC" "$DEST" || {
-            mv "$DEST" "$DEST-$(date +'%Y%m%d%H%M')";
-            mv "$SRC" "$DEST";
-        }
+        if [[ "${isSystem:-}" ]]; then
+            /bin/rm -rf "$SRC"
+        else
+            [[ -e "$DEST" ]] && { mv "$DEST" "$DEST-$(date +'%Y%m%d%H%M%S')"; }
+            mv "$SRC" "${TRASH}/"
+        fi
     fi
 }
 
 function safe_mv() {
-    # Split string with `;`
+    # Split a string with separator `;`.
     # This code is found in
     #   https://stackoverflow.com/questions/918886/how-do-i-split-a-string-on-a-delimiter-in-bash
-    # (Sppose `IFS=$(echo -en "\n\b")` is executed to avoid split string with white space.)
+    # (Suppose that `IFS=$(echo -en "\n\b")` has been executed to avoid split string with white space.)
     
-    IN=$1
+    IN="$1"
+    # IN=$(echo "$1" | sed "s/[] \\[]/\\\&/g")
     ITER=""
+
     while [[ ! "$IN" = "$ITER" ]]; do
         # extract the substring from start of string up to delimiter.
-        ITER=${IN%%;*}
+        ITER="${IN%%;*}"
 
         move_to_trash $ITER
         
         # delete this first "element" AND next separator, from $IN.
-        IN="${IN#$ITER;}"
+        # IN="${IN#${ITER};}"  # failed when the string has square brackets `[]`.
+        IN="${IN#*;}"
     done
 }
 
