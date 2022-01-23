@@ -1,6 +1,7 @@
 # key: opt
 # name: option_handler
 # --
+[[ \$# = 0 ]] && help
 while (( \$# > 0 )); do
     case $1 in
         -h | --help)
@@ -12,15 +13,13 @@ while (( \$# > 0 )); do
             help
             ;;
         *)
-            if [[ -z \${ARGS+x} ]]; then
+            if [[ -z \${ARGS:-} ]]; then
                 ARGS=(\$1)
             else
                 ARGS=("\${ARGS[@]} \$1")
             fi
-            ARGS=("\${ARGS[@]} \$1")
             ;;
     esac
     shift
 done
-[[ \$# = 0 ]] && help
 [[ -z \${ARGS+x} ]] && help
