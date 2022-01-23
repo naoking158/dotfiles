@@ -16,11 +16,6 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
-[[ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]] && {
-    . $HOME/.nix-profile/etc/profile.d/nix.sh
-}
-
-
 case $- in
     *i*) ;;
     *) return;;
