@@ -145,8 +145,12 @@ function deploy() {
             DEST=${i##*,}
             ink cyan "from"; ink gray " $SRC"; ink cyan " to"; ink gray " $DEST\n";
             [[ ${1:-} = run ]] && {
-                [[ $(readlink $DEST) = $SRC ]] && { unlink $DEST; }
-                ln -s $SRC $DEST;
+                [[ -e $DEST ]] && [[ $(readlink $DEST) = $SRC ]] && { unlink $DEST; }
+                
+                ln -s $SRC $DEST || {
+                    mkdir -p $(dirname $DEST);
+                    ln -s $SRC $DEST;
+                }
             }
         done
     fi

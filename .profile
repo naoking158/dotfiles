@@ -49,12 +49,10 @@ fi
 # Set cargo path
 [[ -e $HOME/.cargo/env ]] && . "$HOME/.cargo/env"
 
-[[ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]] && {
-    . "$HOME/.nix-profile/etc/profile.d/nix.sh"
-}
 
 [[ -e $HOME/.nix-defexpr ]] && {
-    export NIX_PATH=$HOME/.nix-defexpr/channels${NIX_PATH:+:}$NIX_PATH
+    export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}
+    # export NIX_PATH=$HOME/.nix-defexpr/channels${NIX_PATH:+:}$NIX_PATH
 }
 
 [[ -e $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh ]] && {
