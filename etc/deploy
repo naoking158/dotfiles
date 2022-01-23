@@ -2,7 +2,7 @@
 
 set -Ceu
 
-MANJARO_FILE=("i3" "mimeapps.list" "polybar")
+MANJARO_FILE=("i3" "manjaro" "mimeapps.list" "polybar")
 MAC_FILE=("karabiner" "skhd" "yabai")
 EXCLUDE_CONFIG_DIR=("bash/" "fish" "iterm2")
 EXCLUDE_DOTFILES=(".dir_colors" ".DS_Store" ".emacs.d" ".git/" ".gitmodules" ".ssh" ".tmux/" ".Brewfile")
@@ -144,13 +144,13 @@ function deploy() {
             SRC=${i%%,*}
             DEST=${i##*,}
             ink cyan "from"; ink gray " $SRC"; ink cyan " to"; ink gray " $DEST\n";
-            [[ -n ${1:-} ]] && {
+            [[ ${1:-} = run ]] && {
                 [[ $(readlink $DEST) = $SRC ]] && { unlink $DEST; }
                 ln -s $SRC $DEST;
             }
         done
     fi
-    if [[ -n ${SKIP_LIST:-} ]]; then
+    if [[ -n ${SKIP_LIST:-} ]] && [[ ! ${1:-} = run ]]; then
         e_newline; e_header "These are skipped."
         for i in "${SKIP_LIST[@]}"; do
             SRC=${i%%,*}
@@ -162,15 +162,17 @@ function deploy() {
     e_header "======== Summary ======== "
     e_header "  Created: ${#CREATE_LIST[@]}"
     e_header "  Skipped: ${#SKIP_LIST[@]}"
-    [[ -z ${1:-} ]] && {
+    [[ ! ${1:-} = run ]] && {
         e_newline
         ink red "This is dry run.\n"
         ink red "To create symlinks, run following command: deploy run\n"
     }
 }
 
-if [[ -n ${1:-} ]] && [[ ${1} = run ]]; then
-    deploy $1
-else
-    deploy
-fi
+deploy ${1:-}
+
+# if [[ -n ${1:-} ]] && [[ ${1} = run ]]; then
+#     deploy $1
+# else
+#     deploy
+# fi
