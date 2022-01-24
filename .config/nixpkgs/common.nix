@@ -58,7 +58,7 @@
   };
   
   programs = {
-    zsh = import ./zsh/zsh.nix { config=config; pkgs=pkgs; };
+    zsh = import ./zsh/zsh.nix { config=config; };
     git = import ./git/git.nix;
     
     # Let Home Manager install and manage itself.

@@ -7,7 +7,7 @@
 # https://github.com/xeres/dotfiles/blob/3c7ca493e12d25ccecb588e992f30b5325fa9889/dot_zshrc
 # https://zenn.dev/kis9a/scraps/02f3ec438d93d1
 
-{ config, pkgs, ... }:
+{ config }:
 
 {
   enable = true;
