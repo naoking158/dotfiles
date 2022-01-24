@@ -1,11 +1,29 @@
 #!/bin/bash
+#
+# Usage:
+#     dry-run:
+#         $0
+#
+#     If you know which files will be placed where:
+#         $0 run
+#
+
+help () {
+    awk -v CMD="$(basename $0)" 'NR > 2 {
+    if (/^#/) { sub("^# ?", ""); sub("\\$0", CMD); print }
+    else { exit }
+    }' $0
+    exit 1
+}
+
+[[ $1 = -h ]] || [[ $1 = -help ]] || [[ $1 = --help ]] && help
 
 set -Ceu
 
 MANJARO_FILE=("i3" "manjaro" "mimeapps.list" "polybar")
 MAC_FILE=("karabiner" "skhd" "yabai")
 EXCLUDE_CONFIG_DIR=("bash/" "fish" "iterm2")
-EXCLUDE_DOTFILES=(".dir_colors" ".DS_Store" ".emacs.d" ".git/" ".gitmodules" ".ssh" ".tmux/" ".Brewfile")
+EXCLUDE_DOTFILES=(".dir_colors" ".DS_Store" ".emacs.d" ".git" ".gitconfig" ".gitignore" ".gitignore_global" ".gitmodules" ".ssh" ".tmux/" ".Brewfile")
 DOTPATH=$(cd ../ && pwd)
 
 [[ -z ${XDG_CONFIG_HOME:-} ]] && {
@@ -21,6 +39,10 @@ function e_newline() {
 
 function e_header() {
     printf " \033[37;1m%s\033[m\n" "$*"
+}
+
+function e_important() {
+    printf " \033[31;1m%s\033[m\n" "$*"
 }
 
 function e_done() {
@@ -139,7 +161,7 @@ function deploy() {
     if [[ -z ${CREATE_LIST:-} ]]; then
         e_header "No symlinks are created."
     else
-        e_header "These symlinks are created."
+        e_important "These symlinks are created."
         for i in "${CREATE_LIST[@]}"; do
             SRC=${i%%,*}
             DEST=${i##*,}
@@ -155,7 +177,7 @@ function deploy() {
         done
     fi
     if [[ -n ${SKIP_LIST:-} ]] && [[ ! ${1:-} = run ]]; then
-        e_newline; e_header "These are skipped."
+        e_newline; e_important "These are skipped."
         for i in "${SKIP_LIST[@]}"; do
             SRC=${i%%,*}
             DEST=${i##*,}
@@ -169,7 +191,7 @@ function deploy() {
     [[ ! ${1:-} = run ]] && {
         e_newline
         ink red "This is dry run.\n"
-        ink red "To create symlinks, run following command: deploy run\n"
+        help
     }
 }
 
