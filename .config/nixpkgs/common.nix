@@ -1,3 +1,6 @@
+# Available options is here:
+# https://rycee.gitlab.io/home-manager/options.html
+
 { config, pkgs, ... }:
 
 {
@@ -5,6 +8,7 @@
   
   home = {   
     packages = with pkgs; [
+      bat
       cairo
       cask
       cmigemo
@@ -55,6 +59,7 @@
   
   programs = {
     zsh = import ./zsh/zsh.nix { config=config; pkgs=pkgs; };
+    git = import ./git/git.nix;
     
     # Let Home Manager install and manage itself.
     home-manager.enable = true;

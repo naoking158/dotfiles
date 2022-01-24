@@ -32,6 +32,7 @@
     "...." = "cd ../../..";
     
     # file
+    cat = "bat";
     ls = "ls --color=auto --file-type";
     la = "ls -a";
     ll = "exa -l -g --icons";
@@ -40,6 +41,19 @@
     grep = "grep --color=auto";
     diff = "diff --color=auto";
     tgz = "f() { env COPYFILE_DISABLE=1 tar zcvf $1 --exclude=\".DS_Store\" \${@:2}; unset -f f; }; f";
+
+    # conda
+    c = "conda";
+    ca = "c activate";
+    ce = "c env";
+    ci = "c install";
+    cs = "c search";
+    
+    # emacs
+    e = "emacsclient";
+    ed = "emacs -nw --daemon";
+    en = "emacsclient -nw";
+    ekill = "emacsclient -e \"(kill-emacs)\"";
 
     # git
     g = "git";
@@ -50,12 +64,6 @@
     # latex compile command
     en_latex = "latexmk -e \"$bibtex=q/bibtex/\" -pdf -pvc";
     ja_latex = "latexmk -pvc";
-
-    # emacs
-    e = "emacsclient";
-    ed = "emacs -nw --daemon";
-    en = "emacsclient -nw";
-    ekill = "emacsclient -e \"(kill-emacs)\"";
 
     # ssh
     _kingkong = "ssh kingkong";
