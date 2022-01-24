@@ -21,8 +21,9 @@
     options = {
       navigate = true;
       line-numbers = true;
-      syntax-theme = "GitHub";
+      syntax-theme = "zenburn";
       side-by-side = true;
+      hyperlinks = true;
     };
   };
 
