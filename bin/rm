@@ -84,7 +84,7 @@ while (( $# > 0 )); do
             isDryRun=$1
             ;;
         -d | --delete)
-            Delete?=$1
+            isDelete=$1
             ;;
         -*)
             echo
@@ -119,7 +119,7 @@ function move_to_trash() {
         ink cyan " to"
         ink gray " $DEST\n"
     else
-        if [[ "${Delete?:-}" ]]; then
+        if [[ "${isDelete:-}" ]]; then
             /bin/rm -rf "$SRC"
         else
             # If $DEST file is duplicated, older one is renamed with date.
