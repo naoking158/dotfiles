@@ -33,12 +33,20 @@
     
     # file
     ls = "ls --color=auto --file-type";
+    la = "ls -a";
     ll = "exa -l -g --icons";
     lla = "ll -a";
     dua = "/usr/bin/du -shc * | sort -h";
     grep = "grep --color=auto";
     diff = "diff --color=auto";
-    
+    tgz = "f() { env COPYFILE_DISABLE=1 tar zcvf $1 --exclude=\".DS_Store\" \${@:2}; unset -f f; }; f";
+
+    # git
+    g = "git";
+    gc = "g commit -m";
+    gs = "g status";
+    gas = "g add -A && gs";
+
     # latex compile command
     en_latex = "latexmk -e \"$bibtex=q/bibtex/\" -pdf -pvc";
     ja_latex = "latexmk -pvc";
