@@ -43,13 +43,21 @@ function e_arrow() {
     printf " \033[37;1m%s\033[m\n" "➜ $*"
 }
 
-
+function __hashr() {
+    if [ -n "${ZSH_VERSION:+x}" ]; then
+        rehash
+    elif [ -n "${POSH_VERSION:+x}" ]; then
+        :  # pass
+    else
+        hash -r
+    fi
+}
 
 function install_nix() {
     sh <(curl -L https://nixos.org/nix/install) "$OPT[@]" && {
-        e_newline
-        e_arrow "Restarting your shell..."
-        exec "${SHELL:-/bin/bash}"
+        # e_newline
+        # e_arrow "Restarting your shell..."
+        # exec "${SHELL:-/bin/bash}"
 
         e_newline
         e_arrow "Executing following command to activate Nix..."
@@ -59,16 +67,19 @@ function install_nix() {
 
         export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}
         . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+        __hashr
+
 
         e_newline
         e_arrow "Adding channels..."
         nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
         nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
         nix-channel --update
+        __hashr
 
-        e_newline
-        e_arrow "Restarting your shell..."
-        exec "${SHELL:-/bin/bash}"
+        # e_newline
+        # e_arrow "Restarting your shell..."
+        # exec "${SHELL:-/bin/bash}"
     } &&
 
     e_done "Install Nix" 
@@ -80,9 +91,10 @@ function install_home_manager() {
     
     e_newline
     e_arrow "Installing home-manager..."
-    
+
     nix-shell '<home-manager>' -A install && {
         . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+        __hashr
         home-manager switch
     } &&
 
@@ -96,9 +108,12 @@ function install_home_manager() {
     }
 }
 
-
 if is_exists "nix-shell"; then
-    echo "Nix is already installed."
+    if [[ $1 = -hm ]] || [[ $1 = --home-manager ]]; then
+        install_home_manager
+    else
+        echo "Nix is already installed."
+    fi
 else
     install_nix && install_home_manager
 fi
