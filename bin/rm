@@ -10,7 +10,7 @@
 # Options:
 #     -h, --help
 #     -n, --dry-run
-#     -f                   Use system `rm` program instead of this program
+#     -d, --delete  ----  Use system `rm` program instead of this program
 #
 
 help () {
@@ -83,8 +83,8 @@ while (( $# > 0 )); do
         -n | --dry-run)
             isDryRun=$1
             ;;
-        -f)
-            isSystem=$1
+        -d | --delete)
+            Delete?=$1
             ;;
         -*)
             echo
@@ -93,9 +93,9 @@ while (( $# > 0 )); do
             ;;
         *)
             if [[ -z ${ARGS:-} ]]; then
-                ARGS="$1"
+                ARGS=("$1")
             else
-                ARGS="${ARGS};$1"
+                ARGS=("${ARGS[@]}" "$1")
             fi
             ;;
     esac
@@ -114,11 +114,15 @@ function move_to_trash() {
     DEST="${TRASH}/${FNAME}"
 
     if [[ "${isDryRun:-}" ]]; then
-        ink cyan "Move"; ink gray " $SRC"; ink cyan " to"; ink gray " $DEST\n"
+        ink cyan "Move"
+        ink gray " $SRC"
+        ink cyan " to"
+        ink gray " $DEST\n"
     else
-        if [[ "${isSystem:-}" ]]; then
+        if [[ "${Delete?:-}" ]]; then
             /bin/rm -rf "$SRC"
         else
+            # If $DEST file is duplicated, older one is renamed with date.
             [[ -e "$DEST" ]] && { mv "$DEST" "$DEST-$(date +'%Y%m%d%H%M%S')"; }
             mv "$SRC" "${TRASH}/"
         fi
@@ -126,26 +130,11 @@ function move_to_trash() {
 }
 
 function safe_mv() {
-    # Split a string with separator `;`.
-    # This code is found in
-    #   https://stackoverflow.com/questions/918886/how-do-i-split-a-string-on-a-delimiter-in-bash
-    # (Suppose that `IFS=$(echo -en "\n\b")` has been executed to avoid split string with white space.)
-    
-    IN="$1"
-    # IN=$(echo "$1" | sed "s/[] \\[]/\\\&/g")
-    ITER=""
-
-    while [[ ! "$IN" = "$ITER" ]]; do
-        # extract the substring from start of string up to delimiter.
-        ITER="${IN%%;*}"
-
-        move_to_trash $ITER
-        
-        # delete this first "element" AND next separator, from $IN.
-        # IN="${IN#${ITER};}"  # failed when the string has square brackets `[]`.
-        IN="${IN#*;}"
+    for i in "${ARGS[@]}"; do
+        move_to_trash "$i"
     done
 }
+
 
 safe_mv "$ARGS"
 
