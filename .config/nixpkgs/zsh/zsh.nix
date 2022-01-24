@@ -159,6 +159,8 @@
               zdharma-continuum/fast-syntax-highlighting \
          blockf \
              zsh-users/zsh-completions \
+         as"blockf; completion; snippet" \
+             https://github.com/esc/conda-zsh-completion/blob/master/_conda \
          atload"!_zsh_autosuggest_start" \
             zsh-users/zsh-autosuggestions
 
