@@ -10,16 +10,20 @@
 # Options:
 #     -h, --help
 #     -n, --dry-run
-#     -d, --delete  ----  Use system `rm` program instead of this program
+#     -d, --delete  ----  `rm -rf SRC` is executed using `/bin/rm` (Be careful!!!)
+#         --restore ----  Restore previously moved files to their original locations.
+#                             Previously moved history is saved in `~/.myTrash/.moved.log`
 #
 
 help () {
     awk -v CMD="$(basename $0)" 'NR > 2 {
-    if (/^#/) { sub("^# ?", ""); sub("\\$0", CMD); print }
+    if (/^#/) { sub("^# ?", ""); sub("\\$0", CMD); sub("Be careful!!!", "\033[31;1m\&\033[0m"); print }
     else { exit }
     }' $0
     exit 1
 }
+
+set -Ceu
 
 function e_newline() {
     printf "\n"
@@ -68,8 +72,6 @@ function ink() {
     printf "${open}${color}${text}${close}"
 }
 
-set -Ceu
-
 # Avoid split file name with white space
 SAVEIFS=IFS
 IFS=$(echo -en "\n\b")
@@ -86,6 +88,9 @@ while (( $# > 0 )); do
         -d | --delete)
             isDelete=$1
             ;;
+        --restore)
+            RESTORE=$1
+            ;;
         -*)
             echo
             echo "Illegal option -- '$(echo $1 | sed 's/^-*//')'." 1>&2
@@ -101,7 +106,7 @@ while (( $# > 0 )); do
     esac
     shift
 done
-[[ -z ${ARGS:-} ]] && help
+[[ -z ${ARGS:-} ]] && [[ -z ${RESTORE:-} ]] && help
 
 
 TRASH="$HOME/.myTrash"
@@ -114,8 +119,8 @@ function move_to_trash() {
     DEST="${TRASH}/${FNAME}"
 
     if [[ "${isDryRun:-}" ]]; then
-        ink cyan "Move"
-        ink gray " $SRC"
+        ink cyan "from"
+        ink gray " $(realpath ${SRC})"
         ink cyan " to"
         ink gray " $DEST\n"
     else
@@ -123,19 +128,66 @@ function move_to_trash() {
             /bin/rm -rf "$SRC"
         else
             # If $DEST file is duplicated, older one is renamed with date.
-            [[ -e "$DEST" ]] && { mv "$DEST" "$DEST-$(date +'%Y%m%d%H%M%S')"; }
-            mv "$SRC" "${TRASH}/"
+            [[ -e "$DEST" ]] && { mv "$DEST" "${DEST}-$(date +'%Y%m%d%H%M%S')"; }
+            mv "$SRC" "${DEST}"
         fi
     fi
+    return 0
 }
 
-function safe_mv() {
+function safe_rm() {
+    [[ "${isDryRun:-}" ]] && { ink cyan "\nBellow files will be moved...\n"; }
     for i in "${ARGS[@]}"; do
         move_to_trash "$i"
     done
+    e_newline
+}
+
+function move_from_trash() {
+    DEST="$1"
+    FNAME="$(basename $1)"
+    SRC="${TRASH}/${FNAME}"
+
+    ink gray " $DEST\n"
+    
+    # If $DEST file is duplicated, older one is renamed with date.
+    [[ -e "$DEST" ]] && { e_important "$DEST is exist."; exit 1; }
+    [[ -z "${isDryRun:-}" ]] && { mv "$SRC" "$DEST"; }
+    return 0
+}
+
+function restore() {
+    ink cyan "\nBellow files are restored...\n"
+    while read F; do
+        [[ "${#F}" > 0 ]] && { move_from_trash "$F"; } 
+    done < $LOGFILE
+    e_newline
 }
 
 
-safe_mv "$ARGS"
+LOGFILE="${HOME}/.myTrash/.moved.log"
+
+if [[ "${RESTORE:-}" ]]; then
+    if [[ "${isDelete:-}" ]]; then
+        e_important "-d/--delete and --restore options cannot be used simultaneously."
+        exit 1
+    elif [[ -e $LOGFILE ]]; then
+        restore        
+    else
+        e_important "You have no removed data."
+    fi
+else
+    safe_rm && [[ -z "${isDryRun:-}" ]] && {
+        REMOVED_LIST=()
+        for i in "${ARGS[@]}"; do
+            REMOVED_LIST+="$(realpath $i)\n"
+        done
+        echo -e "${REMOVED_LIST[@]}" >| ~/.myTrash/.moved.log
+    }
+fi
+
+[[ "${isDryRun:-}" ]] && { e_important "This is dry run. File are unchanged."; }
+
 
 IFS=$SAVEIFS
+
