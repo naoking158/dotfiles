@@ -11,16 +11,19 @@
       bat
       cairo
       cask
+      cmake
       cmigemo
       coreutils
       curl
       exa
       fd
+      ffmpeg
       fzf
       gcc
       gh
       ghostscript
       ghq
+      glib
       gnutls
       go
       harfbuzz
@@ -31,6 +34,7 @@
       jq
       libgccjit
       librsvg
+      libtool
       llvm
       mailutils
       nkf
