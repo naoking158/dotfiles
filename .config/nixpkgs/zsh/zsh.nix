@@ -65,6 +65,11 @@
     en_latex = "latexmk -e \"$bibtex=q/bibtex/\" -pdf -pvc";
     ja_latex = "latexmk -pvc";
 
+    # nix
+    ne-search="nix-env -qa";
+    nc-list="nix-channel --list";
+    nc-update="nix-channel --update";
+    
     # ssh
     _kingkong = "ssh kingkong";
     __kingkong = "ssh _kingkong";
@@ -163,14 +168,16 @@
 
     # zinit plugins
     zinit wait lucid for \
-          atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay" \
-              zdharma-continuum/fast-syntax-highlighting \
+         atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay" \
+             zdharma-continuum/fast-syntax-highlighting \
+         atload"!_zsh_autosuggest_start" \
+             zsh-users/zsh-autosuggestions \
          blockf \
              zsh-users/zsh-completions \
          as"blockf; completion; snippet" \
              https://github.com/esc/conda-zsh-completion/blob/master/_conda \
-         atload"!_zsh_autosuggest_start" \
-            zsh-users/zsh-autosuggestions
+         as"blockf; completion; snippet" \
+             https://github.com/spwhitt/nix-zsh-completions/blob/master/_nix-common-options
 
     zinit wait lucid for \
         atclone"curl -sOL https://github.com/ohmyzsh/ohmyzsh/raw/master/plugins/tmux/tmux.extra.conf" \
