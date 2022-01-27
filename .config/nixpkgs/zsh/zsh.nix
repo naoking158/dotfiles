@@ -21,6 +21,7 @@
     expireDuplicatesFirst = true;
     ignoreDups = true;
     ignoreSpace = false;
+    share = true;
     size = 10000;
     path = "${config.xdg.dataHome}/zsh/history";
   };
@@ -163,8 +164,16 @@
             ls --color=auto --file-type
         fi
     }
-    autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
-    add-zsh-hook chpwd chpwd_recent_dirs
+
+    # cdr
+    if [[ -n $(echo ''${^fpath}/chpwd_recent_dirs(N)) && -n $(echo ''${^fpath}/cdr(N)) ]]; then
+        autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
+        add-zsh-hook chpwd chpwd_recent_dirs
+        zstyle ':completion:*' recent-dirs-insert both
+        zstyle ':chpwd:*' recent-dirs-default true
+        zstyle ':chpwd:*' recent-dirs-max 1000
+        # zstyle ':chpwd:*' recent-dirs-file "$HOME/.cache/chpwd-recent-dirs"
+    fi
 
     # zinit plugins
     zinit wait lucid for \
@@ -182,6 +191,8 @@
     zinit wait lucid for \
         atclone"curl -sOL https://github.com/ohmyzsh/ohmyzsh/raw/master/plugins/tmux/tmux.extra.conf" \
             OMZP::tmux
+
+    zinit ice pick"bd.zsh"; zinit light Tarrasch/zsh-bd
 
     zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
         atpull'%atclone' pick"clrs.zsh" nocompile'!' \
