@@ -1388,6 +1388,7 @@ Only in Neotree Buffer:
 
 #+end_src
 
+
 ** Debugger with Dap Mode
 
 #+begin_src emacs-lisp
@@ -1461,7 +1462,7 @@ Only in Neotree Buffer:
 #+end_src
 
 ** Language
-*** Language Server Support
+*** Language Server Support with LSP-mode
 :PROPERTIES:
 :ID:       87866DFF-1C8E-4735-8871-63E754812DAF
 :END:
@@ -5421,6 +5422,10 @@ Manual is [[https://notmuchmail.org/emacstips/][here]]
             :query "tag:unread not tag:archived"
             :sort-order newest-first
             :key ,(kbd "U"))
+          ( :name "Archived"
+            :query "tag:archived"
+            :sort-order newest-first
+            :key ,(kbd "a"))
           ( :name "todo"
             :query "tag:todo not tag:archived"
             :sort-order newest-first
@@ -5516,7 +5521,7 @@ Manual is [[https://notmuchmail.org/emacstips/][here]]
           mark-delete-tags '("+del" "-inbox" "-archived" "-unread")
           mark-flag-tags '("+flag" "-unread")
           mark-spam-tags '("+spam" "+del" "-inbox" "-unread")
-          mark-todo-tags '("+todo" "-unread"))
+          mark-todo-tags '("+todo" "-unread" "-inbox"))
 
     (setq notmuch-tagging-keys
           `((,(kbd "a") notmuch-archive-tags "Archive (remove from inbox)")

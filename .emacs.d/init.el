@@ -3768,6 +3768,10 @@ Interactively, URL defaults to the string looking like a url around point."
             :query "tag:unread not tag:archived"
             :sort-order newest-first
             :key ,(kbd "U"))
+          ( :name "Archived"
+            :query "tag:archived"
+            :sort-order newest-first
+            :key ,(kbd "a"))
           ( :name "todo"
             :query "tag:todo not tag:archived"
             :sort-order newest-first
@@ -3863,7 +3867,7 @@ Interactively, URL defaults to the string looking like a url around point."
           mark-delete-tags '("+del" "-inbox" "-archived" "-unread")
           mark-flag-tags '("+flag" "-unread")
           mark-spam-tags '("+spam" "+del" "-inbox" "-unread")
-          mark-todo-tags '("+todo" "-unread"))
+          mark-todo-tags '("+todo" "-unread" "-inbox"))
 
     (setq notmuch-tagging-keys
           `((,(kbd "a") notmuch-archive-tags "Archive (remove from inbox)")
