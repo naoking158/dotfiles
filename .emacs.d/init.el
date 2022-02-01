@@ -1681,15 +1681,14 @@ respectively."
   :ensure t
   :require t
   :after orderless
-  ;; :bind (("C-c g" . affe-grep)
-  ;;        ("C-c f" . affe-find))
+  :bind (("C-c C-g" . affe-grep)
+         ("C-c C-f" . affe-find))
   :custom
   ;; Use Orderless
   ((affe-highlight-function function orderless-highlight-matches)
    (affe-regexp-function function orderless-pattern-compiler)
-   (affe-find-command . "fd --color=never --full-path")
-   ;; (affe-grep-command . "rg --null --color=never --max-columns=1000 --no-heading --no-ignore  --line-number -v ^$ .")
-   )
+   (affe-find-command . "fd --color=never --full-path --no-ignore --hidden --exclude \".git\"")
+   (affe-grep-command . "rg --null --color=never --max-columns=1000 --no-heading --no-ignore --hidden --glob=\"!.git\" --line-number -v ^$ ."))
   :config
   (consult-customize affe-grep :preview-key (kbd "M-.")))
 
@@ -1731,7 +1730,7 @@ respectively."
    ("C-M-r" . consult-recent-file)
    ("C-x C-o" . consult-file-externally)
    ("C-S-s" . consult-imenu)
-   ("C-c C-g" . consult-grep)
+   ;; ("C-c C-g" . consult-grep)
    ("C-c C-j" . consult-mark))
   :preface
   (defun my-consult-line (&optional at-point)
