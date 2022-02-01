@@ -42,12 +42,13 @@
     dua = "/usr/bin/du -shc * | sort -h";
     fd = "fd --color=auto --full-path --no-ignore --hidden --exclude \".git\"";
     grep = "grep --color=auto";
-    ls = "ls --color=auto --file-type";
-    la = "ls -a";
+    ls = "exa --icons";
+    la = "exa -a";
     ll = "exa -l -g --icons";
     lla = "ll -a";
     rg = "rg --color=auto --no-ignore --hidden --glob=\"!.git\" --line-number";
     tgz = "f() { env COPYFILE_DISABLE=1 tar zcvf $1 --exclude=\".DS_Store\" \${@:2}; unset -f f; }; f";
+    tree = "exa --tree --level 3 -a --ignore-glob \"node_modules|.git|.cache\" --icons";
 
     # conda
     c = "conda";
@@ -169,7 +170,7 @@
     # builtins
     function chpwd() {
         if [[ $(pwd) != $HOME ]]; then;
-            ls --color=auto --file-type
+            exa -a --icons
         fi
     }
 

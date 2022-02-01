@@ -8,7 +8,6 @@
   
   home = {   
     packages = with pkgs; [
-      bat
       cairo
       cask
       cmake
@@ -50,7 +49,6 @@
       ruby
       texlab
       tmux
-      tree
       tree-sitter
       w3m
       wget
@@ -64,6 +62,13 @@
   programs = {
     zsh = import ./zsh/zsh.nix { config=config; };
     git = import ./git/git.nix;
+    bat = {
+      enable = true;
+      config = {
+        pager = "less -FR";
+        theme = "Coldark-Dark";
+      };
+    };
     
     # Let Home Manager install and manage itself.
     home-manager.enable = true;
