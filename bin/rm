@@ -20,7 +20,7 @@
 # https://stackoverflow.com/questions/4261876/check-if-bash-script-was-invoked-from-a-shell-or-another-script-application
 # If own `rm` script is executed from other script or program, system's `rm` is executed
 PSOUT="$(ps -o stat= -p $PPID)$(ps -o stat= -p $$)"
-if [[ ! $PSOUT =~ ^(Ss S+|Ss+ S) ]]; then
+if [[ !$PSOUT =~ ^(Ss S+|Ss+ S) ]]; then
     /bin/rm $@
     exit 0
 fi
@@ -117,11 +117,11 @@ while (( $# > 0 )); do
     esac
     shift
 done
-[[ -z ${ARGS:-} ]] && [[ -z ${RESTORE:-} ]] && help
+[[ -z ${ARGS:-} && -z ${RESTORE:-} ]] && help
 
 
 TRASH="$HOME/.myTrash"
-[[ ! -e $TRASH ]] && mkdir $TRASH
+[[ ! -e $TRASH ]] && mkdir -p $TRASH
 
 
 function move_to_trash() {
@@ -181,7 +181,6 @@ LOGFILE="${HOME}/.myTrash/.moved.log"
 if [[ "${RESTORE:-}" ]]; then
     if [[ "${isDelete:-}" ]]; then
         e_important "-d/--delete and --restore options cannot be used simultaneously."
-        exit 1
     elif [[ -e $LOGFILE ]]; then
         restore        
     else
