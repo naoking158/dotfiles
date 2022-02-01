@@ -25,6 +25,10 @@
     size = 10000;
     path = "${config.xdg.dataHome}/zsh/history";
   };
+
+  shellGlobalAliases = {
+    G = "| grep";
+  };
   
   shellAliases = {
     # move
@@ -34,13 +38,15 @@
     
     # file
     cat = "bat";
+    diff = "diff --color=auto";
+    dua = "/usr/bin/du -shc * | sort -h";
+    fd = "fd --color=auto --full-path --no-ignore --hidden --exclude \".git\"";
+    grep = "grep --color=auto";
     ls = "ls --color=auto --file-type";
     la = "ls -a";
     ll = "exa -l -g --icons";
     lla = "ll -a";
-    dua = "/usr/bin/du -shc * | sort -h";
-    grep = "grep --color=auto";
-    diff = "diff --color=auto";
+    rg = "rg --color=auto --no-ignore --hidden --glob=\"!.git\" --line-number";
     tgz = "f() { env COPYFILE_DISABLE=1 tar zcvf $1 --exclude=\".DS_Store\" \${@:2}; unset -f f; }; f";
 
     # conda
@@ -53,7 +59,9 @@
     # emacs
     e = "emacsclient";
     ed = "emacs -nw --daemon";
-    en = "emacsclient -nw";
+    eq = "emacs -q";
+    eql = "eq -l";
+    enw = "emacsclient -nw";
     ekill = "emacsclient -e \"(kill-emacs)\"";
 
     # git
