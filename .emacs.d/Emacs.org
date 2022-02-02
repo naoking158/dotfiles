@@ -3484,10 +3484,22 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
      org-agenda-bulk-custom-functions `((,jethro/org-agenda-bulk-process-key
                                          jethro/org-agenda-process-inbox-item)))
 
-    (add-to-list 'org-capture-templates
-                 `("i" "inbox" entry
-                   (file ,(concat jethro/org-agenda-directory "inbox.org"))
-                   "* TODO %?"))
+    (setq journal-directory (expand-file-name "journal" org-directory)
+          journal-daily-file (expand-file-name "daily.org" journal-directory)
+          journal-weekly-file (expand-file-name "weekly.org" journal-directory)
+          journal-monthly-file (expand-file-name "monthly.org" journal-directory)
+          journal-template-directory (expand-file-name "templates" journal-directory)
+          journal-template-daily (expand-file-name "daily.org" journal-template-directory)
+          journal-template-weekly (expand-file-name "weekly.org" journal-template-directory)
+          journal-template-monthly (expand-file-name "monthly.org" journal-template-directory))
+
+    (setq org-capture-templates
+          `(("i" "inbox" entry
+             (file ,(concat jethro/org-agenda-directory "inbox.org"))
+             "* TODO %?")
+            ("d" "daily" entry
+             (file+headline ,journal-daily-file ,(format-time-string "%Y-%m-%d %A"))
+             (file ,journal-template-daily))))
 
     (defun jethro/org-archive-done-tasks ()
       "Archive all done tasks."
