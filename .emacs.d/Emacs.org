@@ -2498,17 +2498,18 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 
 (leaf affe
   :ensure t
-  :require t
   :after orderless
   :bind (("C-c C-g" . affe-grep)
          ("C-c C-f" . affe-find))
   :custom
   ;; Use Orderless
-  ((affe-highlight-function function orderless-highlight-matches)
-   (affe-regexp-function function orderless-pattern-compiler)
-   (affe-find-command . "fd --color=never --full-path --no-ignore --hidden --exclude \".git\"")
-   (affe-grep-command . "rg --null --color=never --max-columns=1000 --no-heading --no-ignore --hidden --glob=\"!.git\" --line-number -v ^$ ."))
+  ((affe-find-command . "fd --color=never --full-path --no-ignore --hidden --exclude \".git\"")
+   (affe-grep-command . "rg --null --color=never --max-columns=1000 --no-heading --no-ignore --hidden --smart-case --line-number -v ^$ --glob=\"!.git\" ."))
   :config
+  (defun affe-orderless-regexp-compiler (input _type)
+    (setq input (orderless-pattern-compiler input))
+    (cons input (lambda (str) (orderless--highlight input str))))
+  (setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
   (consult-customize affe-grep :preview-key (kbd "M-.")))
 
 #+end_src
