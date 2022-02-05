@@ -1,0 +1,9 @@
+[
+  "textlint",
+  "textlint-rule-preset-ja-technical-writing",
+  "textlint-rule-write-good",
+  "textlint-rule-ginger",
+  "textlint-rule-alex",
+  "textlint-plugin-org",
+  "traverse"
+]

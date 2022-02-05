@@ -3,6 +3,9 @@
 
 { config, pkgs, ... }:
 
+let
+  extraNodePackages = import ./node/default.nix {};
+in
 {
   imports = [ ./mail/mail.nix ];
   
@@ -38,6 +41,13 @@
       mailutils
       nkf
       nodejs
+      extraNodePackages.textlint
+      extraNodePackages.textlint-rule-preset-ja-technical-writing
+      extraNodePackages.textlint-rule-write-good
+      extraNodePackages.textlint-rule-ginger
+      extraNodePackages.textlint-rule-alex
+      extraNodePackages.textlint-plugin-org
+      extraNodePackages.traverse
       peco
       php
       pkg-config
