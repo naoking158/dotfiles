@@ -37,6 +37,7 @@ in
       libgccjit
       librsvg
       libtool
+      libxml2
       llvm
       mailutils
       nkf
@@ -46,6 +47,8 @@ in
       extraNodePackages.textlint-rule-write-good
       extraNodePackages.textlint-rule-ginger
       extraNodePackages.textlint-rule-alex
+      extraNodePackages.textlint-rule-en-max-word-count
+      extraNodePackages.textlint-rule-common-misspellings
       extraNodePackages.textlint-plugin-org
       extraNodePackages.traverse
       peco
