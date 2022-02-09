@@ -1459,10 +1459,11 @@ respectively."
 
 (leaf skk
   :ensure ddskk
-  :hook ((text-mode-hook . (lambda nil
-                             (skk-mode)
-                             (skk-latin-mode-on)
-                             (context-skk-mode))))
+  :hook
+  ((text-mode-hook occur-edit-mode-hook) . (lambda nil
+                                             (skk-mode)
+                                             (skk-latin-mode-on)
+                                             (context-skk-mode)))
   :custom ((default-input-method . "japanese-skk")
            (skk-jisyo-code . 'utf-8)
            (skk-large-jisyo . "~/.emacs.d/skk-get-jisyo/SKK-JISYO.Huge.utf8")
