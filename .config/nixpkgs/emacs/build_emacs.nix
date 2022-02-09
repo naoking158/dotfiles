@@ -10,7 +10,7 @@ with rec {
   withNS = stdenv.isDarwin;
   withX = ! stdenv.isDarwin;
   siteStart = ./site-start.el;
-  # emacs-source = builtins.fetchGit { url = "https://github.com/emacs-mirror/emacs"; ref = "master"; };
+  # emacs-source = builtins.fetchGit { url = "https://github.com/emacs-mirror/emacs"; ref = "emacs-28"; };
 };
 
 assert withNS -> !withX;
@@ -32,9 +32,16 @@ let
 
       # rev = "${emacs-source.rev}";
       # sha256 = "${emacs-source.narHash}";
+
+      # emacs-29
+      # rev = "015d881b6dbdd527e309d8337daaf22d192a3c70";
+      # sha256 = "sha256-a36MJb/M4Iyxxw8hGhOv/j5xA/KCE02XiqZObOQXqk0=";
+
+      # emacs-28
+      rev = "82e74e4559b8becd44f3e7ac0134e2baddd69921";
+      sha256 = "sha256-RuUyPyxozimbhNya53k+BUWWYD7S1vaEMq2zzob8NS8=";
+
       
-      rev = "015d881b6dbdd527e309d8337daaf22d192a3c70";
-      sha256 = "sha256-a36MJb/M4Iyxxw8hGhOv/j5xA/KCE02XiqZObOQXqk0=";
     };
 
     patches = if stdenv.isDarwin
@@ -92,6 +99,7 @@ let
       jansson # --with-json
       zlib libgccjit # --with-native-compilation
       imagemagick
+      libxml2
     ] ++
     (lib.optionals stdenv.isDarwin [ # https://github.com/holochain/launcher/issues/37
       frameworks.AppKit
@@ -111,6 +119,7 @@ let
       "--with-native-compilation"
       "--with-pgtk"
       "--with-imagemagick"
+      "--with-xml2"
     ] ++
     (lib.optional stdenv.isDarwin
       (lib.withFeature withNS "ns")) ++
