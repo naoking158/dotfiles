@@ -432,9 +432,9 @@
           frame-title-format '(" - " display-time-string " - "))
     (display-time))
   
-  (leaf global-visual-line-mode
+  (leaf visual-line-mode
     :tag "builtin"
-    :global-minor-mode t))
+    :hook (text-mode-hook . visual-line-mode)))
 
 (leaf *frame-transparency
   :when window-system
