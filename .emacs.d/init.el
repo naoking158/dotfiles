@@ -1759,9 +1759,10 @@ respectively."
    :preview-key '(:debounce 0.4 any)
    consult-ripgrep consult-git-grep consult-grep
    consult-bookmark consult-recent-file consult-xref
-   consult--source-file consult--source-project-file consult--source-bookmark
-   ;; :preview-key (kbd "C-S-p")
-   :preview-key (list :debounce 0.5 (kbd "M-.")))
+   consult--source-recent-file consult--source-project-recent-file consult--source-bookmark
+   :preview-key (kbd "M-.")
+   ;; :preview-key (list :debounce 0.7 (kbd "M-."))
+   )
 
   (leaf consult-dir
     :after consult
