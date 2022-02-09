@@ -158,7 +158,7 @@
     :tag "builtin" "internal"
     :url "http://handlename.hatenablog.jp/entry/2011/12/11/214923"
     :leaf-defer nil
-    :bind (("C-M-h" . delete-region)
+    :bind (("C-M-<backspace>" . delete-region)
            ("C-x C-p" . switch-to-prev-buffer)
            ("C-x C-n" . switch-to-next-buffer))
     :hook (after-init-hook . general-init-hook)
