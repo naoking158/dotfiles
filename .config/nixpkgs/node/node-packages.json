@@ -4,6 +4,8 @@
   "textlint-rule-write-good",
   "textlint-rule-ginger",
   "textlint-rule-alex",
+  "textlint-rule-en-max-word-count",
+  "textlint-rule-common-misspellings",
   "textlint-plugin-org",
   "traverse"
 ]

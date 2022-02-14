@@ -4,7 +4,6 @@
 { config, pkgs, ... }:
 
 let
-  # extraNodePackages = import ./node/default.nix {};
   myEmacs = (import ./emacs/build_emacs.nix);
 in
 {
@@ -40,6 +39,7 @@ in
       go
       harfbuzz
       htop
+      hub
       hugo
       imagemagick
       imapnotify
@@ -52,15 +52,7 @@ in
       mailutils
       nkf
       nodejs
-      extraNodePackages.textlint
-      extraNodePackages.textlint-rule-preset-ja-technical-writing
-      extraNodePackages.textlint-rule-write-good
-      extraNodePackages.textlint-rule-ginger
-      extraNodePackages.textlint-rule-alex
-      extraNodePackages.textlint-rule-en-max-word-count
-      extraNodePackages.textlint-rule-common-misspellings
-      extraNodePackages.textlint-plugin-org
-      extraNodePackages.traverse
+      nodePackages.textlint
       peco
       php
       pkg-config
@@ -78,7 +70,6 @@ in
       zlib
       zstd
       (pkgs.python3.withPackages(ps: with ps; [pip]))
-      (import ./emacs/build_emacs.nix)
     ];
   };
   

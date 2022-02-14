@@ -958,6 +958,15 @@ let
         sha1 = "d8a96bd77fd68df7793a73036a3ba0d5405d477b";
       };
     };
+    "concat-stream-1.6.2" = {
+      name = "concat-stream";
+      packageName = "concat-stream";
+      version = "1.6.2";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/concat-stream/-/concat-stream-1.6.2.tgz";
+        sha512 = "27HBghJxjiZtIk3Ycvn/4kbJk/1uZuJFfuPEns6LaEvpvG1f0hTea8lilrouyo9mVc2GWdcEZ8OLoGmSADlrCw==";
+      };
+    };
     "concat-stream-2.0.0" = {
       name = "concat-stream";
       packageName = "concat-stream";
@@ -3208,13 +3217,13 @@ let
         sha512 = "I9jwMn07Sy/IwOj3zVkVik2JTvgpaykDZEigL6Rx6N9LbMywwUSMtxET+7lVoDLLd3O3IXwJwvuuns8UB/HeAg==";
       };
     };
-    "minimatch-3.0.4" = {
+    "minimatch-3.1.1" = {
       name = "minimatch";
       packageName = "minimatch";
-      version = "3.0.4";
+      version = "3.1.1";
       src = fetchurl {
-        url = "https://registry.npmjs.org/minimatch/-/minimatch-3.0.4.tgz";
-        sha512 = "yJHVQEhyqPLUTgt9B83PXu6W3rx4MvvHvSUvToogpwoGDOUQ+yDrR0HRot+yOCdCO7u4hX3pWft6kWBBcqh0UA==";
+        url = "https://registry.npmjs.org/minimatch/-/minimatch-3.1.1.tgz";
+        sha512 = "reLxBcKUPNBnc/sVtAbxgRVFSegoGeLaSjmphNhcwcolhYLRgtJscn5mRl6YRZNQv40Y7P6JM2YhSIsbL9OB5A==";
       };
     };
     "minimist-1.2.5" = {
@@ -3233,6 +3242,15 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/minimist-options/-/minimist-options-4.1.0.tgz";
         sha512 = "Q4r8ghd80yhO/0j1O3B2BjweX3fiHg9cdOwjJd2J76Q135c+NDxGCqdYKQ1SKBuFfgWbAUzBfvYjPUEeNgqN1A==";
+      };
+    };
+    "misspellings-1.1.0" = {
+      name = "misspellings";
+      packageName = "misspellings";
+      version = "1.1.0";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/misspellings/-/misspellings-1.1.0.tgz";
+        sha1 = "53d500266cbd09cda9d94c4cf392e60589b5b324";
       };
     };
     "mkdirp-0.5.5" = {
@@ -3802,6 +3820,15 @@ let
         sha1 = "150e20b756590ad3f91093f25a4f2ad8bff30ba3";
       };
     };
+    "process-nextick-args-2.0.1" = {
+      name = "process-nextick-args";
+      packageName = "process-nextick-args";
+      version = "2.0.1";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/process-nextick-args/-/process-nextick-args-2.0.1.tgz";
+        sha512 = "3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==";
+      };
+    };
     "property-information-5.6.0" = {
       name = "property-information";
       packageName = "property-information";
@@ -3971,6 +3998,15 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/readable-stream/-/readable-stream-2.0.6.tgz";
         sha1 = "8f90341e68a53ccc928788dacfcd11b36eb9b78e";
+      };
+    };
+    "readable-stream-2.3.7" = {
+      name = "readable-stream";
+      packageName = "readable-stream";
+      version = "2.3.7";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/readable-stream/-/readable-stream-2.3.7.tgz";
+        sha512 = "Ebho8K4jIbHAxnuxi7o42OrZgF/ZTNcsZj6nRKyUmkhLFq8CHItp/fy6hQZuZmP/n3yZ9VBUbp4zz/mX8hmYPw==";
       };
     };
     "readable-stream-3.6.0" = {
@@ -4252,6 +4288,15 @@ let
         sha512 = "mwqeW5XsA2qAejG46gYdENaxXjx9onRNCfn7L0duuP4hCuTIi/QO7PDK07KJfp1d+izWPrzEJDcSqBa0OZQriA==";
       };
     };
+    "safe-buffer-5.1.2" = {
+      name = "safe-buffer";
+      packageName = "safe-buffer";
+      version = "5.1.2";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.2.tgz";
+        sha512 = "Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==";
+      };
+    };
     "safe-buffer-5.2.1" = {
       name = "safe-buffer";
       packageName = "safe-buffer";
@@ -4304,6 +4349,15 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/semver-diff/-/semver-diff-3.1.1.tgz";
         sha512 = "GX0Ix/CJcHyB8c4ykpHGIAvLyOwOobtM/8d+TQkAd81/bEjgPHrfba41Vpesr7jX/t8Uh+R3EX9eAS5be+jQYg==";
+      };
+    };
+    "sentence-splitter-2.3.2" = {
+      name = "sentence-splitter";
+      packageName = "sentence-splitter";
+      version = "2.3.2";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/sentence-splitter/-/sentence-splitter-2.3.2.tgz";
+        sha512 = "QnpHNykm4nI4T6mT+NoVayh9Ixl5DohYCSVqMgPJsO2WejOcqaYTh4HQOkmzaDzXH3NO5pif4z/hpo2NGtgNlg==";
       };
     };
     "sentence-splitter-3.2.2" = {
@@ -4520,6 +4574,15 @@ let
       src = fetchurl {
         url = "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz";
         sha1 = "62e203bc41766c6c28c9fc84301dab1c5310fa94";
+      };
+    };
+    "string_decoder-1.1.1" = {
+      name = "string_decoder";
+      packageName = "string_decoder";
+      version = "1.1.1";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/string_decoder/-/string_decoder-1.1.1.tgz";
+        sha512 = "n/ShnvDi6FHbbVfviro+WojiFzv+s8MPMHBczVePfUpDJLwoLT0ht1l4YwBCbi8pJAveEEdnkHyPyTP/mzRfwg==";
       };
     };
     "string_decoder-1.3.0" = {
@@ -5251,6 +5314,15 @@ let
         sha512 = "F5CZ68eYzuSvJjGhCLPL3cYx45IxkqXSetCcRgUXtbcm50X2L9oOWQlfUfDdAf+6Pd27YDblBfdtmsThXmwpbQ==";
       };
     };
+    "unist-util-map-1.0.5" = {
+      name = "unist-util-map";
+      packageName = "unist-util-map";
+      version = "1.0.5";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/unist-util-map/-/unist-util-map-1.0.5.tgz";
+        sha512 = "dFil/AN6vqhnQWNCZk0GF/G3+Q5YwsB+PqjnzvpO2wzdRtUJ1E8PN+XRE/PRr/G3FzKjRTJU0haqE0Ekl+O3Ag==";
+      };
+    };
     "unist-util-modify-children-2.0.0" = {
       name = "unist-util-modify-children";
       packageName = "unist-util-modify-children";
@@ -5779,7 +5851,7 @@ in
       sources."micromark-extension-gfm-table-0.4.3"
       sources."micromark-extension-gfm-tagfilter-0.3.0"
       sources."micromark-extension-gfm-task-list-item-0.3.3"
-      sources."minimatch-3.0.4"
+      sources."minimatch-3.1.1"
       sources."minimist-1.2.5"
       sources."mkdirp-0.5.5"
       sources."ms-2.1.2"
@@ -6508,7 +6580,7 @@ in
       sources."meow-7.1.1"
       sources."mimic-response-1.0.1"
       sources."min-indent-1.0.1"
-      sources."minimatch-3.0.4"
+      sources."minimatch-3.1.1"
       sources."minimist-1.2.5"
       sources."minimist-options-4.1.0"
       sources."ms-2.1.2"
@@ -6697,6 +6769,68 @@ in
       description = "textlint rule for alex";
       homepage = "https://github.com/textlint-rule/textlint-rule-alex";
       license = "MIT";
+    };
+    production = true;
+    bypassCache = true;
+    reconstructLock = true;
+  };
+  textlint-rule-en-max-word-count = nodeEnv.buildNodePackage {
+    name = "textlint-rule-en-max-word-count";
+    packageName = "textlint-rule-en-max-word-count";
+    version = "1.1.0";
+    src = fetchurl {
+      url = "https://registry.npmjs.org/textlint-rule-en-max-word-count/-/textlint-rule-en-max-word-count-1.1.0.tgz";
+      sha512 = "nDm8b6cN+62P6mdJ81vHJ0K6UYu5oQkkiHhM9XicMRxBoAP6tml4BqeeRtq84UeBfXSf9QcRjI3D5ob1oN8iXA==";
+    };
+    dependencies = [
+      sources."boundary-1.0.1"
+      sources."buffer-from-1.1.2"
+      sources."concat-stream-1.6.2"
+      sources."core-util-is-1.0.3"
+      sources."inherits-2.0.4"
+      sources."isarray-1.0.0"
+      sources."object-assign-4.1.1"
+      sources."process-nextick-args-2.0.1"
+      sources."readable-stream-2.3.7"
+      sources."safe-buffer-5.1.2"
+      sources."sentence-splitter-2.3.2"
+      sources."string_decoder-1.1.1"
+      sources."structured-source-3.0.2"
+      sources."textlint-util-to-string-2.1.1"
+      sources."typedarray-0.0.6"
+      sources."unist-util-map-1.0.5"
+      sources."util-deprecate-1.0.2"
+    ];
+    buildInputs = globalBuildInputs;
+    meta = {
+      description = "textlint rule that specify the maximum word count of a sentence.";
+      homepage = "https://github.com/azu/textlint-rule-en-max-word-count";
+      license = "MIT";
+    };
+    production = true;
+    bypassCache = true;
+    reconstructLock = true;
+  };
+  textlint-rule-common-misspellings = nodeEnv.buildNodePackage {
+    name = "textlint-rule-common-misspellings";
+    packageName = "textlint-rule-common-misspellings";
+    version = "1.0.1";
+    src = fetchurl {
+      url = "https://registry.npmjs.org/textlint-rule-common-misspellings/-/textlint-rule-common-misspellings-1.0.1.tgz";
+      sha1 = "8c4133cf3bb59aa159199d2c9bced12413365774";
+    };
+    dependencies = [
+      sources."misspellings-1.1.0"
+      sources."textlint-rule-helper-1.2.0"
+      sources."unist-util-is-3.0.0"
+      sources."unist-util-visit-1.4.1"
+      sources."unist-util-visit-parents-2.1.2"
+    ];
+    buildInputs = globalBuildInputs;
+    meta = {
+      description = "textlint rule to check common misspellings";
+      homepage = "https://github.com/io-monad/textlint-rule-common-misspellings";
+      license = "GPL-3.0";
     };
     production = true;
     bypassCache = true;
