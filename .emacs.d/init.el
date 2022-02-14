@@ -2883,9 +2883,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
         to comunicate between org-mode and paperpile using org-roam-protocol."
   :load-path "~/.emacs.d/elisp/orp-paperpile/"
   :require t
-  ;; :hook (emacs-startup-hook . orp-activate)
-  :commands orp-activate
-  :config (orp-activate)
+  :defer-config (orp-activate)
   :advice (:around org-link-open advice-around-org-link-open)
   :custom
   ((orp-paperpile-local-pdf-dir . "~/drive/Paperpile/")
