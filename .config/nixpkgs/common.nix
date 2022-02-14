@@ -4,13 +4,23 @@
 { config, pkgs, ... }:
 
 let
-  extraNodePackages = import ./node/default.nix {};
+  # extraNodePackages = import ./node/default.nix {};
+  myEmacs = (import ./emacs/build_emacs.nix);
 in
 {
   imports = [ ./mail/mail.nix ];
   
   home = {   
     packages = with pkgs; [
+      myEmacs
+      (makeDesktopItem {
+        name = "org-protocol";
+        exec = "emacsclient %u";
+        comment = "Org protocol";
+        desktopName = "org-protocol";
+        type = "Application";
+        mimeType = "x-scheme-handler/org-protocol";
+      })
       cairo
       cask
       cmake
