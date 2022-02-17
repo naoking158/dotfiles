@@ -1816,12 +1816,14 @@ respectively."
       (completion-category-overrides
        quote ((file (styles orderless-migemo-style))
               ;; for consult-line
+              (citar-reference (styles orderless-migemo-style))
+              (command (styles orderless-default-style))
               (consult-location (styles orderless-migemo-style))
               (consult-multi (styles orderless-default-style))
-              (citar-reference (styles orderless-migemo-style))
+              (imenu (styles orderless-migemo-style))
+              (org-roam-node (styles orderless-migemo-style))
               (unicode-name (styles orderless-migemo-style))
-              (command (styles orderless-default-style))
-              (org-roam-node (styles orderless-migemo-style)))))
+              )))
     :config
     (setq my--orderless-default-styles
           '(orderless-prefixes
