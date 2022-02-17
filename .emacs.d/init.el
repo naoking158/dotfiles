@@ -3382,6 +3382,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 
 (leaf mu4e
+  :disabled t
   ;; :when (and window-system path-to-mu)
   ;; :load-path path-to-mu
   :commands (mu4e)
@@ -3613,6 +3614,7 @@ _o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2ma
 
 
 (leaf mu4e-views
+  :disabled t
   :ensure t
   :after mu4e
   :bind (mu4e-headers-mode-map
