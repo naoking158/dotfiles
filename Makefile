@@ -32,8 +32,7 @@ clean: ## Remove the dot files
 	@echo ''
 	@make .confirm_prompt
 	@echo ''
-	@-$(foreach val, $(DOTFILES), rm -vrf $(HOME)/$(val);)
-
+	./etc/clean
 
 update:
 	git pull origin main

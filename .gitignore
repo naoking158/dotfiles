@@ -3,6 +3,7 @@
 
 !Makefile
 !/etc/
+/etc/.symlink_hist
 !/bin/
 
 !/.git*
