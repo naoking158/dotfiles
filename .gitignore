@@ -6,7 +6,7 @@
 !/bin/
 
 !/.git*
-!/README.md
+!/README.org
 
 ## dotfiles
 !/.bashrc

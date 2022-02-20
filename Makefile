@@ -17,13 +17,14 @@ nix:
 	./etc/nix-installer
   
 init: ## Initialize
-	@echo ''
-	@echo 'etc/init/*.sh will be conducted.'
-	@make .confirm_prompt
-	@echo ''
-	@echo '==> Start to initialize.'
-	@echo ''
-	@$(foreach val, $(wildcard ./etc/init/*.sh), bash $(val);)
+	@echo 'Execute shell scripts located in ./etc/init/ manually.'
+	# @echo ''
+	# @echo 'etc/init/*.sh will be conducted.'
+	# @make .confirm_prompt
+	# @echo ''
+	# @echo '==> Start to initialize.'
+	# @echo ''
+	# @$(foreach val, $(wildcard ./etc/init/*.sh), bash $(val);)
 
 
 clean: ## Remove the dot files
