@@ -286,4 +286,4 @@ case "${DIRECTION}" in
 esac
 
 [[ "${IsDryRun:-}" ]] && { e_red "This is dry run. File are unchanged." ; }
-
+return 0
