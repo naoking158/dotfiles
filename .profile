@@ -27,9 +27,9 @@ export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
 # github
-G_USER=$(git config user.name)
-G_ROOT=$(git config ghq.root)
-G_REPO=$(eval echo ${G_ROOT}/github.com/${G_USER})
+export G_USER=$(git config user.name)
+export G_ROOT=$(git config ghq.root)
+export G_REPO=$(eval echo ${G_ROOT}/github.com/${G_USER})
 
 # Python path
 [[ -e $G_REPO ]] && export PYTHONPATH=$G_REPO

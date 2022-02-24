@@ -30,7 +30,7 @@ trap postprocess EXIT
 
 MANJARO_FILE=("i3" "manjaro" "mimeapps.list" "polybar")
 MAC_FILE=("karabiner")
-EXCLUDE_CONFIG_DIR=("bash/" "fish" "iterm2" "skhd" "yabai" "nixpkgs")
+EXCLUDE_CONFIG_DIR=("bash/" "fish" "iterm2" "skhd" "yabai")
 EXCLUDE_DOTFILES=(".dir_colors" ".DS_Store" ".emacs.d" ".git" ".gitconfig" ".gitignore" ".gitignore_global" ".gitmodules" ".ssh" ".tmux/" ".Brewfile")
 DOTPATH=$(cd ../ && pwd)
 declare -x XDG_CONFIG_HOME="${XDG_CONFIG_HOME:=${HOME}/.config}"
