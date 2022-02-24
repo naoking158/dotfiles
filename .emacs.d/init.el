@@ -535,7 +535,7 @@
       (doom-themes-neotree-config)
       (doom-themes-org-config)
       (doom-themes-treemacs-config)))
-
+  
   (leaf modus-themes
     :ensure t
     :config
@@ -549,7 +549,9 @@
             modus-themes-variable-pitch-ui t
             modus-themes-fringes nil
             modus-themes-prompts '(intense gray)
-            modus-themes-completions 'opinionated
+            modus-themes-completions '((matches . (extrabold))
+                                       (selection . (semibold accented))
+                                       (popup . (accented intense)))
             modus-themes-paren-match '(underline)
             ;; this is an alist: read the manual or its doc string
             modus-themes-org-agenda '((header-block . (variable-pitch scale-title))
@@ -1214,6 +1216,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
            (format " [%s]" id))))))
   
   (leaf *flycheck-gui
+    :disabled t
     :when window-system
     :config
     ;; checker for textlint
@@ -3136,9 +3139,15 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :config
 ;;; Account settings
   (setq notmuch-fcc-dirs
-        '(("naoki@bbo.cs.tsukuba.ac.jp" . "bbo/Sent")
+        '(
+          ("naoki@bbo.cs.tsukuba.ac.jp" . "bbo/Sent")
           ("nok.skmt.snow@gmail.com" . "private/Sent")
-          ("s1930160@s.tsukuba.ac.jp" . "univ/Sent")))
+          ("s1930160@s.tsukuba.ac.jp" . "univ/Sent")
+          ;; ("naoki@bbo.cs.tsukuba.ac.jp" . "bbo/Sent -inbox -unread +sent +archived")
+          ;; ("nok.skmt.snow@gmail.com" . "private/Sent -inbox -unread +sent +archived")
+          ;; ("s1930160@s.tsukuba.ac.jp" . "univ/Sent -inbox -unread +sent +archived")
+          )
+        )
 
 ;;; General UI
   (setq notmuch-show-logo nil)
@@ -3874,5 +3883,14 @@ Interactively, URL defaults to the string looking like a url around point."
   :ensure t
   :bind* (("C-x C-b w" . burly-bookmark-windows)
           ("C-x C-b f" . burly-bookmark-frames)))
+
+(leaf atomic-chrome
+  :ensure t
+  :hook (emacs-startup-hook . atomic-chrome-start-server)
+  :custom ((atomic-chrome-enable-auto-update . nil)
+           (atomic-chrome-default-major-mode . 'org-mode)
+           (atomic-chrome-url-major-mode-alist . '(("overleaf\\.com" . tex-mode)))
+           (atomic-chrome-buffer-open-style . 'split)
+           (atomic-chrome-extension-type-list . '(ghost-text))))
 
 (provide 'init)
