@@ -3905,4 +3905,10 @@ Interactively, URL defaults to the string looking like a url around point."
                         (?- . "•"))))
   )
 
+(leaf vertico-posframe
+  :ensure t
+  :custom
+  `((vertico-posframe-poshandler . 'posframe-poshandler-frame-center)
+    (vertico-posframe-width . 160)))
+
 (provide 'init)

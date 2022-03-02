@@ -114,6 +114,7 @@ a bunch of resources I've found online.
   - [[#save-frame-and-window-configs-with-burly][Save frame and window configs with Burly]]
   - [[#atomic-chrome][Atomic-Chrome]]
   - [[#org-modern][Org-modern]]
+  - [[#vertico-posframe][Vertico-posframe]]
 - [[#footer][Footer]]
 :END:
 
@@ -5576,6 +5577,16 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
                         (?* . "-")
                         (?- . "•"))))
   )
+#+end_src
+
+** Vertico-posframe
+
+#+begin_src emacs-lisp
+(leaf vertico-posframe
+  :ensure t
+  :custom
+  `((vertico-posframe-poshandler . 'posframe-poshandler-frame-center)
+    (vertico-posframe-width . 160)))
 #+end_src
 
 * Footer
