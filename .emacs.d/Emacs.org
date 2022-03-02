@@ -113,6 +113,7 @@ a bunch of resources I've found online.
   - [[#org-inline-anim][Org-inline-anim]]
   - [[#save-frame-and-window-configs-with-burly][Save frame and window configs with Burly]]
   - [[#atomic-chrome][Atomic-Chrome]]
+  - [[#org-modern][Org-modern]]
 - [[#footer][Footer]]
 :END:
 
@@ -3220,10 +3221,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (org-hide-block-startup . nil)
    (org-startup-folded . 'content)
 
-   (org-adapt-indentation . t)
-   (org-indent-indentation-per-level . 1)
+   ;; (org-adapt-indentation . t)
+   ;; (org-indent-indentation-per-level . 1)
    (org-edit-src-content-indentation . 0)
    (org-startup-indented . t)
+
    (org-use-speed-commands . t)
    (org-enforce-todo-dependencies . t)
    (org-log-done . t)
@@ -4203,6 +4205,7 @@ get_citation(callback_fn);
 #+begin_src emacs-lisp
 
 (leaf org-superstar
+  :disabled t
   :ensure t
   :after org
   :hook (org-mode-hook . org-superstar-mode)
@@ -5561,6 +5564,20 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
            (atomic-chrome-extension-type-list . '(ghost-text))))
 #+end_src
 
+** Org-modern
+
+#+begin_src emacs-lisp
+(leaf org-modern
+  :ensure t
+  :hook (org-mode-hook . org-modern-mode)
+  :custom
+  ((org-modern-star . ["◉" "●" "○" "◇" "✿" "✸" " "])
+   (org-modern-list . '((?+ . "➤")
+                        (?* . "-")
+                        (?- . "•"))))
+  )
+#+end_src
+
 * Footer
 :PROPERTIES:
 :ID:       B2B50080-95ED-4DEC-B99E-B120D1A08233
@@ -5569,3 +5586,4 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+begin_src emacs-lisp
 (provide 'init)
 #+end_src
+
