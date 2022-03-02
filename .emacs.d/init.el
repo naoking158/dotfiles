@@ -2255,10 +2255,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (org-hide-block-startup . nil)
    (org-startup-folded . 'content)
 
-   (org-adapt-indentation . t)
-   (org-indent-indentation-per-level . 1)
+   ;; (org-adapt-indentation . t)
+   ;; (org-indent-indentation-per-level . 1)
    (org-edit-src-content-indentation . 0)
    (org-startup-indented . t)
+
    (org-use-speed-commands . t)
    (org-enforce-todo-dependencies . t)
    (org-log-done . t)
@@ -2930,6 +2931,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
         (apply f link arg)))))
 
 (leaf org-superstar
+  :disabled t
   :ensure t
   :after org
   :hook (org-mode-hook . org-superstar-mode)
@@ -3892,5 +3894,15 @@ Interactively, URL defaults to the string looking like a url around point."
            (atomic-chrome-url-major-mode-alist . '(("overleaf\\.com" . tex-mode)))
            (atomic-chrome-buffer-open-style . 'split)
            (atomic-chrome-extension-type-list . '(ghost-text))))
+
+(leaf org-modern
+  :ensure t
+  :hook (org-mode-hook . org-modern-mode)
+  :custom
+  ((org-modern-star . ["◉" "●" "○" "◇" "✿" "✸" " "])
+   (org-modern-list . '((?+ . "➤")
+                        (?* . "-")
+                        (?- . "•"))))
+  )
 
 (provide 'init)
