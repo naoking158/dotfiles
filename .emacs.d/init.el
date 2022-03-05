@@ -2241,9 +2241,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :when window-system
   :doc "Export Framework for Org Mode"
   :tag "builtin"
-  ;; :ensure org-plus-contrib
   :mode "\\.org\\'"
-  ;; :hook (org-mode-hook . my/org-mode-hook)
   :custom
   ((org-directory . "~/org/")
    (org-ellipsis . " ▼ ")
@@ -2254,9 +2252,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (org-fontify-quote-and-verse-blocks . t)
    (org-hide-block-startup . nil)
    (org-startup-folded . 'content)
-
+   
    ;; (org-adapt-indentation . t)
-   ;; (org-indent-indentation-per-level . 1)
+   ;; (org-indent-indentation-per-level . 2)
    (org-edit-src-content-indentation . 0)
    (org-startup-indented . t)
 
@@ -2273,7 +2271,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
    (lazy-count-prefix-format . " (%s/%s) ")
    (isearch-yank-on-move . 'shift)
    (isearch-allow-scroll . 'unlimited)
-   ;; (org-show-notification-handler . nil)
    (org-structure-template-alist . '(("sh" . "src shell")
                                      ("bash" . "src bash")
                                      ("c" . "center")
@@ -3898,6 +3895,8 @@ Interactively, URL defaults to the string looking like a url around point."
 (leaf org-modern
   :ensure t
   :hook (org-mode-hook . org-modern-mode)
+  :custom-face
+  (org-modern-label . '((t :height 0.9 :inherit t)))
   :custom
   ((org-modern-star . ["◉" "●" "○" "◇" "✿" "✸" " "])
    (org-modern-list . '((?+ . "➤")
