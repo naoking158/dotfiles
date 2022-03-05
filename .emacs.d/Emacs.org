@@ -5584,9 +5584,12 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+begin_src emacs-lisp
 (leaf vertico-posframe
   :ensure t
+  :hook (emacs-startup-hook . vertico-posframe-mode)
   :custom
-  `((vertico-posframe-poshandler . 'posframe-poshandler-frame-center)
-    (vertico-posframe-width . 160)))
+  `((vertico-posframe-poshandler . 'posframe-poshandler-frame-bottom-center)
+    (vertico-posframe-width . 155)
+    (vertico-posframe-border-width . 5))
+ )
 #+end_src
 
 * Footer

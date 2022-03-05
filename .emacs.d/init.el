@@ -3907,8 +3907,11 @@ Interactively, URL defaults to the string looking like a url around point."
 
 (leaf vertico-posframe
   :ensure t
+  :hook (emacs-startup-hook . vertico-posframe-mode)
   :custom
-  `((vertico-posframe-poshandler . 'posframe-poshandler-frame-center)
-    (vertico-posframe-width . 160)))
+  `((vertico-posframe-poshandler . 'posframe-poshandler-frame-bottom-center)
+    (vertico-posframe-width . 155)
+    (vertico-posframe-border-width . 5))
+ )
 
 (provide 'init)
