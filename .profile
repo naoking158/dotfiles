@@ -1,15 +1,12 @@
-# export XDG_CONFIG_HOME=$HOME/.config
-
 export TERM=xterm-256color
 
-export XDG_CONFIG_HOME=$HOME/.config
+export XDG_CONFIG_HOME="${HOME}/.config"
 export XDG_CACHE_HOME=$HOME/.cache
 export XDG_DATA_HOME=$HOME/.local/share
 export XDG_STATE_HOME=$HOME/.local/state
 
 export USER=naoki    # A local network user
-export HOST=gateway.mdl.cs.tsukuba.ac.jp    # Host Name for GIP
-export MDL=ssh-user@$HOST
+export MDL=ssh-user@gateway.mdl.cs.tsukuba.ac.jp
 
 export MY_CONFIG_PATH=".dotfiles/.config"
 export MY_BASH_PATH="${MY_CONFIG_PATH}/bash"
@@ -50,16 +47,17 @@ fi
 [[ -e $HOME/.cargo/env ]] && . "$HOME/.cargo/env"
 
 
-[[ -e $HOME/.nix-defexpr ]] && {
-    export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH};
-}
+#[[ -e $HOME/.nix-defexpr ]] && {
+#    export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH};
+#}
 
-[[ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]] && {
-    . "$HOME/.nix-profile/etc/profile.d/nix.sh";
-}
+#[[ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]] && {
+#   . "$HOME/.nix-profile/etc/profile.d/nix.sh";
+#}
 
-[[ -e $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh ]] && {
-    . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh";
-}
+#[[ -e $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh ]] && {
+#    . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh";
+#}
 
-export PATH="$HOME/.local/bin:$PATH"
+eval "$(/opt/homebrew/bin/brew shellenv)"
+export PATH="/usr/local/bin:$HOME/.local/bin:$PATH"

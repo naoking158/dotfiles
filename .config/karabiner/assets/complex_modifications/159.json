@@ -15,7 +15,7 @@
                     ],
                     "from": { "key_code": "right_shift" },
                     "to": [
-                        { "shell_command": "source ~/.profile && open ~/.nix-profile/Applications/Emacs.app" }
+                        { "shell_command": "source ~/.profile && open /Applications/Emacs.app" }
                     ]
                 },
                 {
