@@ -3139,12 +3139,12 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 ;;; Account settings
   (setq notmuch-fcc-dirs
         '(
-          ("naoki@bbo.cs.tsukuba.ac.jp" . "bbo/Sent")
-          ("nok.skmt.snow@gmail.com" . "private/Sent")
-          ("s1930160@s.tsukuba.ac.jp" . "univ/Sent")
-          ;; ("naoki@bbo.cs.tsukuba.ac.jp" . "bbo/Sent -inbox -unread +sent +archived")
-          ;; ("nok.skmt.snow@gmail.com" . "private/Sent -inbox -unread +sent +archived")
-          ;; ("s1930160@s.tsukuba.ac.jp" . "univ/Sent -inbox -unread +sent +archived")
+          ;; ("naoki@bbo.cs.tsukuba.ac.jp" . "bbo/Sent")
+          ;; ("nok.skmt.snow@gmail.com" . "private/Sent")
+          ;; ("s1930160@s.tsukuba.ac.jp" . "univ/Sent")
+          ("naoki@bbo.cs.tsukuba.ac.jp" . "bbo/Sent -inbox -unread +sent +archived")
+          ("nok.skmt.snow@gmail.com" . "private/Sent -inbox -unread +sent +archived")
+          ("s1930160@s.tsukuba.ac.jp" . "univ/Sent -inbox -unread +sent +archived")
           )
         )
 

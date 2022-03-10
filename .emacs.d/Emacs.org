@@ -4533,12 +4533,12 @@ Manual is [[https://notmuchmail.org/emacstips/][here]]
 ;;; Account settings
   (setq notmuch-fcc-dirs
         '(
-          ("naoki@bbo.cs.tsukuba.ac.jp" . "bbo/Sent")
-          ("nok.skmt.snow@gmail.com" . "private/Sent")
-          ("s1930160@s.tsukuba.ac.jp" . "univ/Sent")
-          ;; ("naoki@bbo.cs.tsukuba.ac.jp" . "bbo/Sent -inbox -unread +sent +archived")
-          ;; ("nok.skmt.snow@gmail.com" . "private/Sent -inbox -unread +sent +archived")
-          ;; ("s1930160@s.tsukuba.ac.jp" . "univ/Sent -inbox -unread +sent +archived")
+          ;; ("naoki@bbo.cs.tsukuba.ac.jp" . "bbo/Sent")
+          ;; ("nok.skmt.snow@gmail.com" . "private/Sent")
+          ;; ("s1930160@s.tsukuba.ac.jp" . "univ/Sent")
+          ("naoki@bbo.cs.tsukuba.ac.jp" . "bbo/Sent -inbox -unread +sent +archived")
+          ("nok.skmt.snow@gmail.com" . "private/Sent -inbox -unread +sent +archived")
+          ("s1930160@s.tsukuba.ac.jp" . "univ/Sent -inbox -unread +sent +archived")
           )
         )
 
