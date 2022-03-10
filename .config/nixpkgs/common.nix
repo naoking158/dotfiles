@@ -5,12 +5,18 @@
 
 let
   myEmacs = (import ./emacs/build_emacs.nix);
+  glibtool = (import ./libtool/libtool.nix);
+  pythonEnv = (pkgs.python3.withPackages(ps: with ps; [
+    pip
+    setuptools
+  ]));
 in
 {
   imports = [ ./mail/mail.nix ];
   
   home = {   
     packages = with pkgs; [
+      glibtool
       myEmacs
       (makeDesktopItem {
         name = "org-protocol";
@@ -46,7 +52,6 @@ in
       jq
       libgccjit
       librsvg
-      libtool
       libxml2
       llvm
       mailutils
@@ -58,6 +63,7 @@ in
       pkg-config
       poppler
       proselint
+      pythonEnv
       rename
       ripgrep
       rsync
@@ -69,7 +75,6 @@ in
       wget
       zlib
       zstd
-      (pkgs.python3.withPackages(ps: with ps; [pip]))
     ];
   };
   

@@ -38,8 +38,8 @@ let
       # sha256 = "sha256-a36MJb/M4Iyxxw8hGhOv/j5xA/KCE02XiqZObOQXqk0=";
 
       # emacs-28
-      rev = "b30ef0991915fbcab016a9485b1dece6f15f801c";
-      sha256 = "sha256-Io1RbdmQ+YFQuLBeG2P+bRqu4cjOTI5tefdFFMZDdWE=";
+      rev = "5942504391df1b81ded820f9c8cd3047a05f3543";
+      sha256 = "sha256-JaYvA1Uh22T/cCqAfeGPxN0q17hR/q95AAkbOkAiKSQ=";
 
       
     };
