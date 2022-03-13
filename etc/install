@@ -308,9 +308,6 @@ dotfiles_install() {
     # 3. Execute all sh files within etc/init/
     # ==> initializing
     dotfiles_initialize "$@" &&
-
-    # 4. Install nix with home-manager manually
-    install_nix
 }
 
 
