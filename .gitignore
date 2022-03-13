@@ -29,6 +29,8 @@
 !/.config/alacritty/**
 !/.config/bash/
 !/.config/bash/**
+!/.config/bat/
+!/.config/bat/**
 !/.config/cron/
 !/.config/cron/**
 !/.config/fish/
