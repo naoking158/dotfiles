@@ -1,0 +1,47 @@
+[color]
+	ui = true
+
+[core]
+	editor = "vim"
+	pager = "delta"
+
+[delta]
+	hyperlinks = true
+	line-numbers = true
+	navigate = true
+	side-by-side = true
+	syntax-theme = "zenburn"
+
+[ghq]
+	root = "~/src"
+
+[init]
+	defaultBranch = "main"
+
+[interactive]
+	diffFilter = "delta --color-only"
+
+[pull]
+	ff = "only"
+
+[push]
+	default = "simple"
+
+[sendemail "bbo"]
+	envelopeSender = "auto"
+	from = "naoki@bbo.cs.tsukuba.ac.jp"
+	smtpServer = "msmtp"
+
+[sendemail "private"]
+	envelopeSender = "auto"
+	from = "nok.skmt.snow@gmail.com"
+	smtpServer = "msmtp"
+
+[sendemail "univ"]
+	envelopeSender = "auto"
+	from = "s1930160@s.tsukuba.ac.jp"
+	smtpServer = "msmtp"
+
+[user]
+	email = "naoki@bbo.cs.tsukuba.ac.jp"
+	name = "naoking158"
