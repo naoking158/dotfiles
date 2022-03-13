@@ -1904,12 +1904,12 @@ parses its input."
 
 (leaf vertico
   :ensure t
-  :require t
   :custom ((vertico-count . 10)
            (vertico-cycle . t))
-  :global-minor-mode t savehist-mode
-  :config
-
+  :hook (emacs-startup-hook . (lambda ()
+                                (vertico-mode)
+                                (savehist-mode)))
+  :defer-config
   (leaf vertico-directory
     :load-path "~/.emacs.d/elisp/vertico/extensions/"
     ;; Tidy shadowed file names
@@ -3906,11 +3906,27 @@ Interactively, URL defaults to the string looking like a url around point."
 
 (leaf vertico-posframe
   :ensure t
-  :hook (emacs-startup-hook . vertico-posframe-mode)
+  :hook ((vertico-mode-hook . (lambda ()
+                                (vertico-posframe-mode)
+                                (vertico-multiform-mode))))
   :custom
   `((vertico-posframe-poshandler . 'posframe-poshandler-frame-bottom-center)
     (vertico-posframe-width . 155)
-    (vertico-posframe-border-width . 5))
+    (vertico-posframe-border-width . 5)
+    (vertico-multiform-categories . '((file posframe)
+                                      (citar-reference posframe)
+                                      (command posframe)
+                                      (consult-location posframe)
+                                      (consult-multi posframe)
+                                      (org-roam-node posframe)
+                                      (completing-read posframe)
+                                      ))
+    (vertico-multiform-commands . '((consult-imenu buffer)
+                                    (execute-extended-command posframe)
+                                    (helpful-function posframe)
+                                    (helpful-symbol posframe)
+                                    (helpful-variable posframe)))
+    )
  )
 
 (provide 'init)
