@@ -1,0 +1,4 @@
+export NOTMUCH_CONFIG="/Users/naoki/.config/notmuch/default/config"
+export NMBGIT="/Users/naoki/.local/share/notmuch/nmbug"
+
+mbsync --all
