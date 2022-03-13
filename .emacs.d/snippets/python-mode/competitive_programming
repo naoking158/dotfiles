@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: competitive-programming
+# key: cp
+# --
+import sys
+input = sys.stdin.readline
+
+def s_input() -> str: return input()
+def list_s_input() -> list[str]: return input().split()
+
+def i_input() -> int: return int(input())
+def list_i_input() -> list[int]: return list(map(int, input().split()))
