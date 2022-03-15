@@ -4,7 +4,10 @@
 set -Ceu
 
 readonly ORIGIN=$(pwd)
-readonly WORK_DIR="${HOME}/src/github.com/emacs-mirror/emacs"
+readonly WORK_DIR="${HOME}/src/emacs"
+readonly TARBALLS_DIR="${WORK_DIR}/tarballs"
+readonly SOURCE_DIR="${WORK_DIR}/sources"
+# readonly WORK_DIR="${HOME}/src/github.com/emacs-mirror/emacs"
 
 PATCH_DIR="${WORK_DIR}/patches"
 PATCH_URL=(
@@ -63,6 +66,43 @@ function apply_patches() {
     return 0 || exit 1   
 }
 
+function download_tarball() {
+    [[ -d $TARBALLS_DIR ]] || mkdir -p $TARBALLS_DIR
+    local FILENAME="emacs-28.tgz"
+    local TARGET="${TARBALLS_DIR}/${FILENAME}"
+
+    e_important "Downloading emacs taball..."
+
+    if [[ -d $TARGET ]]; then
+	echo "${FILENAME} already exists locally, attempting to use."
+    else
+	local URL="https://github.com/emacs-mirror/emacs/tarball/emacs-28"
+	curl -L $URL -o $TARGET &&
+	    e_done "Downloaded emacs tarball." &&
+	    return 0 || exit 1
+    fi
+
+}
+
+function extract_tarball() {
+    local FILENAME="emacs-28.tgz"
+    local TARGET="${TARBALLS_DIR}/${FILENAME}"
+    [[ -d $SOURCE_DIR ]] || mkdir -p $SOURCE_DIR
+
+    e_important "Extracting tarball..."
+    
+    if [[ -f $TARGET ]]; then
+	tar -xzf $TARGET -C $SOURCE_DIR &&
+	    e_done "Extracted tarball..." &&
+	    return 0  ||
+		{
+		    e_error "failed extracting tarball"
+		    exit 1
+		}
+    else
+	exit 1
+    fi
+}
 
 function build() {
     configureFlags=(
@@ -71,6 +111,8 @@ function build() {
         "--with-native-compilation"
         "--with-imagemagick"
         "--with-xml2"
+	"--with-xwidgets"
+	"--prefix=${HOME}/.local"
     )
 
     configureCMD="./configure"
@@ -85,17 +127,15 @@ function build() {
     fi
 
     # Pre-process
-    cd $WORK_DIR &&
-    git reset --hard HEAD &&
-    git switch emacs-28 &&
-    git pull origin emacs-28 || exit 1
+    download_tarball &&
+    extract_tarball
 
     if is_macos; then
         prepare_patches &&
         apply_patches || exit 1
     fi
 
-    cd $WORK_DIR &&
+    cd "${SOURCE_DIR}/$(ls ${SOURCE_DIR})" &&
     ./autogen.sh &&
     eval $configureCMD &&
     eval "${makeCMD} clean" &&

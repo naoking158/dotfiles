@@ -60,14 +60,12 @@ function chpwd() {
 }
 
 # cdr
-if [[ -n $(echo ${^fpath}/chpwd_recent_dirs(N)) && -n $(echo ${^fpath}/cdr(N)) ]]; then
     autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
     add-zsh-hook chpwd chpwd_recent_dirs
     zstyle ':completion:*' recent-dirs-insert both
     zstyle ':chpwd:*' recent-dirs-default true
     zstyle ':chpwd:*' recent-dirs-max 1000
     # zstyle ':chpwd:*' recent-dirs-file "$HOME/.cache/chpwd-recent-dirs"
-fi
 
 # zinit plugins
 zinit wait lucid for \
@@ -145,7 +143,7 @@ bindkey '^R' peco-history-selection
 function peco-cdr () {
     local selected_dir="$(cdr -l | sed 's/^[0-9]\+ \+//' | peco --prompt="cdr >" --query "$LBUFFER")"
     if [ -n "$selected_dir" ]; then
-        BUFFER="cd `echo $selected_dir | awk '{print$2}'`"
+	    BUFFER="cd ${selected_dir}"
         CURSOR=$#BUFFER
         zle reset-prompt
     fi
@@ -196,7 +194,7 @@ bindkey '^[^R' peco-cdr
 HISTSIZE="10000"
 SAVEHIST="10000"
 
-HISTFILE="/Users/naoki/.local/share/zsh/history"
+HISTFILE="${HOME}/naoki/.local/share/zsh/history"
 mkdir -p "$(dirname "$HISTFILE")"
 
 setopt HIST_FCNTL_LOCK

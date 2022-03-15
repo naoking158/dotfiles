@@ -59,5 +59,7 @@ fi
 #    . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh";
 #}
 
-eval "$(/opt/homebrew/bin/brew shellenv)"
+if [[ $SYSTEM == "macos" ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
 export PATH="/usr/local/bin:$HOME/.local/bin:$PATH"
