@@ -3850,6 +3850,7 @@ Interactively, URL defaults to the string looking like a url around point."
     (sie-brow/search-in-external-browser sie-brow/prefix-for-google-scholar at-point)))
 
 (leaf eaf
+  :disabled t
   :when (memq window-system '(x))
   :load-path "~/.emacs.d/elisp/emacs-application-framework/"
   :commands

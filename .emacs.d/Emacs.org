@@ -5492,6 +5492,7 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+begin_src emacs-lisp
 
 (leaf eaf
+  :disabled t
   :when (memq window-system '(x))
   :load-path "~/.emacs.d/elisp/emacs-application-framework/"
   :commands
