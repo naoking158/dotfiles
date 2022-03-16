@@ -47,6 +47,8 @@
 !/.config/skhd/**
 !/.config/sway/
 !/.config/sway/**
+!/.config/waybar/
+!/.config/waybar/**
 !/.config/textlint/
 !/.config/textlint/**
 !/.config/yabai/

@@ -210,26 +210,28 @@ bindsym $mod+r mode "resize"
 #
 # Status Bar:
 #
+bar swaybar_command waybar
 # Read `man 5 sway-bar` for more information about this section.
-bar {
-    position top
+# bar {
+#     position top
 
-    # When the status_command prints a new line to stdout, swaybar updates.
-    # The default just shows the current date and time.
-    status_command while date +'%Y-%m-%d %I:%M:%S %p'; do sleep 1; done
-    # status_command i3status
+#     # When the status_command prints a new line to stdout, swaybar updates.
+#     # The default just shows the current date and time.
+#     status_command while date +'%Y-%m-%d %I:%M:%S %p'; do sleep 1; done
+#     # status_command i3status
 
-    colors {
-        statusline #ffffff
-        background #323232
-        inactive_workspace #32323200 #32323200 #5c5c5c
-    }
-}
+#     colors {
+#         statusline #ffffff
+#         background #323232
+#         inactive_workspace #32323200 #32323200 #5c5c5c
+#     }
+# }
 
-# include @sysconfdir@/sway/config.d/*
+# Autostart Input Method
+exec --no-startup-id fcitx5 -d
 
-# # Autostart Input Method
-# exec --no-startup-id fcitx5 -d
-
-# # Alfred-like application
-# exec --no-startup-id albert
+# Screencapture
+bindsym $mod+Ctrl+4  exec grimshot --notify save area
+bindsym $mod+Shift+Ctrl+4  exec grimshot --notify copy area
+bindsym $mod+Ctrl+5  exec grimshot --notify save window
+bindsym $mod+Shift+Ctrl+5  exec grimshot --notify copy window
