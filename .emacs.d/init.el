@@ -1280,14 +1280,14 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
         )))
   :config
   (leaf *untab-region
-    :bind (("M-[" . untab-region))
+    :bind (("C-M-[" . untab-region))
     :preface
     (defun untab-region nil
       (interactive)
       (indent-region-custom -4)))
 
   (leaf *tab-region
-    :bind ("M-]" . tab-region)
+    :bind ("C-M-]" . tab-region)
     :preface
     (defun tab-region nil
       (interactive)
@@ -1296,7 +1296,8 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
         (if (use-region-p)    ; tab is pressed is any other buffer -> execute with space insertion
             (indent-region-custom 4) ; region was selected, call indent-region-custom
           (insert "    ") ; else insert four spaces as expected
-          )))))
+          ))
+      )))
 
 (leaf paren
   :hook (emacs-startup-hook . show-paren-mode)
