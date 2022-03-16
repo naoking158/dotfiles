@@ -5,6 +5,8 @@
 !/etc/
 /etc/.symlink_hist
 !/bin/
+!/wallpapers/
+!/wallpapers/**
 
 !/README.org
 
