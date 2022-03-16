@@ -429,7 +429,7 @@
     ;; This shoud be set before exec `display-time`. 
     (setq display-time-string-forms '((format "%s %s %s" dayname monthname day)
                                       (format "  %s:%s" 24-hours minutes))
-          frame-title-format '(" - " display-time-string " - "))
+          frame-title-format '(" - " display-time-string " - Emacs"))
     (display-time))
   
   (leaf visual-line-mode

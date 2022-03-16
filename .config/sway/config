@@ -13,6 +13,41 @@ set $left h
 set $down j
 set $up k
 set $right l
+
+
+### Nord Color Palettes
+# Polar Night
+set $nord0 #2E3440
+set $nord1 #3B4252
+set $nord2 #434C5E
+set $nord3 #4C566A
+
+# Snow Storm
+set $nord4 #D8DEE9
+set $nord5 #E5E9F0
+set $nord6 #ECEFF4
+
+# Frost
+set $nord7 #8FBCBB
+set $nord8 #88C0D0
+set $nord9 #81A1C1
+set $nord10 #5E81AC
+
+# Aurora
+set $nord11 #BF616A
+set $nord12 #D08770
+set $nord13 #EBCB8B
+set $nord14 #A3BE8C
+set $nord15 #B48EAD
+
+set $bg             $nord10
+set $bg-inactive    $nord0
+set $bg-urgent      $nord0
+set $text-light     $nord9
+set $text-dark      $nord4
+set $text-inactive  $nord9
+
+
 # Your preferred terminal emulator
 set $term alacritty
 # Your preferred application launcher
@@ -37,6 +72,19 @@ output * bg ~/.dotfiles/wallpapers/sea_and_mountain.jpg fill
     workspace 4 output HDMI-A-1
 #
 # You can get the names of your outputs by running: swaymsg -t get_outputs
+
+# set inner and outer gaps
+gaps outer 2
+gaps inner 10
+default_border pixel 4
+
+# set color theme
+# class                 border        bground       text        indicator     child_border
+client.focused          $bg           $bg           $text-dark  $bg           $bg
+client.focused_inactive $bg-inactive  $bg-inactive  $text-light $bg-inactive  $bg-inactive
+client.unfocused        $bg-inactive  $bg-inactive  $text-light $bg-inactive  $bg-inactive
+client.urgent           $bg-urgent    $bg-urgent    $text-light $bg-urgent    $bg-urgent
+client.placeholder      $bg-inactive  $bg-inactive  $text-light $bg-inactive  $bg-inactive
 
 ### Idle configuration
 #
@@ -221,8 +269,8 @@ bar swaybar_command waybar
 
 #     # When the status_command prints a new line to stdout, swaybar updates.
 #     # The default just shows the current date and time.
-#     status_command while date +'%Y-%m-%d %I:%M:%S %p'; do sleep 1; done
-#     # status_command i3status
+#     # status_command while date +'%Y-%m-%d %I:%M:%S %p'; do sleep 1; done
+#     status_command i3status
 
 #     colors {
 #         statusline #ffffff
@@ -241,21 +289,21 @@ bindsym $mod+Ctrl+5  exec grimshot --notify save window
 bindsym $mod+Shift+Ctrl+5  exec grimshot --notify copy window
 
 # Set shut down, restart and locking features
-# set $mode_system (l)ock, (e)xit, (s)uspend, (h)ibernate, (r)eboot, (Shift+s)hutdown
-# bindsym $mod+0 mode "$mode_system"
-# mode "$mode_system" {
-#     bindsym l exec --no-startup-id swaylock -e -f -c 000000, mode "default"
-#     bindsym s exec --no-startup-id systemctl suspend, mode "default"
-#     bindsym e exec --no-startup-id swaymsg exit, mode "default"
-#     bindsym h exec --no-startup-id systemctl hibernate, mode "default"
-#     bindsym r exec --no-startup-id systemctl reboot, mode "default"
-#     bindsym Shift+s exec --no-startup-id systemctl poweroff, mode "default"
+set $mode_system (l)ock, (e)xit, (s)uspend, (h)ibernate, (r)eboot, (Shift+s)hutdown
+bindsym $mod+0 mode "$mode_system"
+mode "$mode_system" {
+    bindsym l exec --no-startup-id swaylock -e -f -c 000000, mode "default"
+    bindsym s exec --no-startup-id systemctl suspend, mode "default"
+    bindsym e exec --no-startup-id swaymsg exit, mode "default"
+    bindsym h exec --no-startup-id systemctl hibernate, mode "default"
+    bindsym r exec --no-startup-id systemctl reboot, mode "default"
+    bindsym Shift+s exec --no-startup-id systemctl poweroff, mode "default"
 
-#     # exit system mode: "Enter" or "Escape"
-#     bindsym Return mode "default"
-#     bindsym Escape mode "default"
-# }
-bindsym $mod+Shift+e exec --no-startup-id "~/.config/sway/swaypower.sh"
+    # exit system mode: "Enter" or "Escape"
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+# bindsym $mod+Shift+e exec --no-startup-id "~/.config/sway/swaypower.sh"
 
 # Share clipboard
 exec wl-paste -t text --watch clipman store
