@@ -194,7 +194,7 @@ bindkey '^[^R' peco-cdr
 HISTSIZE="10000"
 SAVEHIST="10000"
 
-HISTFILE="${HOME}/naoki/.local/share/zsh/history"
+HISTFILE="${HOME}/.local/share/zsh/history"
 mkdir -p "$(dirname "$HISTFILE")"
 
 setopt HIST_FCNTL_LOCK
