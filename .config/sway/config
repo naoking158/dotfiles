@@ -78,6 +78,9 @@ gaps outer 2
 gaps inner 10
 default_border pixel 4
 
+# set window transparency
+exec_always ~/.config/sway/window-transparency.sh
+
 # set color theme
 # class                 border        bground       text        indicator     child_border
 client.focused          $bg           $bg           $text-dark  $bg           $bg
