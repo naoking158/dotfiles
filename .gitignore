@@ -49,10 +49,14 @@
 !/.config/skhd/**
 !/.config/sway/
 !/.config/sway/**
+!/.config/swayr/
+!/.config/swayr/**
 !/.config/waybar/
 !/.config/waybar/**
 !/.config/textlint/
 !/.config/textlint/**
+!/.config/wofi/
+!/.config/wofi/**
 !/.config/yabai/
 !/.config/yabai/**
 
