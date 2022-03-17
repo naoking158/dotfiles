@@ -1692,7 +1692,7 @@ respectively."
   ((affe-find-command . "fd --color=never --full-path --no-ignore --hidden --exclude \".git\"")
    (affe-grep-command . "rg --null --color=never --max-columns=1000 --no-heading --no-ignore --hidden --smart-case --line-number -v ^$ --glob=\"!.git\" ."))
   :config
-  (defun affe-orderless-regexp-compiler (input _type)
+  (defun affe-orderless-regexp-compiler (input _type _ignorecase)
     (setq input (orderless-pattern-compiler input))
     (cons input (lambda (str) (orderless--highlight input str))))
   (setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
