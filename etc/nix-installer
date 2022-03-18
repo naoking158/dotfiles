@@ -56,23 +56,25 @@ function __hashr() {
 function install_nix() {
     sh <(curl -L https://nixos.org/nix/install) "$OPT" && {
 	__hashr
-        e_newline
-        e_header "Executing following command to activate Nix..."
-        e_arrow 'export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}'
-        e_arrow '. "\$HOME/.nix-profile/etc/profile.d/nix.sh"'
-        e_important "Write above commands in Shell's profile, if necessary."
+  e_newline
+  e_arrow "Adding channels..."
+  nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+  nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
+  nix-channel --update
+    } && # {
+	  #     __hashr
+    #     e_newline
+    #     e_header "Executing following command to activate Nix..."
+    #     e_arrow 'export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}'
+    #     e_arrow '. "\$HOME/.nix-profile/etc/profile.d/nix.sh"'
+    #     e_important "Write above commands in Shell's profile, if necessary."
 
-        export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}
-        . "$HOME/.nix-profile/etc/profile.d/nix.sh"
-    } && {
-	__hashr
-        e_newline
-        e_arrow "Adding channels..."
-        nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
-        nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
-        nix-channel --update
-        __hashr
-    } && {
+    #     export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}
+    #     . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+        
+    #     __hashr
+    # }
+     {
 	e_done "Install Nix"
     }
 }

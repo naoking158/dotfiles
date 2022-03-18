@@ -16,65 +16,65 @@ in
   
   home = {   
     packages = with pkgs; [
-      glibtool
-      myEmacs
-      (makeDesktopItem {
-        name = "org-protocol";
-        exec = "emacsclient %u";
-        comment = "Org protocol";
-        desktopName = "org-protocol";
-        type = "Application";
-        mimeType = "x-scheme-handler/org-protocol";
-      })
-      cairo
-      cask
-      cmake
-      cmigemo
-      coreutils
-      curl
+      # glibtool
+      # myEmacs
+      # (makeDesktopItem {
+      #   name = "org-protocol";
+      #   exec = "emacsclient %u";
+      #   comment = "Org protocol";
+      #   desktopName = "org-protocol";
+      #   type = "Application";
+      #   mimeType = "x-scheme-handler/org-protocol";
+      # })
+      # cairo
+      # cask
+      # cmake
+      # cmigemo
+      # coreutils
+      # curl
       exa
       fd
-      ffmpeg
-      fzf
+      # ffmpeg
+      # fzf
       gcc
       gh
-      ghostscript
+      # ghostscript
       ghq
-      glib
-      gnutls
-      go
-      harfbuzz
-      htop
-      hub
-      hugo
-      imagemagick
-      imapnotify
-      jq
-      libgccjit
-      librsvg
-      libxml2
-      llvm
-      mailutils
-      nkf
-      nodejs
-      nodePackages.textlint
+      # glib
+      # gnutls
+      # go
+      # harfbuzz
+      # htop
+      # hub
+      # hugo
+      # imagemagick
+      # imapnotify
+      # jq
+      # libgccjit
+      # librsvg
+      # libxml2
+      # llvm
+      # mailutils
+      # nkf
+      # nodejs
+      # nodePackages.textlint
       peco
-      php
+      # php
       pkg-config
-      poppler
-      proselint
-      pythonEnv
-      rename
+      # poppler
+      # proselint
+      # pythonEnv
+      # rename
       ripgrep
       rsync
       ruby
-      texlab
+      # texlab
       tmux
-      tree-sitter
-      w3m
-      wget
-      zlib
-      zstd
+      # tree-sitter
+      # w3m
+      # wget
+      # zlib
+      # zstd
     ];
   };
   
