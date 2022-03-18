@@ -1,15 +1,30 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# Usage:
+#     $0 [OPTION]...
+#     $0 -j=1 -v=28 --prefix=~/.local --working_dir=~/src/emacs  (same without options)
+#
+# Options:
+#     -h, --help
+#     -j, --parallel COUNT    ----    Compile using COUNT parallel processes (default: 1).
+#     -v, --version NUMBER    ----    Emacs version (default: 28).
+#         --working_dir DIR   ----    Working directory to be used for downloading sources and building them (default: "~/src/emacs").
+#         --source DIR        ----    Source directory that contains build files and `autogen.sh` (default: It downloaded in working_dir).
+#         --prefix DIR        ----    Directory where the installation process should put emacs and its data files (default: "~/.local").
+#
 
+function help () {
+    awk -v CMD="$(basename $0)" 'NR > 2 {
+    if (/^#/) {
+        sub("^# ?", "");
+        sub("\\$0", CMD);
+        print }
+    else { exit }
+    }' $0
+    exit 1
+}
 
 set -Ceu
-
-readonly ORIGIN=$(pwd)
-readonly WORK_DIR="${HOME}/src/emacs"
-readonly TARBALLS_DIR="${WORK_DIR}/tarballs"
-readonly SOURCE_DIR="${WORK_DIR}/sources"
-# readonly WORK_DIR="${HOME}/src/github.com/emacs-mirror/emacs"
-
-PATCH_DIR="${WORK_DIR}/patches"
 PATCH_URL=(
     "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-28/fix-window-role.patch"
     "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-28/system-appearance.patch"
@@ -17,6 +32,25 @@ PATCH_URL=(
 
 function e_error() {
     printf " \033[31m%s\033[m\n" "✖ $*" 1>&2
+}
+
+function e_newline() {
+    printf "\n"
+}
+
+function e_arrow() {
+    printf " \033[37;1m%s\033[m\n" "➜ $*"
+}
+
+function e_indent() {
+    for ((i=0; i<${1:-4}; i++)); do
+        echon " "
+    done
+    if [ -n "$2" ]; then
+        echo "$2"
+    else
+        cat <&0
+    fi
 }
 
 function e_header() {
@@ -34,17 +68,99 @@ function e_done() {
 function is_macos() { [[ $(uname -s) =~ Darwin ]]; }
 function is_manjaro() { [[ $(uname -r) =~ .*MANJARO ]]; }
 
+# Parse arguments
+while (( $# > 0 )); do
+    case $1 in
+        -h | -help | --help)
+            help
+            ;;
+        -j | --parallel | -j=* | --parallel=*)
+            if [[ "$1" =~ ^-j= || "$1" =~ ^--parallel= ]]; then                
+                NPROC="${1##=}"
+            elif [[ -z "${2:-}" || "$2" =~ ^-+ ]]; then
+                e_error "'-j/--parallel' requires an int number."
+                exit 1
+            else
+                NPROC="$2"
+            fi
+            ;;
+        -v | --version | -v=* | --version=*)
+            if [[ "$1" =~ ^-v= || "$1" =~ ^--version= ]]; then
+                VERSION="${1##=}"
+            elif [[ -z "${2:-}" || "$2" =~ ^-+ ]]; then
+                e_error "'-v/--version' requires an int number."
+                exit 1
+            else
+                VERSION="$2"
+            fi
+            ;;
+        --working_dir | --working_dir=*)
+            if [[ "$1" =~ ^--working_dir ]]; then
+                WORK_DIR="${1##=}"
+            elif [[ -z "${2:-}" || "$2" =~ ^-+ ]]; then
+                e_error "'--working_dir' requires directory name to be used for downloading sources and building them."
+                exit 1
+            else
+                WORK_DIR="$2"
+            fi
+            ;;
+        --source | --source=*)
+            if [[ "$1" =~ ^--source= ]]; then
+                SOURCE_DIR="${1##=}"
+            elif [[ -z "${2:-}" || "$2" =~ ^-+ ]]; then
+                e_error "'--source' requires directory name that contains build files and 'autogen.sh'."
+                exit 1
+            else
+                SOURCE_DIR="$2"
+            fi
+            ;;
+        --prefix | --prefix=*)
+            if [[ "$1" =~ ^--prefix= ]]; then
+                PREFIX="${1##}"
+            elif [[ -z "${2:-}" || "$2" =~ ^-+ ]]; then
+                e_error "'--prefix' requires directory name where the installation process should put emacs and its data files."
+            else
+                PREFIX="$2"
+            fi
+            ;;
+        -*)
+            e_error "Illegal option -- '$(echo $1 | sed 's/^-*//')'."
+            help
+            ;;
+    esac
+    shift
+done
+
+declare -r  ORIGIN=$(pwd)
+declare -ri NPROC="${NPROC:=1}"
+declare -ri VERSION="${VERSION:=28}"
+declare -r  WORK_DIR="${WORK_DIR:=${HOME}/src/emacs}"
+declare -r  TARBALL_DIR="${WORK_DIR}/tarballs"
+declare -r  TARBALL_NAME="emacs-${VERSION}.tgz"
+declare -r  TARBALL_FILE="${TARBALL_DIR}/${TARBALL_NAME}"
+declare -r  TARBALL_URL="https://github.com/emacs-mirror/emacs/tarball/emacs-${VERSION}"
+declare -r  TARBALL_EXTRACED_DIR="${WORK_DIR}/sources/emacs-${VERSION}"
+declare -r  PREFIX="${PREFIX:=${HOME}/.local}"
+
+if is_macos; then
+    declare -r makeCMD="gmake"
+else
+    declare -r makeCMD="make"
+fi
+
 function postprocess() {
-    $(cd $ORIGIN)
+    cd $ORIGIN
 }
 trap postprocess EXIT
 
 function prepare_patches() {
+    local PATCH_DIR=$1
     if [[ ! -d $PATCH_DIR ]]; then
         mkdir -p $PATCH_DIR
     fi
 
-    e_header "Downloading patches in ${PATCH_DIR}"
+    e_newline
+    e_arrow "Downloading patches in ${PATCH_DIR}"
     cd $PATCH_DIR
     for url in "${PATCH_URL[@]}"; do
         curl -LO $url
@@ -55,100 +171,106 @@ function prepare_patches() {
 
 
 function apply_patches() {
-    PATCH_FILES=($(ls $PATCH_DIR))
+    local FILE_DIR=$1
+    local PATCH_DIR="${FILE_DIR}/patches"
     
-    e_header "Applying Patches..."
-    cd $WORK_DIR
+    prepare_patches $PATCH_DIR &&
+    local PATCH_FILES=($(ls -d ${PATCH_DIR}/*))
+
+    e_newline
+    e_arrow "Applying Patches..."
+    cd $FILE_DIR
     for patch_file in "${PATCH_FILES[@]}"; do
-        patch -p1 < "${PATCH_DIR}/${patch_file}" &&
-        e_done "Apply patch: ${patch_file}"
+        patch -f -p1 < $patch_file &&
+        e_done "Apply patch: ${patch_file}" ||
+        continue
     done &&
     return 0 || exit 1   
 }
 
 function download_tarball() {
-    [[ -d $TARBALLS_DIR ]] || mkdir -p $TARBALLS_DIR
-    local FILENAME="emacs-28.tgz"
-    local TARGET="${TARBALLS_DIR}/${FILENAME}"
+    [[ -d "$TARBALL_DIR" ]] || mkdir -p "$TARBALL_DIR"
 
-    e_important "Downloading emacs taball..."
+    e_newline
+    e_arrow "Downloading emacs taball..."
 
-    if [[ -d $TARGET ]]; then
-	echo "${FILENAME} already exists locally, attempting to use."
+    if [[ -d "$TARBALL_FILE" ]]; then
+	      echo "${TARBALL_NAME} already exists locally, attempting to use."
     else
-	local URL="https://github.com/emacs-mirror/emacs/tarball/emacs-28"
-	curl -L $URL -o $TARGET &&
-	    e_done "Downloaded emacs tarball." &&
-	    return 0 || exit 1
+	      curl -L $TARBALL_URL -o $TARBALL_FILE &&
+	      e_done "Downloaded emacs tarball." &&
+	      return 0 || exit 1
     fi
-
 }
 
 function extract_tarball() {
-    local FILENAME="emacs-28.tgz"
-    local TARGET="${TARBALLS_DIR}/${FILENAME}"
-    [[ -d $SOURCE_DIR ]] || mkdir -p $SOURCE_DIR
+    [[ -d "$TARBALL_EXTRACED_DIR" ]] || mkdir -p "$TARBALL_EXTRACED_DIR"
 
-    e_important "Extracting tarball..."
+    e_newline
+    e_arrow "Extracting tarball..."
     
-    if [[ -f $TARGET ]]; then
-	tar -xzf $TARGET -C $SOURCE_DIR &&
-	    e_done "Extracted tarball..." &&
-	    return 0  ||
-		{
-		    e_error "failed extracting tarball"
-		    exit 1
-		}
+    if [[ -f "$TARBALL_FILE" ]]; then
+	      tar -xzf $TARBALL_FILE -C $TARBALL_EXTRACED_DIR &&
+	      e_done "Extracted tarball." &&
+	      return 0 || {
+		        e_error "failed extracting tarball"
+		        exit 1
+		    }
     else
-	exit 1
+	      exit 1
     fi
 }
 
-function build() {
+function prepare_sources() {
+    download_tarball &&
+    extract_tarball &&
+    return 0 || exit 1
+}
+
+
+function build() {    
     configureFlags=(
         "--with-modules"
         "--with-json"
         "--with-native-compilation"
         "--with-imagemagick"
         "--with-xml2"
-	"--with-xwidgets"
-	"--prefix=${HOME}/.local"
+	      "--with-xwidgets"
+	      "--prefix=${PREFIX}"
     )
 
     configureCMD="./configure"
     for cmd in "${configureFlags[@]}"; do
         configureCMD+=" $cmd"
     done
-
-    if is_macos; then
-        makeCMD="gmake"
-    else
-        makeCMD="make"
-    fi
-
+    
     # Pre-process
-    download_tarball &&
-    extract_tarball
+    if [[ -z "${SOURCE_DIR:-}" ]]; then
+        prepare_sources &&
+            SOURCE_DIR="$(ls -Artd ${TARBALL_EXTRACED_DIR}/* | tail -1)" || exit 1
+    else
+        cd $SOURCE_DIR &&
+        eval "${makeCMD} extraclean" || exit 1
+    fi &&
 
     if is_macos; then
-        prepare_patches &&
-        apply_patches || exit 1
-    fi
+        apply_patches $SOURCE_DIR || exit 1
+    fi &&
 
-    cd "${SOURCE_DIR}/$(ls ${SOURCE_DIR})" &&
+    # Main-process
+    cd $SOURCE_DIR &&
     ./autogen.sh &&
     eval $configureCMD &&
-    eval "${makeCMD} clean" &&
-    eval "${makeCMD} bootstrap" &&
-    eval "${makeCMD} install" &&
-    e_done "Emacs Build processes are completed!" || exit 1
+    eval "${makeCMD} --jobs=${NPROC} all" &&
+    # eval "${makeCMD} install" &&
+    e_newline && e_done "Emacs Build processes are completed!" || exit 1
 
     if is_macos; then
-        cp "${HOME}/.dotfiles/etc/helper/emacs-cli.bash" "${WORK_DIR}/nextstep/Emacs.app/Contents/MacOS/bin/emacs"
-        chmod +x "${WORK_DIR}/nextstep/Emacs.app/Contents/MacOS/bin/emacs"
+        cp "${HOME}/.dotfiles/etc/helper/emacs-cli.bash" "${SOURCE_DIR}/nextstep/Emacs.app/Contents/MacOS/bin/emacs"
+        chmod +x "${SOURCE_DIR}/nextstep/Emacs.app/Contents/MacOS/bin/emacs"
 
         echo "Finally, recommend following steps:"
-        echo "  mv ${WORK_DIR}/nextstep/Emacs.app /Applications/"
+        echo "  mv ${SOURCE_DIR}/nextstep/Emacs.app /Applications/"
         echo "  sudo ln -s /Applications/Emacs.app/Contents/MacOS/bin/emacs /usr/local/bin/emacs"
         echo "  sudo ln -s /Applications/Emacs.app/Contents/MacOS/bin/emacsclient /usr/local/bin/emacsclient"
         echo ""
@@ -158,7 +280,6 @@ function build() {
     fi &&
     return 0 || exit 1
 }
-
 
 trap "e_error 'terminated'; exit 1" INT ERR
 build
