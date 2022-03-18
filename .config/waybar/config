@@ -34,7 +34,7 @@
         }
     },
     "sway/mode": {
-        "format": "<span style=\"italic\">{}</span>"
+        "format": "<span color=\"#D8DEE9\">{}</span>",
     },
     "sway/window": {
         "format": "{}",
