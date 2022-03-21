@@ -23,22 +23,19 @@
   "modules-left": ["sway/workspaces", "custom/scratchpad", "sway/window", "custom/media"],
   "modules-center": ["clock", "custom/weather", "sway/mode"],
   "modules-right": [
-    // informational
-    "custom/github",
+    "custom/playerctl",
+    "pulseaudio",
+    
     "cpu",
     "memory",
     "temperature",
-    "keyboard-state",
-    "sway/language",
-
-    // connecting
-    "network",
+    
+    // "network",
     "bluetooth",
 
-    // media
-    "custom/playerctl",
+    "keyboard-state",
+    "sway/language",
     "idle_inhibitor",
-    "pulseaudio",
   ],
 
   
@@ -129,8 +126,8 @@
   },
 
   "pulseaudio": {
-    // "scroll-step": 1, // %, can be a float
-    "format": "{icon} {volume}%{format_source}",
+    "scroll-step": 1, // %, can be a float
+    "format": "{icon} {volume}% {format_source}",
     "format-bluetooth": "{icon} {volume}%{format_source}",
     "format-bluetooth-muted": " {icon} {format_source}",
     "format-muted": " {format_source}",
@@ -138,8 +135,6 @@
     "format-source-muted": "",
     "format-icons": {
       "headphone": "",
-      "hands-free": "",
-      "headset": "",
       "phone": "",
       "portable": "",
       "car": "",
@@ -237,17 +232,6 @@
     "exec-if": "pgrep wf-recorder",
     "on-click": "killall -s SIGINT wf-recorder",
     "signal": 8
-  },
-
-  "custom/github": {
-    "interval": 300,
-    "tooltip": false,
-    "return-type": "json",
-    "format": " {}",
-    "exec": "gh api '/notifications' -q '{ text: length }' | cat -",
-    "exec-if": "[ -x \"$(command -v gh)\" ] && gh auth status 2>&1 | grep -q -m 1 'Logged in' && gh api '/notifications' -q 'length' | grep -q -m 1 '0' ; test $? -eq 1",
-    "on-click": "xdg-open https://github.com/notifications && sleep 30 && pkill -RTMIN+4 waybar",
-    "signal": 4
   },
 
   "custom/playerctl": {

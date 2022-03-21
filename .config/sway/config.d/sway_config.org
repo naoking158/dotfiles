@@ -1,9 +1,7 @@
 #+TITLE: Sway Configuration
-#+PROPERTY: header-args: 
 
-#+PROPERTY: header-args:conf :comments link :tangle-mode (identity #o444) :tangle (file-truename "~/.dotfiles/.config/sway/config.d/all-config.conf")
-#+PROPERTY: header-args:bash :comments link :tangle-mode (identity #o444)
-#+PROPERTY: header-args:python :comments link :tangle-mode (identity #o444)
+#+PROPERTY: header-args :comments no :tangle yes :tangle-mode (identity #o755)
+#+PROPERTY: header-args:conf :tangle (file-truename "~/.dotfiles/.config/sway/config.d/all-config.conf")
 
 
 
@@ -17,7 +15,7 @@
 set $mod Mod4
 
 # Script directory
-set $scripts $HOME/.config/sway/scripts
+set $scripts /home/naoki/.dotfiles/.config/sway/scripts
 
 # Direction keys
 set $left Left
@@ -61,6 +59,8 @@ exec hash dbus-update-activation-environment 2>/dev/null && \
 #+begin_src conf
 ### Terminal
 set $term alacritty
+set $term_float footclient -a floating_shell
+set $term_float_portrait footclient -a floating_shell_portrait
 
 ## Launch // Terminal ##
 $bindsym $mod+Return exec $term
@@ -482,7 +482,8 @@ for_window [title="Save File"] floating enable
 for_window [title="Firefox — Sharing Indicator"] floating enable
 for_window [app_id="" title=".* is sharing your screen."] floating enable
 for_window [title="^wlay$"] floating enable
-for_window [title="^.* Fcitx*$"] floating enable
+for_window [title="Fcitx*$"] floating enable
+for_window [title="1Password*$"] floating enable
 
 # inhibit idle
 for_window [app_id="microsoft teams - preview"] inhibit_idle fullscreen
@@ -643,21 +644,30 @@ set $pulseaudio $term_float pulsemixer
 #
 set $statusbar waybar
 set $waybar_position top
+# set $waybar_cmd /home/naoki/.dotfiles/.config/sway/scripts/waybar.sh
+set $waybar_cmd $scripts/waybar.sh
+
+# set $hoge /usr/share/sway/scripts
+# set $waybar_cmd $hoge/waybar.sh
+
 
 ## Action // Toggle Waybar ##
 $bindsym $mod+Shift+b exec pkill -SIGUSR1 waybar
 
 bar {
     id default
-    swaybar_command $scripts/waybar.sh
+    swaybar_command $waybar_cmd
     position $waybar_position
 }
 #+end_src
 
 ** Script
 
-#+begin_src bash
+#+begin_src bash :tangle (file-truename "~/.config/sway/scripts/waybar.sh")
 #!/usr/bin/env bash
+
+set -Ceu
+
 # wrapper script for waybar with args, see https://github.com/swaywm/sway/issues/5724
 
 USER_CONFIG_PATH=$HOME/.config/waybar/config.jsonc
@@ -671,8 +681,7 @@ if [ -f $USER_STYLE_PATH ]; then
     USER_STYLE=$USER_STYLE_PATH
 fi
 
-waybar -c ${USER_CONFIG:-"/usr/share/sway/templates/waybar/config.jsonc"} -s ${USER_STYLE:-"/usr/share/sway/templates/waybar/style.css"} &
-
+waybar -c ${USER_CONFIG} -s ${USER_STYLE} &
 #+end_src
 
 * Screenshot with grimshot
@@ -812,7 +821,6 @@ exec $notifications
 #
 exec {
     '[ -x "$(command -v flashfocus)" ] && flashfocus'
-    '[ -x "$(command -v wlsunset)" ] && $HOME/.config/sway/scripts/sunset.sh "on"'
     '[ -x "$(command -v autotiling)" ] && autotiling'
     '[ -x "$(command -v foot)" ] && $HOME/.config/sway/scripts/foot.sh --server'
     '[ -x "$(command -v nwg-wrapper)" ] && [ -f $HOME/.config/nwg-wrapper/help.sh ] && $HOME/.config/sway/scripts/help.sh --restore'

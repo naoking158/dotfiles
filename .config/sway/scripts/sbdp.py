@@ -1,4 +1,3 @@
-# [[file:../config.d/sway_config.org::*Generate help][Generate help:2]]
 #!/usr/bin/env python
 import sys
 import glob
@@ -135,4 +134,3 @@ for config in docsList:
     result = result + [{'category': config.category,
                         'action': config.action, 'keybinding': config.keybinding}]
 print(json.dumps(result))
-# Generate help:2 ends here

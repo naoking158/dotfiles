@@ -1,4 +1,3 @@
-# [[file:../config.d/sway_config.org::*recorder scripts][recorder scripts:1]]
 #!/usr/bin/env bash 
 set -x
 
@@ -46,4 +45,3 @@ else
     pkill --signal SIGINT wf-recorder
     pkill -RTMIN+8 waybar
 fi
-# recorder scripts:1 ends here

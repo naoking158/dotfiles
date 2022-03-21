@@ -1,4 +1,3 @@
-# [[file:../config.d/sway_config.org::*Help script][Help script:2]]
 #!/usr/bin/env bash
 set -x 
 # toggles the help wrapper state
@@ -23,4 +22,3 @@ else
     fi
     echo "true" > $STATE_FILE
 fi
-# Help script:2 ends here
