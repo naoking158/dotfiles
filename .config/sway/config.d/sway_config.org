@@ -1,0 +1,836 @@
+#+TITLE: Sway Configuration
+#+PROPERTY: header-args: 
+
+#+PROPERTY: header-args:conf :comments link :tangle-mode (identity #o444) :tangle (file-truename "~/.dotfiles/.config/sway/config.d/all-config.conf")
+#+PROPERTY: header-args:bash :comments link :tangle-mode (identity #o444)
+#+PROPERTY: header-args:python :comments link :tangle-mode (identity #o444)
+
+
+
+* Basic config
+
+** Config
+
+#+begin_src conf
+
+# Logo key. Use Mod1 for Alt and Mod4 for Super.
+set $mod Mod4
+
+# Script directory
+set $scripts $HOME/.config/sway/scripts
+
+# Direction keys
+set $left Left
+set $down Down
+set $up Up
+set $right Right
+
+# Add --to-code to bindsym, support for non-latin layouts
+set $bindsym bindsym --to-code
+
+# For user's convenience, the same for unbindsym
+set $unbindsym unbindsym --to-code
+
+# follow windows after moving them
+set $focus_after_move true
+
+## Action // Kill focused window ##
+$bindsym $mod+Shift+q kill
+
+# Drag floating windows by holding down $mod and left mouse button.
+# Resize them with right mouse button + $mod.
+# Despite the name, also works for non-floating windows.
+# Change normal to inverse to use left mouse button for resizing and right
+# mouse button for dragging.
+floating_modifier $mod normal
+
+## Action // Reload Sway Configuration ##
+$bindsym $mod+Shift+c reload
+
+
+# sway does not set DISPLAY/WAYLAND_DISPLAY in the systemd user environment
+# See FS#63021
+# Adapted from xorg's 50-systemd-user.sh, which achieves a similar goal.
+exec systemctl --user import-environment DISPLAY WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP
+exec hash dbus-update-activation-environment 2>/dev/null && \
+     dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP
+#+end_src
+
+** Terminal
+
+#+begin_src conf
+### Terminal
+set $term alacritty
+
+## Launch // Terminal ##
+$bindsym $mod+Return exec $term
+
+#+end_src
+
+** Help command
+
+*** Help script
+
+#+begin_src conf
+# help command
+set $help $scripts/help.sh
+#+end_src
+
+#+begin_src bash :tangle (file-truename "~/.config/sway/scripts/help.sh")
+#!/usr/bin/env bash
+set -x 
+# toggles the help wrapper state
+
+STATE_FILE=$HOME/.config/nwg-wrapper/help.state
+PID_FILE=$HOME/.config/nwg-wrapper/help.pid
+
+PID=$(cat $PID_FILE 2>/dev/null) 
+STATE=$(cat $STATE_FILE 2>/dev/null)
+
+if  [[ $STATE == 'true' && "$1" != "--restore" ]] || [[ "$1" == "--restore" && $STATE == 'false' ]]
+then
+    if kill -0 $PID; then
+        kill -9 $PID
+        rm -rf $PID_FILE
+    fi
+    echo "false" > $STATE_FILE
+else
+    if ! kill -0 $PID; then
+        nwg-wrapper -s help.sh -p left -a end &
+        echo $! > $PID_FILE
+    fi
+    echo "true" > $STATE_FILE
+fi
+#+end_src
+
+*** Generate help
+
+#+begin_src conf
+## generate help
+exec_always sed '/^.SH SHORTCUTS$/r'<($HOME/.config/sway/scripts/sbdp.py $HOME/.config/sway/config man) /usr/share/sway/templates/help.man > $HOME/.config/sway/help.man
+#+end_src
+
+#+begin_src python :tangle (file-truename "~/.config/sway/scripts/sbdp.py")
+#!/usr/bin/env python
+import sys
+import glob
+import re
+from typing import Text
+import json
+
+if len(sys.argv) >= 2:
+    rootPath = sys.argv[1]
+else:
+    rootPath = '/etc/sway/config'
+
+
+def readFile(filePath):
+    try:
+        paths = glob.glob(filePath)
+    except:
+        print("couldn't resolve glob:", filePath)
+        paths = []
+
+    allLines: list[str] = []
+    for path in paths:
+        allLines = allLines + open(path, "r").readlines()
+
+    finalLines: list[str] = []
+    for line in allLines:
+        if re.search(r'^include\s+(.+?)$', line):
+            nextPath = re.findall(r'^include\s+(.+?)$', line)[0]
+            finalLines = finalLines + readFile(nextPath)
+        else:
+            finalLines = finalLines + [line]
+
+    return finalLines
+
+
+lines = readFile(rootPath)
+
+
+def findKeybindingForLine(lineNumber: int, lines: list[str]):
+    return lines[lineNumber+1].split(' ')[1]
+
+
+class DocsConfig:
+    category: Text
+    action: Text
+    keybinding: Text
+
+
+def getDocsConfig(lines: list[str]):
+    docsLineRegex = r"^## (?P<category>.+?) // (?P<action>.+?)\s+(// (?P<keybinding>.+?))*##"
+    docsConfig: list[DocsConfig] = []
+    for index, line in enumerate(lines):
+        match = re.match(docsLineRegex, line)
+        if (match):
+            config = DocsConfig()
+            config.category = match.group('category')
+            config.action = match.group('action')
+            config.keybinding = match.group('keybinding')
+            if (config.keybinding == None):
+                config.keybinding = findKeybindingForLine(index, lines)
+            docsConfig = docsConfig + [config]
+    return docsConfig
+
+
+def getSymbolDict(lines: list[str]):
+    setRegex = r"^set\s+(?P<variable>\$.+?)\s(?P<value>.+)?"
+    dictionary = {}
+    for line in lines:
+        match = re.match(setRegex, line)
+        if (match):
+            if (match.group('variable')):
+                dictionary[match.group('variable')] = match.group('value')
+    return dict(dictionary)
+
+
+translations = {
+    'Mod1': "Alt",
+    'Mod2': "",
+    'Mod3': "בּ",
+    'Mod4': "",
+    'Mod5': "Scroll",
+    'question': "?",
+    'space': "␣",
+    'minus': "-",
+    'plus': '+',
+    'Return': "",
+    'XF86AudioRaiseVolume': "ﱛ",
+    'XF86AudioLowerVolume': "ﱜ",
+    'XF86AudioMute': "ﱝ",
+    'XF86AudioMicMute': '',
+    'XF86MonBrightnessUp': "",
+    'XF86MonBrightnessDown': "",
+    'XF86PowerOff': "襤",
+    'XF86TouchpadToggle': "Toggle Touchpad"
+}
+
+
+def translate(word: Text, dictionary: dict):
+    try:
+        return dictionary[word.strip()]
+    except:
+        return word.strip()
+
+
+def replaceBindingFromMap(binding: Text, dictionary: dict):
+    elements = binding.split('+')
+    resultElements = []
+    for el in elements:
+        translation = translate(translate(el, dictionary), translations)
+        resultElements = resultElements + [translation]
+
+    return " + ".join(resultElements)
+
+
+def sanitize(configs: list[DocsConfig], symbolDict: dict):
+    for index, config in enumerate(configs):
+        config.keybinding = replaceBindingFromMap(
+            config.keybinding, symbolDict)
+        configs[index] = config
+    return configs
+
+
+def getDocsList(lines: list[str]):
+    docsConfig = getDocsConfig(lines)
+    symbolDict = getSymbolDict(lines)
+    sanitizedConfig = sanitize(docsConfig, symbolDict)
+    return sanitizedConfig
+
+
+docsList = getDocsList(lines)
+
+result = []
+for config in docsList:
+    result = result + [{'category': config.category,
+                        'action': config.action, 'keybinding': config.keybinding}]
+print(json.dumps(result))
+
+#+end_src
+
+** Calendar application
+
+#+begin_src conf
+# calendar application
+set $calendar $term_float khal interactive
+#+end_src
+
+** Shutdown Command
+
+#+begin_src conf
+set $mode_shutdown "\
+<span foreground='$color10'></span>  \
+<span foreground='$color5'> \
+<span foreground='$color10'>(<b>h</b>)</span>hibernate \
+<span foreground='$color10'>(<b>l</b>)</span>lock \
+<span foreground='$color10'>(<b>e</b>)</span>logout \
+<span foreground='$color10'>(<b>r</b>)</span>reboot \
+<span foreground='$color10'>(<b>u</b>)</span>suspend \
+<span foreground='$color10'>(<b>s</b>)</span>shutdown \
+</span>"
+
+set $purge_cliphist [ $purge_cliphist_logout == 'true' ] && rm -f $HOME/.cache/cliphist/db || exit 0
+
+mode --pango_markup $mode_shutdown {
+    # lock
+    $bindsym l mode "default", exec $locking
+
+    # logout
+    $bindsym e exec $purge_cliphist; exec loginctl terminate-user $USER
+
+    # suspend
+    $bindsym u mode "default", exec systemctl suspend
+
+    # hibernate
+    $bindsym h mode "default", exec systemctl hibernate
+
+    # shutdown
+    $bindsym s exec $purge_cliphist; exec systemctl poweroff
+
+    # reboot
+    $bindsym r exec $purge_cliphist; exec systemctl reboot
+
+    # Return to default mode.
+    $bindsym Escape mode "default"
+}
+
+## Launch // Exit Menu ##
+$bindsym $mod+Shift+e mode $mode_shutdown
+
+#+end_src
+
+* User Interface
+
+** Background
+
+#+begin_src conf
+
+# Background
+set $background $HOME/.dotfiles/wallpapers/sea_and_mountain.jpg
+output * bg $background fill
+#+end_src
+
+** Onscreen bar
+
+#+begin_src conf
+
+# Onscreen bar
+set $onscreen_bar bash $scripts/wob.sh "$accent-colorFF" "$background-colorFF"
+
+#+end_src
+
+** Brightness control
+
+#+begin_src conf
+
+# brightness control
+set $brightness_step bash -c 'echo $(( $(light -Mr) / 100 * 5 < 1 ? 1 : $(( $(light -Mr) / 100 * 5 )) ))'
+set $brightness_up light -r -A $($brightness_step) && $onscreen_bar $(light -G | cut -d'.' -f1)
+set $brightness_down light -r -U $($brightness_step) && $onscreen_bar $(light -G | cut -d'.' -f1)
+
+$bindsym --locked XF86MonBrightnessUp exec $brightness_up
+$bindsym --locked XF86MonBrightnessDown exec $brightness_down
+#+end_src
+
+** Audio control
+
+#+begin_src conf
+
+# audio control
+set $sink_volume pactl get-sink-volume @DEFAULT_SINK@ | grep '^Volume:' | cut -d / -f 2 | tr -d ' ' | sed 's/%//'
+set $source_volume pactl get-source-volume @DEFAULT_SOURCE@ | grep '^Volume:' | cut -d / -f 2 | tr -d ' ' | sed 's/%//'
+set $volume_down $onscreen_bar $(pactl set-sink-volume @DEFAULT_SINK@ -5% && $sink_volume)
+set $volume_up $onscreen_bar $(pactl set-sink-volume @DEFAULT_SINK@ +5% && $sink_volume)
+set $volume_mute $onscreen_bar $(pactl set-sink-mute @DEFAULT_SINK@ toggle && pactl get-sink-mute @DEFAULT_SINK@ | sed -En "/no/ s/.*/$($sink_volume)/p; /yes/ s/.*/0/p")
+set $mic_mute $onscreen_bar $(pactl set-source-mute @DEFAULT_SOURCE@ toggle && pactl get-source-mute @DEFAULT_SOURCE@ | sed -En "/no/ s/.*/$($source_volume)/p; /yes/ s/.*/0/p")
+
+$bindsym --locked XF86AudioRaiseVolume exec $volume_up
+$bindsym --locked XF86AudioLowerVolume exec $volume_down
+$bindsym --locked XF86AudioMute exec $volume_mute
+$bindsym XF86AudioMicMute exec $mic_mute
+
+$bindsym --locked XF86AudioPlay exec playerctl play-pause
+$bindsym XF86AudioNext exec playerctl next
+$bindsym XF86AudioPrev exec playerctl previous
+#+end_src
+
+** Lockscreen
+
+#+begin_src conf
+### Lockscreen configuration
+set $locking swaylock --daemonize --color "$selection-color" --inside-color "$selection-color" --inside-clear-color "$text-color" --ring-color "$color2" --ring-clear-color "$color11" --ring-ver-color "$color13" --show-failed-attempts --fade-in 0.2 --grace 2 --effect-vignette 0.5:0.5 --effect-blur 7x5 --ignore-empty-password --screenshots --clock
+#+end_src
+
+** Notification
+
+#+begin_src conf
+###Notification daemon configuration
+set $notifications mako --font "$term-font" --text-color "$text-color" --border-color "$accent-color" --background-color "$background-color" --border-size 3 --width 400 --height 200 --padding 20 --margin 20 --default-timeout 15000
+#+end_src
+
+** Window Layout
+
+#+begin_src conf
+#
+# Layout stuff:
+#
+## Setting // Split windows horizontally ##
+$bindsym $mod+b splith
+## Setting // Split windows vertically ##
+$bindsym $mod+v splitv
+
+## Action // Switch to window stacking ##
+$bindsym $mod+s layout stacking
+## Action // Switch to window tabbing ##
+$bindsym $mod+w layout tabbed
+## Action // Toggle window splitting ##
+$bindsym $mod+e layout toggle split
+
+## Action // Toggle fullscreen ##
+$bindsym $mod+f fullscreen
+
+## Action // Toggle global fullscreen ##
+$bindsym $mod+Shift+f fullscreen global
+
+## Action // Toggle floating ##
+$bindsym $mod+Shift+space floating toggle
+
+## Navigation // Toggle focus between tiling and floating ##
+$bindsym $mod+space focus mode_toggle
+
+## Navigation // Swap focus to the parent window ##
+$bindsym $mod+a focus parent
+
+## Launch // Toggle Help ##
+$bindsym $mod+question exec $help
+
+default_border pixel 4
+hide_edge_borders smart
+#+end_src
+
+** Window Resizer
+
+#+begin_src conf
+#
+# Window resizer
+#
+set $mode_resize "<span foreground='$color10'></span>  \
+<span foreground='$color5'><b>Resize</b></span> <span foreground='$color10'>(<b>↑ ↓ ← →</b>)</span> \
+<span foreground='$color5'><b>Increase Gaps</b></span> <span foreground='$color10'>(<b>+</b>)</span> \
+<span foreground='$color5'><b>Decrease Gaps</b></span> <span foreground='$color10'>(<b>-</b>)</span>"
+
+mode --pango_markup $mode_resize {
+    # left will shrink the containers width
+    # right will grow the containers width
+    # up will shrink the containers height
+    # down will grow the containers height
+    $bindsym $left resize shrink width 10px
+    $bindsym $down resize grow height 10px
+    $bindsym $up resize shrink height 10px
+    $bindsym $right resize grow width 10px
+    $bindsym Shift+$left resize shrink width 20px
+    $bindsym Shift+$down resize grow height 20px
+    $bindsym Shift+$up resize shrink height 20px
+    $bindsym Shift+$right resize grow width 20px
+
+    ## Resize // Window Gaps // + - ##
+    $bindsym minus gaps inner current minus 5px
+    $bindsym plus gaps inner current plus 5px
+
+    # Return to default mode
+    $bindsym Return mode "default"
+    $bindsym Escape mode "default"
+}
+## Launch // Resize Mode ##
+$bindsym $mod+r mode $mode_resize
+gaps inner 5px
+gaps outer 5px
+#+end_src
+
+** Enable gtk theme
+
+#+begin_src conf
+exec_always {
+  gsettings set org.gnome.desktop.interface gtk-theme "$gtk-theme"
+  gsettings set org.gnome.desktop.interface icon-theme "$icon-theme"
+  gsettings set org.gnome.desktop.interface cursor-theme "$cursor-theme"
+  gsettings set org.gnome.desktop.interface font-name "$gui-font"
+}
+#+end_src
+
+** Application window default state
+
+#+begin_src conf
+#don't show gaps if there's only one window on the desktop
+smart_gaps on
+
+# set floating mode for specific applications
+for_window [instance="lxappearance"] floating enable
+for_window [app_id="pamac-manager"] floating enable
+for_window [app_id="blueberry.py"] floating enable
+for_window [app_id="firefox" title="^Library$"] floating enable, border pixel 1, sticky enable
+for_window [app_id="thunderbird" title=".*Reminder"] floating enable
+for_window [app_id="floating_shell_portrait"] floating enable, border pixel 1, sticky enable, resize set width 30 ppt height 40 ppt
+for_window [app_id="floating_shell"] floating enable, border pixel 1, sticky enable
+for_window [app_id="Manjaro.manjaro-settings-manager"] floating enable
+for_window [app_id="" title="Picture in picture"] floating enable, sticky enable
+for_window [app_id="" title="Picture-in-Picture"] floating enable, sticky enable
+for_window [app_id="xsensors"] floating enable
+for_window [title="Save File"] floating enable
+for_window [title="Firefox — Sharing Indicator"] floating enable
+for_window [app_id="" title=".* is sharing your screen."] floating enable
+for_window [title="^wlay$"] floating enable
+for_window [title="^.* Fcitx*$"] floating enable
+
+# inhibit idle
+for_window [app_id="microsoft teams - preview"] inhibit_idle fullscreen
+for_window [class=".*"] inhibit_idle fullscreen
+for_window [app_id=".*"] inhibit_idle fullscreen
+#+end_src
+
+* Moving Around
+
+** Windows
+
+#+begin_src conf
+# Move your focus around
+## Navigation // Move focus // $mod + ↑ ↓ ← → ##
+$bindsym $mod+$left focus left
+$bindsym $mod+$down focus down
+$bindsym $mod+$up focus up
+$bindsym $mod+$right focus right
+
+## Navigation // Move focused window // $mod + Shift + ↑ ↓ ← → ##
+$bindsym $mod+Shift+$left move left
+$bindsym $mod+Shift+$down move down
+$bindsym $mod+Shift+$up move up
+$bindsym $mod+Shift+$right move right
+#+end_src
+
+** Workspace
+:PROPERTIES:
+:ID:       6fd3d3f3-bb40-4e01-b3e7-20156ea938ac
+:END:
+
+#+begin_src conf
+#
+# Workspaces:
+#
+## workspace names
+set $ws1 number 1
+set $ws2 number 2
+set $ws3 number 3
+set $ws4 number 4
+set $ws5 number 5
+set $ws6 number 6
+set $ws7 number 7
+set $ws8 number 8
+set $ws9 number 9
+set $ws10 number 10
+
+## Navigation // Switch workspace // $mod + [number] ##
+$bindsym $mod+1 workspace $ws1
+$bindsym $mod+2 workspace $ws2
+$bindsym $mod+3 workspace $ws3
+$bindsym $mod+4 workspace $ws4
+$bindsym $mod+5 workspace $ws5
+$bindsym $mod+6 workspace $ws6
+$bindsym $mod+7 workspace $ws7
+$bindsym $mod+8 workspace $ws8
+$bindsym $mod+9 workspace $ws9
+$bindsym $mod+0 workspace $ws10
+
+set $focus_ws [ $focus_after_move == 'true' ] && swaymsg workspace
+
+## Action // Move focused window to workspace // $mod + Shift + [number] ##
+$bindsym $mod+Shift+1 move container to workspace $ws1, exec $focus_ws $ws1
+$bindsym $mod+Shift+2 move container to workspace $ws2, exec $focus_ws $ws2
+$bindsym $mod+Shift+3 move container to workspace $ws3, exec $focus_ws $ws3
+$bindsym $mod+Shift+4 move container to workspace $ws4, exec $focus_ws $ws4
+$bindsym $mod+Shift+5 move container to workspace $ws5, exec $focus_ws $ws5
+$bindsym $mod+Shift+6 move container to workspace $ws6, exec $focus_ws $ws6
+$bindsym $mod+Shift+7 move container to workspace $ws7, exec $focus_ws $ws7
+$bindsym $mod+Shift+8 move container to workspace $ws8, exec $focus_ws $ws8
+$bindsym $mod+Shift+9 move container to workspace $ws9, exec $focus_ws $ws9
+$bindsym $mod+Shift+0 move container to workspace $ws10, exec $focus_ws $ws10
+#+end_src
+
+* Scratchpad
+
+#+begin_src conf
+#
+# Scratchpad:
+#
+# Sway has a "scratchpad", which is a bag of holding for windows.
+# You can send windows there and get them back later.
+
+## Action // Move window to scratchpad ##
+$bindsym $mod+Shift+minus move scratchpad, exec "pkill -RTMIN+7 waybar"
+
+# If there are multiple scratchpad windows, this command cycles through them.
+## Action // Toggle scratchpad ##
+$bindsym $mod+minus scratchpad show, exec "pkill -RTMIN+7 waybar"
+#+end_src
+
+* Application launcher with rofi
+
+#+begin_src conf
+
+# rofi - Application launcher 
+set $menu rofi -show combi -combi-modi "drun,run" -terminal $term -ssh-command "{terminal} {ssh-client} {host} [-p {port}]" -run-shell-command "{terminal} {cmd}" -show-icons -font "$gui-font" -lines 10 -width 35 -theme-str $rofi_theme
+
+## Launch // Launcher ##
+$bindsym $mod+d exec $menu
+#+end_src
+
+** theme
+
+#+begin_src conf
+# rofi theme
+set $rofi_theme "* {lightbg: $background-color; background: $background-color; lightfg: $accent-color; foreground: $text-color;}"
+#+end_src
+
+* Clipborad
+
+** History with rofi
+
+#+begin_src conf
+# clipboard history
+set $clipboard cliphist list | rofi -dmenu -font "$gui-font" -p "Select item to copy" -lines 10 -width 35 -theme-str $rofi_theme | cliphist decode | wl-copy
+set $clipboard-del cliphist list | rofi -dmenu -font "$gui-font" -p "Select item to delete" -lines 10 -width 35 -theme-str $rofi_theme | cliphist delete
+
+## Launch // Clipboard ##
+$bindsym $mod+Shift+p exec $clipboard
+
+#+end_src
+
+* Idle configulation
+
+#+begin_src conf
+### Idle configuration
+# This will lock your screen after 300 seconds of inactivity, then turn off
+# your displays after another 300 seconds, and turn your screens back on when
+# resumed. It will also lock your screen before your computer goes to sleep.
+#
+set $idle swayidle -w \
+    timeout 600 'light -G > /tmp/brightness && light -S 10' resume 'light -S $([ -f /tmp/brightness ] && cat /tmp/brightness || echo 100%)' \
+    timeout 1800 'exec $locking' \
+    timeout 3600 'swaymsg "output * dpms off"' \
+    resume 'swaymsg "output * dpms on"' \
+    before-sleep 'playerctl pause' \
+    before-sleep 'exec $locking'
+#+end_src
+
+
+
+* Audio with pulseaudio
+
+#+begin_src conf
+# pulseaudio command
+set $pulseaudio $term_float pulsemixer
+#+end_src
+
+
+
+* Statusbar with waybar
+** Config 
+
+#+begin_src conf
+#
+# statusbar with waybar
+#
+set $statusbar waybar
+set $waybar_position top
+
+## Action // Toggle Waybar ##
+$bindsym $mod+Shift+b exec pkill -SIGUSR1 waybar
+
+bar {
+    id default
+    swaybar_command $scripts/waybar.sh
+    position $waybar_position
+}
+#+end_src
+
+** Script
+
+#+begin_src bash
+#!/usr/bin/env bash
+# wrapper script for waybar with args, see https://github.com/swaywm/sway/issues/5724
+
+USER_CONFIG_PATH=$HOME/.config/waybar/config.jsonc
+USER_STYLE_PATH=$HOME/.config/waybar/style.css
+
+if [ -f $USER_CONFIG_PATH ]; then
+    USER_CONFIG=$USER_CONFIG_PATH
+fi
+
+if [ -f $USER_STYLE_PATH ]; then
+    USER_STYLE=$USER_STYLE_PATH
+fi
+
+waybar -c ${USER_CONFIG:-"/usr/share/sway/templates/waybar/config.jsonc"} -s ${USER_STYLE:-"/usr/share/sway/templates/waybar/style.css"} &
+
+#+end_src
+
+* Screenshot with grimshot
+
+#+begin_src conf
+# screenshot 
+set $grimshot $scripts/grimshot
+set $image_upload $scripts/upload-image.sh
+set $screenshot_screen_clipboard $grimshot --notify copy output
+set $screenshot_screen_file $grimshot --notify save output
+set $screenshot_screen_upload $screenshot_screen_file | xargs $image_upload
+set $screenshot_selection_window_clipboard $grimshot --notify copy window
+set $screenshot_selection_window_file $grimshot --notify save window
+set $screenshot_selection_window_upload $screenshot_selection_window_file | xargs $image_upload
+set $screenshot_selection_area_clipboard $grimshot --notify copy area
+set $screenshot_selection_area_file $grimshot --notify save area
+set $screenshot_selection_area_upload $screenshot_selection_area_file | xargs $image_upload
+
+bindsym $mod+Ctrl+4        exec $screenshot_selection_area_file
+bindsym $mod+Shift+Ctrl+4  exec $screenshot_selection_area_clipboard
+bindsym $mod+Ctrl+5        exec $screenshot_selection_window_file
+bindsym $mod+Shift+Ctrl+5  exec $screenshot_selection_window_clipboard
+
+# set $mode_screenshot "<span foreground='$color10'></span>  \
+# <span foreground='$color5'><b>Pick</b></span> <span foreground='$color10'>(<b>p</b>)</span> \
+# <span foreground='$color5'><b>Output</b></span> <span foreground='$color10'>(<b>o</b>)</span> \
+# <span foreground='$color7'>+ <span foreground='$color10'><b>Shift</b></span> for </span> \
+# <span foreground='$color7'>+ <span foreground='$color10'><b>Ctrl</b></span> for </span>"
+
+# mode --pango_markup $mode_screenshot {
+#     # output = currently active output
+#     $bindsym o mode "default", exec $screenshot_screen_clipboard
+#     $bindsym Shift+o mode "default", exec $screenshot_screen_file
+#     $bindsym Shift+Ctrl+o mode "default", exec $screenshot_screen_upload
+
+#     # pick the region to screenshot
+#     $bindsym p mode "default", exec $screenshot_selection_clipboard
+#     $bindsym Shift+p mode "default", exec $screenshot_selection_file
+#     $bindsym Shift+Ctrl+p mode "default", exec $screenshot_selection_upload
+
+#     # Return to default mode.
+#     $bindsym Escape mode "default"
+# }
+
+# ## Launch // Screenshot Mode ##
+# $bindsym Print mode $mode_screenshot
+#+end_src
+
+* Recording with wf-recorder
+** Config
+
+#+begin_src conf
+set $mode_recording "<span foreground='$color10'></span>  \
+<span foreground='$color5'><b>Record</b></span> <span foreground='$color10'>(<b>r</b>)</span> \
+<span foreground='$color5'>+ [<span foreground='$color10'><b>Shift</b></span> for ]</span>"
+
+set $recorder $HOME/.config/sway/scripts/recorder.sh
+
+mode --pango_markup $mode_recording {
+        $bindsym r exec $recorder, mode "default"
+        $bindsym Shift+r exec $recorder -a, mode "default"
+
+        # Return to default mode.
+        $bindsym Escape mode "default"
+}
+
+## Launch // Recording Mode ##
+$bindsym $mod+Shift+r mode $mode_recording
+
+## Launch // Stop Recording Mode ##
+$bindsym $mod+Escape exec killall -s SIGINT wf-recorder
+#+end_src
+
+** recorder scripts
+
+#+begin_src bash :tangle (file-truename "~/.dotfiles/.config/sway/scripts/recorder.sh")
+#!/usr/bin/env bash 
+set -x
+
+pid=`pgrep wf-recorder`
+status=$?
+
+gif=false
+
+countdown() {
+  notify "Recording in 3 seconds" -t 1000
+  sleep 1
+  notify "Recording in 2 seconds" -t 1000
+  sleep 1
+  notify "Recording in 1 seconds" -t 1000
+  sleep 1
+}
+
+notify() {
+    line=$1
+    shift
+    notify-send "Recording" "${line}" -i /usr/share/icons/Papirus-Dark/32x32/devices/camera-video.svg $*;
+}
+
+if [ $status != 0 ]
+then
+    target_path=$(xdg-user-dir VIDEOS)
+    timestamp=$(date +'recording_%Y%m%d-%H%M%S')
+
+    notify "Select a region to record" -t 1000
+    area=$(swaymsg -t get_tree | jq -r '.. | select(.pid? and .visible?) | .rect | "\(.x),\(.y) \(.width)x\(.height)"' | slurp)
+
+    countdown
+    (sleep 0.5 && pkill -RTMIN+8 waybar) &
+
+    if [ "$1" == "-a" ]; then
+        file="$target_path/$timestamp.mp4"
+        wf-recorder --audio -g "$area" --file="$file"
+    else
+        file="$target_path/$timestamp.webm"
+        wf-recorder -g "$area" -c libvpx --codec-param="qmin=0" --codec-param="qmax=25" --codec-param="crf=4" --codec-param="b:v=1M" --file="$file" 
+    fi
+
+    pkill -RTMIN+8 waybar && notify "Finished recording ${file}"
+else
+    pkill --signal SIGINT wf-recorder
+    pkill -RTMIN+8 waybar
+fi
+#+end_src
+
+* Autostart Applications
+
+#+begin_src conf
+# enable idle mode
+exec $idle
+
+# autostart background applications
+exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+exec $notifications
+
+# if-exists autostarts
+#
+exec {
+    '[ -x "$(command -v flashfocus)" ] && flashfocus'
+    '[ -x "$(command -v wlsunset)" ] && $HOME/.config/sway/scripts/sunset.sh "on"'
+    '[ -x "$(command -v autotiling)" ] && autotiling'
+    '[ -x "$(command -v foot)" ] && $HOME/.config/sway/scripts/foot.sh --server'
+    '[ -x "$(command -v nwg-wrapper)" ] && [ -f $HOME/.config/nwg-wrapper/help.sh ] && $HOME/.config/sway/scripts/help.sh --restore'
+    '[ -x "$(command -v wl-paste)" ] && [ -x "$(command -v cliphist)" ] && wl-paste --watch cliphist store'
+    '[ -x "$(command -v wl-paste)" ] && [ -x "$(command -v cliphist)" ] && wl-paste --watch pkill -RTMIN+9 waybar'
+}
+exec_always {
+    '[ -x "$(command -v spice-vdagent)" ] && spice-vdagent'
+    # restart kanshi https://github.com/emersion/kanshi/issues/43#issuecomment-531679213
+    '[ -x "$(command -v kanshi)" ] && pkill kanshi; exec kanshi'
+    '[ -x "$(command -v sworkstyle)" ] && pkill sworkstyle; sworkstyle &> /tmp/sworkstyle.log'
+    '[ -x "$(command -v playerctl)" ] && pkill playerctl; playerctl -a metadata --format \'{{status}} {{title}}\' --follow | while read line; do pkill -RTMIN+5 waybar; done'
+}
+
+# https://github.com/Alexays/Waybar/issues/1093#issuecomment-841846291
+exec systemctl --user import-environment DISPLAY WAYLAND_DISPLAY SWAYSOCK
+exec hash dbus-update-activation-environment 2>/dev/null && \
+    dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY SWAYSOCK
+
+#+end_src
+

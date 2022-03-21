@@ -1,30 +1,56 @@
-/* Waybar Stylesheet */
+/* =============================================================================
+ *
+ * Waybar configuration
+ *
+ * Configuration reference: https://github.com/Alexays/Waybar/wiki/Configuration
+ *
+ * =========================================================================== */
+
+/* import css definitions for current theme */
+
+/* -----------------------------------------------------------------------------
+ * Keyframes
+ * -------------------------------------------------------------------------- */
 
 /* General Configuration */
 * {
   border: none;
-  /* border-radius: 10px;*/
-  /* `otf-font-awesome` is required to be installed for icons */
-  font-family: PlemolJP Console NF, sans-serif;
-  font-size: 16px;
-  /*  min-height: 24px;*/
+  border-radius: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  font-family: "PlemolJP Console NF", sans-serif;
 }
 
-window#waybar {
-    background-color: #2E3440;
-    /*  border: 2px solid #5e5662;*/
+/* The whole bar */
+#waybar {
+    background: #2E3440;
     color: #ECEFF4;
-    /* box-shadow: 3px 2px 2px red;*/
     transition-property: background-color;
     transition-duration: 0.5s;
-    /*  border-radius: 30;*/
+    font-size: 15px;
 }
 
-window#waybar.hidden {
-  opacity: 0.2;
+#waybar.hidden {
+    opacity: 0.2;
 }
+
+/* window#waybar { */
+/*     background-color: #2E3440; */
+/*     /\*  border: 2px solid #5e5662;*\/ */
+/*     color: #ECEFF4; */
+/*     /\* box-shadow: 3px 2px 2px red;*\/ */
+/*     transition-property: background-color; */
+/*     transition-duration: 0.5s; */
+/*     /\*  border-radius: 30;*\/ */
+/* } */
+
+/* window#waybar.hidden { */
+/*   opacity: 0.2; */
+/* } */
 
 /*
+
 window#waybar.empty {
     background-color: transparent;
 }
@@ -41,42 +67,11 @@ window#waybar.firefox {
     border: none;
 }*/
 
-#workspaces button {
-    padding: 0px 15px;
-    color: #ECEFF4;
-  font-weight: bold;
-  /* Use box-shadow instead of border so the text isn't offset */
-  /* box-shadow: inset 0 -3px transparent; */
-}
-
-/* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
-#workspaces button:hover {
-  background-color: #D08770;
-  /* box-shadow: inset 0 -3px #d2ced9; */
-  /* border-radius: 24; */
-}
-
-#workspaces button.focused {
-  background-color: #5E81AC;
-}
-
-#workspaces button.urgent {
-  /* background-color: #d9989c;*/
-  color: #d9989c;
-}
-
-#mode {
-  background: #8a8299;
-  margin: 10px;
-  border-radius: 5px;
-  color: #292433;
-  /*  border-bottom: 3px solid #d2ced9; */
-}
 
 /* Modules Configuration */
 
 /* set default */
-
+#bluetooth,
 #clock,
 #battery,
 #cpu,
@@ -86,14 +81,19 @@ window#waybar.firefox {
 #backlight,
 #network,
 #pulseaudio,
-#custom-media,
 #custom-pacman,
-#custom-brightness,
+#custom-menu,
+#custom-help,
+#custom-scratchpad,
+#custom-github,
+#custom-clipboard,
+#custom-media,
+#custom-sunset,
+#custom-playerctl,
 #language,
 #tray,
 #mode,
-#idle_inhibitor,
-#mpd {
+#idle_inhibitor {
   padding: 1px 15px;
   /*  margin: 0 4px;*/
 }
@@ -103,8 +103,7 @@ window#waybar.firefox {
 #memory,
 #disk,
 #network,
-#pulseaudio,
-#mpd {
+#pulseaudio {
   margin: 10px 0px;
 }
 
@@ -123,6 +122,18 @@ window#waybar.firefox {
   margin-right: 0;
 }
 
+/* -----------------------------------------------------------------------------
+ * Module styles
+ * -------------------------------------------------------------------------- */
+
+#mode {
+  background: #8a8299;
+  margin: 10px;
+  border-radius: 5px;
+  color: #292433;
+  /*  border-bottom: 3px solid #d2ced9; */
+}
+
 #clock {
   background-color: #D8DEE9;
   color: #1c1921;
@@ -131,7 +142,7 @@ window#waybar.firefox {
   font-size: 18px;
 }
 
-/*
+
 #battery {
     background-color: #d2ced9;
     color: #000000;
@@ -158,16 +169,16 @@ window#waybar.firefox {
     animation-iteration-count: infinite;
     animation-direction: alternate;
 }
-*/
 
 label:focus {
-  /*  background-color: #000000;*/
+    background-color: #000000;
 }
 
 #window {
-  /*  color: #1c1921;*/
-  /*  border-radius: 30;*/
-  padding: 0 15px;
+    font-weight: bold;
+    margin-right: 25px;
+    color: #ECEFF4;
+    /* padding: 0 15px; */
 }
 
 #custom-pacman {
@@ -178,18 +189,42 @@ label:focus {
 
 #workspaces {
   border-radius: 15px;
-  padding: 2 0px;
+  padding: 2px 0px;
+}
+
+#workspaces button {
+    padding: 0px 15px;
+    color: #ECEFF4;
+    font-weight: bold;
+}
+
+/* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
+#workspaces button:hover {
+  background-color: #D08770;
+}
+
+#workspaces button.focused {
+  background-color: #5E81AC;
+}
+
+#workspaces button.urgent {
+  color: #d9989c;
 }
 
 #cpu {
   background-color: #e6bbbe;
   color: #1c1921;
   border-radius: 5px;
-  /* min-width: 11em; */
-  /*  border-bottom-left-radius:30;
-    border-top-left-radius:30;*/
   margin-right: 10px;
   margin-left: 10px;
+}
+
+#cpu.warning {
+    color: #EBCB8B;
+}
+
+#cpu.critical {
+    color: #BF616A;
 }
 
 #temperature {
@@ -198,22 +233,37 @@ label:focus {
   margin-right: 10px;
   margin-left: 0px;
   border-radius: 5px;
-  /*  background-color: #f0932b;*/
-  /*  background-color:#d9c77e;*/
 }
 
 #temperature.critical {
-  /*  background-color: #d9989c;*/
+    background-color: #BF616A;
+}
+
+#custom-menu {
+    background-color: #A3BEBC;
+    padding-left: 10px;
+    padding-right: 14px;
 }
 
 #memory {
-  background-color: #b8d2aa;
-  color: #1c1921;
-  margin-right: 10px;
-  margin-left: 0px;
-  border-radius: 5px;
-  /*  background-color: #9b59b6;*/
-  /*  background-color: #eba0aa;*/
+    background-color: #b8d2aa;
+    color: #1c1921;
+    margin-right: 10px;
+    margin-left: 0px;
+    border-radius: 5px;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+#memory.warning {
+    color: #EBCB8B;
+}
+
+#memory.critical {
+    color: #BF616A;
+    animation-name: blink-critical;
+    animation-duration: 2s;
 }
 
 #disk {
