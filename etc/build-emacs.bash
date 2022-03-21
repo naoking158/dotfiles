@@ -76,7 +76,7 @@ while (( $# > 0 )); do
             ;;
         -j | --parallel | -j=* | --parallel=*)
             if [[ "$1" =~ ^-j= || "$1" =~ ^--parallel= ]]; then                
-                NPROC="${1##=}"
+                NPROC="${1##*=}"
             elif [[ -z "${2:-}" || "$2" =~ ^-+ ]]; then
                 e_error "'-j/--parallel' requires an int number."
                 exit 1
@@ -86,7 +86,7 @@ while (( $# > 0 )); do
             ;;
         -v | --version | -v=* | --version=*)
             if [[ "$1" =~ ^-v= || "$1" =~ ^--version= ]]; then
-                VERSION="${1##=}"
+                VERSION="${1##*=}"
             elif [[ -z "${2:-}" || "$2" =~ ^-+ ]]; then
                 e_error "'-v/--version' requires an int number."
                 exit 1
@@ -96,7 +96,7 @@ while (( $# > 0 )); do
             ;;
         --working_dir | --working_dir=*)
             if [[ "$1" =~ ^--working_dir ]]; then
-                WORK_DIR="${1##=}"
+                WORK_DIR="${1##*=}"
             elif [[ -z "${2:-}" || "$2" =~ ^-+ ]]; then
                 e_error "'--working_dir' requires directory name to be used for downloading sources and building them."
                 exit 1
@@ -106,7 +106,7 @@ while (( $# > 0 )); do
             ;;
         --source | --source=*)
             if [[ "$1" =~ ^--source= ]]; then
-                SOURCE_DIR="${1##=}"
+                SOURCE_DIR="${1##*=}"
             elif [[ -z "${2:-}" || "$2" =~ ^-+ ]]; then
                 e_error "'--source' requires directory name that contains build files and 'autogen.sh'."
                 exit 1
@@ -116,7 +116,7 @@ while (( $# > 0 )); do
             ;;
         --prefix | --prefix=*)
             if [[ "$1" =~ ^--prefix= ]]; then
-                PREFIX="${1##}"
+                PREFIX="${1##*=}"
             elif [[ -z "${2:-}" || "$2" =~ ^-+ ]]; then
                 e_error "'--prefix' requires directory name where the installation process should put emacs and its data files."
             else
@@ -261,8 +261,8 @@ function build() {
     cd $SOURCE_DIR &&
     ./autogen.sh &&
     eval $configureCMD &&
-    eval "${makeCMD} --jobs=${NPROC} all" &&
-    # eval "${makeCMD} install" &&
+    eval "${makeCMD} --jobs=${NPROC} bootstrap" &&
+    eval "${makeCMD} install" &&
     e_newline && e_done "Emacs Build processes are completed!" || exit 1
 
     if is_macos; then
