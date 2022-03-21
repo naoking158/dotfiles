@@ -28,3 +28,6 @@
 [submodule ".emacs.d/elisp/elisp-tree-sitter"]
 	path = .emacs.d/elisp/elisp-tree-sitter
 	url = https://github.com/emacs-tree-sitter/elisp-tree-sitter.git
+[submodule ".config/sway/themes/base16-sway"]
+	path = .config/sway/themes/base16-sway
+	url = https://github.com/rkubosz/base16-sway.git
