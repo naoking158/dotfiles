@@ -1118,6 +1118,11 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
                     (make-local-variable 'js-indent-level)
                     (setq js-indent-level 2))))
 
+(leaf json-mode
+  :ensure t
+  :custom
+  ((json-mode-standard-file-ext . '(".json" ".jsonc" ".jsonld"))))
+
 (leaf flymake
   :disabled t
   :doc "A universal on-the-fly syntax checker"
@@ -2276,6 +2281,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                      ("bash" . "src bash")
                                      ("c" . "center")
                                      ("C" . "comment")
+                                     ("conf" . "src conf")
                                      ("el" . "src emacs-lisp")
                                      ("ex" . "example")
                                      ("ht" . "export html")
@@ -2619,7 +2625,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf ob-python
   :ensure org
-  :commands (org-babel-execute:python org-babel-expand-body:python))
+  :commands (org-babel-execute:python))
 
 (leaf ob-latex
   :ensure org
@@ -2630,8 +2636,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :commands
   org-babel-execute:sh
   org-babel-expand-body:sh
-  org-babel-execute:bas
-  org-babel-expand-body:bash)
+  org-babel-execute:shell
+  org-babel-expand-body:shell)
 
 (leaf org-present
   :when window-system
