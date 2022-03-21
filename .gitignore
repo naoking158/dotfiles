@@ -59,6 +59,8 @@
 !/.config/wofi/**
 !/.config/yabai/
 !/.config/yabai/**
+!/.config/zsh/
+!/.config/zsh/**
 
 !/.config/karabiner/
 !/.config/karabiner/karabiner.json
