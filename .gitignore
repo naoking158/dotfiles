@@ -39,6 +39,8 @@
 !/.config/fish/*.fish
 !/.config/git/
 !/.config/git/**
+!/.config/libskk/
+!/.config/libskk/**
 !/.config/nixpkgs/
 !/.config/nixpkgs/**
 !/.config/notmuch/
