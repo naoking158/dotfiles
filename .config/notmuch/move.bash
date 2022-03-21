@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -Ceu
 
@@ -40,7 +40,7 @@ for i in "${ADDRESS[@]}"; do
             }
         done
     fi
-
+ 
     # # Move all spam messages to the Spam folder
     # echo Moving $(notmuch count --output=files tag:spam AND NOT folder:Spam) \
     #      spam-marked messages to the Spam folder
