@@ -64,8 +64,8 @@ local cfg_misc = {
 ---------------------------------------------------------------
 
 local tmux_keybinds = {
-	{ key = "t", mods = "ALT", action = wezterm.action({ SpawnTab = "CurrentPaneDomain" }) },
-	{ key = "d", mods = "ALT", action = wezterm.action({ CloseCurrentTab = { confirm = false } }) },
+	{ key = "t", mods = "ALT|SHIFT", action = wezterm.action({ SpawnTab = "CurrentPaneDomain" }) },
+	{ key = "d", mods = "ALT|SHIFT", action = wezterm.action({ CloseCurrentTab = { confirm = false } }) },
 	{ key = "[", mods = "SUPER", action = wezterm.action({ ActivateTabRelative = -1 }) },
 	{ key = "]", mods = "SUPER", action = wezterm.action({ ActivateTabRelative = 1 }) },
 	{ key = "[", mods = "SUPER|SHIFT", action = wezterm.action({ MoveTabRelative = -1 }) },
@@ -110,7 +110,7 @@ local default_keybinds = {
 	{ key = "r", mods = "ALT", action = "ReloadConfiguration" },
 	{ key = "r", mods = "ALT|SHIFT", action = wezterm.action({ EmitEvent = "toggle-tmux-keybinds" }) },
 	{ key = "e", mods = "ALT", action = wezterm.action({ EmitEvent = "trigger-emacs-with-scrollback" }) },
-	{ key = "x", mods = "ALT", action = wezterm.action({ CloseCurrentPane = { confirm = false } }) },
+	-- { key = "x", mods = "ALT", action = wezterm.action({ CloseCurrentPane = { confirm = false } }) },
 }
 
 local function create_keybinds()

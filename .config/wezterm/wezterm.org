@@ -2,6 +2,11 @@
 
 #+PROPERTY: header-args:lua :comments no :tangle-mode (identity #o755) :tangle (file-truename "~/.dotfiles/.config/wezterm/wezterm.lua")
 
+
+* References
+- https://github.com/yutkat/dotfiles/tree/8a0d161e262f52683972cde614e11243b7a2d7e2/.config/wezterm
+- https://github.com/bew/dotfiles/blob/main/gui/wezterm/wezterm.lua
+
 * Header
 :PROPERTIES:
 :ID:       5b5613f6-b1b4-4602-a3bf-c7ca73309af0
@@ -84,8 +89,8 @@ local cfg_misc = {
 ---------------------------------------------------------------
 
 local tmux_keybinds = {
-	{ key = "t", mods = "ALT", action = wezterm.action({ SpawnTab = "CurrentPaneDomain" }) },
-	{ key = "d", mods = "ALT", action = wezterm.action({ CloseCurrentTab = { confirm = false } }) },
+	{ key = "t", mods = "ALT|SHIFT", action = wezterm.action({ SpawnTab = "CurrentPaneDomain" }) },
+	{ key = "d", mods = "ALT|SHIFT", action = wezterm.action({ CloseCurrentTab = { confirm = false } }) },
 	{ key = "[", mods = "SUPER", action = wezterm.action({ ActivateTabRelative = -1 }) },
 	{ key = "]", mods = "SUPER", action = wezterm.action({ ActivateTabRelative = 1 }) },
 	{ key = "[", mods = "SUPER|SHIFT", action = wezterm.action({ MoveTabRelative = -1 }) },
@@ -130,7 +135,7 @@ local default_keybinds = {
 	{ key = "r", mods = "ALT", action = "ReloadConfiguration" },
 	{ key = "r", mods = "ALT|SHIFT", action = wezterm.action({ EmitEvent = "toggle-tmux-keybinds" }) },
 	{ key = "e", mods = "ALT", action = wezterm.action({ EmitEvent = "trigger-emacs-with-scrollback" }) },
-	{ key = "x", mods = "ALT", action = wezterm.action({ CloseCurrentPane = { confirm = false } }) },
+	-- { key = "x", mods = "ALT", action = wezterm.action({ CloseCurrentPane = { confirm = false } }) },
 }
 
 local function create_keybinds()
