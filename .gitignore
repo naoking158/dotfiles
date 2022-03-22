@@ -57,6 +57,8 @@
 !/.config/waybar/**
 !/.config/textlint/
 !/.config/textlint/**
+!/.config/wezterm/
+!/.config/wezterm/**
 !/.config/wofi/
 !/.config/wofi/**
 !/.config/yabai/

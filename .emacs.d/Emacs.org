@@ -1586,6 +1586,12 @@ Only in Neotree Buffer:
 
 #+end_src
 
+*** Lua
+
+#+begin_src emacs-lisp
+(leaf lua-mode
+  :ensure t)
+#+end_src
 
 *** Python
 :PROPERTIES:
@@ -3255,6 +3261,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                      ("el" . "src emacs-lisp")
                                      ("ex" . "example")
                                      ("ht" . "export html")
+                                     ("lua" . "src lua")
                                      ("tex" . "export latex")
                                      ("q" . "quote")
                                      ("s" . "src")
@@ -3605,7 +3612,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (setq org-babel-load-languages '((emacs-lisp . t)
                                  (python . t)
                                  (latex . t)
-                                 (shell . t)))
+                                 (shell . t)
+                                 (lua . t)))
 
 (leaf ob-emacs-lisp
   :ensure org
@@ -3627,6 +3635,9 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   org-babel-execute:shell
   org-babel-expand-body:shell)
 
+(leaf ob-lua
+  :ensure org
+  :commands (org-babel-execute:lua))
 #+end_src
 
 

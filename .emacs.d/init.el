@@ -1040,6 +1040,9 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :ensure t
   :bind (("C-c e" . macrostep-expand)))
 
+(leaf lua-mode
+  :ensure t)
+
 (when-let* ((miniconda-path
              (my/trim-newline-from-string
               (shell-command-to-string
@@ -2285,6 +2288,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                      ("el" . "src emacs-lisp")
                                      ("ex" . "example")
                                      ("ht" . "export html")
+                                     ("lua" . "src lua")
                                      ("tex" . "export latex")
                                      ("q" . "quote")
                                      ("s" . "src")
@@ -2617,7 +2621,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (setq org-babel-load-languages '((emacs-lisp . t)
                                  (python . t)
                                  (latex . t)
-                                 (shell . t)))
+                                 (shell . t)
+                                 (lua . t)))
 
 (leaf ob-emacs-lisp
   :ensure org
@@ -2638,6 +2643,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   org-babel-expand-body:sh
   org-babel-execute:shell
   org-babel-expand-body:shell)
+
+(leaf ob-lua
+  :ensure org
+  :commands (org-babel-execute:lua))
 
 (leaf org-present
   :when window-system
