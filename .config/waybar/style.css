@@ -117,10 +117,8 @@
  * -------------------------------------------------------------------------- */
 
 #mode {
-    background: @nord9;
-    margin: 10px;
-    border-radius: 5px;
-    color: @bg-color;
+    background: @nord10;
+    /* color: @bg-color; */
 }
 
 #clock {
