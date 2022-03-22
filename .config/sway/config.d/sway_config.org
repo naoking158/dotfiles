@@ -392,7 +392,7 @@ $bindsym XF86AudioPrev exec playerctl previous
 
 #+begin_src conf
 ### Lockscreen configuration
-set $locking swaylock --daemonize --color "$selection-color" --inside-color "$selection-color" --inside-clear-color "$text-color" --ring-color "$color2" --ring-clear-color "$color11" --ring-ver-color "$color13" --show-failed-attempts --fade-in 0.2 --grace 2 --effect-vignette 0.5:0.5 --effect-blur 7x5 --ignore-empty-password --screenshots --clock
+set $locking swaylock --daemonize --color "$selection-color" --inside-color "$selection-color" --inside-clear-color "$text-color" --ring-color "$base02" --ring-clear-color "$base0B" --ring-ver-color "$base0F" --show-failed-attempts --fade-in 0.2 --grace 2 --effect-vignette 0.5:0.5 --effect-blur 7x5 --ignore-empty-password --screenshots --clock
 #+end_src
 
 ** Notification
@@ -448,10 +448,10 @@ hide_edge_borders smart
 #
 # Window resizer
 #
-set $mode_resize "<span foreground='$color10'></span>  \
-<span foreground='$color5'><b>Resize</b></span> <span foreground='$color10'>(<b>↑ ↓ ← →</b>)</span> \
-<span foreground='$color5'><b>Increase Gaps</b></span> <span foreground='$color10'>(<b>+</b>)</span> \
-<span foreground='$color5'><b>Decrease Gaps</b></span> <span foreground='$color10'>(<b>-</b>)</span>"
+set $mode_resize "<span foreground='$base0A'></span>  \
+<span foreground='$base05'><b>Resize</b></span> <span foreground='$base0A'>(<b>↑ ↓ ← →</b>)</span> \
+<span foreground='$base05'><b>Increase Gaps</b></span> <span foreground='$base0A'>(<b>+</b>)</span> \
+<span foreground='$base05'><b>Decrease Gaps</b></span> <span foreground='$base0A'>(<b>-</b>)</span>"
 
 mode --pango_markup $mode_resize {
     # left will shrink the containers width
@@ -778,9 +778,9 @@ bindsym $mod+Shift+Ctrl+5  exec $screenshot_selection_window_clipboard
 ** Config
 
 #+begin_src conf
-set $mode_recording "<span foreground='$color10'></span>  \
-<span foreground='$color5'><b>Record</b></span> <span foreground='$color10'>(<b>r</b>)</span> \
-<span foreground='$color5'>+ [<span foreground='$color10'><b>Shift</b></span> for ]</span>"
+set $mode_recording "<span foreground='$base0A'></span>  \
+<span foreground='$base05'><b>Record</b></span> <span foreground='$base0A'>(<b>r</b>)</span> \
+<span foreground='$base05'>+ [<span foreground='$base0A'><b>Shift</b></span> for ]</span>"
 
 set $recorder $HOME/.config/sway/scripts/recorder.sh
 
