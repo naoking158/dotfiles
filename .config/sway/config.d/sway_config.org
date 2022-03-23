@@ -64,8 +64,8 @@ include $colorscheme
 set $gtk-theme Matcha-dark-sea
 set $icon-theme Papirus-Dark-Maia
 set $cursor-theme xcursor-breeze
-set $gui-font PlemolJP35 14
-set $term-font PlemolJP Console NF 14
+set $gui-font RobotoMono Nerd Font 14
+set $term-font RobotoMono Nerd Font Mono 14
 set $kvantum-theme Matchama-Dark
 
 # Basic color configuration using the Base16 variables for windows and borders.
@@ -506,6 +506,7 @@ exec_always {
   gsettings set org.gnome.desktop.interface icon-theme "$icon-theme"
   gsettings set org.gnome.desktop.interface cursor-theme "$cursor-theme"
   gsettings set org.gnome.desktop.interface font-name "$gui-font"
+  gsettings set org.gnome.desktop.interface gtk-key-theme "Emacs"
 }
 #+end_src
 
