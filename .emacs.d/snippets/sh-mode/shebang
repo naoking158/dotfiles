@@ -1,7 +1,7 @@
 # key: sb
 # name: shebang
 # --
-#!/bin/bash
+#!/usr/bin/env bash
 
 
 set -Ceu
