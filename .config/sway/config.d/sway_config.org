@@ -106,7 +106,7 @@ input * {
 
 #+begin_src conf
 ### Terminal
-set $term alacritty
+set $term wezterm
 set $term_float footclient -a floating_shell
 set $term_float_portrait footclient -a floating_shell_portrait
 
@@ -506,7 +506,6 @@ exec_always {
   gsettings set org.gnome.desktop.interface icon-theme "$icon-theme"
   gsettings set org.gnome.desktop.interface cursor-theme "$cursor-theme"
   gsettings set org.gnome.desktop.interface font-name "$gui-font"
-  gsettings set org.gnome.desktop.interface gtk-key-theme "Emacs"
 }
 #+end_src
 

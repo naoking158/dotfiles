@@ -10,6 +10,8 @@ local cfg_misc = {
    adjust_window_size_when_changing_font_size = false,
    tab_bar_at_bottom = true,
    disable_default_key_bindings = true,
+   enable_csi_u_key_encoding = true,
+   scrollback_lines = 5000,
 
    -- Avoid unexpected config breakage and unusable terminal
    automatically_reload_config = false,
@@ -44,7 +46,7 @@ local cfg_misc = {
   -- Font configuration
   -- https://wezfurlong.org/wezterm/config/fonts.html
   font = wezterm.font('PlemolJP Console NF'),
-  font_size = 16.0,
+  font_size = 14.0,
   use_ime = true,
 
   -- Disable ligatures
@@ -92,8 +94,8 @@ local tmux_keybinds = {
 	{ key = "k", mods = "ALT|SHIFT|CTRL", action = wezterm.action({ AdjustPaneSize = { "Up", 1 } }) },
 	{ key = "j", mods = "ALT|SHIFT|CTRL", action = wezterm.action({ AdjustPaneSize = { "Down", 1 } }) },
 	{ key = " ", mods = "ALT", action = "QuickSelect" },
-  { key = "v", mods = "ALT", action = wezterm.action({ ScrollByPage = -1 }) },
-	{ key = "v", mods = "CTRL", action = wezterm.action({ ScrollByPage = 1 }) },
+  { key = "p", mods = "CTRL|ALT", action = wezterm.action({ ScrollByPage = -1 }) },
+	{ key = "n", mods = "CTRL|ALT", action = wezterm.action({ ScrollByPage = 1 }) },
 }
 
 local default_keybinds = {
@@ -110,7 +112,7 @@ local default_keybinds = {
 	{ key = "r", mods = "ALT", action = "ReloadConfiguration" },
 	{ key = "r", mods = "ALT|SHIFT", action = wezterm.action({ EmitEvent = "toggle-tmux-keybinds" }) },
 	{ key = "e", mods = "ALT", action = wezterm.action({ EmitEvent = "trigger-emacs-with-scrollback" }) },
-	-- { key = "x", mods = "ALT", action = wezterm.action({ CloseCurrentPane = { confirm = false } }) },
+	{ key = "s", mods = "CTRL|SHIFT", action = wezterm.action({ Search = { CaseSensitiveString = "" } }) },
 }
 
 local function create_keybinds()
@@ -180,7 +182,7 @@ local io = require("io")
 local os = require("os")
 
 wezterm.on("trigger-emacs-with-scrollback", function(window, pane)
-              local scrollback = pane:get_lines_as_text()
+              local scrollback = pane:get_lines_as_text(1000)
               local name = os.tmpname()
               local f = io.open(name, "w+")
               f:write(scrollback)
@@ -188,91 +190,12 @@ wezterm.on("trigger-emacs-with-scrollback", function(window, pane)
               f:close()
               window:perform_action(
                  wezterm.action({ SpawnCommandInNewTab = {
-                                     args = { "emacs", "-Q", "-nw", name },
+                                     args = { "emacs", "-q", "-nw", "-l", "~/.dotfiles/.config/wezterm/empty-buffer-with-skk.el", name },
                  } }),
                  pane
               )
               wezterm.sleep_ms(1000)
               os.remove(name)
-end)
-
----------------------------------------------------------------
---- wezterm on
----------------------------------------------------------------
-wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_width)
-	local title = wezterm.truncate_right(utils.basename(tab.active_pane.foreground_process_name), max_width)
-	if title == "" then
-		local uri = utils.convert_home_dir(tab.active_pane.current_working_dir)
-		local basename = utils.basename(uri)
-		if basename == "" then
-			basename = uri
-		end
-		title = wezterm.truncate_right(basename, max_width)
-	end
-	return {
-		{ Text = tab.tab_index + 1 .. ":" .. title },
-	}
-end)
-
-wezterm.on("update-right-status", function(window, pane)
-	local cwd_uri = pane:get_current_working_dir()
-	local cwd = ""
-	local hostname = ""
-	if cwd_uri then
-		cwd_uri = cwd_uri:sub(8)
-		local slash = cwd_uri:find("/")
-		if slash then
-			hostname = cwd_uri:sub(1, slash - 1)
-			-- Remove the domain name portion of the hostname
-			local dot = hostname:find("[.]")
-			if dot then
-				hostname = hostname:sub(1, dot - 1)
-			end
-			if hostname ~= "" then
-				hostname = "@" .. hostname
-			end
-			-- and extract the cwd from the uri
-			cwd = utils.convert_home_dir(cwd)
-		end
-	end
-
-	window:set_right_status(wezterm.format({
-		{ Attribute = { Underline = "Single" } },
-		{ Attribute = { Italic = true } },
-		{ Text = cwd .. hostname },
-	}))
-end)
-
-wezterm.on("toggle-tmux-keybinds", function(window, pane)
-	local overrides = window:get_config_overrides() or {}
-	if not overrides.window_background_opacity then
-		overrides.window_background_opacity = 0.95
-		overrides.keys = default_keybinds
-	else
-		overrides.window_background_opacity = nil
-		overrides.keys = utils.merge_lists(default_keybinds, tmux_keybinds)
-	end
-	window:set_config_overrides(overrides)
-end)
-
-local io = require("io")
-local os = require("os")
-
-wezterm.on("trigger-nvim-with-scrollback", function(window, pane)
-	local scrollback = pane:get_lines_as_text()
-	local name = os.tmpname()
-	local f = io.open(name, "w+")
-	f:write(scrollback)
-	f:flush()
-	f:close()
-	window:perform_action(
-		wezterm.action({ SpawnCommandInNewTab = {
-			args = { "nvim", name },
-		} }),
-		pane
-	)
-	wezterm.sleep_ms(1000)
-	os.remove(name)
 end)
 
 ---------------------------------------------------------------

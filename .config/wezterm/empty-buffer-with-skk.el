@@ -1,4 +1,4 @@
-;;; -*- lexical-binding: t no-byte-compile: t -*-
+;;; -*- lexical-binding: t; -*-
 
 ;; Speed up startup
 (defvar default-file-name-handler-alist file-name-handler-alist)
@@ -24,24 +24,24 @@
       user-mail-address "naoki@bbo.cs.tsukuba.ac.jp"
       user-login-name "naoking158"
       package-enable-at-startup nil
-      package-native-compile t)
-
-(setq inhibit-splash-screen t
+      package-native-compile t
+      inhibit-splash-screen t
       frame-inhibit-implied-resize t
       byte-compile-warnings '(cl-functions))
+
 
 ;; Avoid popup Async buffer window
 (add-to-list 'display-buffer-alist
              '("^*Async Shell Command*" . (display-buffer-no-window)))
 
 ;; map backspace [delete-backward-char] to C-h
-(define-key key-translation-map [?\C-?] [?\C-h])
+;; (define-key key-translation-map [?\C-?] [?\C-h])
 
 ;; map M-backspace [backward-kill-word] to M-h
 (define-key key-translation-map [?\M-\d] [?\M-h])
 
 ;; map C-h to backspace
-;; (define-key key-translation-map [?\C-h] [?\C-?])
+(define-key key-translation-map [?\C-h] [?\C-?])
 
 ;; map M-h [mark-paragraph] to M-backspace
 (define-key key-translation-map [?\M-h] [?\M-\d])
@@ -77,9 +77,11 @@
         ;; skk-inline-show-face '( :foreground "#ECEFF4"
         ;;                         :background "#4C566A"
         ;;                         :inherit 'normal)
-        )  
+        )
   )
 
+
+;; https://gist.github.com/yorickvP/6132f237fbc289a45c808d8d75e0e1fb
 (defun enable-wl-copy-process nil
   (setq wl-copy-process nil)
   (defun wl-copy (text)
@@ -94,21 +96,24 @@
         nil ; should return nil if we're the current paste owner
       (shell-command-to-string "wl-paste -n | tr -d \r")))
   (setq interprogram-cut-function 'wl-copy)
-  (setq interprogram-paste-function 'wl-paste)
-  )
+  (setq interprogram-paste-function 'wl-paste))
 
 
 (defun create-empty-buffer-with-skk nil
-  (interactive)  
-  (let ((buf (generate-new-buffer "untitled")))
-    (switch-to-buffer buf)
-    (enable-wl-copy-process)
-    (text-mode)
-    (fido-vertical-mode)
-    (init-skk)
-    (skk-mode)
-    (setq confirm-kill-processes nil
-          select-enable-primary t)
-    ))
+  (interactive)
+  (setq-local confirm-kill-processes nil)
+  (enable-wl-copy-process)
+  (fido-vertical-mode)
+  
+  ;; (let ((buf (generate-new-buffer "untitled")))
+  ;;   (switch-to-buffer buf)
+  ;;   (enable-wl-copy-process)
+  ;;   (text-mode)
+  ;;   (fido-vertical-mode)
+  ;;   (init-skk)
+  ;;   (skk-mode)
+  ;;   (setq-local confirm-kill-processes nil)
+  ;;   )
+  )
 
 (create-empty-buffer-with-skk)
