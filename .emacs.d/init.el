@@ -1049,8 +1049,9 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
                "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
             (path-to-venv (expand-file-name "envs/torch" miniconda-path)))
   (setq path-to-miniconda miniconda-path)
-  (setq path-to-venv-python (expand-file-name "bin/python" path-to-venv))
-  (custom-set-variables '(org-babel-python-command path-to-venv-python)))
+  ;; (setq path-to-venv-python (expand-file-name "bin/python" path-to-venv))
+  ;; (custom-set-variables '(org-babel-python-command path-to-venv-python))
+  )
 
 (leaf python-mode
   :doc "Python major mode"
@@ -1060,8 +1061,9 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :custom `((py-keep-windows-configuration . t)
             (python-indent-guess-indent-offset . t)
             (python-indent-guess-indent-offset-verbose . nil)
-            (python-shell-virtualenv-root . ,(expand-file-name "envs/torch"
-                                                               path-to-miniconda)))
+            ;; (python-shell-virtualenv-root . ,(expand-file-name "envs/torch"
+            ;;                                                    path-to-miniconda))
+            )
   :hook (python-mode-hook . my/python-basic-config)
   :preface
   (defun my/python-basic-config ()
@@ -3790,9 +3792,10 @@ Interactively, URL defaults to the string looking like a url around point."
   (defun org-babel-edit-prep:jupyter-python (babel-info)
     (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
     (my/python-basic-config))
-  (defun org-babel-edit-prep:python (babel-info)
-    (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
-    (my/python-basic-config)))
+  ;; (defun org-babel-edit-prep:python (babel-info)
+  ;;   (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+  ;;   (my/python-basic-config))
+  )
 
 (leaf sie-brow
   :disabled t
