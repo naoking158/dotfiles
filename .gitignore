@@ -5,6 +5,7 @@
 !/etc/
 /etc/.symlink_hist
 !/bin/
+!/bin/**
 !/wallpapers/
 !/wallpapers/**
 
