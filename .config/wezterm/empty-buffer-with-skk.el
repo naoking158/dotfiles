@@ -103,17 +103,6 @@
   (interactive)
   (setq-local confirm-kill-processes nil)
   (enable-wl-copy-process)
-  (fido-vertical-mode)
-  
-  ;; (let ((buf (generate-new-buffer "untitled")))
-  ;;   (switch-to-buffer buf)
-  ;;   (enable-wl-copy-process)
-  ;;   (text-mode)
-  ;;   (fido-vertical-mode)
-  ;;   (init-skk)
-  ;;   (skk-mode)
-  ;;   (setq-local confirm-kill-processes nil)
-  ;;   )
-  )
+  (fido-vertical-mode))
 
 (create-empty-buffer-with-skk)

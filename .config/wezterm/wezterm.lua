@@ -83,8 +83,8 @@ local tmux_keybinds = {
 	-- { key = "7", mods = "ALT", action = wezterm.action({ ActivateTab = 6 }) },
 	-- { key = "8", mods = "ALT", action = wezterm.action({ ActivateTab = 7 }) },
 	-- { key = "9", mods = "ALT", action = wezterm.action({ ActivateTab = 8 }) },
-	{ key = "3", mods = "ALT|CTRL", action = wezterm.action({ SplitVertical = { domain = "CurrentPaneDomain" } }) },
-	{ key = "2", mods = "ALT|CTRL", action = wezterm.action({ SplitHorizontal = { domain = "CurrentPaneDomain" } }) },
+	{ key = "2", mods = "ALT|CTRL", action = wezterm.action({ SplitVertical = { domain = "CurrentPaneDomain" } }) },
+	{ key = "3", mods = "ALT|CTRL", action = wezterm.action({ SplitHorizontal = { domain = "CurrentPaneDomain" } }) },
 	{ key = "h", mods = "ALT|SHIFT", action = wezterm.action({ ActivatePaneDirection = "Left" }) },
 	{ key = "l", mods = "ALT|SHIFT", action = wezterm.action({ ActivatePaneDirection = "Right" }) },
 	{ key = "k", mods = "ALT|SHIFT", action = wezterm.action({ ActivatePaneDirection = "Up" }) },
@@ -182,7 +182,7 @@ local io = require("io")
 local os = require("os")
 
 wezterm.on("trigger-emacs-with-scrollback", function(window, pane)
-              local scrollback = pane:get_lines_as_text(1000)
+              local scrollback = pane:get_lines_as_text(3000)
               local name = os.tmpname()
               local f = io.open(name, "w+")
               f:write(scrollback)
