@@ -2294,7 +2294,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                      ("tex" . "export latex")
                                      ("q" . "quote")
                                      ("s" . "src")
-                                     ("py" . "src python :session py :async yes")
+                                     ("py" . "src python :session :results value")
                                      ("jp" . "src jupyter-python :session py :async yes :kernel torch")
                                      ("js" . "src javascript")
                                      ("d" . "definition")
@@ -2632,7 +2632,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf ob-python
   :ensure org
-  :commands (org-babel-execute:python))
+  :commands (org-babel-execute:python org-babel-load-session:python))
 
 (leaf ob-latex
   :ensure org

@@ -95,7 +95,7 @@ a bunch of resources I've found online.
   - [[#update-table-of-contents-on-save][Update Table of Contents on Save]]
 - [[#latex-mode][LaTeX Mode]]
 - [[#applications][Applications]]
-  - [[#competitive-programming][Competitive Programming]]
+  - [[#competitive-programming-with-oj---online-judge][Competitive Programming with oj - Online Judge]]
   - [[#elfeed][Elfeed]]
   - [[#mail][Mail]]
   - [[#notmuch][Notmuch]]
@@ -3267,7 +3267,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                      ("tex" . "export latex")
                                      ("q" . "quote")
                                      ("s" . "src")
-                                     ("py" . "src python :session py :async yes")
+                                     ("py" . "src python :session :results value")
                                      ("jp" . "src jupyter-python :session py :async yes :kernel torch")
                                      ("js" . "src javascript")
                                      ("d" . "definition")
@@ -3623,7 +3623,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf ob-python
   :ensure org
-  :commands (org-babel-execute:python))
+  :commands (org-babel-execute:python org-babel-load-session:python))
 
 (leaf ob-latex
   :ensure org
