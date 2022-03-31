@@ -29,7 +29,7 @@ local cfg_misc = {
    adjust_window_size_when_changing_font_size = false,
    tab_bar_at_bottom = true,
    disable_default_key_bindings = true,
-   enable_csi_u_key_encoding = true,
+   enable_csi_u_key_encoding = false,
    scrollback_lines = 5000,
 
    -- Avoid unexpected config breakage and unusable terminal
@@ -93,26 +93,18 @@ local cfg_misc = {
 --- keybinds
 ---------------------------------------------------------------
 
-local tmux_keybinds = {
-	{ key = "t", mods = "ALT|SHIFT", action = wezterm.action({ SpawnTab = "CurrentPaneDomain" }) },
-	{ key = "d", mods = "ALT|SHIFT", action = wezterm.action({ CloseCurrentTab = { confirm = false } }) },
+local my_keybinds = {
+	{ key = "5", mods = "LEADER", action = wezterm.action({ SpawnTab = "CurrentPaneDomain" }) },
+	{ key = "k", mods = "LEADER|CTRL", action = wezterm.action({ CloseCurrentTab = { confirm = false } }) },
+  { key = "k", mods = "LEADER", action = wezterm.action({ CloseCurrentPane = { confirm = false } }) },
 	{ key = "[", mods = "SUPER", action = wezterm.action({ ActivateTabRelative = -1 }) },
 	{ key = "]", mods = "SUPER", action = wezterm.action({ ActivateTabRelative = 1 }) },
 	{ key = "[", mods = "SUPER|SHIFT", action = wezterm.action({ MoveTabRelative = -1 }) },
 	{ key = "]", mods = "SUPER|SHIFT", action = wezterm.action({ ActivateTabRelative = 1 }) },
-	{ key = "q", mods = "ALT|CTRL", action = "ActivateCopyMode" },
+	{ key = "q", mods = "LEADER|CTRL", action = "ActivateCopyMode" },
 	{ key = "y", mods = "CTRL", action = wezterm.action({ PasteFrom = "PrimarySelection" }) },
-	-- { key = "1", mods = "ALT", action = wezterm.action({ ActivateTab = 0 }) },
-	-- { key = "2", mods = "ALT", action = wezterm.action({ ActivateTab = 1 }) },
-	-- { key = "3", mods = "ALT", action = wezterm.action({ ActivateTab = 2 }) },
-	-- { key = "4", mods = "ALT", action = wezterm.action({ ActivateTab = 3 }) },
-	-- { key = "5", mods = "ALT", action = wezterm.action({ ActivateTab = 4 }) },
-	-- { key = "6", mods = "ALT", action = wezterm.action({ ActivateTab = 5 }) },
-	-- { key = "7", mods = "ALT", action = wezterm.action({ ActivateTab = 6 }) },
-	-- { key = "8", mods = "ALT", action = wezterm.action({ ActivateTab = 7 }) },
-	-- { key = "9", mods = "ALT", action = wezterm.action({ ActivateTab = 8 }) },
-	{ key = "2", mods = "ALT|CTRL", action = wezterm.action({ SplitVertical = { domain = "CurrentPaneDomain" } }) },
-	{ key = "3", mods = "ALT|CTRL", action = wezterm.action({ SplitHorizontal = { domain = "CurrentPaneDomain" } }) },
+	{ key = "2", mods = "LEADER", action = wezterm.action({ SplitVertical = { domain = "CurrentPaneDomain" } }) },
+	{ key = "3", mods = "LEADER", action = wezterm.action({ SplitHorizontal = { domain = "CurrentPaneDomain" } }) },
 	{ key = "h", mods = "ALT|SHIFT", action = wezterm.action({ ActivatePaneDirection = "Left" }) },
 	{ key = "l", mods = "ALT|SHIFT", action = wezterm.action({ ActivatePaneDirection = "Right" }) },
 	{ key = "k", mods = "ALT|SHIFT", action = wezterm.action({ ActivatePaneDirection = "Up" }) },
@@ -121,30 +113,21 @@ local tmux_keybinds = {
 	{ key = "l", mods = "ALT|SHIFT|CTRL", action = wezterm.action({ AdjustPaneSize = { "Right", 1 } }) },
 	{ key = "k", mods = "ALT|SHIFT|CTRL", action = wezterm.action({ AdjustPaneSize = { "Up", 1 } }) },
 	{ key = "j", mods = "ALT|SHIFT|CTRL", action = wezterm.action({ AdjustPaneSize = { "Down", 1 } }) },
-	{ key = " ", mods = "ALT", action = "QuickSelect" },
   { key = "p", mods = "CTRL|ALT", action = wezterm.action({ ScrollByPage = -1 }) },
 	{ key = "n", mods = "CTRL|ALT", action = wezterm.action({ ScrollByPage = 1 }) },
-}
-
-local default_keybinds = {
-	{ key = "c", mods = "CTRL|SHIFT", action = wezterm.action({ CopyTo = "Clipboard" }) },
+  { key = "c", mods = "CTRL|SHIFT", action = wezterm.action({ CopyTo = "Clipboard" }) },
 	{ key = "v", mods = "CTRL|SHIFT", action = wezterm.action({ PasteFrom = "Clipboard" }) },
-	{ key = "Insert", mods = "SHIFT", action = wezterm.action({ PasteFrom = "PrimarySelection" }) },
-	{ key = "=", mods = "CTRL", action = "ResetFontSize" },
+  { key = "=", mods = "CTRL", action = "ResetFontSize" },
 	{ key = "+", mods = "CTRL", action = "IncreaseFontSize" },
 	{ key = "-", mods = "CTRL", action = "DecreaseFontSize" },
 	{ key = " ", mods = "CTRL|SHIFT", action = "QuickSelect" },
-	{ key = "x", mods = "CTRL|SHIFT", action = "ActivateCopyMode" },
-	{ key = "PageUp", mods = "ALT", action = wezterm.action({ ScrollByPage = -1 }) },
-	{ key = "PageDown", mods = "ALT", action = wezterm.action({ ScrollByPage = 1 }) },
 	{ key = "r", mods = "ALT", action = "ReloadConfiguration" },
-	{ key = "r", mods = "ALT|SHIFT", action = wezterm.action({ EmitEvent = "toggle-tmux-keybinds" }) },
 	{ key = "e", mods = "ALT", action = wezterm.action({ EmitEvent = "trigger-emacs-with-scrollback" }) },
 	{ key = "s", mods = "CTRL|SHIFT", action = wezterm.action({ Search = { CaseSensitiveString = "" } }) },
 }
 
 local function create_keybinds()
-	return utils.merge_lists(default_keybinds, tmux_keybinds)
+   return my_keybinds
 end
 #+end_src
 
@@ -198,17 +181,6 @@ wezterm.on("update-right-status", function(window, pane)
               }))
 end)
 
-wezterm.on("toggle-tmux-keybinds", function(window, pane)
-              local overrides = window:get_config_overrides() or {}
-              if not overrides.window_background_opacity then
-                 overrides.window_background_opacity = 0.95
-                 overrides.keys = default_keybinds
-              else
-                 overrides.window_background_opacity = nil
-                 overrides.keys = utils.merge_lists(default_keybinds, tmux_keybinds)
-              end
-              window:set_config_overrides(overrides)
-end)
 
 local io = require("io")
 local os = require("os")
@@ -238,7 +210,8 @@ end)
 ---------------------------------------------------------------
 --- Config
 ---------------------------------------------------------------
-local config = {   
+local config = {
+   leader = { key="q", mods="CTRL", timeout_milliseconds=1000 },
    keys = create_keybinds(),
 }
 
