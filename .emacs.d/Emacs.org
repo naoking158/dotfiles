@@ -3497,7 +3497,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
      org-log-state-notes-insert-after-drawers nil
      org-tag-alist '(("@errand" . ?e)
                      ("@private" . ?p)
-                     ("@work" . ?p)
+                     ("@work" . ?w)
                      (:newline)
                      ("CANCELLED" . ?c))
      org-fast-tag-selection-single-key nil
