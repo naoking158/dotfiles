@@ -63,3 +63,9 @@ if [[ $SYSTEM == "macos" ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 export PATH="/usr/local/bin:$HOME/.local/bin:$PATH"
+
+if type emacs >/dev/null 2>&1; then
+    export EDITOR="emacsclient -nw --alternate-editor='emacs -Q -nw'"
+else
+    export EDITOR=vi
+fi
