@@ -5598,9 +5598,15 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+begin_src emacs-lisp
 (leaf vertico-posframe
   :ensure t
-  :hook ((vertico-mode-hook . (lambda ()
-                                (vertico-posframe-mode)
-                                (vertico-multiform-mode))))
+  :when (display-graphic-p)
+  :hook
+  ((vertico-mode-hook . (lambda ()
+                          (vertico-posframe-mode)
+                          (vertico-multiform-mode)))
+   (before-make-frame-hook . (lambda ()
+                               (when (not (display-graphic-p))
+                                 (vertico-posframe-mode -1)
+                                 (vertico-multiform-mode -1)))))
   :custom
   `((vertico-posframe-poshandler . 'posframe-poshandler-frame-bottom-center)
     (vertico-posframe-width . 155)
@@ -5617,8 +5623,7 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
                                     (execute-extended-command posframe)
                                     (helpful-function posframe)
                                     (helpful-symbol posframe)
-                                    (helpful-variable posframe)))
-    )
+                                    (helpful-variable posframe))))
  )
 #+end_src
 

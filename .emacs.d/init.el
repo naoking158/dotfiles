@@ -3916,9 +3916,15 @@ Interactively, URL defaults to the string looking like a url around point."
 
 (leaf vertico-posframe
   :ensure t
-  :hook ((vertico-mode-hook . (lambda ()
-                                (vertico-posframe-mode)
-                                (vertico-multiform-mode))))
+  :when (display-graphic-p)
+  :hook
+  ((vertico-mode-hook . (lambda ()
+                          (vertico-posframe-mode)
+                          (vertico-multiform-mode)))
+   (before-make-frame-hook . (lambda ()
+                               (when (not (display-graphic-p))
+                                 (vertico-posframe-mode -1)
+                                 (vertico-multiform-mode -1)))))
   :custom
   `((vertico-posframe-poshandler . 'posframe-poshandler-frame-bottom-center)
     (vertico-posframe-width . 155)
@@ -3935,8 +3941,7 @@ Interactively, URL defaults to the string looking like a url around point."
                                     (execute-extended-command posframe)
                                     (helpful-function posframe)
                                     (helpful-symbol posframe)
-                                    (helpful-variable posframe)))
-    )
+                                    (helpful-variable posframe))))
  )
 
 (provide 'init)
