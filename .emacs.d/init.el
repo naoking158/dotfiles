@@ -1061,6 +1061,8 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :custom `((py-keep-windows-configuration . t)
             (python-indent-guess-indent-offset . t)
             (python-indent-guess-indent-offset-verbose . nil)
+            (py-shell-name . ,(if (executable-find "python3") "python3"
+                                "python"))
             ;; (python-shell-virtualenv-root . ,(expand-file-name "envs/torch"
             ;;                                                    path-to-miniconda))
             )
@@ -1075,6 +1077,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :doc "Work with your conda environments"
   :req "emacs-24.4" "pythonic-0.1.0" "dash-2.13.0" "s-1.11.0" "f-0.18.2"
   :url "http://github.com/necaris/conda.el"
+  :when (length> path-to-miniconda 0)
   :ensure t
   :commands conda-env-activate
   :custom ((conda-anaconda-home . path-to-miniconda)
@@ -1087,6 +1090,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :doc "Python LSP client using Pyright"
   :req "emacs-26.1" "lsp-mode-7.0" "dash-2.18.0" "ht-2.0"
   :url "https://github.com/emacs-lsp/lsp-pyright"
+  :when (length> path-to-miniconda 0)
   :ensure t
   :custom
   `((lsp-pyright-venv-path . ,(expand-file-name "envs"
