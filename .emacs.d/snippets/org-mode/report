@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: report
+# key: report
+# --
+#+BEGIN: clocktable :scope file :maxlevel 5 :block today$0
+#+END
