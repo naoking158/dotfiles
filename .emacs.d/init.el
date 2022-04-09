@@ -1262,11 +1262,12 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :req "emacs-24.1"
   :url "https://github.com/DarthFennec/highlight-indent-guides"
   :ensure t
-  :hook prog-mode-hook yaml-mode
+  :hook prog-mode-hook
   :custom
   ((highlight-indent-guides-auto-enabled . t)
    (highlight-indent-guides-responsive . t)
-   (highlight-indent-guides-method . 'character)))
+   (highlight-indent-guides-method . 'character)
+   (highlight-indent-guides-suppress-auto-error . t)))
 
 (leaf *indent-region-custom
   :doc "This should be used in GUI Emacs to avoid inserting weired characters in CUI Emacs."
