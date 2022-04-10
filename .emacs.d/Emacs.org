@@ -4499,41 +4499,9 @@ From the search buffer there are a number of ways to interact with entries. Entr
 *** General Settings
 
 #+begin_src emacs-lisp
-(setq user-full-name "Naoki Sakamoto"
-      user-mail-address "naoki@bbo.cs.tsukuba.ac.jp"
-      mail-header-separator (purecopy "*****")
-      message-kill-buffer-on-exit t
-      message-wide-reply-confirm-recipients t
-      mail-specify-envelope-from t
-      message-sendmail-envelope-from 'header
-      mail-envelope-from 'header
-      mail-user-agent 'notmuch-user-agent
-      message-send-mail-function 'smtpmail-send-it
-      mm-default-directory "~/Maildir/attachment/"
-      )
-#+end_src
-
-*** Mail Composing with org-msg
-
-#+begin_src emacs-lisp
-
-(leaf org-msg
-  :ensure t org-contrib
-  :after notmuch
-  :config
-  (require 'ox-extra)
-  (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
-        ;; org-msg-startup "hidestars indent inlineimages"
-        org-msg-recipient-names '(("naoki@bbo.cs.tsukuba.ac.jp" . "Naoki Sakamoto")
-                                  ("nok.skmt.snow@gmail.com" . "Naoki Sakamoto")
-                                  ("s1930160@s.tsukuba.ac.jp". "Naoki Sakamoto"))
-        ;; org-msg-greeting-name-limit 3
-        org-msg-default-alternatives '((new		. (text html))
-                                       (reply-to-html	. (text html))
-                                       (reply-to-text	. (text)))
-        org-msg-convert-citation t)
-  (org-msg-mode))
-
+(leaf mail-general
+  :require t
+  :load-path "~/src/github.com/naoking158/envs/config-mail/")
 #+end_src
 
 ** Notmuch
@@ -4550,17 +4518,7 @@ Manual is [[https://notmuchmail.org/emacstips/][here]]
   ;; :ensure t
   :commands notmuch notmuch-hello
   :config
-;;; Account settings
-  (setq notmuch-fcc-dirs
-        '(
-          ;; ("naoki@bbo.cs.tsukuba.ac.jp" . "bbo/Sent")
-          ;; ("nok.skmt.snow@gmail.com" . "private/Sent")
-          ;; ("s1930160@s.tsukuba.ac.jp" . "univ/Sent")
-          ("naoki@bbo.cs.tsukuba.ac.jp" . "bbo/Sent -inbox -unread +sent +archived")
-          ("nok.skmt.snow@gmail.com" . "private/Sent -inbox -unread +sent +archived")
-          ("s1930160@s.tsukuba.ac.jp" . "univ/Sent -inbox -unread +sent +archived")
-          )
-        )
+  (load-file "~/src/github.com/naoking158/envs/config-mail/config-notmuch.el")
 
 ;;; General UI
   (setq notmuch-show-logo nil)
@@ -4589,36 +4547,6 @@ Manual is [[https://notmuchmail.org/emacstips/][here]]
         '(("unread" . notmuch-search-unread-face)
           ("flag" . notmuch-search-flagged-face)))
   (setq notmuch-show-empty-saved-searches t)
-  (setq notmuch-saved-searches
-        `(( :name "inbox"
-            :query "tag:inbox"
-            :sort-order newest-first
-            :key ,(kbd "i"))
-          ( :name "unread (inbox)"
-            :query "tag:unread and tag:inbox"
-            :sort-order newest-first
-            :key ,(kbd "u"))
-          ( :name "unread all"
-            :query "tag:unread not tag:archived"
-            :sort-order newest-first
-            :key ,(kbd "U"))
-          ( :name "Archived"
-            :query "tag:archived"
-            :sort-order newest-first
-            :key ,(kbd "a"))
-          ( :name "todo"
-            :query "tag:todo not tag:archived"
-            :sort-order newest-first
-            :key ,(kbd "t"))
-          ( :name "work"
-            :query "(to:naoki@bbo.cs.tsukuba.ac.jp or to:s1930160@s.tsukuba.ac.jp) not tag:archived"
-            :sort-order newest-first
-            :key ,(kbd "w"))
-          ( :name "private"
-            :query "(to:nok.skmt.snow@gmail.com) not tag:archived"
-            :sort-order newest-first
-            :key ,(kbd "p"))
-          ))
 
 ;;; Tags
   (setq notmuch-archive-tags '("-inbox" "+archived"))
@@ -4701,17 +4629,6 @@ Manual is [[https://notmuchmail.org/emacstips/][here]]
             (,(kbd "t") mark-todo-tags "To-do")
             (,(kbd "r") ("-unread") "Mark as read")
             (,(kbd "u") ("+unread") "Mark as unread")))
-
-    ;; (add-to-list 'notmuch-tag-formats
-    ;;              '("encrypted" (propertize tag 'face 'prot-notmuch-encrypted-tag)))
-    ;; (add-to-list 'notmuch-tag-formats
-    ;;              '("sent" (propertize tag 'face 'prot-notmuch-sent-tag)))
-    ;; (add-to-list 'notmuch-tag-formats
-    ;;              '("ref" (propertize tag 'face 'prot-notmuch-ref-tag)))
-    ;; (add-to-list 'notmuch-tag-formats
-    ;;              '("todo" (propertize tag 'face 'prot-notmuch-todo-tag)))
-    ;; (add-to-list 'notmuch-tag-formats
-    ;;              '("spam" (propertize tag 'face 'prot-notmuch-spam-tag)))
     )
   )
 #+end_src
@@ -4734,15 +4651,7 @@ Manual is [[https://notmuchmail.org/emacstips/][here]]
                             ("=" . notmuch-hello-mode-transient))
    (:notmuch-show-mode-map :package notmuch
                            ("=" . nil)
-                           ("=" . notmuch-show-mode-transient)))
-  
-  ;; :advice
-  ;; (:after notmuch-show-mode (lambda nil (setq notmuch-transient-prefix (kbd "="))))
-  ;; (:after notmuch-tree-mode (lambda nil (setq notmuch-transient-prefix (kbd "="))))
-  ;; (:after notmuch-hello-mode (lambda nil (setq notmuch-transient-prefix (kbd "="))))
-  ;; (:after notmuch-search-mode (lambda nil (setq notmuch-transient-prefix (kbd "="))))
-  ;; (:after notmuch-message-mode (lambda nil (setq notmuch-transient-prefix (kbd "="))))
-  )
+                           ("=" . notmuch-show-mode-transient))))
 #+end_src
 
 *** ol-notmuch
@@ -4771,275 +4680,13 @@ mu index
 #+end_src
 
 **** Config
-:PROPERTIES:
-:ID:       ED299631-3A91-47B2-B004-9B8DBA051218
-:END:
+
 #+begin_src emacs-lisp
-;; (let* ((file-dir (cond
-;;                   ((when (file-exists-p "/usr/share/emacs/")
-;;                      "/usr/share/emacs/"))
-;;                   ((when (file-exists-p "/opt/homebrew/Cellar/mu/")
-;;                      "/opt/homebrew/Cellar/mu/"))
-;;                   ((when (file-exists-p "/usr/local/Cellar/mu/")
-;;                      "/usr/local/Cellar/mu/")))))
-;;   (setq path-to-mu
-;;         (car (last (split-string
-;;                     (shell-command-to-string
-;;                      (concat "find " file-dir " -type d -name mu4e")))))))
-
-
-(leaf mu4e
+(leaf *config-mu4e
   :disabled t
-  ;; :when (and window-system path-to-mu)
-  ;; :load-path path-to-mu
-  :commands (mu4e)
-  :hook (mu4e-headers-mode-hook . (lambda nil (visual-line-mode -1)))
   :config
-  (set-variable 'read-mail-command 'mu4e)
-  (setq mail-user-agent 'mu4e-user-agent
-        message-send-mail-function 'smtpmail-send-it
-
-        ;; Make sure plain text mails flow correctly for recipients
-        mu4e-compose-format-flowed t
-
-        ;; This is set to 't' to avoid mail syncing issues when using mbsync
-        mu4e-change-filenames-when-moving t
-
-        ;; Refresh mail using isync every 10 minutes
-        mu4e-update-interval (* 10 60)
-        mu4e-get-mail-command "mbsync -a"
-        mu4e-maildir "~/Mail"
-        mu4e-attachment-dir "~/Mail/Downloads"
-        mu4e-completing-read-function 'completing-read
-        mu4e-headers-precise-alignment t
-        mu4e-use-fancy-chars t)
-
-  (setq mu4e-contexts
-        (list
-         ;; Work account
-         (make-mu4e-context
-          :name "Work"
-          :match-func
-          (lambda (msg)
-            (when msg
-              (string-prefix-p "/BBO" (mu4e-message-field msg :maildir))))
-          :vars '((user-mail-address			. "naoki@bbo.cs.tsukuba.ac.jp")
-                  (user-full-name					. "Naoki Sakamoto")
-                  (smtpmail-smtp-server		. "smtp.gmail.com")
-                  (smtpmail-smtp-service	. 465)
-                  (smtpmail-stream-type		. ssl)
-                  (mu4e-drafts-folder			. "/BBO/[Gmail]/Drafts")
-                  (mu4e-sent-folder				. "/BBO/[Gmail]/Sent Mail")
-                  (mu4e-refile-folder			. "/BBO/[Gmail]/All Mail")
-                  (mu4e-trash-folder			. "/BBO/[Gmail]/Trash")))
-
-         ;; Private account
-         (make-mu4e-context
-          :name "Private"
-          :match-func
-          (lambda (msg)
-            (when msg
-              (string-prefix-p "/Private" (mu4e-message-field msg :maildir))))
-          :vars '((user-mail-address			. "nok.skmt.snow@gmail.com")
-                  (user-full-name					. "Naoki Sakamoto")
-                  (smtpmail-smtp-server		. "smtp.gmail.com")
-                  (smtpmail-smtp-service	. 465)
-                  (smtpmail-stream-type		. ssl)
-                  (mu4e-drafts-folder			. "/Private/[Gmail]/Drafts")
-                  (mu4e-sent-folder				. "/Private/[Gmail]/Sent Mail")
-                  (mu4e-refile-folder			. "/Private/[Gmail]/All Mail")
-                  (mu4e-trash-folder			. "/Private/[Gmail]/Trash")))
-
-         ;; University account
-         (make-mu4e-context
-          :name "University"
-          :match-func
-          (lambda (msg)
-            (when msg
-              (string-prefix-p "/University" (mu4e-message-field msg :maildir))))
-          :vars '((user-mail-address			. "s1930160@s.tsukuba.ac.jp")
-                  (user-full-name					. "s1930160@s.tsukuba.ac.jp")
-                  (smtpmail-smtp-server		. "smtp.office365.com")
-                  (smtpmail-smtp-service	. 587)
-                  (smtpmail-stream-type		. starttls)
-                  (mu4e-drafts-folder			. "/University/Drafts")
-                  (mu4e-sent-folder				. "/University/Sent Items")
-                  (mu4e-refile-folder			. "/University/Archive")
-                  (mu4e-trash-folder			. "/University/Deleted Items")
-                  ))))
-
-  (setq mu4e-maildir-shortcuts
-        '((:maildir "/BBO/[Gmail]/All Mail"		:key ?a)
-          (:maildir "/BBO/Inbox"							:key ?i)
-          (:maildir "/BBO/[Gmail]/Drafts"			:key ?d)
-          (:maildir "/BBO/[Gmail]/Sent Mail"	:key ?s)
-          (:maildir "/BBO/[Gmail]/Trash"			:key ?t)
-          (:maildir "/Private/Inbox"					:key ?p)
-          ))
-
-  (setq mu4e-bookmarks
-        '((:name "All Inbox"
-                 :query "(maildir:/BBO/Inbox OR maildir:/Private/Inbox OR maildir:/University/Inbox) AND NOT flag:trashed"
-                 :key ?i)
-          (:name  "Unread messages"
-                  :query "flag:unread AND NOT flag:trashed"
-                  :key ?u)
-          (:name "Today's messages"
-                 :query "date:today..now"
-                 :key ?t)
-          (:name "Last 7 days"
-                 :query "date:7d..now"
-                 :hide-unread t
-                 :key ?w)
-          (:name "Flagged massages"
-                 :query "flag:flagged AND NOT flag:trashed"
-                 :key ?f)
-          (:name "All massages"
-                 :query "NOT flag:trashed AND NOT flag:draft AND NOT flag:sent"
-                 :key ?a)))
-
-  (add-to-list 'mu4e-marks
-               '(tag
-                 :char       "g"
-                 :prompt     "gtag"
-                 :ask-target (lambda ()
-                               (completing-read "What tag do you want to add?:"
-                                                '("Pinned" "starred")))
-                 :action      (lambda (docid msg target)
-                                (mu4e-action-retag-message msg (concat "+" target)))))
-  (mu4e~headers-defun-mark-for tag)
-
-  (add-to-list 'org-capture-templates
-               `("o" "respond to email" entry 
-                 (file ,(concat jethro/org-agenda-directory "inbox.org"))
-                 "* TODO %^{Description}\n%A\n%?\n"))
-
-    :advice
-  ;; disable fancy characters only for flags
-  (:around mu4e~headers-flags-str (lambda (f &rest args)
-                                    (let* ((mu4e-use-fancy-chars nil))
-                                      (apply f args))))
-
-  :preface
-  (defun my/org-capture-mu4e ()
-    (interactive)
-    "Capture a TODO item via email."
-    (org-capture nil "o"))
-
-  :bind
-  ((mu4e-main-mode-map
-    ("q" . quit-window)
-    ("Q" . mu4e-quit))
-   (mu4e-headers-mode-map
-    ("{" . mu4e-headers-query-prev)      ; differs from built-in
-    ("}" . mu4e-headers-query-next)      ; differs from built-in
-    ("o" . my/org-capture-mu4e)          ; differs from built-in
-
-    ("A" . mu4e-headers-mark-for-action) ; differs from built-in
-
-    ("`" . mu4e-update-mail-and-index)   ; differs from built-in
-    ("|" . mu4e-view-pipe)               ; does not seem to be built in any longer
-    ("." . hydra-mu4e-headers/body)))
-
-  :hydra
-  (hydra-mu4e-headers
-   (:color blue :hint nil)
-   "
- ^General^   | ^Search^           | _!_: read    | _#_: deferred  | ^Switches^
--^^----------+-^^-----------------| _?_: unread  | _%_: pattern   |-^^------------------
-_n_: next    | _s_: search        | _r_: refile  | _&_: custom    | _O_: sorting
-_p_: prev    | _S_: edit prev qry | _u_: unmk    | _+_: flag      | _P_: threading
-_]_: n unred | _/_: narrow search | _U_: unmk *  | _-_: unflag    | _Q_: full-search
-_[_: p unred | _b_: search bkmk   | _d_: trash   | _T_: thr       | _V_: skip dups 
-_y_: sw view | _B_: edit bkmk     | _D_: delete  | _t_: subthr    | _W_: include-related
-_R_: reply   | _{_: previous qry  | _m_: move    |-^^-------------+-^^------------------ 
-_C_: compose | _}_: next query    | _a_: action  | _|_: thru shl  | _`_: update, reindex
-_F_: forward | _C-+_: show more   | _A_: mk4actn | _H_: help      | _;_: context-switch
-_o_: org-cap | _C--_: show less   | _*_: *thing  | _q_: quit hdrs | _j_: jump2maildir "
-
-   ;; general
-   ("n" mu4e-headers-next)
-   ("p" mu4e-headers-previous)
-   ("[" mu4e-select-next-unread)
-   ("]" mu4e-select-previous-unread)
-   ("y" mu4e-select-other-view)
-   ("R" mu4e-compose-reply)
-   ("C" mu4e-compose-new)
-   ("F" mu4e-compose-forward)
-   ("o" my/org-capture-mu4e)                  ; differs from built-in
-
-   ;; search
-   ("s" mu4e-headers-search)
-   ("S" mu4e-headers-search-edit)
-   ("/" mu4e-headers-search-narrow)
-   ("b" mu4e-headers-search-bookmark)
-   ("B" mu4e-headers-search-bookmark-edit)
-   ("{" mu4e-headers-query-prev)              ; differs from built-in
-   ("}" mu4e-headers-query-next)              ; differs from built-in
-   ("C-+" mu4e-headers-split-view-grow)
-   ("C--" mu4e-headers-split-view-shrink)
-
-   ;; mark stuff 
-   ("!" mu4e-headers-mark-for-read)
-   ("?" mu4e-headers-mark-for-unread)
-   ("r" mu4e-headers-mark-for-refile)
-   ("u" mu4e-headers-mark-for-unmark)
-   ("U" mu4e-mark-unmark-all)
-   ("d" mu4e-headers-mark-for-trash)
-   ("D" mu4e-headers-mark-for-delete)
-   ("m" mu4e-headers-mark-for-move)
-   ("a" mu4e-headers-action)                  ; not really a mark per-se
-   ("A" mu4e-headers-mark-for-action)         ; differs from built-in
-   ("*" mu4e-headers-mark-for-something)
-
-   ("#" mu4e-mark-resolve-deferred-marks)
-   ("%" mu4e-headers-mark-pattern)
-   ("&" mu4e-headers-mark-custom)
-   ("+" mu4e-headers-mark-for-flag)
-   ("-" mu4e-headers-mark-for-unflag)
-   ("t" mu4e-headers-mark-subthread)
-   ("T" mu4e-headers-mark-thread)
-
-   ;; miscellany
-   ("q" mu4e~headers-quit-buffer)
-   ("H" mu4e-display-manual)
-   ("|" mu4e-view-pipe)                       ; does not seem built-in any longer
-
-   ;; switches
-   ("O" mu4e-headers-change-sorting)
-   ("P" mu4e-headers-toggle-threading)
-   ("Q" mu4e-headers-toggle-full-search)
-   ("V" mu4e-headers-toggle-skip-duplicates)
-   ("W" mu4e-headers-toggle-include-related)
-
-   ;; more miscellany
-   ("`" mu4e-update-mail-and-index)           ; differs from built-in
-   (";" mu4e-context-switch)  
-   ("j" mu4e~headers-jump-to-maildir)
-
-   ("." nil)))
-
-
-(leaf mu4e-views
-  :disabled t
-  :ensure t
-  :after mu4e
-  :bind (mu4e-headers-mode-map
-         :package mu4e
-         ("v" . mu4e-views-mu4e-select-view-msg-method) ;; select viewing method
-         ("M-n" . mu4e-views-cursor-msg-view-window-down) ;; from headers window scroll the email view
-         ("M-p" . mu4e-views-cursor-msg-view-window-up) ;; from headers window scroll the email view
-         )
-  :config
-  (setq mu4e-views-default-view-method "dispatcher") ;; make xwidgets default
-  (mu4e-views-mu4e-use-view-msg-method "text") ;; select the default
-  (setq mu4e-views-next-previous-message-behaviour 'stick-to-current-window) ;; when pressing n and p stay in the current window
-  (setq mu4e-views-auto-view-selected-message t)  ;; automatically open messages when moving in the headers view
-  (setq mu4e-views-dispatcher-predicate-view-map
-        `((,(lambda (msg) (mu4e-message-field msg :body-html)) . "html")
-          (,(lambda (msg) (ignore msg) t) . "text"))))
+  (load-file "~/src/github.com/naoking158/envs/config-mail/config-mu4e.el"))
 #+end_src
-
 
 
 * Server Mode
