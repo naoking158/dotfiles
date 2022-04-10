@@ -3945,4 +3945,6 @@ Interactively, URL defaults to the string looking like a url around point."
   """
   :ensure t)
 
+(leaf csv-mode :ensure t)
+
 (provide 'init)

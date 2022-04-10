@@ -116,6 +116,7 @@ a bunch of resources I've found online.
   - [[#org-modern][Org-modern]]
   - [[#vertico-posframe][Vertico-posframe]]
   - [[#know-your-http-well][Know Your HTTP Well]]
+  - [[#csv-mode][CSV-mode]]
 - [[#footer][Footer]]
 :END:
 
@@ -5638,7 +5639,12 @@ HTTP encodings, headers, media types, methods, relations and status codes, all s
 
   #+end_src
 
+** CSV-mode
 
+#+begin_src emacs-lisp
+
+(leaf csv-mode :ensure t)
+#+end_src
 
 * Footer
 :PROPERTIES:
