@@ -2937,7 +2937,6 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   (kind-icon-default-face . 'corfu-default)
   :defer-config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
-
 #+end_src
 
 #+RESULTS:
