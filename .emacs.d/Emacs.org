@@ -1178,13 +1178,12 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :after consult
   :leaf-defer nil
   :load-path "~/.emacs.d/elisp/meow-config/"
-  ;; :preface (if (file-exists-p "~/.emacs.d/elisp/meow/")
-  ;;              (leaf meow :load-path "~/.emacs.d/elisp/meow/")
-  ;;            (leaf meow :ensure t))
   :config
   (require 'meow-keybindings)
   (meow-setup)
   (meow-global-mode)
+  (setq meow-cursor-type-region-cursor '(bar . 3)
+        meow-cursor-type-insert '(bar . 3))
   :hook
   ((meow-insert-exit-hook . (lambda nil
                               (if skk-mode (skk-latin-mode-on))))
