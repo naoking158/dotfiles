@@ -3932,4 +3932,17 @@ Interactively, URL defaults to the string looking like a url around point."
                                     (helpful-variable posframe))))
  )
 
+(leaf know-your-http-well
+  :doc
+  """
+  HTTP encodings, headers, media types, methods, relations and status codes, all summarized and linking to their specification.
+
+  M-x http-header ;; content-type
+  M-x http-method ;; post | POST
+  M-x http-relation ;; describedby
+  M-x http-status-code ;; 500
+  M-x http-status-code ;; not_found | NOT_FOUND
+  """
+  :ensure t)
+
 (provide 'init)

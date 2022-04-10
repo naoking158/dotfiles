@@ -115,6 +115,7 @@ a bunch of resources I've found online.
   - [[#atomic-chrome][Atomic-Chrome]]
   - [[#org-modern][Org-modern]]
   - [[#vertico-posframe][Vertico-posframe]]
+  - [[#know-your-http-well][Know Your HTTP Well]]
 - [[#footer][Footer]]
 :END:
 
@@ -5614,6 +5615,30 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
                                     (helpful-variable posframe))))
  )
 #+end_src
+
+** Know Your HTTP Well
+
+https://github.com/for-GET/know-your-http-well
+
+HTTP encodings, headers, media types, methods, relations and status codes, all summarized and linking to their specification.
+
+#+begin_src emacs-lisp
+(leaf know-your-http-well
+  :doc
+  """
+  HTTP encodings, headers, media types, methods, relations and status codes, all summarized and linking to their specification.
+
+  M-x http-header ;; content-type
+  M-x http-method ;; post | POST
+  M-x http-relation ;; describedby
+  M-x http-status-code ;; 500
+  M-x http-status-code ;; not_found | NOT_FOUND
+  """
+  :ensure t)
+
+  #+end_src
+
+
 
 * Footer
 :PROPERTIES:
