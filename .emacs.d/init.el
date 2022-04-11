@@ -381,6 +381,17 @@
   :ensure t
   :commands command-log-mode)
 
+(setq my/presentation nil)
+(defun my/toggle-presentation (fontsize)
+  (interactive (list
+                (read-number "Fontsize: " (if my/presentation 16 35))))
+  (my/toggle-modeline)
+  (tab-bar-mode 'toggle)
+  (my/set-font-size fontsize)
+  (if my/presentation
+      (setq my/presentation nil)
+    (setq my/presentation t)))
+
 (defun my/bibtex-indent-in-buffer nil
   "Align indent and equal symbol"
   (interactive)

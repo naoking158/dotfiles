@@ -28,6 +28,7 @@ a bunch of resources I've found online.
   - [[#trim-newline-from-string][Trim newline from string]]
   - [[#sort-sexpresions][Sort Sexpresions]]
   - [[#command-log-mode][Command Log Mode]]
+  - [[#presentation][Presentation]]
   - [[#bibtex-indent][Bibtex Indent]]
 - [[#basic-ui-configuration][Basic UI Configuration]]
   - [[#user-interface][User Interface]]
@@ -720,6 +721,21 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
   :ensure t
   :commands command-log-mode)
 
+#+end_src
+
+** Presentation
+
+#+begin_src emacs-lisp
+(setq my/presentation nil)
+(defun my/toggle-presentation (fontsize)
+  (interactive (list
+                (read-number "Fontsize: " (if my/presentation 16 35))))
+  (my/toggle-modeline)
+  (tab-bar-mode 'toggle)
+  (my/set-font-size fontsize)
+  (if my/presentation
+      (setq my/presentation nil)
+    (setq my/presentation t)))
 #+end_src
 
 ** Bibtex Indent
