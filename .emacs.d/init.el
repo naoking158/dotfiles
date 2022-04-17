@@ -318,9 +318,9 @@
 ;; native-compile all Elisp files under a directory
 (native-compile-async (file-truename "~/.emacs.d/elisp/") 'recursively)
 
-(defun my/toggle-modeline ()
+(defun my/toggle-modeline (&optional arg)
   (interactive)
-  (if (null mode-line-format)
+  (if (or (null mode-line-format) arg)
       (kill-local-variable 'mode-line-format)
     (setq-local mode-line-format nil)
     (force-mode-line-update)))
@@ -381,16 +381,14 @@
   :ensure t
   :commands command-log-mode)
 
-(setq my/presentation nil)
 (defun my/toggle-presentation (fontsize)
   (interactive (list
-                (read-number "Fontsize: " (if my/presentation 16 35))))
-  (my/toggle-modeline)
-  (tab-bar-mode 'toggle)
-  (my/set-font-size fontsize)
-  (if my/presentation
-      (setq my/presentation nil)
-    (setq my/presentation t)))
+                (read-number "Fontsize: " (if (null mode-line-format) 16 35))))
+
+  (let ((my/presentation (null mode-line-format)))
+    (my/toggle-modeline my/presentation)
+    (tab-bar-mode (if my/presentation 1 'toggle))
+    (my/set-font-size fontsize)))
 
 (defun my/bibtex-indent-in-buffer nil
   "Align indent and equal symbol"
