@@ -3613,4 +3613,15 @@ Interactively, URL defaults to the string looking like a url around point."
 
 (leaf csv-mode :ensure t)
 
+(leaf markdown-preview-mode
+  :ensure t
+  :defer-config
+  (setq markdown-preview-stylesheets
+        (list "http://thomasf.github.io/solarized-css/solarized-light.min.css"))
+  
+  (dolist (elm (list
+                "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"))
+    (add-to-list 'markdown-preview-javascript elm))
+  )
+
 (provide 'init)

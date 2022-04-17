@@ -118,6 +118,7 @@ a bunch of resources I've found online.
   - [[#vertico-posframe][Vertico-posframe]]
   - [[#know-your-http-well][Know Your HTTP Well]]
   - [[#csv-mode][CSV-mode]]
+  - [[#markdown-preview-mode][Markdown-preview-mode]]
 - [[#footer][Footer]]
 :END:
 
@@ -5305,6 +5306,21 @@ HTTP encodings, headers, media types, methods, relations and status codes, all s
 #+begin_src emacs-lisp
 
 (leaf csv-mode :ensure t)
+#+end_src
+
+** Markdown-preview-mode
+
+#+begin_src emacs-lisp
+(leaf markdown-preview-mode
+  :ensure t
+  :defer-config
+  (setq markdown-preview-stylesheets
+        (list "http://thomasf.github.io/solarized-css/solarized-light.min.css"))
+  
+  (dolist (elm (list
+                "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"))
+    (add-to-list 'markdown-preview-javascript elm))
+  )
 #+end_src
 
 * Footer
