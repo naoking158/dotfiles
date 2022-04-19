@@ -1055,10 +1055,10 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
              (my/trim-newline-from-string
               (shell-command-to-string
                "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
-            (path-to-venv (expand-file-name "envs/torch" miniconda-path)))
+            (path-to-venv (expand-file-name "envs/venv" miniconda-path)))
   (setq path-to-miniconda miniconda-path)
-  ;; (setq path-to-venv-python (expand-file-name "bin/python" path-to-venv))
-  ;; (custom-set-variables '(org-babel-python-command path-to-venv-python))
+  (setq path-to-venv-python (expand-file-name "bin/python" path-to-venv))
+  (custom-set-variables '(org-babel-python-command path-to-venv-python))
   )
 
 (leaf python-mode
@@ -1069,10 +1069,10 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :custom `((py-keep-windows-configuration . t)
             (python-indent-guess-indent-offset . t)
             (python-indent-guess-indent-offset-verbose . nil)
-            (py-shell-name . ,(if (executable-find "python3") "python3"
+            (py-python-command . ,(if (executable-find "python3") "python3"
                                 "python"))
-            ;; (python-shell-virtualenv-root . ,(expand-file-name "envs/torch"
-            ;;                                                    path-to-miniconda))
+            (python-shell-virtualenv-root . ,(expand-file-name "envs/venv"
+                                                               path-to-miniconda))
             )
   :hook (python-mode-hook . my/python-basic-config)
   :preface
