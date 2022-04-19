@@ -146,7 +146,7 @@ bindkey '^R' peco-history-selection
 
 # cdr with peco
 function peco-cdr () {
-    local selected_dir="$(cdr -l | sed 's/^[0-9]\+ \+//' | peco --prompt="cdr >" --query "$LBUFFER")"
+    local selected_dir="$(cdr -l | perl -pe 's/^[0-9]+ +//' | peco --prompt="cdr >" --query "$LBUFFER")"
     if [ -n "$selected_dir" ]; then
 	    BUFFER="cd ${selected_dir}"
         CURSOR=$#BUFFER
@@ -219,14 +219,14 @@ fi
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$(\"$MINICONDA/bin/conda\" 'shell.bash' 'hook' 2> /dev/null)"
+__conda_setup="$('/Users/sakamoto/miniconda/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "$MINICONDA/etc/profile.d/conda.sh" ]; then
-        . "$MINICONDA/etc/profile.d/conda.sh"
+    if [ -f "/Users/sakamoto/miniconda/etc/profile.d/conda.sh" ]; then
+        . "/Users/sakamoto/miniconda/etc/profile.d/conda.sh"
     else
-        export PATH="$MINICONDA/bin:$PATH"
+        export PATH="/Users/sakamoto/miniconda/bin:$PATH"
     fi
 fi
 unset __conda_setup
