@@ -190,6 +190,10 @@ function hostname_of() {
     ssh -G $1 | awk '/^hostname / { print $2 }'
 }
 
+function username_of() {
+    ssh -G $1 | awk '/^user / { print $2 }'
+}
+
 function port_of() {
     ssh -G $1 | awk '/^port / { print $2 }'
 }
@@ -200,10 +204,11 @@ function sshtunnel() {
         exit 1
     else
         local host=$(hostname_of $1)
+        local user=$(username_of $1)
         local port=$2
         local hostport=$3
 
-        ssh -M -S mdlssh-socket -fNL ${hostport}:${host}:${port} ${MDL} -l ${USER}
+        ssh -M -S mdlssh-socket -fNL ${hostport}:${host}:${port} ${MDL} -l ${user}
         echo "Tunnel from localhost:$hostport to $host:$port has been created."
         echo "Be sure to kill the tunnel after you finish your job, by sshexit $hostport"
     fi
@@ -249,19 +254,21 @@ function mdlrsyncto() {
 
 function rsyncfrom() {
     local host=$(hostname_of $1)
+    local user=$(username_of $1)
     local port=$(port_of $1)
     local remotepath=$(echo $2 | awk -v home="$HOME" '{ sub(home, "\~"); print }')
     local localpath=$3
-    rsync $IsDryRun -avz --copy-unsafe-links -e "ssh -p $port" ${USER}@${host}:${remotepath} $localpath --include='*/' "$include" "$exclude"
+    rsync $IsDryRun -avz --copy-unsafe-links -e "ssh -p $port" ${user}@${host}:${remotepath} $localpath --include='*/' "$include" "$exclude"
 }
 
 function rsyncto() {
     local host=$(hostname_of $1)
+    local user=$(username_of $1)
     local port=$(port_of $1)
     shift
     local localpath=${@:0:$#}
     local remotepath=$(echo ${@:$#} | awk -v home="$HOME" '{ sub(home, "\~"); print }')
-    rsync $IsDryRun -avz --copy-unsafe-links -e "ssh -p $port" $localpath ${USER}@${host}:${remotepath} --include='*/' "$include" "$exclude"
+    rsync $IsDryRun -avz --copy-unsafe-links -e "ssh -p $port" $localpath ${user}@${host}:${remotepath} --include='*/' "$include" "$exclude"
 }
 
 # main
