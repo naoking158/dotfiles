@@ -1495,8 +1495,7 @@ respectively."
   :hook
   ((text-mode-hook occur-edit-mode-hook) . (lambda nil
                                              (skk-mode)
-                                             (skk-latin-mode-on)
-                                             (context-skk-mode)))
+                                             (skk-latin-mode-on)))
   :custom ((default-input-method . "japanese-skk")
            (skk-jisyo-code . 'utf-8)
            (skk-large-jisyo . nil)
