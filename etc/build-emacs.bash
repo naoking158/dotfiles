@@ -133,13 +133,22 @@ done
 
 declare -r  ORIGIN=$(pwd)
 declare -ri NPROC="${NPROC:=1}"
-declare -ri VERSION="${VERSION:=28}"
+if [[ "${VERSION:-}" ]]; then
+    if [[ $VERSION == "29" ]]; then
+        VERSION="master"
+    else
+        VERSION="emacs-${VERSION}"
+    fi
+else
+    VERSION="emacs-28"
+fi
+declare -r VERSION=$VERSION
 declare -r  WORK_DIR="${WORK_DIR:=${HOME}/src/emacs}"
 declare -r  TARBALL_DIR="${WORK_DIR}/tarballs"
-declare -r  TARBALL_NAME="emacs-${VERSION}.tgz"
+declare -r  TARBALL_NAME="${VERSION}.tgz"
 declare -r  TARBALL_FILE="${TARBALL_DIR}/${TARBALL_NAME}"
-declare -r  TARBALL_URL="https://github.com/emacs-mirror/emacs/tarball/emacs-${VERSION}"
-declare -r  TARBALL_EXTRACED_DIR="${WORK_DIR}/sources/emacs-${VERSION}"
+declare -r  TARBALL_URL="https://github.com/emacs-mirror/emacs/tarball/${VERSION}"
+declare -r  TARBALL_EXTRACED_DIR="${WORK_DIR}/sources/${VERSION}"
 declare -r  PREFIX="${PREFIX:=${HOME}/.local}"
 
 if is_macos; then
@@ -191,12 +200,11 @@ function apply_patches() {
 function download_tarball() {
     [[ -d "$TARBALL_DIR" ]] || mkdir -p "$TARBALL_DIR"
 
-    e_newline
-    e_arrow "Downloading emacs taball..."
-
     if [[ -d "$TARBALL_FILE" ]]; then
 	      echo "${TARBALL_NAME} already exists locally, attempting to use."
     else
+        e_newline
+        e_arrow "Downloading emacs taball from ${TARBALL_URL}..."
 	      curl -L $TARBALL_URL -o $TARBALL_FILE &&
 	      e_done "Downloaded emacs tarball." &&
 	      return 0 || exit 1
@@ -205,11 +213,10 @@ function download_tarball() {
 
 function extract_tarball() {
     [[ -d "$TARBALL_EXTRACED_DIR" ]] || mkdir -p "$TARBALL_EXTRACED_DIR"
-
-    e_newline
-    e_arrow "Extracting tarball..."
     
     if [[ -f "$TARBALL_FILE" ]]; then
+        e_newline
+        e_arrow "Extracting tarball '${TARBALL_FILE}'..."
 	      tar -xzf $TARBALL_FILE -C $TARBALL_EXTRACED_DIR &&
 	      e_done "Extracted tarball." &&
 	      return 0 || {
