@@ -1824,6 +1824,9 @@ respectively."
     (tramp-set-completion-function "ssh"
                                    '((tramp-parse-sconfig "~/.ssh/config")))))
 
+(leaf consult-ls-git
+  :ensure t)
+
 (if (not (executable-find "cmigemo"))
     (leaf orderless
       :ensure t

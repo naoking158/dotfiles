@@ -2682,6 +2682,12 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 
 #+end_src
 
+*** consult-ls-git
+
+#+begin_src emacs-lisp
+(leaf consult-ls-git
+  :ensure t)
+#+end_src
 
 ** Improved Candidate Filtering with Orderless
 :PROPERTIES:
