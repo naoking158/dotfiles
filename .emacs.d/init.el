@@ -892,7 +892,13 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
            (magit-clone-default-directory . "~/src/github.com/")
            (magit-remote-add-set-remote\.pushDefault quote ask)
            (magit-log-margin-show-committer-date . t)
-           (magit-log-margin . '(t "%m/%d/%Y %H:%M " magit-log-margin-width t 12))))
+           (magit-log-margin . '(t "%m/%d/%Y %H:%M " magit-log-margin-width t 12)))
+  :config
+  (leaf emoji-cheat-sheet-plus
+    :ensure t
+    :commands magit-status
+    :hook (magit-log-mode-hook . emoji-cheat-sheet-plus-display-mode))
+)
 
 (leaf git-gutter
   :doc "Port of Sublime Text plugin GitGutter"
