@@ -1964,7 +1964,7 @@ parses its input."
    (tab-first-completion . 'word))
   :hook (python-mode-hook . (lambda nil
                               (setq-local corfu-auto t
-                                          corfu-auto-delay 0.4)))
+                                          corfu-auto-delay 0.2)))
 
   ;; Optionally use TAB for cycling, default is `corfu-complete'.
   :bind (:corfu-map
