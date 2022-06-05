@@ -479,9 +479,9 @@
 
   (defun my/set-font (&optional fontsize)
     (interactive)
-    (let ((ascii-font "PlemolJP Console NF")
+    (let ((ascii-font "UDEV Gothic NF")
           (variable-font "Iosevka Aile")
-          (japanese-font "PlemolJP Console NF")
+          (japanese-font "UDEV Gothic NF")
           (emoji-font (if (eq 'darwin system-type)
                           "Apple Color Emoji"
                         "Noto Color Emoji")))
