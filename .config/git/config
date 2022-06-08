@@ -27,21 +27,6 @@
 [push]
 	default = "simple"
 
-[sendemail "bbo"]
-	envelopeSender = "auto"
-	from = "naoki@bbo.cs.tsukuba.ac.jp"
-	smtpServer = "msmtp"
-
-[sendemail "private"]
-	envelopeSender = "auto"
-	from = "nok.skmt.snow@gmail.com"
-	smtpServer = "msmtp"
-
-[sendemail "univ"]
-	envelopeSender = "auto"
-	from = "s1930160@s.tsukuba.ac.jp"
-	smtpServer = "msmtp"
-
 [user]
 	email = "naoki@bbo.cs.tsukuba.ac.jp"
 	name = "naoking158"
