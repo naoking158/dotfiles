@@ -1,6 +1,13 @@
 # Set global environment variables
 [[ -f "${HOME}/.profile" ]] && source "${HOME}/.profile"
 
+if type brew &>/dev/null
+then
+  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+
+  autoload -Uz compinit
+  compinit
+fi
 
 typeset -U path cdpath fpath manpath
 
