@@ -1954,7 +1954,7 @@ parses its input."
 
 (leaf corfu
   :ensure t
-  :global-minor-mode corfu-global-mode
+  :global-minor-mode global-corfu-mode
   :custom
   ((corfu-excluded-modes . '(shell-mode eshell-mode))
 
