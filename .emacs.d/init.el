@@ -55,57 +55,92 @@
 
 (prog1 'leaf-setup
   (eval-and-compile
-    (custom-set-variables
-     '(warning-suppress-types '((comp)))
-     '(package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                          ("nongnu" . "https://elpa.nongnu.org/nongnu/")
-                          ("melpa" . "https://melpa.org/packages/"))))
-    (package-initialize)
-    (unless (package-installed-p 'leaf)
-      (package-refresh-contents)
-      (package-install 'leaf))
+    ;; Setup straight
+    (defvar bootstrap-version)
+    (let ((bootstrap-file
+           (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+          (bootstrap-version 5))
+      (unless (file-exists-p bootstrap-file)
+        (with-current-buffer
+            (url-retrieve-synchronously
+             "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+             'silent 'inhibit-cookies)
+          (goto-char (point-max))
+          (eval-print-last-sexp)))
+      (load bootstrap-file nil 'nomessage))
 
+    ;; Install leaf and leaf-keywords
+    (straight-use-package 'leaf)
+    (straight-use-package 'leaf-keywords)
+    (straight-use-package 'leaf-convert)
+    (straight-use-package 'hydra)
+    (straight-use-package 'blackout)
+    
     (leaf leaf-keywords
-      :ensure t
+      :require t
       :config (leaf-keywords-init)
-      :init
-      (leaf leaf-convert :ensure t)
-      (leaf hydra :ensure t)
-      (leaf blackout :ensure t)
+      ;; :init
+      ;; (leaf leaf-convert :straight t)
+      ;; (leaf hydra :straight t)
+      ;; (leaf blackout :straight t)
 
-      (leaf key-chord
-        :ensure t
-        :hook (emacs-startup-hook . (lambda () (key-chord-mode 1)))
-        :custom ((key-chord-one-keys-delay . 0.02)
-                 (key-chord-two-keys-delay . 0.03))
-        :config
-        (key-chord-define-global "x0" '"\C-x0")
-        (key-chord-define-global "x1" '"\C-x1")
-        (key-chord-define-global "x2" '"\C-x2")
-        (key-chord-define-global "x3" '"\C-x3")
-        (key-chord-define-global "x5" '"\C-x52"))
-
-      ;; (leaf straight
+      ;; (leaf key-chord
+      ;;   :disabled t
+      ;;   :straight t
+      ;;   :hook (emacs-startup-hook . (lambda () (key-chord-mode 1)))
+      ;;   :custom ((key-chord-one-keys-delay . 0.02)
+      ;;            (key-chord-two-keys-delay . 0.03))
       ;;   :config
-      ;;   (defvar bootstrap-version)
-      ;;   (let ((bootstrap-file
-      ;;          (expand-file-name "straight/repos/straight.el/bootstrap.el" "~/.emacs.d/"))
-      ;;         (bootstrap-version 5))
-      ;;     (unless (file-exists-p bootstrap-file)
-      ;;       (with-current-buffer
-      ;;           (url-retrieve-synchronously
-      ;;            "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-      ;;            'silent 'inhibit-cookies)
-      ;;         (goto-char (point-max))
-      ;;         (eval-print-last-sexp)))
-      ;;     (load bootstrap-file nil 'nomessage)))
-      )))
+      ;;   (key-chord-define-global "x0" '"\C-x0")
+      ;;   (key-chord-define-global "x1" '"\C-x1")
+      ;;   (key-chord-define-global "x2" '"\C-x2")
+      ;;   (key-chord-define-global "x3" '"\C-x3")
+      ;;   (key-chord-define-global "x5" '"\C-x52"))
+      )
+    )
+  
+  ;; (eval-and-compile
+  ;;   (custom-set-variables
+  ;;    '(warning-suppress-types '((comp)))
+  ;;    '(package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+  ;;                         ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+  ;;                         ("melpa" . "https://melpa.org/packages/"))))
+  ;;   (package-initialize)
+  ;;   (unless (package-installed-p 'leaf)
+  ;;     (package-refresh-contents)
+  ;;     (package-install 'leaf))
+
+  ;;   (leaf leaf-keywords
+  ;;     :straight t
+  ;;     :config (leaf-keywords-init)
+  ;;     :init
+  ;;     (leaf leaf-convert :straight t)
+  ;;     (leaf hydra :straight t)
+  ;;     (leaf blackout :straight t)
+
+  ;;     (leaf key-chord
+  ;;       :straight t
+  ;;       :hook (emacs-startup-hook . (lambda () (key-chord-mode 1)))
+  ;;       :custom ((key-chord-one-keys-delay . 0.02)
+  ;;                (key-chord-two-keys-delay . 0.03))
+  ;;       :config
+  ;;       (key-chord-define-global "x0" '"\C-x0")
+  ;;       (key-chord-define-global "x1" '"\C-x1")
+  ;;       (key-chord-define-global "x2" '"\C-x2")
+  ;;       (key-chord-define-global "x3" '"\C-x3")
+  ;;       (key-chord-define-global "x5" '"\C-x52"))
+
+  ;;     (leaf straight
+  ;;       :config
+  ;;       )
+  ;;     ))
+  )
 
 (leaf *keep-clean
   :config
   ;; Use no-littering to automatically set common paths to the new user-emacs-directory
   (leaf no-littering
-    :ensure t
+    :straight t
     :leaf-defer nil
     :config
     ;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
@@ -207,7 +242,7 @@
     :doc "Get environment variables such as $PATH from the shell"
     :tag "environment" "unix"
     :url "https://github.com/purcell/exec-path-from-shell"
-    :ensure t
+    :straight t
     :leaf-defer nil
     :when window-system
     :custom
@@ -277,14 +312,12 @@
   :doc "Auto-save buffers, based on your activity."
   :req "emacs-24.4"
   :url "https://github.com/bbatsov/super-save"
-  :ensure t
-  :require t
-  :require ace-window
+  :straight t ace-window
+  :require t ace-window
   :blackout
   :custom ((super-save-auto-save-when-idle . t)
            (super-save-idle-duration . 7))
   :config
-  (require 'ace-window)
   ;; add integration with ace-window
   (add-to-list 'super-save-triggers 'ace-window)
   ;; save on find-file
@@ -293,7 +326,7 @@
 
 (leaf undo-tree
   :disabled t
-  :ensure t
+  :straight t
   :hook (emacs-startup-hook . global-undo-tree-mode)
   :bind (("C-/" . undo-tree-undo)
          ("C-?" . undo-tree-redo)
@@ -308,8 +341,7 @@
                                                    "undo"))))))
 
 (leaf vundo
-  :load-path "~/.emacs.d/elisp/vundo/"
-  :require t
+  :straight t
   :bind ("C-c u" . vundo))
 
 ;; Compilation deny package
@@ -378,7 +410,7 @@
                         (delete-region (point) (marker-position end)))))))))
 
 (leaf command-log-mode
-  :ensure t
+  :straight t
   :commands command-log-mode)
 
 (defun my/toggle-presentation (fontsize)
@@ -416,7 +448,7 @@
     :req "emacs-25.3" "page-break-lines-0.11"
     :tag "dashboard" "tools" "screen" "startup" "emacs>=25.3"
     :url "https://github.com/emacs-dashboard/emacs-dashboard"
-    :ensure t
+    :straight t
     :require dashboard-widgets
     :leaf-defer nil
     :init
@@ -533,7 +565,7 @@
     :req "emacs-25.1" "cl-lib-0.5"
     :tag "nova" "faces" "icons" "neotree" "theme" "one" "atom" "blue" "light" "dark" "emacs>=25.1"
     :url "https://github.com/hlissner/emacs-doom-theme"
-    :ensure t neotree all-the-icons
+    :straight t neotree all-the-icons
     :custom ((doom-themes-enable-italic . nil)
              (doom-themes-enable-bold . t))
     :config
@@ -546,7 +578,7 @@
       (doom-themes-treemacs-config)))
   
   (leaf modus-themes
-    :ensure t
+    :straight t
     :config
     (defun my/load-modus-theme (sym-theme)
       (setq modus-themes-bold-constructs t
@@ -578,14 +610,6 @@
       (pcase sym-theme
         ('modus-dark (modus-themes-load-vivendi))
         ('modus-light (modus-themes-load-operandi)))
-
-
-      (leaf *lin-face
-        :load-path "~/.emacs.d/elisp/lin/"
-        :config
-        (set-face-attribute 'lin-hl nil
-                            :background (modus-themes-color 'cyan-subtle-bg)))
-
       
       (defvar my-rainbow-region-colors
         (modus-themes-with-colors
@@ -628,7 +652,7 @@
       (setq tab-bar-tab-name-format-function #'my--tab-bar-format)
 
       (leaf *flycheck-set-face
-        :ensure flycheck-inline
+        :straight flycheck-inline
         :custom-face
         ((flycheck-inline-info . '((t (:inherit modus-themes-intense-cyan))))
          (flycheck-inline-warning . '((t (:inherit modus-themes-intense-yellow))))
@@ -636,22 +660,27 @@
       ))
 
   (leaf bespoke-themes
-    :load-path "~/.emacs.d/elisp/bespoke-themes/"
+    :straight (bespoke-themes
+               :type git
+               :host github
+               :repo "mclear-tools/bespoke-themes"
+               :branch "main")
     :require t bespoke-theme
-    :custom ((bespoke-set-mode-line-size . 1)  ;; Set initial theme variant
+    :custom (;; Set initial theme variant
              (bespoke-set-italic-comments . nil)
              (bespoke-set-italic-keywords . nil))
     :config
     (defun my/load-bespoke-theme (sym-theme)
       (funcall sym-theme)
-      (set-face-attribute 'org-block nil
-                          :inherit 'fixed-pitch
-                          :foreground nil
-                          :background bespoke-subtle)
-      (custom-theme-set-faces
-       `user
-       `(org-agenda-clocking ((t :foreground ,bespoke-salient)))
-       `(org-agenda-done ((t :foreground ,bespoke-faded :strike-through nil))))))
+       ;; (set-face-attribute 'org-block nil
+       ;;                    :inherit 'fixed-pitch
+       ;;                    :foreground nil
+       ;;                    :background bespoke-subtle)
+      ;; (custom-theme-set-faces
+      ;;  `user
+      ;;  `(org-agenda-clocking ((t :foreground ,bespoke-salient)))
+      ;;  `(org-agenda-done ((t :foreground ,bespoke-faded :strike-through nil))))
+      ))
 
     ;;; utils
   (setq my/theme-list '(doom-nord
@@ -701,7 +730,7 @@
   :preface
   (leaf moody
     :when window-system
-    :ensure t
+    :straight t
     :config
     (setq my--modeline-gui-rw-symbol "📖"
           my--modeline-tty-rw-symbol "RW"
@@ -744,13 +773,47 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
       (moody-replace-element 'mode-line-modified
                              '(:eval (my--modeline-status)))))
 
+  (leaf bespoke-modeline
+    :straight (bespoke-modeline
+               :type git
+               :host github
+               :repo "mclear-tools/bespoke-modeline")
+    ;; :custom (;; Set header line
+    ;;          (bespoke-modeline-position . 'top)
+    ;;          ;; Set mode-line height
+    ;;          (bespoke-modeline-size . 3)
+    ;;          ;; Show diff lines in mode-line
+    ;;          (bespoke-modeline-git-diff-mode-line . t)
+    ;;          ;; Set mode-line cleaner
+    ;;          (bespoke-modeline-cleaner . t)
+    ;;          ;; Use mode-line visual bell
+    ;;          (bespoke-modeline-visual-bell . t)
+    ;;          ;; Set vc symbol
+    ;;          (bespoke-modeline-vc-symbol . "G:"))
+    :config
+    (defun my/modeline-bespoke-modeline nil
+      (interactive)
+      ;; Set header line
+      (setq bespoke-modeline-position 'top)
+      ;; Set mode-line height
+      (setq bespoke-modeline-size 3)
+      ;; Show diff lines in mode-line
+      (setq bespoke-modeline-git-diff-mode-line t)
+      ;; Set mode-line cleaner
+      (setq bespoke-modeline-cleaner t)
+      ;; Use mode-line visual bell
+      (setq bespoke-modeline-visual-bell t)
+      ;; Set vc symbol
+      (setq  bespoke-modeline-vc-symbol "G:")
+      (bespoke-modeline-mode)))
+
   (leaf doom-modeline
     :when (not window-system)
     :doc "A minimal and modern mode-line"
     :req "emacs-25.1" "all-the-icons-2.2.0" "shrink-path-0.2.0" "dash-2.11.0"
     :tag "mode-line" "faces" "emacs>=25.1"
     :url "https://github.com/seagle0128/doom-modeline"
-    :ensure t
+    :straight t
     :custom ((doom-modeline-buffer-file-name-style . 'truncate-except-project)
              (doom-modeline-project-detection . 'auto)
              (doom-modeline-icon . t)
@@ -771,14 +834,14 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
       (doom-modeline-mode)))
 
   (leaf minions
-    :ensure t
+    :straight t
     :hook (emacs-startup-hook . minions-mode)
     :custom ((minions-mode-line-lighter . ";")
              (minions-prominent-modes . '(defining-kbd-macro ;; flymake-mode
                                                              )))))
 
 (leaf meow
-  :ensure t
+  :straight t
   :after consult
   :leaf-defer nil
   :load-path "~/.emacs.d/elisp/meow-config/"
@@ -806,7 +869,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :doc "Display available keybindings in popup"
   :req "emacs-24.4"
   :url "https://github.com/justbur/emacs-which-key"
-  :ensure t
+  :straight t
   :blackout t
   :custom ((which-key-idle-delay . 1)
            (which-key-replacement-alist quote
@@ -826,7 +889,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :doc "Transient commands"
   :req "emacs-25.1"
   :url "https://github.com/magit/transient"
-  :ensure t
+  :straight t
   :custom ((transient-detect-key-conflicts . t))
   :config
   (leaf transient-dwim
@@ -834,11 +897,11 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
     :req "emacs-26.1" "transient-0.1.0"
     :tag "conao3" "conao3-dev" "out-of-MELPA"
     :url "https://github.com/conao3/transient-dwim.el"
-    :ensure t
+    :straight t
     :bind ("M-=" . transient-dwim-dispatch)))
 
 ;; (leaf dired
-;;   :ensure dired-collapse
+;;   :straight dired-collapse
 ;;   :require dired-x
 ;;   :hook (dired-mode-hook . (lambda ()
 ;;                              (dired-collapse-mode 1)
@@ -854,7 +917,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 ;;            (dired-dwim-target . t)))
 
 (leaf dirvish
-  :ensure t
+  :straight t
   :custom
   ((dired-kill-when-opening-new-dired-buffer . t) ; added in emacs 28
    (dired-clean-confirm-killing-deleted-buffers . nil)
@@ -866,11 +929,11 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   )
 
 (leaf crux
-  :ensure t
+  :straight t
   :bind ("C-S-k" . crux-top-join-line))
 
 (leaf neotree
-  :ensure t all-the-icons
+  :straight t all-the-icons
   :require all-the-icons
   ;; :bind ("C-c c" . neotree-show)
   :custom ((neo-show-hidden-files . t)
@@ -883,7 +946,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :doc "A Git porcelain inside Emacs."
   :req "emacs-25.1" "async-20200113" "dash-20200524" "git-commit-20200516" "transient-20200601" "with-editor-20200522"
   :url "https://github.com/magit/magit"
-  :ensure t
+  :straight t
   :bind ("C-c m" . magit-status)
   :custom ((magit-bury-buffer-function quote magit-mode-quit-window)
            (magit-refresh-verbose . t)
@@ -895,7 +958,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
            (magit-log-margin . '(t "%m/%d/%Y %H:%M " magit-log-margin-width t 12)))
   :config
   (leaf emoji-cheat-sheet-plus
-    :ensure t
+    :straight t
     :commands magit-status
     :hook (magit-log-mode-hook . emoji-cheat-sheet-plus-display-mode))
 )
@@ -904,7 +967,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :doc "Port of Sublime Text plugin GitGutter"
   :req "emacs-24.3"
   :url "https://github.com/emacsorphanage/git-gutter"
-  :ensure t
+  :straight t
   :custom
   ((git-gutter:modified-sign . "~")
    (git-gutter:added-sign . "+")
@@ -916,7 +979,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 
 (leaf dap-mode
   :when window-system
-  :ensure t
+  :straight t
   ;; :after exec-path-from-shell
   :custom (;; (dap-python-debugger . 'debugpy)
            ;; (dap-python-executable . path-to-venv-python)
@@ -944,14 +1007,14 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :doc "Manage and navigate projects in Emacs easily"
   :req "emacs-25.1" "pkg-info-0.4"
   :url "https://github.com/bbatsov/projectile"
-  :ensure t
+  :straight t
   :custom (projectile-enable-caching . t)
   :global-minor-mode t)
 
 
 (leaf project
   :when (version<= "28" emacs-version)
-  :ensure t)
+  :straight t)
 
 (leaf lsp-mode
   :doc "LSP mode"
@@ -960,7 +1023,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :url "https://github.com/emacs-lsp/lsp-mode#supported-languages"
   :url "https://github.com/MaskRay/ccls/wiki/lsp-mode#find-definitionsreferences"
   :emacs>= 25.1
-  :ensure t
+  :straight t
   :after orderless cape
   :commands lsp lsp-deferred
   :hook ((lsp-mode-hook . lsp-enable-which-key-integration)
@@ -1004,7 +1067,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :doc "UI modules for lsp-mode"
   :req "emacs-25.1" "dash-2.14" "dash-functional-1.2.0" "lsp-mode-6.0" "markdown-mode-2.3"
   :url "https://github.com/emacs-lsp/lsp-ui"
-  :ensure t
+  :straight t
   :hook (lsp-mode-hook . lsp-ui-mode)
   :preface
   (defun ladicle/toggle-lsp-ui-doc ()
@@ -1040,10 +1103,10 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
            ;; lsp-ui-imenu
            (lsp-ui-imenu-enable . nil)))
 
-(leaf lsp-latex :ensure t)
+(leaf lsp-latex :straight t)
 
 (leaf helpful
-  :ensure t
+  :straight t
   :bind* (("C-c h f" . helpful-function)
           ("C-c h s" . helpful-symbol)
           ("C-c h v" . helpful-variable)
@@ -1051,11 +1114,11 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
           ("C-c h k" . helpful-key)))
 
 (leaf macrostep
-  :ensure t
+  :straight t
   :bind (("C-c e" . macrostep-expand)))
 
 (leaf lua-mode
-  :ensure t)
+  :straight t)
 
 (when-let* ((miniconda-path
              (my/trim-newline-from-string
@@ -1070,7 +1133,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 (leaf python-mode
   :doc "Python major mode"
   :url "https://gitlab.com/groups/python-mode-devs"
-  :ensure t
+  :straight t
   :mode "\\.py\\'"
   :custom `((py-keep-windows-configuration . t)
             (python-indent-guess-indent-offset . t)
@@ -1092,7 +1155,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :req "emacs-24.4" "pythonic-0.1.0" "dash-2.13.0" "s-1.11.0" "f-0.18.2"
   :url "http://github.com/necaris/conda.el"
   :when (length> path-to-miniconda 0)
-  :ensure t
+  :straight t
   :commands conda-env-activate
   :custom ((conda-anaconda-home . path-to-miniconda)
            (conda-env-home-directory . path-to-miniconda))
@@ -1105,7 +1168,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :req "emacs-26.1" "lsp-mode-7.0" "dash-2.18.0" "ht-2.0"
   :url "https://github.com/emacs-lsp/lsp-pyright"
   :when (length> path-to-miniconda 0)
-  :ensure t
+  :straight t
   :custom
   `((lsp-pyright-venv-path . ,(expand-file-name "envs"
                                                 path-to-miniconda)))
@@ -1120,10 +1183,10 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
       (require 'lsp-pyright)
       (lsp))))
 
-(leaf python-isort :ensure t)
+(leaf python-isort :straight t)
 
 (leaf web-mode
-  :ensure t
+  :straight t
   :custom ((web-mode-markup-indent-offset . 2)
            (web-mode-css-indent-offset . 2)
            (web-mode-code-indent-offset . 2))
@@ -1142,7 +1205,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
                     (setq js-indent-level 2))))
 
 (leaf json-mode
-  :ensure t
+  :straight t
   :custom
   ((json-mode-standard-file-ext . '(".json" ".jsonc" ".jsonld"))))
 
@@ -1155,17 +1218,12 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
          ("C-c C-n" . flymake-goto-next-error)
          ("C-c C-p" . flymake-goto-prev-error))
   :config
-  ;; (leaf flymake-proselint
-  ;;   :ensure t
-  ;;   :hook
-  ;;   ((markdown-mode-hook org-mode-hook text-mode-hook) . flymake-proselint-setup))
-
   (leaf flymake-diagnostic-at-point
     :doc "Display flymake diagnostics at point"
     :req "emacs-26.1" "popup-0.5.3"
     :tag "tools" "languages" "convenience" "emacs>=26.1"
     :url "https://github.com/meqif/flymake-diagnostic-at-point"
-    :ensure t
+    :straight t
     :after flymake
     :custom ((flymake-diagnostic-at-point-timer-delay . 0.8)
              (flymake-diagnostic-at-point-error-prefix . " ► ")
@@ -1175,16 +1233,14 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 
   
   (leaf flymake-posframe
-    :load-path "~/.emacs.d/elisp/flymake-posframe/"
+    :straight (flymake-posframe
+               :type git
+               :host github
+               :repo "ladicle/flymake-posframe")
     :hook (flymake-mode-hook . flymake-posframe-mode)
     :custom ((flymake-posframe-warning-prefix . "⚠️ ")
              (flymake-posframe-error-prefix . "🚫 ")
              (flymake-posframe-note-prefix . "✏️ ")))
-
-  ;; (leaf flymake-grammarly
-  ;;   :ensure t
-  ;;   ;; :hook (LaTeX-mode-hook . flymake-grammarly-load)
-  ;;   :custom (flymake-grammarly-check-time . 2))
   )
 
 (leaf flyspell
@@ -1201,7 +1257,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
                                                '("[^\000-\377]+"))))))
 
 (leaf flycheck
-  :ensure t
+  :straight t
   :bind (("C-c C-n" . flycheck-next-error)
          ("C-c C-p" . flycheck-previous-error)
          (:python-mode-map
@@ -1212,7 +1268,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :custom (flycheck-display-errors-delay . 0.3)
   :config
   (leaf flycheck-inline
-    :ensure t
+    :straight t
     :hook (flycheck-mode-hook . flycheck-inline-mode)
     :advice
     (:override flycheck-inline--error-face my--flycheck-inline--error-face)
@@ -1275,7 +1331,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :doc "Minor mode to highlight indentation"
   :req "emacs-24.1"
   :url "https://github.com/DarthFennec/highlight-indent-guides"
-  :ensure t
+  :straight t
   :hook prog-mode-hook
   :custom
   ((highlight-indent-guides-auto-enabled . t)
@@ -1339,7 +1395,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
    (show-paren-when-point-in-periphery . t)))
 
 (leaf smartparens
-  :ensure t
+  :straight t
   :init (require 'smartparens-config)
   :hook ((prog-mode-hook . turn-on-smartparens-mode)
          ((python-mode-hook
@@ -1416,14 +1472,14 @@ respectively."
 (leaf rainbow-delimiters
   :doc "Highlight brackets according to their depth"
   :url "https://github.com/Fanael/rainbow-delimiters"
-  :ensure t
+  :straight t
   :hook (prog-mode-hook . rainbow-delimiters-mode))
 
 (leaf rainbow-mode
   :doc "Colorize color names in buffers"
   :tag "faces"
   :url "http://elpa.gnu.org/packages/rainbow-mode.html"
-  :ensure t
+  :straight t
   :blackout t
   :commands rainbow-mode
   :custom ((rainbow-html-colors-major-mode-list . '(css-mode
@@ -1444,7 +1500,7 @@ respectively."
 (leaf volatile-highlights
   :doc "Minor mode for visual feedback on some operations."
   :url "http://www.emacswiki.org/emacs/download/volatile-highlights.el"
-  :ensure t
+  :straight t
   :blackout
   :hook emacs-startup-hook
   :custom-face
@@ -1452,14 +1508,15 @@ respectively."
                     ((nil (:foreground "#FF3333" :background "#FFCDCD")))))
 
 (leaf lin
-  :load-path "~/.emacs.d/elisp/lin/"
-  :require t
+  :straight t
+  :custom ((lin-mode-hooks . '(text-mode-hook prog-mode-hook notmuch-search-mode-hook))
+           (lin-face . 'lin-cyan))
   :config
   (global-hl-line-mode)
-  (lin-add-to-many-modes))
+  (lin-global-mode 1))
 
 (leaf yasnippet
-  :ensure t
+  :straight t
   :hook (emacs-startup-hook . yas-global-mode)
   :blackout yas-minor-mode
   :custom ((yas-indent-line . 'fixed)
@@ -1474,7 +1531,7 @@ respectively."
           ("C-c y g" . yas-reload-all))))
 
 (leaf google-translate
-  :ensure t popup
+  :straight t popup
   :bind ("C-c t" . google-translate-smooth-translate)
   :custom
   (google-translate-translation-directions-alist . '(("en" . "ja")
@@ -1486,12 +1543,12 @@ respectively."
     "Search TKK." (list 430675 2721866130)))
 
 (leaf wgrep
-  :ensure t
+  :straight t
   :bind (grep-mode-map
          ("e" . wgrep-change-to-wgrep-mode)))
 
 (leaf skk
-  :ensure ddskk
+  :straight ddskk
   :hook
   ((text-mode-hook occur-edit-mode-hook) . (lambda nil
                                              (skk-mode)
@@ -1540,7 +1597,7 @@ respectively."
   :req "avy-0.5.0"
   :tag "location" "window"
   :url "https://github.com/abo-abo/ace-window"
-  :ensure t
+  :straight t
   :bind* ("C-t" . ace-window)
   :custom (aw-keys . '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
   :custom-face
@@ -1661,7 +1718,7 @@ respectively."
     (if name (tab-bar-rename-tab name)))
 
   (defun my--init-tab-bar nil
-    (tab-bar-mode)
+    (tab-bar-mode 1)
     (tab-bar-rename-tab "Work")
     
     (my/tab-new-with-name "Env")
@@ -1671,13 +1728,13 @@ respectively."
 (leaf rotate
   :doc "Rotate the layout of emacs"
   :url "https://github.com/daichirata/emacs-rotate"
-  :ensure t
+  :straight t
   :bind (("C-x w l"))
   :chord (("rl" . rotate-layout)
           ("rw" . rotate-window)))
 
 (leaf visual-fill-column
-  :ensure t
+  :straight t
   :custom ((visual-fill-column-width . 88)
            (visual-fill-column-center-text . t))
   :hook (org-mode-hook . visual-fill-column-mode))
@@ -1697,13 +1754,13 @@ respectively."
   :doc "Duplicate current line & selection"
   :tag "selection" "line" "duplicate" "command" "convenience"
   :url "https://github.com/ongaeshi/duplicate-thing"
-  :ensure t
+  :straight t
   :bind ("M-c" . duplicate-thing))
 
 (leaf multiple-cursors
   :doc "Multiple cursors for Emacs."
   :req "cl-lib-0.5"
-  :ensure t
+  :straight t
   :bind (("C-S-c C-S-c" . mc/edit-lines)
          ("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
@@ -1727,7 +1784,7 @@ respectively."
       (1 (mark-sexp 1)))))
 
 (leaf affe
-  :ensure t
+  :straight t
   :after orderless
   :bind (("C-c C-g" . affe-grep)
          ("C-c C-f" . affe-find))
@@ -1743,7 +1800,7 @@ respectively."
   (consult-customize affe-grep :preview-key (kbd "M-.")))
 
 (leaf embark
-  :ensure t embark-consult
+  :straight t embark-consult
   :bind (("C-," . embark-act)
          ("C-;" . embark-dwim)
          ("C-. b" . embark-bindings)
@@ -1762,7 +1819,7 @@ respectively."
                  (window-parameters (mode-line-format . none)))))
 
 (leaf consult
-  :ensure t
+  :straight t
   :require t
   :chord ("gl" . consult-goto-line)
   :hook
@@ -1814,7 +1871,7 @@ respectively."
 
   (leaf consult-dir
     :after consult
-    :ensure t
+    :straight t
     :bind (("C-c d" . consult-dir)
            (:vertico-map
             ("C-c d" . consult-dir)
@@ -1822,13 +1879,13 @@ respectively."
 
   (leaf consult-ghq
     :after consult
-    :ensure t
+    :straight t
     :bind (("C-s-f" . consult-ghq-find)
            ("C-s-g" . consult-ghq-grep)))
 
   (leaf consult-lsp
     :after lsp-mode
-    :ensure t
+    :straight t
     :bind (lsp-mode-map
            ([remap xref-find-apropos] . consult-lsp-symbols)))
 
@@ -1841,11 +1898,11 @@ respectively."
                                    '((tramp-parse-sconfig "~/.ssh/config")))))
 
 (leaf consult-ls-git
-  :ensure t)
+  :straight t)
 
 (if (not (executable-find "cmigemo"))
     (leaf orderless
-      :ensure t
+      :straight t
       :require t
       :custom
       '((completion-styles . '(orderless))
@@ -1853,7 +1910,7 @@ respectively."
         (completion-category-overrides . ((file (styles partial-completion))))))
 
   (leaf orderless
-    :ensure t migemo
+    :straight t migemo
     :require t migemo
     :leaf-defer nil
     :bind (:minibuffer-local-completion-map
@@ -1931,7 +1988,7 @@ parses its input."
 
 (leaf migemo
   :when (executable-find "cmigemo")
-  :ensure t
+  :straight t
   :hook (emacs-startup-hook . migemo-init)
   :custom
   `((migemo-user-dictionary  . nil)
@@ -1945,31 +2002,31 @@ parses its input."
     (migemo-isearch-enable-p . t)))
 
 (leaf marginalia
-  :ensure t
+  :straight t
   :require t
   :after vertico
   :global-minor-mode t)
 
 (leaf vertico
-  :ensure t
+  :straight t
   :custom ((vertico-count . 10)
            (vertico-cycle . t))
   :hook (emacs-startup-hook . (lambda ()
                                 (vertico-mode)
-                                (savehist-mode)))
-  :defer-config
-  (leaf vertico-directory
-    :load-path "~/.emacs.d/elisp/vertico/extensions/"
-    ;; Tidy shadowed file names
-    :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy)
-    :bind (:vertico-map
-           ("DEL"   . vertico-directory-delete-char)
-           ("M-DEL" . vertico-directory-delete-word)
-           ("C-w"   . vertico-directory-delete-word)
-           ("RET"   . vertico-directory-enter))))
+                                (savehist-mode))))
+
+(leaf vertico-directory
+  :after vertico
+  ;; Tidy shadowed file names
+  :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy)
+  :bind (:vertico-map
+         ("DEL"   . vertico-directory-delete-char)
+         ("M-DEL" . vertico-directory-delete-word)
+         ("C-w"   . vertico-directory-delete-word)
+         ("RET"   . vertico-directory-enter)))
 
 (leaf corfu
-  :ensure t
+  :straight t
   :global-minor-mode global-corfu-mode
   :custom
   ((corfu-excluded-modes . '(shell-mode eshell-mode))
@@ -2011,7 +2068,7 @@ parses its input."
   (setq corfu-commit-predicate #'my/corfu-commit-predicate))
 
 (leaf cape
-  :ensure t
+  :straight t
   :after dabbrev
   :leaf-defer nil
   :custom (cape-dabbrev-min-length . 2)
@@ -2071,7 +2128,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
           ("C-M-/" . dabbrev-completion)))
 
 (leaf kind-icon
-  :ensure t
+  :straight t
   :after corfu
   :custom
   ;; to compute blended backgrounds correctly
@@ -2080,7 +2137,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (leaf citar
-  :ensure t
+  :straight t
   :bind (("C-c b" . citar-insert-citation)
          (:minibuffer-local-map
           ("M-b" . citar-insert-preset)))
@@ -2093,15 +2150,16 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :req "emacs-24.1" "cl-lib-0.5"
   :tag "location" "point" "emacs>=24.1"
   :url "https://github.com/abo-abo/avy"
-  :ensure t
+  :straight t
   :bind* ("C-q" . avy-goto-char-timer)
-  :init (add-to-list 'avy-styles-alist '(avy-goto-char-timer . pre))
+  ;; :init (add-to-list 'avy-styles-alist '(avy-goto-char-timer . pre))
   ;; :init (add-to-list 'avy-styles-alist '(avy-goto-migemo-timer . pre))
-  :custom ((avy-timeout-seconds . 0.5)
+  :custom ((avy-styles-alist . '(avy-goto-char-timer . pre))
+           (avy-timeout-seconds . 0.5)
            (avy-keys . '( ?q ?e ?r ?u ?o ?p
                           ?a ?s ?d ?f ?g ?h ?j ?l ?'
                           ?c ?v ?b ?n ?, ?/)))
-  :preface
+  ;; :preface
   ;; (defun avy-goto-migemo-timer (&optional arg)
   ;;   (interactive "P")
   ;;   (let ((avy-all-windows (if arg
@@ -2226,7 +2284,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :doc "Switch between the beginning/end of line or code"
   :tag "convenience"
   :url "https://github.com/alezost/mwim.el"
-  :ensure t
+  :straight t
   :bind (("C-a" . mwim-beginning-of-code-or-line)
          ("C-e" . mwim-end-of-code-or-line)))
 
@@ -2241,8 +2299,11 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     (eshell/alias "e" "emacsclient $1"))
   
   (leaf eshell-p10k
-    :load-path "~/.emacs.d/elisp/eshell-p10k/"
-    :require t
+    :disabled t
+    :straight (eshell-p10k
+               :type git
+               :host github
+               :repo "elken/eshell-p10k")
     :config
     (eshell-p10k-def-segment time
                              ""
@@ -2259,18 +2320,18 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :doc "Major mode for fish shell scripts"
   :req "emacs-24"
   :tag "shell" "fish" "emacs>=24"
-  :ensure t)
+  :straight t)
 
 (leaf nix-mode
-  :ensure t
+  :straight t
   :mode "\\.nix\\'")
 
 (leaf vterm
-  :ensure t
+  :straight t
   :custom (vterm-max-scrollback . 10000)
   :config
   (leaf vterm-toggle
-    :ensure t
+    :straight t
     :bind (("C-M-'" . vterm-toggle)
            (vterm-mode-map
             ("C-<return>" . vterm-toggle-insert-cd)))
@@ -2280,7 +2341,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
     ))
 
 (leaf gcmh
-  :ensure t
+  :straight t
   :blackout
   :custom (gcmh-verbose . nil)
   :hook after-init-hook)
@@ -2397,7 +2458,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   (require 'org-indent)  ;; Make sure org-indent face is available
 
   (leaf org-fragtog
-    :ensure t
+    :straight t
     :hook (org-mode-hook . org-fragtog-mode)))
 
 (leaf org-agenda
@@ -2654,19 +2715,19 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                                  (lua . t)))
 
 (leaf ob-emacs-lisp
-  :ensure org
+  :straight org
   :commands (org-babel-execute:emacs-lisp))
 
 (leaf ob-python
-  :ensure org
+  :straight org
   :commands (org-babel-execute:python org-babel-load-session:python))
 
 (leaf ob-latex
-  :ensure org
+  :straight org
   :commands (org-babel-execute:latex))
 
 (leaf ob-shell
-  :ensure org
+  :straight org
   :commands
   org-babel-execute:sh
   org-babel-expand-body:sh
@@ -2674,12 +2735,12 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   org-babel-expand-body:shell)
 
 (leaf ob-lua
-  :ensure org
+  :straight org
   :commands (org-babel-execute:lua))
 
 (leaf org-present
   :when window-system
-  :ensure t
+  :straight t
   :bind (org-present-mode-keymap
          ("C-c C-n" . dw/org-present-next)
          ("C-c C-p" . dw/org-present-prev))
@@ -2725,7 +2786,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :doc "Cross-referencing commands"
   :req "emacs-26.3"
   :url "http://elpa.gnu.org/packages/xref.html"
-  :ensure t
+  :straight t
   :after org)
 
 (leaf ox
@@ -2735,7 +2796,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 (leaf ox-hugo
   :when window-system
   :doc "Hugo Markdown Back-End for Org Export Engine"
-  :ensure t
+  :straight t
   :require t
   :after ox
   :custom ((org-hugo-front-matter-format . "yaml")
@@ -2854,7 +2915,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :when window-system
   :doc "Roam Research replica with Org-mode"
   :url "https://github.com/org-roam/org-roam"
-  :ensure t
+  :straight t
   ;; This is necessary for variables to be initialized correctly.
   ;; :require t
   :bind* (("C-c n l" . org-roam-buffer-toggle)
@@ -2914,9 +2975,10 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 
 (leaf org-roam-ui
+  :disabled t
   :after org-roam
   :load-path "~/.emacs.d/elisp/org-roam-ui/"
-  :ensure simple-httpd websocket
+  :straight simple-httpd websocket
   :commands (org-roam-ui-mode)
   :config
   (setq org-roam-ui-sync-theme t
@@ -2974,7 +3036,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf org-superstar
   :disabled t
-  :ensure t
+  :straight t
   :after org
   :hook (org-mode-hook . org-superstar-mode)
   :custom
@@ -3022,7 +3084,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   )
 
 (leaf org-appear
-  :ensure t
+  :straight t
   :hook org-mode-hook)
 
 (leaf *auto-tangle-configuration
@@ -3040,14 +3102,14 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
         (org-babel-tangle)))))
 
 (leaf org-make-toc
-  :ensure t
+  :straight t
   :hook (org-babel-pre-tangle-hook . org-make-toc-mode))
 
 (leaf *latex
   :when window-system
   :config
   (leaf auctex
-    :ensure t
+    :straight t
     :custom ((TeX-master . nil)
              (TeX-auto-save . t)
              (TeX-parse-self . t)
@@ -3085,7 +3147,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   (leaf latex-extra
     :doc "Adds several useful functionalities to LaTeX-mode."
     :url "http://github.com/Malabarba/latex-extra"
-    :ensure t
+    :straight t
     :hook (LaTeX-mode-hook . latex-extra-mode)
     :bind (:latex-extra-mode-map
            ("C-M-f" . forward-paragraph)
@@ -3107,7 +3169,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 	:doc "Competitive programming tools client for AtCoder, Codeforces"
 	:req "emacs-26.1" "quickrun-2.2"
 	:url "https://github.com/conao3/oj.el"
-	:ensure t
+	:straight t
 	:commands oj-prepare oj-test oj-submit
 	:custom ((oj-default-online-judge quote atcoder)
 					 (oj-compiler-python . "cpython")
@@ -3117,7 +3179,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 
 (leaf elfeed
   :when window-system
-  :ensure t
+  :straight t
   :commands elfeed
   :advice (:after elfeed (lambda nil (visual-line-mode -1)))
   :custom
@@ -3152,7 +3214,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
 ;; which is what we use here (they are maintained by the same people).
 ;; (add-to-list 'load-path "/usr/share/emacs/site-lisp/")
 (leaf notmuch
-  ;; :ensure t
+  ;; :straight t
   :commands notmuch notmuch-hello
   :config
   (load-file "~/src/github.com/naoking158/envs/config-mail/config-notmuch.el")
@@ -3270,7 +3332,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   )
 
 (leaf notmuch-transient
-  :ensure t
+  :straight t
   :after notmuch
   :bind
   ((:notmuch-search-mode-map :package notmuch
@@ -3287,9 +3349,8 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
                            ("=" . notmuch-show-mode-transient))))
 
 (leaf ol-notmuch
-  :load-path "~/.emacs.d/elisp/notmuch/"
-  :after notmuch
-  :require t)
+  :straight t
+  :after notmuch)
 
 (leaf *config-mu4e
   :disabled t
@@ -3304,7 +3365,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :hook (emacs-startup-hook . server-start))
 
 (leaf tree-sitter
-  :ensure t tree-sitter-langs
+  :straight t tree-sitter-langs
   :hook
   (python-mode-hook . (lambda nil
                         (require 'tree-sitter)
@@ -3316,7 +3377,7 @@ While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words 
   :disabled t
   :when (or (<= emacs-major-version 27)
             (memq window-system '(ns darwin)))
-  :ensure t
+  :straight t
   :custom (browse-url-browser-function . 'xwidget-webkit-browse-url)
   :bind (("C-c s" . xwwp)
          (xwidget-webkit-mode-map
@@ -3406,7 +3467,7 @@ Interactively, URL defaults to the string looking like a url around point."
   (setq webkit-dark-mode t))
 
 (leaf pdf-tools
-  :ensure t
+  :straight t
   :mode ("\\.pdf\\'" . pdf-view-mode)
   :bind (:pdf-view-mode-map
          ("j" . pdf-view-next-line-or-next-page)
@@ -3430,11 +3491,11 @@ Interactively, URL defaults to the string looking like a url around point."
      ("s" . pdf-annot-add-strikeout-markup-annotation)
      ("u" . pdf-annot-add-underline-markup-annotation))))
 
-(leaf applescript-mode :ensure t)
+(leaf applescript-mode :straight t)
 
 (leaf jupyter
   :disabled t
-  :ensure jupyter websocket
+  :straight jupyter websocket
   :after org
   :config
   (leaf ob-jupyter
@@ -3555,22 +3616,22 @@ Interactively, URL defaults to the string looking like a url around point."
   (eaf-bind-key nil "M-q" eaf-browser-keybinding))
 
 (leaf browse-at-remote
-  :ensure t
+  :straight t
   :commands browse-at-remote-get-url
   :custom (browse-at-remote-prefer-symbolic . nil)
   :bind ("M-g r" . browse-at-remote))
 
 (leaf org-inline-anim
-  :ensure t
+  :straight t
   :hook (org-mode-hook . org-inline-anim-mode))
 
 (leaf burly
-  :ensure t
+  :straight t
   :bind* (("C-x C-b w" . burly-bookmark-windows)
           ("C-x C-b f" . burly-bookmark-frames)))
 
 (leaf atomic-chrome
-  :ensure t
+  :straight t
   :hook (emacs-startup-hook . atomic-chrome-start-server)
   :custom ((atomic-chrome-enable-auto-update . nil)
            (atomic-chrome-default-major-mode . 'org-mode)
@@ -3579,7 +3640,7 @@ Interactively, URL defaults to the string looking like a url around point."
            (atomic-chrome-extension-type-list . '(ghost-text))))
 
 (leaf org-modern
-  :ensure t
+  :straight t
   :hook (org-mode-hook . org-modern-mode)
   :custom-face
   (org-modern-label . '((t :height 0.9 :inherit t)))
@@ -3590,8 +3651,12 @@ Interactively, URL defaults to the string looking like a url around point."
                         (?- . "•"))))
   )
 
+(leaf vertico-multiform
+  :after vertico)
+
 (leaf vertico-posframe
-  :ensure t
+  :straight t
+  :after vertico-multiform
   :when (display-graphic-p)
   :hook
   ((vertico-mode-hook . (lambda ()
@@ -3631,12 +3696,12 @@ Interactively, URL defaults to the string looking like a url around point."
   M-x http-status-code ;; 500
   M-x http-status-code ;; not_found | NOT_FOUND
   """
-  :ensure t)
+  :straight t)
 
-(leaf csv-mode :ensure t)
+(leaf csv-mode :straight t)
 
 (leaf markdown-preview-mode
-  :ensure t
+  :straight t
   :defer-config
   (setq markdown-preview-stylesheets
         (list "http://thomasf.github.io/solarized-css/solarized-light.min.css"))
@@ -3647,7 +3712,7 @@ Interactively, URL defaults to the string looking like a url around point."
   )
 
 (leaf mermaid-mode
-  :ensure t
+  :straight t
   :defer-config
   (setq mermaid-mode-map
         (let ((map mermaid-mode-map))
