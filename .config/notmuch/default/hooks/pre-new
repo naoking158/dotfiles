@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -Ceu
 
 export NOTMUCH_CONFIG="${HOME}/.config/notmuch/default/config"
 export NMBGIT="${HOME}/.local/share/notmuch/nmbug"
