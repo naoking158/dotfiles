@@ -452,14 +452,14 @@
     "Sets the transparency of the frame window. 0=transparent/100=opaque"
     (interactive (list
                   (read-number "Transparency Value 0 - 100 opaque: " 100)))
-    (let ((diff-active-and-inactive-frame 2))
+    (let ((diff-active-and-inactive-frame 4))
       (set-frame-parameter nil 'alpha
                            (cons num (- num diff-active-and-inactive-frame)))
       (add-to-list 'default-frame-alist
                    `(alpha . (,num . ,(- num diff-active-and-inactive-frame))))))
 
   :config
-  (my/change-transparency 100))
+  (my/change-transparency 93))
 
 (leaf font
   :when window-system
@@ -468,7 +468,7 @@
   :advice (:after load-theme my/set-font-after-load-theme)
   :preface
   (setq-default text-scale-remap-header-line t)
-  (setq-default my-fontsize (if (eq 'darwin system-type) 16 13))
+  (setq-default my-fontsize (if (eq 'darwin system-type) 17 13))
 
   (defun my/set-font-size (fontsize)
     (interactive (list
@@ -567,7 +567,7 @@
                                       (header-date . (grayscale workaholic bold-today))
                                       (scheduled . uniform)
                                       (habit . traffic-light-deuteranopia))
-            modus-themes-headings '((1 . (bold overline variable-pitch background 1.4))
+            modus-themes-headings '((1 . (bold overline variable-pitch  1.5))
                                     (2 . (bold overline variable-pitch 1.3))
                                     (3 . (bold variable-pitch 1.2))
                                     (4 . (bold variable-pitch 1.15))
@@ -732,7 +732,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
     (defun my/modeline-moody nil
       (interactive)
       (setq x-underline-at-descent-line t
-            moody-mode-line-height 26)
+            moody-mode-line-height 30)
       (moody-replace-mode-line-buffer-identification)
       (moody-replace-vc-mode)
       (moody-replace-eldoc-minibuffer-message-function)
