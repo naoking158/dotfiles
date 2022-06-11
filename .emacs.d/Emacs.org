@@ -55,6 +55,7 @@ a bunch of resources I've found online.
   - [[#window-selection-with-ace-window][Window Selection with ace-window]]
   - [[#window-movement-with-windmove][Window Movement with windmove]]
   - [[#resize-window][Resize Window]]
+  - [[#split-and-follow][Split and follow]]
   - [[#named-window-with-tab-bar][Named Window with tab-bar]]
   - [[#rotate-window-layout][Rotate Window Layout]]
   - [[#set-margins][Set Margins]]
@@ -2397,6 +2398,24 @@ Window management commands are accessible by prefix =C-x w=
 #+end_src
 
 
+** Split and follow
+#+begin_src emacs-lisp
+(defun split-and-follow-horizontally ()
+  "Split and follow horizontally."
+  (interactive)
+  (split-window-below)
+  (balance-windows)
+  (other-window 1))
+(global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
+
+(defun split-and-follow-vertically ()
+  "Split and follow vertically."
+  (interactive)
+  (split-window-right)
+  (balance-windows)
+  (other-window 1))
+(global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
+#+end_src
 ** Named Window with tab-bar
 :PROPERTIES:
 :ID:       E76C0A4A-586E-4086-B576-99102F0D9724
