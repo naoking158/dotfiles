@@ -2921,26 +2921,38 @@ parses its input."
   :global-minor-mode global-corfu-mode
   :custom
   ((corfu-excluded-modes . '(shell-mode eshell-mode))
+   (corfu-auto . t)
+   (corfu-auto-delay . 0.2)
+   (corfu-auto-prefix . 2)
+   (corfu-preselect-first . nil)
 
    ;; Enable indentation+completion using the TAB key.
    ;; `completion-at-point' is often bound to M-TAB.
    (tab-always-indent . 'complete)
    (tab-first-completion . 'word))
-  :hook (python-mode-hook . (lambda nil
-                              (setq-local corfu-auto t
-                                          corfu-auto-delay 0.2)))
+  :hook ((java-mode-hook . my/corfu-remap-tab-command)
+         (minibuffer-setup-hook . my/corfu-enable-in-minibuffer))
 
   ;; Optionally use TAB for cycling, default is `corfu-complete'.
   :bind (:corfu-map
          ("<tab>" . corfu-complete))
   :init
+  (defun my/corfu-enable-in-minibuffer ()
+    "Enable Corfu in the minibuffer if `completion-at-point' is bound."
+    (when (where-is-internal #'completion-at-point (list (current-local-map)))
+      (setq-local corfu-auto nil)
+      (corfu-mode 1)))
+
+  (defun my/corfu-remap-tab-command ()
+    (global-set-key [remap c-indent-line-or-region] #'indent-for-tab-command))
+
   ;; https://github.com/minad/corfu/wiki#auto-commit
   (defun my/corfu-commit-predicate ()
     "Auto-commit candidates if:
-1. A `.' is typed, except after a SPACE.
-2. A selection was made, aside from entering SPACE.
-3. Just one candidate exists, and we continue to non-symbol info.
-4. The 1st match is exact."
+    1. A `.' is typed, except after a SPACE.
+    2. A selection was made, aside from entering SPACE.
+    3. Just one candidate exists, and we continue to non-symbol info.
+    4. The 1st match is exact."
     (cond
      ((seq-contains-p (this-command-keys-vector) ?.)
       (or (string-empty-p (car corfu--input))
@@ -2960,8 +2972,7 @@ parses its input."
 
 (leaf cape
   :straight t
-  :after dabbrev
-  :leaf-defer nil
+  :require t dabbrev
   :custom (cape-dabbrev-min-length . 2)
   :bind (("C-c p p" . completion-at-point) ;; capf
          ("C-c p t" . complete-tag)        ;; etags
@@ -2971,38 +2982,40 @@ parses its input."
          ("C-c p a" . cape-abbrev)
          ("C-c p i" . cape-ispell)
          ("C-c p l" . cape-line))
-  :config
-  (defun my--reset-capf (&rest args)
-    (let* ((capfs (remove t completion-at-point-functions)))  
-      (add-to-list 'capfs #'cape-dabbrev t)
-      (setq-local completion-at-point-functions
-                  `(cape-file
-                    ,(cape-capf-buster (apply #'cape-super-capf capfs))
-                    ;; ,(apply #'cape-super-capf
-                    ;;         (mapcar #'cape-capf-buster capfs))
-                    ))))
+  :hook ((prog-mode-hook . my--set-basic-capf)
+         (text-mode-hook . my--set-basic-capf)
+         (lsp-completion-mode-hook . my--set-lsp-capf))
+  :init
+  (defun my--convert-super-capf (arg-capf)
+    (list (cape-capf-buster
+           (cape-super-capf arg-capf #'cape-dabbrev))
+          #'cape-file))
 
-  (dolist (mode '(org-mode
-                  org-roam-mode
-                  lisp-interaction-mode
-                  emacs-lisp-mode
-                  fish-mode
-                  lsp-completion-mode
-                  VirTeX-common-initialization))
-    (advice-add mode :after #'my--reset-capf)))
+  (defun my--set-basic-capf ()
+    (setq-local completion-at-point-functions
+                (my--convert-super-capf (car completion-at-point-functions))))
+
+  (defun my--set-lsp-capf ()
+    (setq-local completion-at-point-functions
+                (my--convert-super-capf #'lsp-completion-at-point)))
+
+  :config
+  (add-to-list 'completion-at-point-functions #'cape-file t)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev t)
+  (add-to-list 'completion-at-point-functions #'cape-keyword t))
 
 
 ;; Dabbrev works with Corfu
 (leaf dabbrev
   :doc """Cited from Sec. 3.1.8.2 at https://protesilaos.com/dotemacs/#h:675ebef4-d74d-41af-808d-f9579c2a5ec4
 
-```
-Whereas dabbrev-completion benefits from minibuffer interactivity and the pattern matching styles in effect (Completion framework and extras). With the help of Corfu, the completion candidates are displayed in a pop-up window near point (Corfu for in-buffer completion).
+    ```
+    Whereas dabbrev-completion benefits from minibuffer interactivity and the pattern matching styles in effect (Completion framework and extras). With the help of Corfu, the completion candidates are displayed in a pop-up window near point (Corfu for in-buffer completion).
 
-The dabbrev-abbrev-char-regexp is configured to match both regular words and symbols (e.g. words separated by hyphens). This makes it equally suitable for code and ordinary language.
+    The dabbrev-abbrev-char-regexp is configured to match both regular words and symbols (e.g. words separated by hyphens). This makes it equally suitable for code and ordinary language.
 
-While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words and symbols that start with any of these: $, *, /, =, ~, '. This regexp may be expanded in the future, but the idea is to be able to perform completion in contexts where the known word/symbol is preceded by a special character. For example, in the org-mode version of this document, all inline code must be placed between the equals sign. So now typing the =, then a letter, will still allow me to expand text based on that input.w
-```
+    While the dabbrev-abbrev-skip-leading-regexp is instructed to also expand words and symbols that start with any of these: $, *, /, =, ~, '. This regexp may be expanded in the future, but the idea is to be able to perform completion in contexts where the known word/symbol is preceded by a special character. For example, in the org-mode version of this document, all inline code must be placed between the equals sign. So now typing the =, then a letter, will still allow me to expand text based on that input.w
+    ```
   """
   :leaf-defer nil
   :require t
@@ -5433,6 +5446,7 @@ HTTP encodings, headers, media types, methods, relations and status codes, all s
           (define-key map (kbd "C-c C-d d") 'mermaid-open-doc)
           map)))
 #+end_src
+
 
 
 * Footer
