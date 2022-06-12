@@ -1,30 +1,9 @@
-[submodule ".emacs.d/elisp/flymake-posframe"]
-	path = .emacs.d/elisp/flymake-posframe
-	url = https://github.com/Ladicle/flymake-posframe.git
 [submodule ".tmux/plugins/tpm"]
 	path = .tmux/plugins/tpm
 	url = https://github.com/tmux-plugins/tpm
 [submodule ".emacs.d/elisp/ddskk-posframe"]
 	path = .emacs.d/elisp/ddskk-posframe
 	url = https://github.com/conao3/ddskk-posframe.el.git
-[submodule ".emacs.d/elisp/vertico"]
-	path = .emacs.d/elisp/vertico
-	url = https://github.com/minad/vertico.git
-[submodule ".emacs.d/elisp/bespoke-themes"]
-	path = .emacs.d/elisp/bespoke-themes
-	url = https://github.com/mclear-tools/bespoke-themes.git
-[submodule ".emacs.d/elisp/bespoke-modeline"]
-	path = .emacs.d/elisp/bespoke-modeline
-	url = https://github.com/mclear-tools/bespoke-modeline.git
-[submodule ".emacs.d/elisp/eshell-p10k"]
-	path = .emacs.d/elisp/eshell-p10k
-	url = https://github.com/elken/eshell-p10k.git
-[submodule ".emacs.d/elisp/lin"]
-	path = .emacs.d/elisp/lin
-	url = https://github.com/protesilaos/lin.git
-[submodule ".emacs.d/elisp/vundo"]
-	path = .emacs.d/elisp/vundo
-	url = https://github.com/casouri/vundo.git
 [submodule ".config/sway/themes/base16-sway"]
 	path = .config/sway/themes/base16-sway
 	url = https://github.com/rkubosz/base16-sway.git
