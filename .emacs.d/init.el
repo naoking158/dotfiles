@@ -2008,7 +2008,11 @@ parses its input."
   :global-minor-mode t)
 
 (leaf vertico
-  :straight t
+  :straight (vertico
+             :files (:defaults "extensions/*")
+             :includes (vertico-buffer
+                        vertico-directory
+                        vertico-multiform))
   :custom ((vertico-count . 10)
            (vertico-cycle . t))
   :hook (emacs-startup-hook . (lambda ()
@@ -3664,21 +3668,13 @@ Interactively, URL defaults to the string looking like a url around point."
                         (?- . "•"))))
   )
 
-(leaf vertico-multiform
-  :after vertico)
-
 (leaf vertico-posframe
   :straight t
-  :after vertico-multiform
+  :after vertico
   :when (display-graphic-p)
   :hook
-  ((vertico-mode-hook . (lambda ()
-                          (vertico-posframe-mode)
-                          (vertico-multiform-mode)))
-   (before-make-frame-hook . (lambda ()
-                               (when (not (display-graphic-p))
-                                 (vertico-posframe-mode -1)
-                                 (vertico-multiform-mode -1)))))
+  ((vertico-mode-hook . my--enable-vertico-posframe-mode)
+   (before-make-frame-hook . my--disable-vertico-posframe-mode))
   :custom
   `((vertico-posframe-poshandler . 'posframe-poshandler-frame-bottom-center)
     (vertico-posframe-width . 155)
@@ -3696,7 +3692,15 @@ Interactively, URL defaults to the string looking like a url around point."
                                     (helpful-function posframe)
                                     (helpful-symbol posframe)
                                     (helpful-variable posframe))))
- )
+  :config
+  (defun my--enable-vertico-posframe-mode ()
+    (vertico-posframe-mode)
+    (vertico-multiform-mode))
+
+  (defun my--disable-vertico-posframe-mode ()
+    (when (not (display-graphic-p))
+      (vertico-posframe-mode -1)
+      (vertico-multiform-mode -1))))
 
 (leaf know-your-http-well
   :doc
