@@ -862,7 +862,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                    `(alpha . (,num . ,(- num diff-active-and-inactive-frame))))))
 
   :config
-  (my/change-transparency 93))
+  (my/change-transparency 91))
 
 #+end_src
 

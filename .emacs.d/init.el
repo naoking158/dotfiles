@@ -491,7 +491,7 @@
                    `(alpha . (,num . ,(- num diff-active-and-inactive-frame))))))
 
   :config
-  (my/change-transparency 93))
+  (my/change-transparency 91))
 
 (leaf font
   :when window-system
