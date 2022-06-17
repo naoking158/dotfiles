@@ -1588,6 +1588,24 @@ respectively."
                                       :background "#4C566A"
                                       :inherit 'normal))))
 
+(leaf whitespace
+  :straight t
+  :commands whitespace-mode
+  :custom ((whitespace-style . '(face
+                                trailing
+                                tabs
+                                spaces
+                                empty
+                                space-mark
+                                tab-mark))
+           (whitespace-display-mappings . '((space-mark ?\u3000 [?\u25a1])
+                                            (tab-mark ?\t [?\u00BB ?\t] [?\\ ?\t])))
+           (whitespace-space-regexp . "\\(\u3000+\\)")
+           (whitespace-global-modes . '(emacs-lisp-mode shell-script-mode sh-mode python-mode org-mode))
+           (global-whitespace-mode . t)
+           )
+)
+
 (leaf winner
   :doc "Restore old window configurations"
   :tag "builtin"

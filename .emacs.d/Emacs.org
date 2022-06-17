@@ -2308,6 +2308,27 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
                                       :inherit 'normal))))
 #+end_src
 
+*** Managing Whitespaces with whitespace
+
+#+begin_src emacs-lisp
+(leaf whitespace
+  :straight t
+  :commands whitespace-mode
+  :custom ((whitespace-style . '(face
+                                trailing
+                                tabs
+                                spaces
+                                empty
+                                space-mark
+                                tab-mark))
+           (whitespace-display-mappings . '((space-mark ?\u3000 [?\u25a1])
+                                            (tab-mark ?\t [?\u00BB ?\t] [?\\ ?\t])))
+           (whitespace-space-regexp . "\\(\u3000+\\)")
+           (whitespace-global-modes . '(emacs-lisp-mode shell-script-mode sh-mode python-mode org-mode))
+           (global-whitespace-mode . t)
+           )
+)
+#+end_src
 
 * Window Management
 
