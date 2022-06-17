@@ -1214,6 +1214,9 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :custom
   ((json-mode-standard-file-ext . '(".json" ".jsonc" ".jsonld"))))
 
+(leaf sh-mode
+  :hook (sh-mode-hook . lsp-deferred))
+
 (leaf flymake
   :disabled t
   :doc "A universal on-the-fly syntax checker"

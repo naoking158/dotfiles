@@ -1797,6 +1797,13 @@ Only in Neotree Buffer:
   ((json-mode-standard-file-ext . '(".json" ".jsonc" ".jsonld"))))
 #+end_src
 
+*** Shell
+
+#+begin_src emacs-lisp
+(leaf sh-mode
+  :hook (sh-mode-hook . lsp-deferred))
+#+end_src
+
 ** Productivity
 *** Syntax checking with Flymake
 :PROPERTIES:
