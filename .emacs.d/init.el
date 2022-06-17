@@ -1185,6 +1185,11 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 
 (leaf python-isort :straight t)
 
+(leaf blacken
+  :straight t
+  :custom ((blacken-line-length . 100)
+           (blacken-skip-string-normalization . t)))
+
 (leaf web-mode
   :straight t
   :custom ((web-mode-markup-indent-offset . 2)

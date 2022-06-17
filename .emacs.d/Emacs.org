@@ -1747,6 +1747,10 @@ Only in Neotree Buffer:
 
 (leaf python-isort :straight t)
 
+(leaf blacken
+  :straight t
+  :custom ((blacken-line-length . 100)
+           (blacken-skip-string-normalization . t)))
 #+end_src
 
 
