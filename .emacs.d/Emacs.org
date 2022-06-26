@@ -1749,7 +1749,7 @@ Only in Neotree Buffer:
 
 (leaf blacken
   :straight t
-  :custom ((blacken-line-length . 100)
+  :custom ((blacken-line-length . 91)
            (blacken-skip-string-normalization . t)))
 #+end_src
 
@@ -2804,7 +2804,9 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
       :custom
       '((completion-styles . '(orderless))
         (completion-category-defaults . nil)
-        (completion-category-overrides . ((file (styles partial-completion))))))
+        (completion-category-overrides . ((file (styles '(orderless-prefixes
+                                                          orderless-initialism
+                                                          orderless-regexp)))))))
 
   (leaf orderless
     :straight t migemo
@@ -2814,7 +2816,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
            ("SPC" . nil)
            ("?" . nil))
     :custom
-    '((completion-styles . '(basic substring initials flex partial-completion orderless))
+    '((completion-styles . '(basic substring initials flex orderless))
       (completion-cycle-threshold . 2)
       (completion-flex-nospace . nil)
       (completion-category-defaults . nil)

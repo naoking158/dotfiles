@@ -1187,7 +1187,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 
 (leaf blacken
   :straight t
-  :custom ((blacken-line-length . 100)
+  :custom ((blacken-line-length . 91)
            (blacken-skip-string-normalization . t)))
 
 (leaf web-mode
@@ -1933,7 +1933,9 @@ respectively."
       :custom
       '((completion-styles . '(orderless))
         (completion-category-defaults . nil)
-        (completion-category-overrides . ((file (styles partial-completion))))))
+        (completion-category-overrides . ((file (styles '(orderless-prefixes
+                                                          orderless-initialism
+                                                          orderless-regexp)))))))
 
   (leaf orderless
     :straight t migemo
@@ -1943,7 +1945,7 @@ respectively."
            ("SPC" . nil)
            ("?" . nil))
     :custom
-    '((completion-styles . '(basic substring initials flex partial-completion orderless))
+    '((completion-styles . '(basic substring initials flex orderless))
       (completion-cycle-threshold . 2)
       (completion-flex-nospace . nil)
       (completion-category-defaults . nil)
