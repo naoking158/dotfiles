@@ -1526,7 +1526,6 @@ respectively."
 (leaf yasnippet
   :straight t
   :hook (emacs-startup-hook . yas-global-mode)
-  :blackout yas-minor-mode
   :custom ((yas-indent-line . 'fixed)
            (yas-snippet-dirs . `(,(file-truename "~/.emacs.d/snippets/"))))
   :bind ((yas-keymap
