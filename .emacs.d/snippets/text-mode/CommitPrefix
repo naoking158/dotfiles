@@ -1,0 +1,22 @@
+# key: :
+# name: CommitPrefix
+# --
+`(let* ((candidates '(("✨  :sparkles:     ---  機能追加 (Add feature)" . ":sparkles: ")
+                      ("🚿  :shower:       ---  機能削除 (Remove feature)" . ":shower: ")
+                      ("💥  :boom:         ---  破壊的変更 (Breaking changes)" . ":boom: ")
+                      ("👽  :alien:        ---  国際化 (Internationalisation)" . ":alien: ")
+                      ("👕  :shirt:        ---  リント (Lint)" . ":shirt: ")
+                      ("💚  :green_heart:  ---  テスト (Test)" . ":green_heart: ")
+                      ("📝  :memo:         ---  コメント (Comment)" . ":memo: ")
+                      ("📚  :books:        ---  ドキュメント (Document)" . ":books: ")
+                      ("🎬  :clapper:      ---  開発ツール (Development tools)" . ":clapper: ")
+                      ("🆙  :up:           ---  依存関係 (Dependencies)" . ":up: ")
+                      ("😇  :innocent:     ---  凡ミス系修正 (Typo fix)" . ":innocent: ")
+                      ("🐛  :bug:          ---  バグ修正 (Bug fix)" . ":bug: ")
+                      ("👮  :cop:          ---  セキュリティ修正 (Security fix)" . ":cop: ")
+                      ("🚀  :rocket:       ---  パフォーマンス修正 (Performance fix)" . ":rocket: ")
+                      ("🎨  :art:          ---  デザインUI/UX 修正 (Accessibility)" . ":art: ")
+                      ("💪  :muscle:       ---  リファクタリング (Refactoring)" . ":muscle: ")
+                      ("🚧  :construction: ---  途中 (Work In Progress)" . ":construction: ")))
+        (choice (completing-read "Choose: " candidates)))
+   (cdr (assoc choice candidates)))`
