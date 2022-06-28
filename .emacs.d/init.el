@@ -2177,7 +2177,7 @@ parses its input."
   :custom
   ;; to compute blended backgrounds correctly
   (kind-icon-default-face . 'corfu-default)
-  :defer-config
+  :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (leaf citar
