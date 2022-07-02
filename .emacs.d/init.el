@@ -75,7 +75,7 @@
     (straight-use-package 'leaf-convert)
     (straight-use-package 'hydra)
     (straight-use-package 'blackout)
-    
+
     (leaf leaf-keywords
       :require t
       :config (leaf-keywords-init)
@@ -98,7 +98,7 @@
       ;;   (key-chord-define-global "x5" '"\C-x52"))
       )
     )
-  
+
   ;; (eval-and-compile
   ;;   (custom-set-variables
   ;;    '(warning-suppress-types '((comp)))
@@ -204,7 +204,7 @@
         (setq insert-directory-program gls dired-use-ls-dired t)
         (setq dired-listing-switches "-al --group-directories-first")))
     :custom '((fill-column . 82)
-              (tab-width . 2)             
+              (tab-width . 2)
               (frame-resize-pixelwise . t)
               (enable-recursive-minibuffers . t)
               (create-lockfiles)
@@ -467,12 +467,12 @@
   (leaf set-title-bar
     :when window-system
     :config
-    ;; This shoud be set before exec `display-time`. 
+    ;; This shoud be set before exec `display-time`.
     (setq display-time-string-forms '((format "%s %s %s" dayname monthname day)
                                       (format "  %s:%s" 24-hours minutes))
           frame-title-format '(" - " display-time-string " - Emacs"))
     (display-time))
-  
+
   (leaf visual-line-mode
     :tag "builtin"
     :hook (text-mode-hook . visual-line-mode)))
@@ -576,7 +576,7 @@
       (doom-themes-neotree-config)
       (doom-themes-org-config)
       (doom-themes-treemacs-config)))
-  
+
   (leaf modus-themes
     :straight t
     :config
@@ -610,7 +610,7 @@
       (pcase sym-theme
         ('modus-dark (modus-themes-load-vivendi))
         ('modus-light (modus-themes-load-operandi)))
-      
+
       (defvar my-rainbow-region-colors
         (modus-themes-with-colors
           `((red . ,red-subtle-bg)
@@ -737,10 +737,10 @@
 
           my--modeline-gui-ro-symbol "📙"
           my--modeline-tty-ro-symbol "RO"
-          
+
           my--modeline-gui-mod-symbol "✏️"
           my--modeline-tty-mod-symbol "**")
-    
+
     (defun my--modeline-status ()
       "Return buffer status: default symbols are read-only (📙)/(RO),
 modified (✏️)/(**), or read-write (📖)/(RW)"
@@ -757,7 +757,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
          (t (if (display-graphic-p)
                 my--modeline-gui-rw-symbol
               my--modeline-tty-rw-symbol)))))
-    
+
     (defun my/modeline-moody nil
       (interactive)
       (setq x-underline-at-descent-line t
@@ -1029,7 +1029,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :hook ((lsp-mode-hook . lsp-enable-which-key-integration)
          (lsp-managed-mode-hook . lsp-modeline-diagnostics-mode)
          (lsp-completion-mode-hook . my/lsp-mode-setup-completion))
-  :custom `((lsp-keymap-prefix . "C-c l")        
+  :custom `((lsp-keymap-prefix . "C-c l")
             (read-process-output-max . ,(* 1 1024 1024))  ;; 1MB
             ;; debug
             (lsp-auto-guess-root . nil)
@@ -1239,7 +1239,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
               quote flymake-diagnostic-at-point-display-minibuffer))
     :hook (flymake-mode-hook . flymake-diagnostic-at-point-mode))
 
-  
+
   (leaf flymake-posframe
     :straight (flymake-posframe
                :type git
@@ -1306,7 +1306,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
          (flycheck-error-message err)
          (when (and id flycheck-inline-display-error-id)
            (format " [%s]" id))))))
-  
+
   (leaf *flycheck-gui
     :disabled t
     :when window-system
@@ -1323,7 +1323,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 " (any " ") (one-or-more not-newline)))
                 line-end))
       :modes (latex-mode latex-extra-mode))
-    
+
     (add-hook 'latex-extra-mode-hook #'(lambda nil
                                          (setq flycheck-checker 'textlint)
                                          (flycheck-mode 1))))
@@ -1413,7 +1413,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :bind (smartparens-mode-map
          ("C-M-a" . sp-beginning-of-sexp)
          ("C-M-e" . sp-end-of-sexp)
-         
+
          ("C-M-n" . sp-next-sexp)
          ("C-M-p" . sp-previous-sexp)
 
@@ -1745,7 +1745,7 @@ respectively."
   (defun my--init-tab-bar nil
     (tab-bar-mode 1)
     (tab-bar-rename-tab "Work")
-    
+
     (my/tab-new-with-name "Env")
     (my/tab-new-with-name "Mail")
     (my/tab-new-with-name "Any")))
@@ -1836,7 +1836,7 @@ respectively."
   :config
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
-  
+
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
@@ -2341,7 +2341,7 @@ parses its input."
     (eshell/alias "ll" "ls -l")
     (eshell/alias "bd" "cd ../")
     (eshell/alias "e" "emacsclient $1"))
-  
+
   (leaf eshell-p10k
     :disabled t
     :straight (eshell-p10k
@@ -2405,7 +2405,7 @@ parses its input."
    (org-fontify-quote-and-verse-blocks . t)
    (org-hide-block-startup . nil)
    (org-startup-folded . 'content)
-   
+
    ;; (org-adapt-indentation . t)
    ;; (org-indent-indentation-per-level . 2)
    (org-edit-src-content-indentation . 0)
@@ -2471,7 +2471,7 @@ parses its input."
     ;; variable pitch
     (face-remap-add-relative 'default :inherit 'variable-pitch)
 
-    ;; Ensure that anything that should be fixed-pitch in Org files appears that way    
+    ;; Ensure that anything that should be fixed-pitch in Org files appears that way
     (set-face-attribute 'org-table nil						:inherit 'fixed-pitch)
     (set-face-attribute 'org-formula nil					:inherit 'fixed-pitch)
     (set-face-attribute 'org-code nil							:inherit '(shadow fixed-pitch))
@@ -2546,7 +2546,7 @@ parses its input."
     (interactive)
     "Capture a task in agenda mode."
     (org-capture))
-  
+
   :defer-config
   (leaf org-agenda
     :hook ((kill-emacs-hook . ladicle/org-clock-out-and-save-when-exit)
@@ -3008,7 +3008,7 @@ parses its input."
   ;;   (:org-roam-dailies-map
   ;;    ("Y" . org-roam-dailies-capture-yesterday)
   ;;    ("T" . org-roam-dailies-capture-tomorrow)))
-  
+
   ;; for org-roam-buffer-toggle
   ;; Recommendation in the official manual
   (add-to-list 'display-buffer-alist
@@ -3050,7 +3050,7 @@ parses its input."
                                                             "#+filetags: Literature\n"
                                                             "#+title: ${title}"))
                                         :unnarrowed t))))
-  
+
   :preface
   (defun open-external (path)
     (interactive)
@@ -3163,7 +3163,7 @@ parses its input."
              (TeX-source-correlate-start-server . t)
              (TeX-source-correlate-mode . t)
              (TeX-PDF-mode . t))
- 
+
     :config
     (defun my/latex-mode-hook nil
       (visual-fill-column-mode t)
@@ -3349,7 +3349,7 @@ parses its input."
     (:after notmuch-hello-mode meow-insert-mode)
     (:after notmuch-search-mode meow-insert-mode)
     (:after notmuch-message-mode meow-insert-mode)
-    
+
     :hook (notmuch-mua-send-hook . notmuch-mua-attachment-check)
     :bind (:notmuch-search-mode-map
            :package notmuch
@@ -3358,7 +3358,7 @@ parses its input."
     :config
     (add-to-list 'corfu-excluded-modes 'notmuch-message-mode)
     (add-to-list 'corfu-excluded-modes 'org-msg-edit-mode)
-    
+
     (setq mark-complete-tags '("+archived" "-inbox" "-todo" "-unread")
           mark-delete-tags '("+del" "-inbox" "-archived" "-unread")
           mark-flag-tags '("+flag" "-unread")
@@ -3463,7 +3463,7 @@ Interactively, URL defaults to the string looking like a url around point."
   :bind (("C-c s" . webkit))
   :config
   ;; If you don't care so much about privacy and want to give your data to google
-  (setq webkit-search-prefix "https://google.com/search?q=") 
+  (setq webkit-search-prefix "https://google.com/search?q=")
 
   ;; Specify a different set of characters use in the link hints
   ;; For example the following are more convienent if you use dvorak
@@ -3477,7 +3477,7 @@ Interactively, URL defaults to the string looking like a url around point."
   ;; If you want cookies saved in a different place or
   ;; Set to `nil' to if you don't want cookies saved
   (setq webkit-cookie-file
-        (expand-file-name "cookies" no-littering-etc-directory)) 
+        (expand-file-name "cookies" no-littering-etc-directory))
 
   ;; Set webkit as the default browse-url browser
   ;; (setq browse-url-browser-function 'webkit-browse-url)
@@ -3751,7 +3751,7 @@ Interactively, URL defaults to the string looking like a url around point."
   :defer-config
   (setq markdown-preview-stylesheets
         (list "http://thomasf.github.io/solarized-css/solarized-light.min.css"))
-  
+
   (dolist (elm (list
                 "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"))
     (add-to-list 'markdown-preview-javascript elm))
