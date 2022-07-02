@@ -28,6 +28,7 @@ set -Ceu
 PATCH_URL=(
     "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-28/fix-window-role.patch"
     "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-28/system-appearance.patch"
+    "https://raw.githubusercontent.com/TheVaffel/emacs/master/emacs_background_transparency.patch"
 )
 
 function e_error() {
@@ -75,7 +76,7 @@ while (( $# > 0 )); do
             help
             ;;
         -j | --parallel | -j=* | --parallel=*)
-            if [[ "$1" =~ ^-j= || "$1" =~ ^--parallel= ]]; then                
+            if [[ "$1" =~ ^-j= || "$1" =~ ^--parallel= ]]; then
                 NPROC="${1##*=}"
             elif [[ -z "${2:-}" || "$2" =~ ^-+ ]]; then
                 e_error "'-j/--parallel' requires an int number."
@@ -182,7 +183,7 @@ function prepare_patches() {
 function apply_patches() {
     local FILE_DIR=$1
     local PATCH_DIR="${FILE_DIR}/patches"
-    
+
     prepare_patches $PATCH_DIR &&
     local PATCH_FILES=($(ls -d ${PATCH_DIR}/*))
 
@@ -194,7 +195,7 @@ function apply_patches() {
         e_done "Apply patch: ${patch_file}" ||
         continue
     done &&
-    return 0 || exit 1   
+    return 0 || exit 1
 }
 
 function download_tarball() {
@@ -213,16 +214,16 @@ function download_tarball() {
 
 function extract_tarball() {
     [[ -d "$TARBALL_EXTRACED_DIR" ]] || mkdir -p "$TARBALL_EXTRACED_DIR"
-    
+
     if [[ -f "$TARBALL_FILE" ]]; then
         e_newline
         e_arrow "Extracting tarball '${TARBALL_FILE}'..."
 	      tar -xzf $TARBALL_FILE -C $TARBALL_EXTRACED_DIR &&
 	      e_done "Extracted tarball." &&
 	      return 0 || {
-		        e_error "failed extracting tarball"
-		        exit 1
-		    }
+	          e_error "failed extracting tarball"
+            exit 1
+        }
     else
 	      exit 1
     fi
@@ -235,7 +236,7 @@ function prepare_sources() {
 }
 
 
-function build() {    
+function build() {
     configureFlags=(
         "--with-modules"
         "--with-json"
@@ -243,6 +244,7 @@ function build() {
         "--with-imagemagick"
         "--with-xml2"
 	      "--with-xwidgets"
+        "--with-cairo"
 	      "--prefix=${PREFIX}"
     )
 
@@ -250,7 +252,7 @@ function build() {
     for cmd in "${configureFlags[@]}"; do
         configureCMD+=" $cmd"
     done
-    
+
     # Pre-process
     if [[ -z "${SOURCE_DIR:-}" ]]; then
         prepare_sources &&
@@ -276,17 +278,36 @@ function build() {
         cp "${HOME}/.dotfiles/etc/helper/emacs-cli.bash" "${SOURCE_DIR}/nextstep/Emacs.app/Contents/MacOS/bin/emacs"
         chmod +x "${SOURCE_DIR}/nextstep/Emacs.app/Contents/MacOS/bin/emacs"
 
+        cd ${SOURCE_DIR}/nextstep/
+        codesign --force --deep -s - Emacs.app
+
         echo "Finally, recommend following steps:"
         echo "  mv ${SOURCE_DIR}/nextstep/Emacs.app /Applications/"
-        echo "  sudo ln -s /Applications/Emacs.app/Contents/MacOS/bin/emacs /usr/local/bin/emacs"
-        echo "  sudo ln -s /Applications/Emacs.app/Contents/MacOS/bin/emacsclient /usr/local/bin/emacsclient"
+        echo "  sudo ln -s /Applications/Emacs.app/Contents/MacOS/bin/emacs ${HOME}/.local/bin/emacs"
+        echo "  sudo ln -s /Applications/Emacs.app/Contents/MacOS/bin/emacsclient ${HOME}/.local/bin/emacsclient"
         echo ""
         echo "If necessary, execute following steps before create symlinks:"
-        echo "  sudo unlink /usr/local/bin/emacs"
-        echo "  sudo unlink /usr/local/bin/emacsclient"
+        echo "  sudo unlink ${HOME}/.local/bin/emacs"
+        echo "  sudo unlink ${HOME}/.local/bin/emacsclient"
     fi &&
     return 0 || exit 1
 }
 
 trap "e_error 'terminated'; exit 1" INT ERR
+
+if [[ -e /opt/homebrew/ ]]; then
+    if [[ -z ${LIBRARY_PATH:-} ]]; then
+        export LIBRARY_PATH=/opt/homebrew/lib/
+    else
+        export LIBRARY_PATH=${LIBRARY_PATH}:/opt/homebrew/lib/
+    fi
+
+    if [[ -z ${CPATH:-} ]]; then
+        export CPATH=/opt/homebrew/include/
+    else
+        export CPATH=${CPATH}:/opt/homebrew/include/
+    fi
+fi
+
 build
+
