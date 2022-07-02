@@ -4067,13 +4067,15 @@ parses its input."
        :unnarrowed t))))
 
   :defer-config
-  (leaf org-roam-dailies
-    :bind-keymap ("C-c n d" . org-roam-dailies-map)
-    :bind
-    (:org-roam-dailies-map
-     ("Y" . org-roam-dailies-capture-yesterday)
-     ("T" . org-roam-dailies-capture-tomorrow)))
-
+  ;; (leaf org-roam-dailies
+  ;;   :after org-roam
+  ;;   :defvar org-roam-dailies-map
+  ;;   :bind-keymap ("C-c n d" . org-roam-dailies-map)
+  ;;   :bind
+  ;;   (:org-roam-dailies-map
+  ;;    ("Y" . org-roam-dailies-capture-yesterday)
+  ;;    ("T" . org-roam-dailies-capture-tomorrow)))
+  
   ;; for org-roam-buffer-toggle
   ;; Recommendation in the official manual
   (add-to-list 'display-buffer-alist
