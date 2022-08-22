@@ -3413,12 +3413,28 @@ parses its input."
 
 (leaf tree-sitter
   :straight t tree-sitter-langs
-  :hook
-  (python-mode-hook . (lambda nil
-                        (require 'tree-sitter)
-                        (require 'tree-sitter-langs)
-                        (tree-sitter-mode)
-                        (tree-sitter-hl-mode))))
+  :hook (tree-sitter-after-on-hook . tree-sitter-hl-mode)
+  :global-minor-mode global-tree-sitter-mode
+  :config
+  (add-to-list 'tree-sitter-major-mode-language-alist '(typescript-tsx-mode . tsx))
+  (tree-sitter-hl-add-patterns 'tsx
+    [
+     ;; styled.div``
+     (call_expression
+      function: (member_expression
+                 object: (identifier) @function.call
+                 (.eq? @function.call "styled"))
+      arguments: ((template_string) @property.definition
+                  (.offset! @property.definition 0 1 0 -1)))
+     ;; styled(Component)``
+     (call_expression
+      function: (call_expression
+                 function: (identifier) @function.call
+                 (.eq? @function.call "styled"))
+      arguments: ((template_string) @property.definition
+                  (.offset! @property.definition 0 1 0 -1)))
+     ])
+)
 
 (leaf xwwp
   :disabled t
