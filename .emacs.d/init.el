@@ -3778,6 +3778,12 @@ Interactively, URL defaults to the string looking like a url around point."
           (define-key map (kbd "C-c C-d d") 'mermaid-open-doc)
           map)))
 
+(leaf pulsar
+  :straight t
+  :custom ((pulsar-pulse-on-window-change . t)
+           (pulsar-pulse . t))
+  :global-minor-mode pulsar-global-mode)
+
 (leaf imenu-list
   :straight t
   :custom ((imenu-list-focus-after-activation . t)
