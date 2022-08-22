@@ -89,6 +89,8 @@ zinit wait lucid for \
          zsh-users/zsh-completions \
      as"blockf; completion; snippet" \
          https://github.com/esc/conda-zsh-completion/blob/master/_conda \
+     as"blockf; completion; snippet" \
+         https://github.com/docker/cli/blob/master/contrib/completion/zsh/_docker
 
 zinit wait lucid for \
     atclone"curl -sOL https://github.com/ohmyzsh/ohmyzsh/raw/master/plugins/tmux/tmux.extra.conf" \
