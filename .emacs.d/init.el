@@ -3778,6 +3778,13 @@ Interactively, URL defaults to the string looking like a url around point."
           (define-key map (kbd "C-c C-d d") 'mermaid-open-doc)
           map)))
 
+(leaf dockerfile-mode
+  :straight (dockerfile-mode
+             :type git
+             :host github
+             :repo "spotify/dockerfile-mode")
+  :mode "Dockerfile\\'")
+
 (leaf yaml-mode
   :straight (yaml-mode
              :type git

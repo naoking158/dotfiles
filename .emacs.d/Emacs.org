@@ -120,6 +120,7 @@ a bunch of resources I've found online.
   - [[#csv-mode][CSV-mode]]
   - [[#markdown-preview-mode][Markdown-preview-mode]]
   - [[#mermaid-mode][Mermaid-mode]]
+  - [[#dockerfile-mode][Dockerfile-mode]]
   - [[#yaml-mode][yaml-mode]]
 - [[#footer][Footer]]
 :END:
@@ -5488,6 +5489,16 @@ HTTP encodings, headers, media types, methods, relations and status codes, all s
           map)))
 #+end_src
 
+** Dockerfile-mode
+
+#+begin_src emacs-lisp
+(leaf dockerfile-mode
+  :straight (dockerfile-mode
+             :type git
+             :host github
+             :repo "spotify/dockerfile-mode")
+  :mode "Dockerfile\\'")
+#+end_src
 
 ** yaml-mode
 
