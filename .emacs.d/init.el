@@ -3778,4 +3778,11 @@ Interactively, URL defaults to the string looking like a url around point."
           (define-key map (kbd "C-c C-d d") 'mermaid-open-doc)
           map)))
 
+(leaf yaml-mode
+  :straight (yaml-mode
+             :type git
+             :host github
+             :repo "yoshiki/yaml-mode")
+  :mode ("\\.yml\\'" "\\.yaml\\'"))
+
 (provide 'init)

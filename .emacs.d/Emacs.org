@@ -120,6 +120,7 @@ a bunch of resources I've found online.
   - [[#csv-mode][CSV-mode]]
   - [[#markdown-preview-mode][Markdown-preview-mode]]
   - [[#mermaid-mode][Mermaid-mode]]
+  - [[#yaml-mode][yaml-mode]]
 - [[#footer][Footer]]
 :END:
 
@@ -5488,6 +5489,16 @@ HTTP encodings, headers, media types, methods, relations and status codes, all s
 #+end_src
 
 
+** yaml-mode
+
+#+begin_src emacs-lisp
+(leaf yaml-mode
+  :straight (yaml-mode
+             :type git
+             :host github
+             :repo "yoshiki/yaml-mode")
+  :mode ("\\.yml\\'" "\\.yaml\\'"))
+#+end_src
 
 * Footer
 :PROPERTIES:
