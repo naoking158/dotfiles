@@ -1200,10 +1200,34 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
                     (make-local-variable 'js-indent-level)
                     (setq js-indent-level 2))))
 
+(leaf typescript-mode
+  :straight t
+  :mode (("\\.ts\\'" . typescript-mode)
+         ("\\.tsx\\'" . typescript-tsx-mode))
+  :hook (typescript-mode-hook . (lambda ()
+                                  (setq-local lsp-disabled-clients '(ts-ls))
+                                  (lsp-deferred)))
+  :custom ((typescript-indent-level . 2)
+           (typescript-auto-indent-flag . nil))
+  )
+
+(leaf deno-emacs
+  :disabled nil
+  :straight (deno-emacs
+             :type git
+             :host github
+             :repo "rclarey/deno-emacs"
+             :includes deno-fmt)
+  :require deno-fmt
+  :hook (typescript-mode-hook . deno-fmt-mode))
+
 (leaf json-mode
   :straight t
   :custom
   ((json-mode-standard-file-ext . '(".json" ".jsonc" ".jsonld"))))
+
+(leaf markdown-mode
+  :mode "\\.md\\'" "\\.spec\\'")
 
 (leaf sh-mode
   :hook (sh-mode-hook . lsp-deferred))
