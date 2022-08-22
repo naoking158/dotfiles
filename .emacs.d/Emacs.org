@@ -1566,12 +1566,10 @@ Only in Neotree Buffer:
   :url "https://github.com/emacs-lsp/lsp-mode#supported-languages"
   :url "https://github.com/MaskRay/ccls/wiki/lsp-mode#find-definitionsreferences"
   :emacs>= 25.1
-  :straight t
-  :after orderless cape
+  :straight t posframe
   :commands lsp lsp-deferred
   :hook ((lsp-mode-hook . lsp-enable-which-key-integration)
-         (lsp-managed-mode-hook . lsp-modeline-diagnostics-mode)
-         (lsp-completion-mode-hook . my/lsp-mode-setup-completion))
+         (lsp-managed-mode-hook . lsp-modeline-diagnostics-mode))
   :custom `((lsp-keymap-prefix . "C-c l")
             (read-process-output-max . ,(* 1 1024 1024))  ;; 1MB
             ;; debug
@@ -1581,23 +1579,15 @@ Only in Neotree Buffer:
             (lsp-trace . nil)
             (lsp-print-performance . nil)
             ;; general
-            (lsp-idle-delay . 0.5)
+            (lsp-idle-delay . 0.3)
             (lsp-document-sync-method . 2)
             (lsp-response-timeout . 5)
             (lsp-prefer-flymake . nil)
             (lsp-completion-enable . t)
             (lsp-enable-indentation . nil)
             (lsp-restart . 'ignore)
-            (lsp-completion-provider . :none))
-  :preface
-  (defun my/orderless-dispatch-flex-first (pattern index _total)
-    (and (eq index 0) 'orderless-flex pattern))
-
-  (defun my/lsp-mode-setup-completion ()
-    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-          '(orderless)))
-  ;; Optionally configure the first word as flex filtered.
-  (add-hook 'orderless-style-dispatchers #'my/orderless-dispatch-flex-first nil 'local)
+            (lsp-completion-provider . :none)
+            (lsp-signature-function . 'lsp-signature-posframe))
   :config
   (dolist (regexp '("[\\d\\D]*\\.dat\\'"
                     "[\\d\\D]*\\.pth\\'"
