@@ -316,7 +316,8 @@
   :require t ace-window
   :blackout
   :custom ((super-save-auto-save-when-idle . t)
-           (super-save-idle-duration . 7))
+           (super-save-idle-duration . 7)
+           (super-save-remote-files . nil))
   :config
   ;; add integration with ace-window
   (add-to-list 'super-save-triggers 'ace-window)
