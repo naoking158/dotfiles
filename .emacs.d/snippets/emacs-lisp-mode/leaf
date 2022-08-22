@@ -1,0 +1,6 @@
+# key: lf
+# name: leaf
+# --
+(leaf $1
+  :straight $0 
+  )
