@@ -120,6 +120,7 @@ a bunch of resources I've found online.
   - [[#csv-mode][CSV-mode]]
   - [[#markdown-preview-mode][Markdown-preview-mode]]
   - [[#mermaid-mode][Mermaid-mode]]
+  - [[#imenu-list][imenu-list]]
   - [[#dockerfile-mode][Dockerfile-mode]]
   - [[#yaml-mode][yaml-mode]]
 - [[#footer][Footer]]
@@ -5487,6 +5488,15 @@ HTTP encodings, headers, media types, methods, relations and status codes, all s
           (define-key map (kbd "C-c C-d o") 'mermaid-open-browser)
           (define-key map (kbd "C-c C-d d") 'mermaid-open-doc)
           map)))
+#+end_src
+
+** imenu-list
+
+#+begin_src emacs-lisp
+(leaf imenu-list
+  :straight t
+  :custom ((imenu-list-focus-after-activation . t)
+           (imenu-list-auto-resize . nil)))
 #+end_src
 
 ** Dockerfile-mode

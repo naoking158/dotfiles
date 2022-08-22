@@ -3778,6 +3778,11 @@ Interactively, URL defaults to the string looking like a url around point."
           (define-key map (kbd "C-c C-d d") 'mermaid-open-doc)
           map)))
 
+(leaf imenu-list
+  :straight t
+  :custom ((imenu-list-focus-after-activation . t)
+           (imenu-list-auto-resize . nil)))
+
 (leaf dockerfile-mode
   :straight (dockerfile-mode
              :type git
