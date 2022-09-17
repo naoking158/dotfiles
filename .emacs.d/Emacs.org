@@ -124,6 +124,8 @@ a bunch of resources I've found online.
   - [[#imenu-list][imenu-list]]
   - [[#dockerfile-mode][Dockerfile-mode]]
   - [[#yaml-mode][yaml-mode]]
+  - [[#go-mode][Go-mode]]
+  - [[#ansible][Ansible]]
 - [[#footer][Footer]]
 :END:
 
@@ -5605,6 +5607,13 @@ HTTP encodings, headers, media types, methods, relations and status codes, all s
              :host github
              :repo "yoshiki/yaml-mode")
   :mode ("\\.yml\\'" "\\.yaml\\'"))
+#+end_src
+
+** Go-mode
+
+#+begin_src emacs-lisp
+(leaf go-mode
+  :straight t)
 #+end_src
 
 * Footer
