@@ -492,7 +492,7 @@
                    `(alpha . (,num . ,(- num diff-active-and-inactive-frame))))))
 
   :config
-  (my/change-transparency 91))
+  (my/change-transparency 100))
 
 (leaf font
   :when window-system
@@ -1203,9 +1203,9 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 (leaf typescript-mode
   :straight t
   :mode (("\\.ts\\'" . typescript-mode)
-         ("\\.tsx\\'" . typescript-tsx-mode))
+         ("\\.tsx\\'" . typescript-mode))
   :hook (typescript-mode-hook . (lambda ()
-                                  (setq-local lsp-disabled-clients '(ts-ls))
+                                  ;; (setq-local lsp-disabled-clients '(ts-ls))
                                   (lsp-deferred)))
   :custom ((typescript-indent-level . 2)
            (typescript-auto-indent-flag . nil))
@@ -1287,10 +1287,17 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
           :package python-mode
           ("C-c C-n" . flycheck-next-error)
           ("C-c C-p" . flycheck-previous-error)))
-  :hook (python-mode-hook . flycheck-mode)
+  :hook ((python-mode-hook typescript-mode-hook) . flycheck-mode)
   :custom (flycheck-display-errors-delay . 0.3)
   :config
+  (leaf flycheck-pos-tip
+    :straight t
+    :custom (flycheck-pos-tip-timeout . 10)
+    :config
+    (flycheck-pos-tip-mode))
+  
   (leaf flycheck-inline
+    :disabled t
     :straight t
     :hook (flycheck-mode-hook . flycheck-inline-mode)
     :advice
@@ -1940,108 +1947,134 @@ respectively."
 (leaf consult-ls-git
   :straight t)
 
-(if (not (executable-find "cmigemo"))
-    (leaf orderless
-      :straight t
-      :require t
-      :custom
-      '((completion-styles . '(orderless))
-        (completion-category-defaults . nil)
-        (completion-category-overrides . ((file (styles '(orderless-prefixes
-                                                          orderless-initialism
-                                                          orderless-regexp)))))))
+;; (if (not (executable-find "cmigemo"))
+;;     (leaf orderless
+;;       :straight t
+;;       :require t
+;;       :custom
+;;       '((completion-styles . '(orderless))
+;;         (completion-category-defaults . nil)
+;;         (completion-category-overrides . ((file (styles '(orderless-prefixes
+;;                                                           orderless-initialism
+;;                                                           orderless-regexp)))))))
 
-  (leaf orderless
-    :straight t migemo
-    :require t migemo
-    :leaf-defer nil
-    :bind (:minibuffer-local-completion-map
-           ("SPC" . nil)
-           ("?" . nil))
-    :custom
-    '((completion-styles . '(basic substring initials flex orderless))
-      (completion-cycle-threshold . 2)
-      (completion-flex-nospace . nil)
-      (completion-category-defaults . nil)
-      (completion-category-overrides
-       quote ((file (styles orderless-migemo-style))
-              ;; for consult-line
-              (citar-reference (styles orderless-migemo-style))
-              (command (styles orderless-default-style))
-              (consult-location (styles orderless-migemo-style))
-              (consult-multi (styles orderless-default-style))
-              (imenu (styles orderless-migemo-style))
-              (org-roam-node (styles orderless-migemo-style))
-              (unicode-name (styles orderless-migemo-style))
-              )))
-    :config
-    (setq my--orderless-default-styles
-          '(orderless-prefixes
-            orderless-initialism
-            orderless-regexp))
+;;   (leaf orderless
+;;     :straight t migemo
+;;     :require t migemo
+;;     :leaf-defer nil
+;;     :bind (:minibuffer-local-completion-map
+;;            ("SPC" . nil)
+;;            ("?" . nil))
+;;     :custom
+;;     '((completion-styles . '(basic substring initials flex orderless))
+;;       (completion-cycle-threshold . 2)
+;;       (completion-flex-nospace . nil)
+;;       (completion-category-defaults . nil)
+;;       (completion-category-overrides
+;;        quote ((file (styles orderless-migemo-style))
+;;               ;; for consult-line
+;;               (citar-reference (styles orderless-migemo-style))
+;;               (command (styles orderless-default-style))
+;;               (consult-location (styles orderless-migemo-style))
+;;               (consult-multi (styles orderless-default-style))
+;;               (imenu (styles orderless-migemo-style))
+;;               (org-roam-node (styles orderless-migemo-style))
+;;               (unicode-name (styles orderless-migemo-style))
+;;               )))
+;;     :config
+;;     (setq my--orderless-default-styles
+;;           '(orderless-prefixes
+;;             orderless-initialism
+;;             orderless-regexp))
 
-    (defun my--orderless-literal-dispatcher (pattern _index _total)
-      "Literal style dispatcher using the equals sign as a suffix.
-It matches PATTERN _INDEX and _TOTAL according to how Orderless
-parses its input."
-      (when (string-suffix-p "=" pattern)
-        `(orderless-literal . ,(substring pattern 0 -1))))
+;;     (defun my--orderless-literal-dispatcher (pattern _index _total)
+;;       "Literal style dispatcher using the equals sign as a suffix.
+;; It matches PATTERN _INDEX and _TOTAL according to how Orderless
+;; parses its input."
+;;       (when (string-suffix-p "=" pattern)
+;;         `(orderless-literal . ,(substring pattern 0 -1))))
 
-    (defun my--orderless-initialism-dispatcher (pattern _index _total)
-      "Leading initialism  dispatcher using the comma suffix.
-It matches PATTERN _INDEX and _TOTAL according to how Orderless
-parses its input."
-      (when (string-suffix-p "," pattern)
-        `(orderless-initialism . ,(substring pattern 0 -1))))
+;;     (defun my--orderless-initialism-dispatcher (pattern _index _total)
+;;       "Leading initialism  dispatcher using the comma suffix.
+;; It matches PATTERN _INDEX and _TOTAL according to how Orderless
+;; parses its input."
+;;       (when (string-suffix-p "," pattern)
+;;         `(orderless-initialism . ,(substring pattern 0 -1))))
 
-    (defun my--orderless-flex-dispatcher (pattern _index _total)
-      "Flex  dispatcher using the tilde suffix.
-It matches PATTERN _INDEX and _TOTAL according to how Orderless
-parses its input."
-      (when (string-suffix-p "~" pattern)
-        `(orderless-flex . ,(substring pattern 0 -1))))
+;;     (defun my--orderless-flex-dispatcher (pattern _index _total)
+;;       "Flex  dispatcher using the tilde suffix.
+;; It matches PATTERN _INDEX and _TOTAL according to how Orderless
+;; parses its input."
+;;       (when (string-suffix-p "~" pattern)
+;;         `(orderless-flex . ,(substring pattern 0 -1))))
 
-    (setq orderless-matching-styles my--orderless-default-styles)
-    (setq orderless-style-dispatchers '(my--orderless-literal-dispatcher
-                                        my--orderless-initialism-dispatcher
-                                        my--orderless-flex-dispatcher))
+;;     (setq orderless-matching-styles my--orderless-default-styles)
+;;     (setq orderless-style-dispatchers '(my--orderless-literal-dispatcher
+;;                                         my--orderless-initialism-dispatcher
+;;                                         my--orderless-flex-dispatcher))
 
-    
-    (defun orderless-migemo (component)
-      (let ((pattern (migemo-get-pattern component)))
-        (condition-case nil
-            (progn (string-match-p pattern "") pattern)
-          (invalid-regexp nil))))
-    
-    (orderless-define-completion-style
-     orderless-default-style
-     (orderless-matching-styles '(orderless-literal
-                                  orderless-prefixes
-                                  orderless-initialism
-                                  orderless-regexp)))
 
-    (orderless-define-completion-style
-     orderless-migemo-style
-     (orderless-matching-styles '(orderless-literal
-                                  orderless-prefixes
-                                  orderless-initialism
-                                  orderless-regexp
-                                  orderless-migemo)))))
+;;     (defun orderless-migemo (component)
+;;       (let ((pattern (migemo-get-pattern component)))
+;;         (condition-case nil
+;;             (progn (string-match-p pattern "") pattern)
+;;           (invalid-regexp nil))))
 
-(leaf migemo
-  :when (executable-find "cmigemo")
+;;     (orderless-define-completion-style
+;;      orderless-default-style
+;;      (orderless-matching-styles '(orderless-literal
+;;                                   orderless-prefixes
+;;                                   orderless-initialism
+;;                                   orderless-regexp)))
+
+;;     (orderless-define-completion-style
+;;      orderless-migemo-style
+;;      (orderless-matching-styles '(orderless-literal
+;;                                   orderless-prefixes
+;;                                   orderless-initialism
+;;                                   orderless-regexp
+;;                                   orderless-migemo)))))
+
+;; (leaf migemo
+;;   :when (executable-find "cmigemo")
+;;   :straight t
+;;   :hook (emacs-startup-hook . migemo-init)
+;;   :custom
+;;   `((migemo-user-dictionary  . nil)
+;;     (migemo-regex-dictionary . nil)
+;;     (migemo-coding-system    . 'utf-8)
+;;     (migemo-dictionary . ,(cond
+;;                            ((file-exists-p "/usr/local/share/migemo/utf-8/migemo-dict")
+;;                             "/usr/local/share/migemo/utf-8/migemo-dict")
+;;                            ((file-exists-p "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
+;;                             "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")))
+;;     (migemo-isearch-enable-p . t)))
+
+(leaf orderless
   :straight t
-  :hook (emacs-startup-hook . migemo-init)
-  :custom
-  `((migemo-user-dictionary  . nil)
-    (migemo-regex-dictionary . nil)
-    (migemo-coding-system    . 'utf-8)
-    (migemo-dictionary . ,(cond
-                           ((file-exists-p "/usr/local/share/migemo/utf-8/migemo-dict")
-                            "/usr/local/share/migemo/utf-8/migemo-dict")
-                           ((file-exists-p "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
-                            "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")))
-    (migemo-isearch-enable-p . t)))
+  :commands (orderless-filter))
+
+(leaf fussy
+  :leaf-defer nil
+  :straight (fussy
+             :type git
+             :host github
+             :repo "jojojames/fussy")
+  :init
+  (leaf fuz
+    :leaf-defer nil
+    :straight (fuz
+               :type git
+               :host github
+               :repo "rustify-emacs/fuz.el")
+    :config
+    (setq fussy-score-fn 'fussy-fuz-score)
+    (unless (require 'fuz-core nil t)
+      (fuz-build-and-load-dymod)))
+  :custom ((completion-styles . '(fussy))
+           (completion-category-defaults . nil)
+           (completion-category-overrides . nil))
+  )
 
 (leaf marginalia
   :straight t
@@ -2196,6 +2229,7 @@ parses its input."
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (leaf citar
+  :disabled t
   :straight t
   :bind (("C-c b" . citar-insert-citation)
          (:minibuffer-local-map
@@ -2454,6 +2488,7 @@ parses its input."
                                      ("py" . "src python :session :results value")
                                      ("jp" . "src jupyter-python :session py :async yes :kernel torch")
                                      ("js" . "src javascript")
+                                     ("ts" . "src typescript")
                                      ("d" . "definition")
                                      ("t" . "theorem")
                                      ("mc" . "quoting")
@@ -2487,14 +2522,14 @@ parses its input."
     (face-remap-add-relative 'default :inherit 'variable-pitch)
 
     ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-    (set-face-attribute 'org-table nil						:inherit 'fixed-pitch)
-    (set-face-attribute 'org-formula nil					:inherit 'fixed-pitch)
-    (set-face-attribute 'org-code nil							:inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-indent t							:inherit '(org-hide fixed-pitch))
-    (set-face-attribute 'org-verbatim nil					:inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-special-keyword nil	:inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-meta-line nil				:inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-checkbox nil					:inherit 'fixed-pitch)
+    (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-formula nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-indent t :inherit '(org-hide fixed-pitch))
+    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
 
     ;; Get rid of the background on column views
     (set-face-attribute 'org-column nil :background nil)
@@ -2518,7 +2553,9 @@ parses its input."
 
   (leaf org-fragtog
     :straight t
-    :hook (org-mode-hook . org-fragtog-mode)))
+    :hook (org-mode-hook . org-fragtog-mode))
+
+  (setq warning-suppress-types (append warning-suppress-types '((org-element-cache)))))
 
 (leaf org-agenda
   :when window-system
@@ -3227,16 +3264,16 @@ parses its input."
 
 (leaf oj
   :when window-system
-	:doc "Competitive programming tools client for AtCoder, Codeforces"
-	:req "emacs-26.1" "quickrun-2.2"
-	:url "https://github.com/conao3/oj.el"
-	:straight t
-	:commands oj-prepare oj-test oj-submit
-	:custom ((oj-default-online-judge quote atcoder)
-					 (oj-compiler-python . "cpython")
-					 (oj-home-dir . "~/drive/work/coder/AtCoder")
-					 (oj-submit-args quote
-													 ("-y" "--wait=0"))))
+  :doc "Competitive programming tools client for AtCoder, Codeforces"
+  :req "emacs-26.1" "quickrun-2.2"
+  :url "https://github.com/conao3/oj.el"
+  :straight t
+  :commands oj-prepare oj-test oj-submit
+  :custom ((oj-default-online-judge quote atcoder)
+           (oj-compiler-python . "cpython")
+           (oj-home-dir . "~/drive/work/coder/AtCoder")
+           (oj-submit-args quote
+                           ("-y" "--wait=0"))))
 
 (leaf elfeed
   :when window-system
@@ -3832,5 +3869,13 @@ Interactively, URL defaults to the string looking like a url around point."
              :host github
              :repo "yoshiki/yaml-mode")
   :mode ("\\.yml\\'" "\\.yaml\\'"))
+
+(leaf go-mode
+  :straight t)
+
+(leaf ansible
+  :straight t
+  :hook (ansible-hook . (lambda ()
+                          (lsp-deferred))))
 
 (provide 'init)
