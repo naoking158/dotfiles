@@ -51,6 +51,12 @@ if [[ $SYSTEM == "macos" ]] && [[ -e "/opt/homebrew" ]]; then
 fi
 export PATH="/usr/local/bin:$HOME/.local/bin:$PATH"
 
+# Set Go path
+if type go >/dev/null 2>&1; then
+    export GOPATH=$(go env GOPATH)
+    export PATH="${PATH}:${GOPATH}/bin"
+fi
+
 if type emacs >/dev/null 2>&1; then
     export EDITOR="emacsclient -nw --alternate-editor='emacs -Q -nw'"
 else
