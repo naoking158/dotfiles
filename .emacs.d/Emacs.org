@@ -5617,6 +5617,15 @@ HTTP encodings, headers, media types, methods, relations and status codes, all s
   :straight t)
 #+end_src
 
+** Ansible
+
+#+begin_src emacs-lisp
+(leaf ansible
+  :straight t
+  :hook (ansible-hook . (lambda ()
+                          (lsp-deferred))))
+#+end_src
+
 * Footer
 :PROPERTIES:
 :ID:       B2B50080-95ED-4DEC-B99E-B120D1A08233
