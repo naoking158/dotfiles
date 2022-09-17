@@ -38,6 +38,7 @@ flycheck_*.el
 .dir-locals.el
 # network security
 /network-security.data
+
 ### LaTeX ###
 ## Core latex/pdflatex auxiliary files:
 *.aux
@@ -233,6 +234,7 @@ pythontex-files-*/
 *.fff
 # Latexian
 TSWLatexianTemp*
+
 ## Editors:
 # WinEdt
 *.bak
@@ -262,11 +264,13 @@ TSWLatexianTemp*
 # option is specified. Footnotes are the stored in a file with suffix Notes.bib.
 # Uncomment the next line to have this generated file ignored.
 #*Notes.bib
+
 ### LaTeX Patch ###
 # LIPIcs / OASIcs
 *.vtc
 # glossaries
 *.glstex
+
 ### macOS ###
 # General
 .DS_Store
@@ -290,6 +294,7 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -428,3 +433,7 @@ Thumbs.db
 **/data/CIFAR10/cifar-10-batches-py/*
 **/data/MNIST/raw/*
 # End of https://www.toptal.com/developers/gitignore/api/macos,latex,python,emacs
+
+### Node.js
+node_modules/
+package-lock.json
