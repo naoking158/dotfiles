@@ -5,9 +5,12 @@ if type brew &>/dev/null
 then
   FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 
-  autoload -Uz compinit
-  compinit
+  autoload -Uz compinit && compinit
+
+  autoload -U bashcompinit && bashcompinit
+  source $(brew --prefix)/etc/bash_completion.d/az
 fi
+
 
 typeset -U path cdpath fpath manpath
 
@@ -265,7 +268,10 @@ alias _vm1='ssh vm1'
 alias _vm2='ssh vm2'
 alias _vm3='ssh vm3'
 alias _vm4='ssh vm4'
+alias _vm5='ssh vm5'
 alias _exp='ssh exp'
+alias _kubota='ssh kubota'
+alias _utm='ssh utm'
 alias c='conda'
 alias ca='c activate'
 alias cat='bat'
@@ -291,7 +297,7 @@ alias ja_latex='latexmk -pvc'
 alias la='exa -a'
 alias ll='exa -l -g --icons'
 alias lla='ll -a'
-alias ls='exa --icons'
+alias ls='exa'
 # alias nc-list='nix-channel --list'
 # alias nc-update='nix-channel --update'
 # alias ne-search='nix-env -qa'
@@ -300,9 +306,20 @@ alias rm='~/src/github.com/naoking158/rm-alternative/rm-alternative.bash'
 alias sudo='sudo '
 alias tgz='f() { env COPYFILE_DISABLE=1 tar zcvf $1 --exclude=".DS_Store" ${@:2}; unset -f f; }; f'
 alias tree='exa --tree --level 3 -a --ignore-glob "node_modules|.git|.cache" --icons'
-alias pull='ssh vm4 "bash ~/work/VMOperateTool/utils/download.sh" && myrsync -d vm4 ~/work/VMOperateTool/ ~/src/work/VMOperateTool/'
-alias push='ssh vm4 "rm -rf ~/work/VMOperateTool" && myrsync -u vm4 ~/src/work/VMOperateTool/ ~/work/VMOperateTool/'
-alias deploy='ssh vm3 "rm -rf ~/work/VMOperateTool" && myrsync -u vm3 ~/src/work/VMOperateTool/ ~/work/VMOperateTool/ && ssh vm3 "bash ~/work/VMOperateTool/utils/upload.sh"'
+alias pull3='ssh vm3 "bash ~/work/VMOperateTool/utils/download.sh" && myrsync -d vm3 ~/work/VMOperateTool/ ~/src/github.com/fixpoint/VMOperateTool/'
+alias push3='ssh vm3 "rm -rf ~/work/VMOperateTool" && myrsync -u vm3 ~/src/github.com/fixpoint/VMOperateTool/ ~/work/VMOperateTool/'
+alias pull4='ssh vm4 "bash ~/work/VMOperateTool/utils/download.sh" && myrsync -d vm4 ~/work/VMOperateTool/ ~/src/github.com/fixpoint/VMOperateTool/'
+alias push4='ssh vm4 "rm -rf ~/work/VMOperateTool" && myrsync -u vm4 ~/src/github.com/fixpoint/VMOperateTool/ ~/work/VMOperateTool/'
+# alias deploy='ssh vm3 "rm -rf ~/work/VMOperateTool" && myrsync -u vm3 ~/src/work/VMOperateTool/ ~/work/VMOperateTool/ && ssh vm3 "bash ~/work/VMOperateTool/utils/upload.sh"'
+# alias push='ssh vm5 "rm -rf ~/work/ToolsOnKE" && myrsync -u vm5 ~/src/github.com/fixpoint/ToolsOnKE/ ~/work/ToolsOnKE/'
+alias xargs='gxargs'
+
+
+dev_vm="vm4"
+dev_pkg="VMOperateTool"
+alias dpull='ssh ${dev_vm} "bash ~/work/${dev_pkg}/utils/download.sh" && myrsync -d ${dev_vm} ~/work/${dev_pkg}/ ~/src/github.com/fixpoint/${dev_pkg}/'
+alias dpush='ssh ${dev_vm} "rm -rf ~/work/${dev_pkg}" && myrsync -u ${dev_vm} ~/src/github.com/fixpoint/${dev_pkg}/ ~/work/${dev_pkg}/'
+
 
 
 # Global Aliases
