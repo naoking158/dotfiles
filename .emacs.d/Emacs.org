@@ -1790,9 +1790,9 @@ Only in Neotree Buffer:
 (leaf typescript-mode
   :straight t
   :mode (("\\.ts\\'" . typescript-mode)
-         ("\\.tsx\\'" . typescript-tsx-mode))
+         ("\\.tsx\\'" . typescript-mode))
   :hook (typescript-mode-hook . (lambda ()
-                                  (setq-local lsp-disabled-clients '(ts-ls))
+                                  ;; (setq-local lsp-disabled-clients '(ts-ls))
                                   (lsp-deferred)))
   :custom ((typescript-indent-level . 2)
            (typescript-auto-indent-flag . nil))
@@ -3490,6 +3490,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                                      ("py" . "src python :session :results value")
                                      ("jp" . "src jupyter-python :session py :async yes :kernel torch")
                                      ("js" . "src javascript")
+                                     ("ts" . "src typescript")
                                      ("d" . "definition")
                                      ("t" . "theorem")
                                      ("mc" . "quoting")
