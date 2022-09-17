@@ -1909,10 +1909,17 @@ Only in Neotree Buffer:
           :package python-mode
           ("C-c C-n" . flycheck-next-error)
           ("C-c C-p" . flycheck-previous-error)))
-  :hook (python-mode-hook . flycheck-mode)
+  :hook ((python-mode-hook typescript-mode-hook) . flycheck-mode)
   :custom (flycheck-display-errors-delay . 0.3)
   :config
+  (leaf flycheck-pos-tip
+    :straight t
+    :custom (flycheck-pos-tip-timeout . 10)
+    :config
+    (flycheck-pos-tip-mode))
+  
   (leaf flycheck-inline
+    :disabled t
     :straight t
     :hook (flycheck-mode-hook . flycheck-inline-mode)
     :advice
