@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: async
+# key: as
+# --
+async ({ $1 }) => {
+    $0
+}
