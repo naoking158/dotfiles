@@ -2959,7 +2959,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
              :repo "jojojames/fussy")
   :init
   (leaf fuz
-    :leaf-defer nil
+    :require t
     :straight (fuz
                :type git
                :host github
