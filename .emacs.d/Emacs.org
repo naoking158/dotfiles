@@ -4229,6 +4229,7 @@ end open location
 #+begin_src emacs-lisp
 
 (leaf orp-paperpile
+  :disabled t
   :when window-system
   :after org-roam
   :doc "orp-paperpile; Org-Roam-Protocol Paperpile is an interface
