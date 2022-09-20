@@ -55,7 +55,7 @@ a bunch of resources I've found online.
   - [[#window-movement-with-windmove][Window Movement with windmove]]
   - [[#resize-window][Resize Window]]
   - [[#split-and-follow][Split and follow]]
-  - [[#named-window-with-tab-bar][Named Window with tab-bar]]
+  - [[#tab-management][Tab management]]
   - [[#rotate-window-layout][Rotate Window Layout]]
   - [[#set-margins][Set Margins]]
   - [[#control-buffer-placement][Control Buffer Placement]]
@@ -2532,40 +2532,48 @@ Window management commands are accessible by prefix =C-x w=
   (other-window 1))
 (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
 #+end_src
-** Named Window with tab-bar
+** Tab management
 :PROPERTIES:
 :ID:       E76C0A4A-586E-4086-B576-99102F0D9724
 :END:
 
 #+begin_src emacs-lisp
 
-(leaf tab-bar
-  :doc "frame-local tabs with named persistent window configurations"
-  :tag "builtin"
-  :bind (("C-x t n" . tab-new)
-         ("C-x t r" . tab-bar-rename-tab)
-         ("s-]" . tab-bar-switch-to-next-tab)
-         ("s-[" . tab-bar-switch-to-prev-tab))
-  :custom ((tab-bar-show . 1)
-           (tab-bar-new-button-show . nil)
-           (tab-bar-close-button-show . nil)
-           (tab-bar-select-tab-modifiers . '(meta)))
+;; (leaf tab-bar
+;;   :doc "frame-local tabs with named persistent window configurations"
+;;   :tag "builtin"
+;;   :bind (("C-x t n" . tab-new)
+;;          ("C-x t r" . tab-bar-rename-tab)
+;;          ("s-]" . tab-bar-switch-to-next-tab)
+;;          ("s-[" . tab-bar-switch-to-prev-tab))
+;;   :custom ((tab-bar-show . 1)
+;;            (tab-bar-new-button-show . nil)
+;;            (tab-bar-close-button-show . nil)
+;;            (tab-bar-select-tab-modifiers . '(meta)))
 
-  :hook (emacs-startup-hook . my--init-tab-bar)
-  :preface
-  (defun my/tab-new-with-name (&optional name)
-    (interactive "sName: ")
-    (tab-new)
-    (if name (tab-bar-rename-tab name)))
+;;   :hook (emacs-startup-hook . my--init-tab-bar)
+;;   :preface
+;;   (defun my/tab-new-with-name (&optional name)
+;;     (interactive "sName: ")
+;;     (tab-new)
+;;     (if name (tab-bar-rename-tab name)))
 
-  (defun my--init-tab-bar nil
-    (tab-bar-mode 1)
-    (tab-bar-rename-tab "Work")
+;;   (defun my--init-tab-bar nil
+;;     (tab-bar-mode 1)
+;;     (tab-bar-rename-tab "Work")
 
-    (my/tab-new-with-name "Env")
-    (my/tab-new-with-name "Mail")
-    (my/tab-new-with-name "Any")))
+;;     (my/tab-new-with-name "Env")
+;;     (my/tab-new-with-name "Mail")
+;;     (my/tab-new-with-name "Any")))
 
+(leaf centaur-tabs
+  :straight t
+  :bind (("s-[" . centaur-tabs-backward)
+         ("s-]" . centaur-tabs-forward))
+  :config
+  (centaur-tabs-headline-match)
+  (setq centaur-tabs-style "rounded")
+  :global-minor-mode centaur-tabs-mode)
 #+end_src
 
 
