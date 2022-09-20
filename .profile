@@ -41,6 +41,8 @@ if [[ -e $HOME/miniconda ]]; then
     export MINICONDA=$HOME/miniconda
 elif [[ -e $HOME/miniconda3 ]]; then
     export MINICONDA=$HOME/miniconda3
+elif [[ -e /opt/miniconda3 ]]; then
+    export MINICONDA=/opt/miniconda3
 fi
 
 # Set cargo path

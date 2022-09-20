@@ -236,7 +236,9 @@ if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
     if [ -f "/Users/sakamoto/miniconda/etc/profile.d/conda.sh" ]; then
-        . "/Users/sakamoto/miniconda/etc/profile.d/conda.sh"
+        source /Users/sakamoto/miniconda/etc/profile.d/conda.sh
+    elif [ -f /opt/miniconda3/etc/profile.d/conda.sh ]; then
+        source /opt/miniconda3/etc/profile.d/conda.sh
     else
         export PATH="/Users/sakamoto/miniconda/bin:$PATH"
     fi
@@ -274,7 +276,6 @@ alias _kubota='ssh kubota'
 alias _utm='ssh utm'
 alias c='conda'
 alias ca='c activate'
-alias cat='bat'
 alias ce='c env'
 alias ci='c install'
 alias cs='c search'
