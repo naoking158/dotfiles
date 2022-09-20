@@ -3167,6 +3167,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 #+begin_src emacs-lisp
 
 (leaf citar
+  :disabled t
   :straight t
   :bind (("C-c b" . citar-insert-citation)
          (:minibuffer-local-map
