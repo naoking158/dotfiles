@@ -122,7 +122,7 @@ zinit light junegunn/fzf
 zinit ice lucid multisrc"shell/{completion,key-bindings}.zsh" id-as"junegunn/fzf_completions" pick"/dev/null"
 zinit light junegunn/fzf
 
-zinit ice from"gh-r" as"command" pick"*/ghq"
+zinit ice from"gh" as"command" pick"*/ghq"
 zinit light x-motemen/ghq
 
 zinit light mollifier/anyframe
