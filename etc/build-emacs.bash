@@ -169,9 +169,11 @@ function prepare_patches() {
         mkdir -p $PATCH_DIR
     fi
 
+    cd $PATCH_DIR
+
     e_newline
     e_arrow "Downloading patches in ${PATCH_DIR}"
-    cd $PATCH_DIR
+    
     for url in "${PATCH_URL[@]}"; do
         curl -LO $url
     done &&
@@ -237,16 +239,26 @@ function prepare_sources() {
 
 
 function build() {
-    configureFlags=(
-        "--with-modules"
-        "--with-json"
-        "--with-native-compilation"
-        "--with-imagemagick"
-        "--with-xml2"
-	      "--with-xwidgets"
-        "--with-cairo"
-	      "--prefix=${PREFIX}"
-    )
+    if is_macos; then
+        configureFlags=(
+            "--with-modules"
+            "--with-json"
+            "--with-native-compilation"
+            "--with-imagemagick"
+            "--with-xml2"
+	          "--with-xwidgets"
+            "--with-cairo"
+	          "--prefix=${PREFIX}"
+        )
+    elif is_manjaro; then
+        configureFlags=(
+            "--with-modules"
+            "--with-json"
+            "--with-native-compilation"
+            "--with-xwidgets"
+	          "--prefix=${PREFIX}"
+        )
+    fi
 
     configureCMD="./configure"
     for cmd in "${configureFlags[@]}"; do
