@@ -3450,6 +3450,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 #+begin_src emacs-lisp
 
 (leaf org
+  :straight t
   :when window-system
   :doc "Export Framework for Org Mode"
   :tag "builtin"
