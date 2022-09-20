@@ -5387,20 +5387,21 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+begin_src emacs-lisp
 
 (leaf eaf
-  :disabled t
   :when (memq window-system '(x))
-  :load-path "~/.emacs.d/elisp/emacs-application-framework/"
+  :load-path "~/src/github.com/emacs-eaf/emacs-application-framework/"
+  :require eaf
   :commands
   (eaf-search-it eaf-open eaf-open-browser eaf-open-browser-with-history eaf-open-pdf-from-history)
   :custom
-                                        ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
-  ((eaf-python-command . "/usr/bin/python")
+  ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
+  (;; (eaf-python-command . "/usr/bin/python")
    (eaf-browser-continue-where-left-off . t)
    (eaf-browser-enable-adblocker . t)
    (browse-url-browser-function . 'eaf-open-browser))
   :config
   (require 'eaf-browser)
   (require 'eaf-pdf-viewer)
+  (add-to-list 'eaf-wm-focus-fix-wms "wlroots wm")
   (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
   (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
   (defalias 'browse-web #'eaf-open-browser)
