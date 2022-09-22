@@ -508,3 +508,6 @@ key_bindings:
   #- { key: H,              mods: Command|Alt,                action: HideOtherApplications }
   - { key: M,              mods: Command,                    action: Minimize              }
   - { key: Q,              mods: Command,                    action: Quit                  }
+
+  # Manjaro
+  - { key: Y,              mods: Control,                    action: Paste                  }
