@@ -55,6 +55,9 @@ for i in "${ADDRESS[@]}"; do
     else
         echo Moving "${#RES[@]}" \
              archived messages from Inbox to Archive folder
+        if [[ ! -d "${MAILDIR}/${Name}/[Gmail]/All Mail/cur" ]]; then
+            mkdir -p "${MAILDIR}/${Name}/[Gmail]/All Mail/cur"
+        fi
         for i in "${RES[@]}"; do
             [[ ! "${i}" =~ ^.*(Sent|All).*$ ]] && {
                 safeMove "$i" "${MAILDIR}/${Name}/[Gmail]/All Mail/cur";
