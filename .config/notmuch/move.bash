@@ -13,7 +13,6 @@ function safeMove {
     LATTER="${LATTER%%,*}";    
     DEST="${2}/${LATTER}";
     mv -f "${1}" "$DEST"
-    # echo "from ${1} to ${DEST}"
 }
 
 SAVEIFS=IFS
@@ -21,7 +20,8 @@ IFS=$(echo -en "\n\b")
 
 MAILDIR=$HOME/Maildir
 ADDRESS=("bbo-naoki@bbo.cs.tsukuba.ac.jp"
-         "private-nok.skmt.snow@gmail.com")
+         "private-nok.skmt.snow@gmail.com"
+         "work-sakamoto@fixpoint.co.jp")
 for i in "${ADDRESS[@]}"; do
     Name=${i%%-*}
     Address=${i##*-}
