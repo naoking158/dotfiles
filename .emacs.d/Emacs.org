@@ -651,7 +651,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 (setq comp-deferred-compilation-deny-list (list "jupyter"))
 
 ;; native-compile all Elisp files under a directory
-(native-compile-async (file-truename "~/.emacs.d/elisp/") 'recursively)
+;; (native-compile-async (file-truename "~/.emacs.d/elisp/") 'recursively)
 
 #+end_src
 
@@ -1014,12 +1014,12 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
 
       (defvar my-rainbow-region-colors
         (modus-themes-with-colors
-          `((red . ,red-subtle-bg)
-            (green . ,green-subtle-bg)
-            (yellow . ,yellow-subtle-bg)
-            (blue . ,blue-subtle-bg)
-            (magenta . ,magenta-subtle-bg)
-            (cyan . ,cyan-subtle-bg)))
+         `((red . ,red-subtle-bg)
+           (green . ,green-subtle-bg)
+           (yellow . ,yellow-subtle-bg)
+           (blue . ,blue-subtle-bg)
+           (magenta . ,magenta-subtle-bg)
+           (cyan . ,cyan-subtle-bg)))
         "Sample list of color values for `my-rainbow-region'.")
 
       (defun my-rainbow-region (color)
@@ -1071,17 +1071,65 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
              (bespoke-set-italic-comments . nil)
              (bespoke-set-italic-keywords . nil))
     :config
+    (defun my/set-org-face nil
+      ;; Increase the size of various headings
+      (interactive)
+      (set-face-attribute 'org-document-title nil
+                          :weight 'bold :height 1.6)
+      (set-face-attribute 'org-level-1 nil
+                          :weight 'bold :slant 'normal :height 1.35)
+      (dolist (face '((org-level-2 . 1.3)
+                      (org-level-3 . 1.2)
+                      (org-level-4 . 1.15)
+                      (org-level-5 . 1.1)
+                      (org-level-6 . 1.1)
+                      (org-level-7 . 1.1)
+                      (org-level-8 . 1.1)))
+        (set-face-attribute (car face) nil
+                            :weight 'medium
+                            :slant 'normal
+                            :height (cdr face)))
+
+      ;; variable pitch
+      (face-remap-add-relative 'default :inherit 'variable-pitch)
+
+      ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+      (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+      (set-face-attribute 'org-formula nil :inherit 'fixed-pitch)
+      (set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
+      (set-face-attribute 'org-indent t :inherit '(org-hide fixed-pitch))
+      (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+      (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+      (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+      (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+
+      ;; Get rid of the background on column views
+      (set-face-attribute 'org-column nil :background nil)
+      (set-face-attribute 'org-column-title nil :background nil))
+    
     (defun my/load-bespoke-theme (sym-theme)
       (funcall sym-theme)
-       ;; (set-face-attribute 'org-block nil
-       ;;                    :inherit 'fixed-pitch
-       ;;                    :foreground nil
-       ;;                    :background bespoke-subtle)
-      ;; (custom-theme-set-faces
-      ;;  `user
-      ;;  `(org-agenda-clocking ((t :foreground ,bespoke-salient)))
-      ;;  `(org-agenda-done ((t :foreground ,bespoke-faded :strike-through nil))))
-      ))
+      (set-face-attribute 'org-block nil
+                          :inherit 'fixed-pitch
+                          :foreground nil
+                          :background bespoke-subtle)
+
+      (custom-theme-set-faces
+       `user
+       `(org-agenda-clocking ((t :foreground ,bespoke-salient)))
+       `(org-agenda-done ((t :foreground ,bespoke-faded :strike-through nil))))
+      
+      (my/set-org-face)
+
+      (my--init-tab-bar)
+      (set-face-attribute 'tab-bar nil
+                          :background bespoke-modeline
+                          :foreground bespoke-foreground
+                          )
+      (set-face-attribute 'tab-bar-tab nil
+                          :background bespoke-blue)
+      (set-face-attribute 'tab-bar-tab-inactive nil
+                          :background bespoke-background)))
 
     ;;; utils
   (setq my/theme-list '(doom-nord
