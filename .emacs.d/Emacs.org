@@ -2788,9 +2788,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
       (consult-line)))
   :advice (;; Optionally tweak the register preview window.
            ;; This adds thin lines, sorting and hides the mode line of the window.
-           (:override register-preview consult-register-window)
-           ;; Optionally replace `completing-read-multiple' with an enhanced version.
-           (:override completing-read-multiple consult-completing-read-multiple))
+           (:override register-preview consult-register-window))
   :config
   ;; Optionally configure preview. The default value
   ;; is 'any, such that any key triggers the preview.
