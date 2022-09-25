@@ -2828,12 +2828,14 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
            ([remap xref-find-apropos] . consult-lsp-symbols)))
 
   (leaf consult-tramp
-    :load-path "~/.emacs.d/elisp/consult-tramp/"
-    :custom ((tramp-default-method . "ssh"))
-    :commands consult-tramp
-    :config
-    (tramp-set-completion-function "ssh"
-                                   '((tramp-parse-sconfig "~/.ssh/config")))))
+    :straight (consult-tramp
+               :type git
+               :host github
+               :repo "Ladicle/consult-tramp")
+    :custom ((tramp-default-method . "ssh")
+             (consult-tramp-method . "ssh"))
+    :commands consult-tramp)
+  )
 
 #+end_src
 
