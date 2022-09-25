@@ -2312,12 +2312,9 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
   :custom ((default-input-method . "japanese-skk")
            (skk-jisyo-code . 'utf-8)
            (skk-large-jisyo . nil)
-           ;; (skk-jisyo . "~/.skk-jisyo")
            (skk-backup-jisyo . "~/.skk-jisyo.BAK")
            (skk-save-jisyo-instantly . t)
            (skk-share-private-jisyo . t)
-           (skk-server-host . "localhost")
-           (skk-server-portnum . 1178)
            (skk-server-report-response . nil)
            (skk-byte-compile-init-file . t)
            (skk-preload . nil)
@@ -2337,7 +2334,13 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
            (skk-status-indicator . 'minor-mode)
            (skk-inline-show-face . '( :foreground "#ECEFF4"
                                       :background "#4C566A"
-                                      :inherit 'normal))))
+                                      :inherit 'normal)))
+  :config
+  (if (memq window-system '(x))
+      (setq skk-jisyo "~/.skk-jisyo")
+    (progn
+      (setq skk-server-host "localhost")
+      (setq skk-server-portnum 1178))))
 #+end_src
 
 *** Managing Whitespaces with whitespace
