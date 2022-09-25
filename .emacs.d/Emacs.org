@@ -1110,12 +1110,14 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
     (funcall my-load-theme-func sym-theme))
 
   (defun my/default-theme nil
-    (let ((time
-           (string-to-number
-            (format-time-string "%H"))))
-      (if (and (> time 5) (< time 18))
-          (my/load-theme 'modus-light)
-        (my/load-theme 'modus-dark))))
+    (my/load-theme 'bespoke/dark-theme)
+    ;; (let ((time
+    ;;        (string-to-number
+    ;;         (format-time-string "%H"))))
+    ;;   (if (and (> time 5) (< time 18))
+    ;;       (my/load-theme 'modus-light)
+    ;;     (my/load-theme 'modus-dark)))
+    )
 
   :config
   (column-number-mode)
@@ -1131,9 +1133,11 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
   :hook (emacs-startup-hook . (lambda nil
                                 (line-number-mode 1)
                                 (column-number-mode 1)
-                                (if window-system
-                                    (my/modeline-moody)
-                                  (my/modeline-doom))))
+                                (my/modeline-bespoke)
+                                ;; (if window-system
+                                ;;     (my/modeline-moody)
+                                ;;   (my/modeline-doom))
+                                ))
   :preface
   (leaf moody
     :when window-system
@@ -1185,33 +1189,20 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
                :type git
                :host github
                :repo "mclear-tools/bespoke-modeline")
-    ;; :custom (;; Set header line
-    ;;          (bespoke-modeline-position . 'top)
-    ;;          ;; Set mode-line height
-    ;;          (bespoke-modeline-size . 3)
-    ;;          ;; Show diff lines in mode-line
-    ;;          (bespoke-modeline-git-diff-mode-line . t)
-    ;;          ;; Set mode-line cleaner
-    ;;          (bespoke-modeline-cleaner . t)
-    ;;          ;; Use mode-line visual bell
-    ;;          (bespoke-modeline-visual-bell . t)
-    ;;          ;; Set vc symbol
-    ;;          (bespoke-modeline-vc-symbol . "G:"))
+    :custom (;; Set header line
+             (bespoke-modeline-position . 'bottom)
+             ;; Set mode-line height
+             (bespoke-modeline-size . 3)
+             ;; Show diff lines in mode-line
+             (bespoke-modeline-git-diff-mode-line . t)
+             ;; Set mode-line cleaner
+             (bespoke-modeline-cleaner . t)
+             ;; Use mode-line visual bell
+             (bespoke-modeline-visual-bell . t)
+             ;; Set vc symbol
+             (bespoke-modeline-vc-symbol . "G:"))
     :config
-    (defun my/modeline-bespoke-modeline nil
-      (interactive)
-      ;; Set header line
-      (setq bespoke-modeline-position 'top)
-      ;; Set mode-line height
-      (setq bespoke-modeline-size 3)
-      ;; Show diff lines in mode-line
-      (setq bespoke-modeline-git-diff-mode-line t)
-      ;; Set mode-line cleaner
-      (setq bespoke-modeline-cleaner t)
-      ;; Use mode-line visual bell
-      (setq bespoke-modeline-visual-bell t)
-      ;; Set vc symbol
-      (setq  bespoke-modeline-vc-symbol "G:")
+    (defun my/modeline-bespoke ()
       (bespoke-modeline-mode)))
 
   (leaf doom-modeline
@@ -2539,43 +2530,66 @@ Window management commands are accessible by prefix =C-x w=
 
 #+begin_src emacs-lisp
 
-;; (leaf tab-bar
-;;   :doc "frame-local tabs with named persistent window configurations"
-;;   :tag "builtin"
-;;   :bind (("C-x t n" . tab-new)
-;;          ("C-x t r" . tab-bar-rename-tab)
-;;          ("s-]" . tab-bar-switch-to-next-tab)
-;;          ("s-[" . tab-bar-switch-to-prev-tab))
-;;   :custom ((tab-bar-show . 1)
-;;            (tab-bar-new-button-show . nil)
-;;            (tab-bar-close-button-show . nil)
-;;            (tab-bar-select-tab-modifiers . '(meta)))
+(leaf tab-bar
+  :doc "frame-local tabs with named persistent window configurations"
+  :tag "builtin"
+  :bind (("C-x t n" . tab-new)
+         ("C-x t r" . tab-bar-rename-tab)
+         ("s-]" . tab-bar-switch-to-next-tab)
+         ("s-[" . tab-bar-switch-to-prev-tab))
+  :custom ((tab-bar-show . 1)
+           (tab-bar-new-button-show . nil)
+           (tab-bar-close-button-show . nil)
+           (tab-bar-select-tab-modifiers . '(meta)))
 
-;;   :hook (emacs-startup-hook . my--init-tab-bar)
-;;   :preface
-;;   (defun my/tab-new-with-name (&optional name)
-;;     (interactive "sName: ")
-;;     (tab-new)
-;;     (if name (tab-bar-rename-tab name)))
-
-;;   (defun my--init-tab-bar nil
-;;     (tab-bar-mode 1)
-;;     (tab-bar-rename-tab "Work")
-
-;;     (my/tab-new-with-name "Env")
-;;     (my/tab-new-with-name "Mail")
-;;     (my/tab-new-with-name "Any")))
-
-(leaf centaur-tabs
-  :straight t
-  :bind (("s-[" . centaur-tabs-backward)
-         ("s-]" . centaur-tabs-forward))
+  ;; :hook (emacs-startup-hook . my--init-tab-bar)
   :config
-  (centaur-tabs-headline-match)
-  (setq centaur-tabs-style "rounded")
-  :global-minor-mode centaur-tabs-mode)
-#+end_src
+  (defun my/tab-new-with-name (&optional name)
+    (interactive "sName: ")
+    (tab-new)
+    (if name (tab-bar-rename-tab name)))
 
+  (defun my--init-tab-bar nil
+    (tab-bar-mode)
+    (tab-bar-rename-tab "Work")
+    (my/tab-new-with-name "Env")
+    (my/tab-new-with-name "Mail")
+    (my/tab-new-with-name "Any")))
+
+;; (leaf centaur-tabs
+;;   :straight t
+;;   :bind (("s-[" . centaur-tabs-backward)
+;;          ("s-]" . centaur-tabs-forward))
+;;   :hook ((dired-mode-hook imenu-list-major-mode-hook) . centaur-tabs-local-mode)
+;;   :custom
+;;   ((centaur-tabs-label-fixed-length . 9)
+;;    (centaur-tabs-style . "bar")
+;;    (centaur-tabs-set-bar . 'left)
+;;    (centaur-tabs-set-icons . t)
+;;    (centaur-tabs-gray-out-icons . 'buffer)
+;;    (centaur-tabs-set-modified-marker . t)
+;;    (centaur-tabs-excluded-prefixes . '("*epc"
+;;                                        "*helm"
+;;                                        "*Helm"
+;;                                        " *which"
+;;                                        "*Compile-Log*"
+;;                                        "*lsp"
+;;                                        "*LSP"
+;;                                        "*company"
+;;                                        "*Flycheck"
+;;                                        "*Ediff"
+;;                                        "*ediff"
+;;                                        "*tramp"
+;;                                        " *Mini"
+;;                                        "*help"
+;;                                        "*straight"
+;;                                        " *temp"
+;;                                        "*Help"
+;;                                        "*eaf*"
+;;                                        "*Ilist*")))
+;;    :config (centaur-tabs-headline-match)
+;;    :global-minor-mode centaur-tabs-mode)
+#+end_src
 
 ** Rotate Window Layout
 :PROPERTIES:
