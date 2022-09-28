@@ -5500,11 +5500,10 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
   :custom-face
   (org-modern-label . '((t :height 0.9 :inherit t)))
   :custom
-  ((org-modern-star . ["◉" "●" "○" "◇" "✿" "✸" " "])
+  ((org-modern-star . ["◉" "●" "○" "◇" "★" "✸" " "])
    (org-modern-list . '((?+ . "➤")
                         (?* . "-")
-                        (?- . "•"))))
-  )
+                        (?- . "•")))))
 #+end_src
 
 ** Vertico-posframe
