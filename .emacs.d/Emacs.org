@@ -1720,7 +1720,12 @@ Only in Neotree Buffer:
 (when-let* ((miniconda-path
              (my/trim-newline-from-string
               (shell-command-to-string
-               "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
+               (format
+                "find %s -maxdepth 1 -type d -name 'miniconda*' | head -n 1"
+                (if (memq window-system '(x))
+                    "/opt"
+                  "$HOME")
+                ))))
             (path-to-venv (expand-file-name "envs/venv" miniconda-path)))
   (setq path-to-miniconda miniconda-path)
   (setq path-to-venv-python (expand-file-name "bin/python" path-to-venv))
