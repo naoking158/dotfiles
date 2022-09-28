@@ -3579,44 +3579,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                                      ("ms" . "summary"))))
 
   :custom-face (org-document-title . '((t (:inherit t :weight bold :height 1.6))))
-  :defun my/set-org-face
   :preface
-  (defun my/set-org-face (&rest sym-theme)
-    ;; Increase the size of various headings
-    (interactive)
-    (set-face-attribute 'org-document-title nil
-                        :weight 'bold :height 1.6)
-    (set-face-attribute 'org-level-1 nil
-                        :weight 'bold :slant 'normal :height 1.35)
-    (dolist (face '((org-level-2 . 1.3)
-                    (org-level-3 . 1.2)
-                    (org-level-4 . 1.15)
-                    (org-level-5 . 1.1)
-                    (org-level-6 . 1.1)
-                    (org-level-7 . 1.1)
-                    (org-level-8 . 1.1)))
-      (set-face-attribute (car face) nil
-                          :weight 'medium
-                          :slant 'normal
-                          :height (cdr face)))
-
-    ;; variable pitch
-    (face-remap-add-relative 'default :inherit 'variable-pitch)
-
-    ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-    (set-face-attribute 'org-table nil						:inherit 'fixed-pitch)
-    (set-face-attribute 'org-formula nil					:inherit 'fixed-pitch)
-    (set-face-attribute 'org-code nil							:inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-indent t							:inherit '(org-hide fixed-pitch))
-    (set-face-attribute 'org-verbatim nil					:inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-special-keyword nil	:inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-meta-line nil				:inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-checkbox nil					:inherit 'fixed-pitch)
-
-    ;; Get rid of the background on column views
-    (set-face-attribute 'org-column nil :background nil)
-    (set-face-attribute 'org-column-title nil :background nil))
-
   (setq org-format-latex-options
         '( :foreground default
            :background default
