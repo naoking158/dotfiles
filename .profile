@@ -48,15 +48,21 @@ fi
 # Set cargo path
 [[ -e $HOME/.cargo/env ]] && . "$HOME/.cargo/env"
 
+# Set homebrew path
 if [[ $SYSTEM == "macos" ]] && [[ -e "/opt/homebrew" ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
-export PATH="/usr/local/bin:$HOME/.local/bin:$PATH"
+
+# Set npm path
+if [[ $SYSTEM == "manjaro" ]] && [[ -e "${HOME}/.npm" ]]; then
+    npm config set prefix '~/.npm'
+    PATH="$HOME/.npm/bin:$PATH"
+fi
 
 # Set Go path
 if type go >/dev/null 2>&1; then
     export GOPATH=$(go env GOPATH)
-    export PATH="${PATH}:${GOPATH}/bin"
+    PATH="${PATH}:${GOPATH}/bin"
 fi
 
 if type emacs >/dev/null 2>&1; then
@@ -89,3 +95,4 @@ if [[ $SYSTEM == "manjaro" ]]; then
     export ZEIT_DB=~/.config/zeit.db
 fi
 
+export PATH="/usr/local/bin:$HOME/.local/bin:$PATH"
