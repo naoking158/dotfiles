@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: Check if command exists
+# key: ex
+# --
+function is_exists() {
+    type "$1" >/dev/null 2>&1
+    return $?
+}
