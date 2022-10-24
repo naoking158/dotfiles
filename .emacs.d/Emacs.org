@@ -2039,7 +2039,7 @@ Only in Neotree Buffer:
   :req "emacs-24.1"
   :url "https://github.com/DarthFennec/highlight-indent-guides"
   :straight t
-  :hook prog-mode-hook
+  :hook prog-mode-hook yaml-mode-hook
   :custom
   ((highlight-indent-guides-auto-enabled . t)
    (highlight-indent-guides-responsive . t)
