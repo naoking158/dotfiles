@@ -1836,10 +1836,19 @@ Only in Neotree Buffer:
   :mode (("\\.ts\\'" . typescript-mode)
          ("\\.tsx\\'" . typescript-mode))
   :hook (typescript-mode-hook . (lambda ()
-                                  ;; (setq-local lsp-disabled-clients '(ts-ls))
+                                  (setq-local lsp-disabled-clients '(ts-ls))
                                   (lsp-deferred)))
   :custom ((typescript-indent-level . 2)
            (typescript-auto-indent-flag . nil))
+  :config
+  ;;; This patch needs to avoid following error:
+  ;;; json-parse-error \u0000 is not allowed without JSON_ALLOW_NUL
+  ;;; ref: https://github.com/emacs-lsp/lsp-mode/issues/2681
+  (advice-add 'json-parse-buffer :around
+              (lambda (orig &rest rest)
+                (while (re-search-forward "\\u0000" nil t)
+                  (replace-match ""))
+                (apply orig rest)))
   )
 
 (leaf deno-emacs
@@ -1944,6 +1953,9 @@ Only in Neotree Buffer:
 
 
 *** Textlint with Flycheck
+:PROPERTIES:
+:ID:       E823FF2D-5DB1-4BF2-98DB-A18062B623FB
+:END:
 
 #+begin_src emacs-lisp
 
@@ -2417,6 +2429,7 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
            )
 )
 #+end_src
+
 
 * Window Management
 
@@ -3598,7 +3611,9 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 
   (leaf org-fragtog
     :straight t
-    :hook (org-mode-hook . org-fragtog-mode)))
+    :hook (org-mode-hook . org-fragtog-mode))
+
+  (setq warning-suppress-types (append warning-suppress-types '((org-element-cache)))))
 
 #+end_src
 
@@ -4262,54 +4277,54 @@ end open location
 
 #+begin_src emacs-lisp
 
-(leaf orp-paperpile
-  :disabled t
-  :when window-system
-  :after org-roam
-  :doc "orp-paperpile; Org-Roam-Protocol Paperpile is an interface
-        to comunicate between org-mode and paperpile using org-roam-protocol."
-  :load-path "~/.emacs.d/elisp/orp-paperpile/"
-  :require t
-  :defer-config (orp-activate)
-  :advice (:around org-link-open advice-around-org-link-open)
-  :custom
-  ((orp-paperpile-local-pdf-dir . "~/drive/Paperpile/")
-   (org-roam-capture-ref-templates . '(("r" "ref" plain "%?"
-                                        :target (file+head "lit/${slug}.org"
-                                                           (concat
-                                                            "#+date: %U\n"
-                                                            "#+filetags: Literature\n"
-                                                            "#+title: ${title}"))
-                                        :unnarrowed t))))
+  (leaf orp-paperpile
+    :disabled t
+    :when window-system
+    :after org-roam
+    :doc "orp-paperpile; Org-Roam-Protocol Paperpile is an interface
+          to comunicate between org-mode and paperpile using org-roam-protocol."
+    :load-path "~/.emacs.d/elisp/orp-paperpile/"
+    :require t
+    :defer-config (orp-activate)
+    :advice (:around org-link-open advice-around-org-link-open)
+    :custom
+    ((orp-paperpile-local-pdf-dir . "~/drive/Paperpile/")
+     (org-roam-capture-ref-templates . '(("r" "ref" plain "%?"
+                                          :target (file+head "lit/${slug}.org"
+                                                             (concat
+                                                              "#+date: %U\n"
+                                                              "#+filetags: Literature\n"
+                                                              "#+title: ${title}"))
+                                          :unnarrowed t))))
 
-  :preface
-  (defun open-external (path)
-    (interactive)
-    (cond
-     ((eq system-type 'darwin)
-      (let ((cmd-list (list
-                       (if (string-prefix-p "chrome-extension" path)
-                           "brave"
-                         "open")
-                       (concat "'" path "'")
-                       "&")))
-        (shell-command (c-concat-separated cmd-list " "))))
-     ((eq system-type 'gnu/linux)
-      (let ((process-connection-type nil))
-        (start-process "" nil "xdg-open" path)))))
+    :preface
+    (defun open-external (path)
+      (interactive)
+      (cond
+       ((eq system-type 'darwin)
+        (let ((cmd-list (list
+                         (if (string-prefix-p "chrome-extension" path)
+                             "brave"
+                           "open")
+                         (concat "'" path "'")
+                         "&")))
+          (shell-command (c-concat-separated cmd-list " "))))
+       ((eq system-type 'gnu/linux)
+        (let ((process-connection-type nil))
+          (start-process "" nil "xdg-open" path)))))
 
-  ;; for open paperpile link in external browser
-  (defun advice-around-org-link-open (f link &optional arg)
-    (let ((path (org-element-property :raw-link link))
-          (type (org-element-property :type link)))
-      (if (or (string-match "paperpile" path)
-              (string-match "chrome-extension" path))
-          (let ((path (if (string-equal "file" type)
-                          (cadr (split-string path ":"))
-                        path)))
-            (open-external path)
-            (message "Open: %s" path))
-        (apply f link arg)))))
+    ;; for open paperpile link in external browser
+    (defun advice-around-org-link-open (f link &optional arg)
+      (let ((path (org-element-property :raw-link link))
+            (type (org-element-property :type link)))
+        (if (or (string-match "paperpile" path)
+                (string-match "chrome-extension" path))
+            (let ((path (if (string-equal "file" type)
+                            (cadr (split-string path ":"))
+                          path)))
+              (open-external path)
+              (message "Open: %s" path))
+          (apply f link arg)))))
 
 #+end_src
 
@@ -4684,16 +4699,16 @@ It's nice to have a table of contents section for long literate configuration fi
 #+begin_src emacs-lisp
 (leaf oj
   :when window-system
-	:doc "Competitive programming tools client for AtCoder, Codeforces"
-	:req "emacs-26.1" "quickrun-2.2"
-	:url "https://github.com/conao3/oj.el"
-	:straight t
-	:commands oj-prepare oj-test oj-submit
-	:custom ((oj-default-online-judge quote atcoder)
-					 (oj-compiler-python . "cpython")
-					 (oj-home-dir . "~/drive/work/coder/AtCoder")
-					 (oj-submit-args quote
-													 ("-y" "--wait=0"))))
+  :doc "Competitive programming tools client for AtCoder, Codeforces"
+  :req "emacs-26.1" "quickrun-2.2"
+  :url "https://github.com/conao3/oj.el"
+  :straight t
+  :commands oj-prepare oj-test oj-submit
+  :custom ((oj-default-online-judge quote atcoder)
+           (oj-compiler-python . "cpython")
+           (oj-home-dir . "~/drive/work/coder/AtCoder")
+           (oj-submit-args quote
+                           ("-y" "--wait=0"))))
 #+end_src
 
 
@@ -5669,6 +5684,8 @@ HTTP encodings, headers, media types, methods, relations and status codes, all s
   :hook (ansible-hook . (lambda ()
                           (lsp-deferred))))
 #+end_src
+
+
 
 * Footer
 :PROPERTIES:
