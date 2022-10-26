@@ -30,11 +30,11 @@
     "memory",
     "temperature",
     
-    // "network",
+    "network",
     "bluetooth",
 
-    "keyboard-state",
-    "sway/language",
+    // "keyboard-state",
+    // "sway/language",
     "idle_inhibitor",
   ],
 
@@ -57,7 +57,7 @@
 
   "clock": {
     "interval": 60,
-    "format": "{:%e %b %Y   %H:%M}",
+    "format": "{:%e %b %Y  %H:%M}",
     "tooltip": true,
     "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
     "on-click": "swaymsg exec \\$calendar"
@@ -94,15 +94,15 @@
     "on-click": "swaymsg exec \\$term_float nmtui"
   },
 
-  "keyboard-state": {
-    "numlock": true,
-    "capslock": true,
-    "format": "{name} {icon}",
-    "format-icons": {
-      "locked": "",
-      "unlocked": ""
-    }
-  },
+  // "keyboard-state": {
+  //   "numlock": true,
+  //   "capslock": true,
+  //   "format": "{name} {icon}",
+  //   "format-icons": {
+  //     "locked": "",
+  //     "unlocked": ""
+  //   }
+  // },
 
   "sway/mode": {
     "format": "<span style=\"italic\">{}</span>",
@@ -188,12 +188,12 @@
     "tooltip-format": "{}"
   },
 
-  "sway/language": {
-    "format": " {}",
-    "min-length": 5,
-    "tooltip": false,
-    "on-click": "swaymsg input $(swaymsg -t get_inputs --raw | jq '[.[] | select(.type == \"keyboard\")][0] | .identifier') xkb_switch_layout next"
-  },
+  // "sway/language": {
+  //   "format": " {}",
+  //   "min-length": 5,
+  //   "tooltip": false,
+  //   "on-click": "swaymsg input $(swaymsg -t get_inputs --raw | jq '[.[] | select(.type == \"keyboard\")][0] | .identifier') xkb_switch_layout next"
+  // },
 
   "custom/scratchpad": {
     "interval": "once",

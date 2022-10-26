@@ -82,7 +82,7 @@
 #custom-media,
 #custom-sunset,
 #custom-playerctl,
-#language,
+/* #language, */
 #tray,
 #mode,
 #idle_inhibitor {
@@ -307,17 +307,17 @@ label:focus {
 }
 */
 
-#language {
-  /*  background: #00b093;*/
-  /*  color: #740864;*/
-  color: #d2ced9;
-  /*  border-radius: 30;*/
-  padding: 0 0px;
-  padding-right: 15px;
-  /*border-top-right-radius: 15px;
-  border-bottom-right-radius: 15px;*/
-  min-width: 27px;
-}
+/* #language { */
+/*   /\*  background: #00b093;*\/ */
+/*   /\*  color: #740864;*\/ */
+/*   color: #d2ced9; */
+/*   /\*  border-radius: 30;*\/ */
+/*   padding: 0 0px; */
+/*   padding-right: 15px; */
+/*   /\*border-top-right-radius: 15px; */
+/*   border-bottom-right-radius: 15px;*\/ */
+/*   min-width: 27px; */
+/* } */
 
 #tray {
   margin: 0px;
