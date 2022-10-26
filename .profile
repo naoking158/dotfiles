@@ -47,6 +47,9 @@ fi
 
 # Set cargo path
 [[ -e $HOME/.cargo/env ]] && . "$HOME/.cargo/env"
+if [[ -e $HOME/.cargo/bin ]]; then
+    PATH="$HOME/.cargo/bin:$PATH"
+fi
 
 # Set homebrew path
 if [[ $SYSTEM == "macos" ]] && [[ -e "/opt/homebrew" ]]; then
