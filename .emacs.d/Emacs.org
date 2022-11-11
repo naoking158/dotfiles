@@ -3113,7 +3113,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   :custom
   ((corfu-excluded-modes . '(shell-mode eshell-mode))
    (corfu-auto . t)
-   (corfu-auto-delay . 0.2)
+   (corfu-auto-delay . 0.1)
    (corfu-auto-prefix . 2)
    (corfu-preselect-first . nil)
 
