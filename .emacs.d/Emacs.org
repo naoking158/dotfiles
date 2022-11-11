@@ -2602,6 +2602,7 @@ Window management commands are accessible by prefix =C-x w=
 (leaf tab-bar
   :doc "frame-local tabs with named persistent window configurations"
   :tag "builtin"
+  :require t
   :bind (("C-x t n" . tab-new)
          ("C-x t r" . tab-bar-rename-tab)
          ("s-]" . tab-bar-switch-to-next-tab)
@@ -2619,45 +2620,42 @@ Window management commands are accessible by prefix =C-x w=
     (if name (tab-bar-rename-tab name)))
 
   (defun my--init-tab-bar nil
-    (tab-bar-mode)
+    (tab-bar-mode 1)
     (tab-bar-rename-tab "Work")
     (my/tab-new-with-name "Env")
-    (my/tab-new-with-name "Mail")
     (my/tab-new-with-name "Any")))
 
-;; (leaf centaur-tabs
-;;   :straight t
-;;   :bind (("s-[" . centaur-tabs-backward)
-;;          ("s-]" . centaur-tabs-forward))
-;;   :hook ((dired-mode-hook imenu-list-major-mode-hook) . centaur-tabs-local-mode)
-;;   :custom
-;;   ((centaur-tabs-label-fixed-length . 9)
-;;    (centaur-tabs-style . "bar")
-;;    (centaur-tabs-set-bar . 'left)
-;;    (centaur-tabs-set-icons . t)
-;;    (centaur-tabs-gray-out-icons . 'buffer)
-;;    (centaur-tabs-set-modified-marker . t)
-;;    (centaur-tabs-excluded-prefixes . '("*epc"
-;;                                        "*helm"
-;;                                        "*Helm"
-;;                                        " *which"
-;;                                        "*Compile-Log*"
-;;                                        "*lsp"
-;;                                        "*LSP"
-;;                                        "*company"
-;;                                        "*Flycheck"
-;;                                        "*Ediff"
-;;                                        "*ediff"
-;;                                        "*tramp"
-;;                                        " *Mini"
-;;                                        "*help"
-;;                                        "*straight"
-;;                                        " *temp"
-;;                                        "*Help"
-;;                                        "*eaf*"
-;;                                        "*Ilist*")))
-;;    :config (centaur-tabs-headline-match)
-;;    :global-minor-mode centaur-tabs-mode)
+(leaf tabspaces
+  :straight (tabspaces
+             :type git
+             :host github
+             :repo "mclear-tools/tabspaces")
+  :after consult
+  :hook (after-init-hook . tabspaces-mode)
+  ;; :commands (tabspaces-switch-or-create-workspace
+  ;;            tabspaces-open-or-create-project-and-workspace)
+  :custom ((tabspace-use-filtered-buffers-as-default . t)
+           (tabspaces-default-tab . "Work")
+           (tabspaces-remove-to-default . t)
+           (tabspaces-include-buffers . '("*scratch*")))
+  :defer-config
+  ;; hide full buffer list (still available with "b" prefix)
+  (consult-customize consult--source-buffer :hidden t :default nil)
+  ;; set consult-workspace buffer list
+  (defvar consult--source-workspace
+    (list :name     "Workspace Buffers"
+          :narrow   ?w
+          :history  'buffer-name-history
+          :category 'buffer
+          :state    #'consult--buffer-state
+          :default  t
+          :items    (lambda () (consult--buffer-query
+                                :predicate #'tabspaces--local-buffer-p
+                                :sort 'visibility
+                                :as #'buffer-name)))
+
+    "Set workspace buffer list for consult-buffer.")
+  (add-to-list 'consult-buffer-sources 'consult--source-workspace))
 #+end_src
 
 ** Rotate Window Layout
