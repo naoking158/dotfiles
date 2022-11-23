@@ -1565,6 +1565,7 @@ Only in Neotree Buffer:
 #+begin_src emacs-lisp
 
 (leaf lsp-mode
+  :disabled t
   :doc "LSP mode"
   :req "emacs-25.1" "dash-2.14.1" "dash-functional-2.14.1" "f-0.20.0" "ht-2.0" "spinner-1.7.3" "markdown-mode-2.3" "lv-0"
   :url "https://github.com/emacs-lsp/lsp-mode"
@@ -1602,6 +1603,7 @@ Only in Neotree Buffer:
 
 
 (leaf lsp-ui
+  :disabled t
   :doc "UI modules for lsp-mode"
   :req "emacs-25.1" "dash-2.14" "dash-functional-1.2.0" "lsp-mode-6.0" "markdown-mode-2.3"
   :url "https://github.com/emacs-lsp/lsp-ui"
@@ -1643,6 +1645,30 @@ Only in Neotree Buffer:
 
 (leaf lsp-latex :straight t)
 
+(leaf lsp-bridge
+  :straight (lsp-bridge
+             :type git
+             :host github
+             :repo "manateelazycat/lsp-bridge"
+             :files (:defaults "*.py" "acm/*" "core/*")
+             )
+  :bind (lsp-bridge-mode-map
+         :package lsp-bridge
+         ("C-c C-d" . lsp-bridge-popup-documentation)
+         ("C-c C-r" . lsp-bridge-find-references)
+         ("C-c C-j" . lsp-bridge-find-def-other-window)
+         ("C-c C-n" . lsp-bridge-diagnostic-jump-next)
+         ("C-c C-p" . lsp-bridge-diagnostic-jump-prev)
+         ("C-c l d" . lsp-bridge-diagnostic-list)
+         ("C-c l r" . lsp-bridge-rename))
+  :hook (lsp-bridge-mode-hook . my/disable-corfu-in-lsp-bridge)
+  :preface
+  (defun my/disable-corfu-in-lsp-bridge ()
+    (if (bound-and-true-p corfu-mode)
+        (corfu-mode 0)
+      )
+    )
+  )
 #+end_src
 
 
@@ -1727,9 +1753,24 @@ Only in Neotree Buffer:
            (conda-env-home-directory . path-to-miniconda))
   :config
   (conda-env-initialize-eshell)
-  (conda-env-initialize-interactive-shells))
+  (conda-env-initialize-interactive-shells)
+  :hook
+  ((conda-postactivate-hook . my/lsp-python-setup-with-conda)
+   (conda-postdeactivate-hook . my/lsp-python-setup-with-conda))
+  :preface
+  (defun my/lsp-python-setup-with-conda ()
+    (setq-local lsp-bridge-python-command
+                (expand-file-name "bin/python"
+                                  python-shell-virtualenv-root))
+    (if (bound-and-true-p lsp-bridge-mode)
+        (lsp-bridge-restart-process)
+      (require 'lsp-bridge)
+      (lsp-bridge-mode))
+  )
+)
 
 (leaf lsp-pyright
+  :disabled t
   :doc "Python LSP client using Pyright"
   :req "emacs-26.1" "lsp-mode-7.0" "dash-2.18.0" "ht-2.0"
   :url "https://github.com/emacs-lsp/lsp-pyright"
@@ -5679,8 +5720,15 @@ HTTP encodings, headers, media types, methods, relations and status codes, all s
 #+begin_src emacs-lisp
 (leaf ansible
   :straight t
-  :hook (ansible-hook . (lambda ()
-                          (lsp-deferred))))
+  :hook ((yaml-mode-hook . (lambda ()
+                             (ansible 1)))
+         (ansible-hook . (lambda ()
+                           (lsp-bridge-mode 1))))
+  
+  :config
+  (require 'lsp-bridge)
+  (add-to-list 'lsp-bridge-single-lang-server-mode-list '(yaml-mode . "ansible-language-server"))
+  )
 #+end_src
 
 
