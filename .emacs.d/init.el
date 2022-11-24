@@ -349,7 +349,7 @@
 (setq comp-deferred-compilation-deny-list (list "jupyter"))
 
 ;; native-compile all Elisp files under a directory
-(native-compile-async (file-truename "~/.emacs.d/elisp/") 'recursively)
+;; (native-compile-async (file-truename "~/.emacs.d/elisp/") 'recursively)
 
 (defun my/toggle-modeline (&optional arg)
   (interactive)
@@ -614,12 +614,12 @@
 
       (defvar my-rainbow-region-colors
         (modus-themes-with-colors
-          `((red . ,red-subtle-bg)
-            (green . ,green-subtle-bg)
-            (yellow . ,yellow-subtle-bg)
-            (blue . ,blue-subtle-bg)
-            (magenta . ,magenta-subtle-bg)
-            (cyan . ,cyan-subtle-bg)))
+         `((red . ,red-subtle-bg)
+           (green . ,green-subtle-bg)
+           (yellow . ,yellow-subtle-bg)
+           (blue . ,blue-subtle-bg)
+           (magenta . ,magenta-subtle-bg)
+           (cyan . ,cyan-subtle-bg)))
         "Sample list of color values for `my-rainbow-region'.")
 
       (defun my-rainbow-region (color)
@@ -673,15 +673,27 @@
     :config
     (defun my/load-bespoke-theme (sym-theme)
       (funcall sym-theme)
-       ;; (set-face-attribute 'org-block nil
-       ;;                    :inherit 'fixed-pitch
-       ;;                    :foreground nil
-       ;;                    :background bespoke-subtle)
-      ;; (custom-theme-set-faces
-      ;;  `user
-      ;;  `(org-agenda-clocking ((t :foreground ,bespoke-salient)))
-      ;;  `(org-agenda-done ((t :foreground ,bespoke-faded :strike-through nil))))
-      ))
+      (set-face-attribute 'org-block nil
+                          :inherit 'fixed-pitch
+                          :foreground nil
+                          :background bespoke-subtle)
+
+      (custom-theme-set-faces
+       `user
+       `(org-agenda-clocking ((t :foreground ,bespoke-salient)))
+       `(org-agenda-done ((t :foreground ,bespoke-faded :strike-through nil))))
+      
+      (my/set-org-face)
+
+      (my--init-tab-bar)
+      (set-face-attribute 'tab-bar nil
+                          :background bespoke-modeline
+                          :foreground bespoke-foreground
+                          )
+      (set-face-attribute 'tab-bar-tab nil
+                          :background bespoke-blue)
+      (set-face-attribute 'tab-bar-tab-inactive nil
+                          :background bespoke-background)))
 
     ;;; utils
   (setq my/theme-list '(doom-nord
@@ -710,12 +722,14 @@
     (funcall my-load-theme-func sym-theme))
 
   (defun my/default-theme nil
-    (let ((time
-           (string-to-number
-            (format-time-string "%H"))))
-      (if (and (> time 5) (< time 18))
-          (my/load-theme 'modus-light)
-        (my/load-theme 'modus-dark))))
+    (my/load-theme 'bespoke/dark-theme)
+    ;; (let ((time
+    ;;        (string-to-number
+    ;;         (format-time-string "%H"))))
+    ;;   (if (and (> time 5) (< time 18))
+    ;;       (my/load-theme 'modus-light)
+    ;;     (my/load-theme 'modus-dark)))
+    )
 
   :config
   (column-number-mode)
@@ -725,9 +739,11 @@
   :hook (emacs-startup-hook . (lambda nil
                                 (line-number-mode 1)
                                 (column-number-mode 1)
-                                (if window-system
-                                    (my/modeline-moody)
-                                  (my/modeline-doom))))
+                                (my/modeline-bespoke)
+                                ;; (if window-system
+                                ;;     (my/modeline-moody)
+                                ;;   (my/modeline-doom))
+                                ))
   :preface
   (leaf moody
     :when window-system
@@ -779,33 +795,20 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
                :type git
                :host github
                :repo "mclear-tools/bespoke-modeline")
-    ;; :custom (;; Set header line
-    ;;          (bespoke-modeline-position . 'top)
-    ;;          ;; Set mode-line height
-    ;;          (bespoke-modeline-size . 3)
-    ;;          ;; Show diff lines in mode-line
-    ;;          (bespoke-modeline-git-diff-mode-line . t)
-    ;;          ;; Set mode-line cleaner
-    ;;          (bespoke-modeline-cleaner . t)
-    ;;          ;; Use mode-line visual bell
-    ;;          (bespoke-modeline-visual-bell . t)
-    ;;          ;; Set vc symbol
-    ;;          (bespoke-modeline-vc-symbol . "G:"))
+    :custom (;; Set header line
+             (bespoke-modeline-position . 'bottom)
+             ;; Set mode-line height
+             (bespoke-modeline-size . 3)
+             ;; Show diff lines in mode-line
+             (bespoke-modeline-git-diff-mode-line . t)
+             ;; Set mode-line cleaner
+             (bespoke-modeline-cleaner . t)
+             ;; Use mode-line visual bell
+             (bespoke-modeline-visual-bell . t)
+             ;; Set vc symbol
+             (bespoke-modeline-vc-symbol . "G:"))
     :config
-    (defun my/modeline-bespoke-modeline nil
-      (interactive)
-      ;; Set header line
-      (setq bespoke-modeline-position 'top)
-      ;; Set mode-line height
-      (setq bespoke-modeline-size 3)
-      ;; Show diff lines in mode-line
-      (setq bespoke-modeline-git-diff-mode-line t)
-      ;; Set mode-line cleaner
-      (setq bespoke-modeline-cleaner t)
-      ;; Use mode-line visual bell
-      (setq bespoke-modeline-visual-bell t)
-      ;; Set vc symbol
-      (setq  bespoke-modeline-vc-symbol "G:")
+    (defun my/modeline-bespoke ()
       (bespoke-modeline-mode)))
 
   (leaf doom-modeline
@@ -1018,6 +1021,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :straight t)
 
 (leaf lsp-mode
+  :disabled t
   :doc "LSP mode"
   :req "emacs-25.1" "dash-2.14.1" "dash-functional-2.14.1" "f-0.20.0" "ht-2.0" "spinner-1.7.3" "markdown-mode-2.3" "lv-0"
   :url "https://github.com/emacs-lsp/lsp-mode"
@@ -1055,6 +1059,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 
 
 (leaf lsp-ui
+  :disabled t
   :doc "UI modules for lsp-mode"
   :req "emacs-25.1" "dash-2.14" "dash-functional-1.2.0" "lsp-mode-6.0" "markdown-mode-2.3"
   :url "https://github.com/emacs-lsp/lsp-ui"
@@ -1096,6 +1101,31 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 
 (leaf lsp-latex :straight t)
 
+(leaf lsp-bridge
+  :straight (lsp-bridge
+             :type git
+             :host github
+             :repo "manateelazycat/lsp-bridge"
+             :files (:defaults "*.py" "acm/*" "core/*")
+             )
+  :bind (lsp-bridge-mode-map
+         :package lsp-bridge
+         ("C-c C-d" . lsp-bridge-popup-documentation)
+         ("C-c C-r" . lsp-bridge-find-references)
+         ("C-c C-j" . lsp-bridge-find-def-other-window)
+         ("C-c C-n" . lsp-bridge-diagnostic-jump-next)
+         ("C-c C-p" . lsp-bridge-diagnostic-jump-prev)
+         ("C-c l d" . lsp-bridge-diagnostic-list)
+         ("C-c l r" . lsp-bridge-rename))
+  :hook (lsp-bridge-mode-hook . my/disable-corfu-in-lsp-bridge)
+  :preface
+  (defun my/disable-corfu-in-lsp-bridge ()
+    (if (bound-and-true-p corfu-mode)
+        (corfu-mode 0)
+      )
+    )
+  )
+
 (leaf helpful
   :straight t
   :bind* (("C-c h f" . helpful-function)
@@ -1114,7 +1144,12 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 (when-let* ((miniconda-path
              (my/trim-newline-from-string
               (shell-command-to-string
-               "find $HOME -maxdepth 1 -type d -name 'miniconda*' | head -n 1")))
+               (format
+                "find %s -maxdepth 1 -type d -name 'miniconda*' | head -n 1"
+                (if (memq window-system '(x))
+                    "/opt"
+                  "$HOME")
+                ))))
             (path-to-venv (expand-file-name "envs/venv" miniconda-path)))
   (setq path-to-miniconda miniconda-path)
   (setq path-to-venv-python (expand-file-name "bin/python" path-to-venv))
@@ -1152,9 +1187,24 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
            (conda-env-home-directory . path-to-miniconda))
   :config
   (conda-env-initialize-eshell)
-  (conda-env-initialize-interactive-shells))
+  (conda-env-initialize-interactive-shells)
+  :hook
+  ((conda-postactivate-hook . my/lsp-python-setup-with-conda)
+   (conda-postdeactivate-hook . my/lsp-python-setup-with-conda))
+  :preface
+  (defun my/lsp-python-setup-with-conda ()
+    (setq-local lsp-bridge-python-command
+                (expand-file-name "bin/python"
+                                  python-shell-virtualenv-root))
+    (if (bound-and-true-p lsp-bridge-mode)
+        (lsp-bridge-restart-process)
+      (require 'lsp-bridge)
+      (lsp-bridge-mode))
+  )
+)
 
 (leaf lsp-pyright
+  :disabled t
   :doc "Python LSP client using Pyright"
   :req "emacs-26.1" "lsp-mode-7.0" "dash-2.18.0" "ht-2.0"
   :url "https://github.com/emacs-lsp/lsp-pyright"
@@ -1205,10 +1255,19 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :mode (("\\.ts\\'" . typescript-mode)
          ("\\.tsx\\'" . typescript-mode))
   :hook (typescript-mode-hook . (lambda ()
-                                  ;; (setq-local lsp-disabled-clients '(ts-ls))
+                                  (setq-local lsp-disabled-clients '(ts-ls))
                                   (lsp-deferred)))
   :custom ((typescript-indent-level . 2)
            (typescript-auto-indent-flag . nil))
+  :config
+  ;;; This patch needs to avoid following error:
+  ;;; json-parse-error \u0000 is not allowed without JSON_ALLOW_NUL
+  ;;; ref: https://github.com/emacs-lsp/lsp-mode/issues/2681
+  (advice-add 'json-parse-buffer :around
+              (lambda (orig &rest rest)
+                (while (re-search-forward "\\u0000" nil t)
+                  (replace-match ""))
+                (apply orig rest)))
   )
 
 (leaf deno-emacs
@@ -1362,7 +1421,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :req "emacs-24.1"
   :url "https://github.com/DarthFennec/highlight-indent-guides"
   :straight t
-  :hook prog-mode-hook
+  :hook prog-mode-hook yaml-mode-hook
   :custom
   ((highlight-indent-guides-auto-enabled . t)
    (highlight-indent-guides-responsive . t)
@@ -1585,12 +1644,9 @@ respectively."
   :custom ((default-input-method . "japanese-skk")
            (skk-jisyo-code . 'utf-8)
            (skk-large-jisyo . nil)
-           ;; (skk-jisyo . "~/.skk-jisyo")
            (skk-backup-jisyo . "~/.skk-jisyo.BAK")
            (skk-save-jisyo-instantly . t)
            (skk-share-private-jisyo . t)
-           (skk-server-host . "localhost")
-           (skk-server-portnum . 1178)
            (skk-server-report-response . nil)
            (skk-byte-compile-init-file . t)
            (skk-preload . nil)
@@ -1610,7 +1666,13 @@ respectively."
            (skk-status-indicator . 'minor-mode)
            (skk-inline-show-face . '( :foreground "#ECEFF4"
                                       :background "#4C566A"
-                                      :inherit 'normal))))
+                                      :inherit 'normal)))
+  :config
+  (if (memq window-system '(x))
+      (setq skk-jisyo "~/.skk-jisyo")
+    (progn
+      (setq skk-server-host "localhost")
+      (setq skk-server-portnum 1178))))
 
 (leaf whitespace
   :straight t
@@ -1748,6 +1810,7 @@ respectively."
 (leaf tab-bar
   :doc "frame-local tabs with named persistent window configurations"
   :tag "builtin"
+  :require t
   :bind (("C-x t n" . tab-new)
          ("C-x t r" . tab-bar-rename-tab)
          ("s-]" . tab-bar-switch-to-next-tab)
@@ -1757,8 +1820,8 @@ respectively."
            (tab-bar-close-button-show . nil)
            (tab-bar-select-tab-modifiers . '(meta)))
 
-  :hook (emacs-startup-hook . my--init-tab-bar)
-  :preface
+  ;; :hook (emacs-startup-hook . my--init-tab-bar)
+  :config
   (defun my/tab-new-with-name (&optional name)
     (interactive "sName: ")
     (tab-new)
@@ -1767,10 +1830,40 @@ respectively."
   (defun my--init-tab-bar nil
     (tab-bar-mode 1)
     (tab-bar-rename-tab "Work")
-
     (my/tab-new-with-name "Env")
-    (my/tab-new-with-name "Mail")
     (my/tab-new-with-name "Any")))
+
+(leaf tabspaces
+  :straight (tabspaces
+             :type git
+             :host github
+             :repo "mclear-tools/tabspaces")
+  :after consult
+  :hook (after-init-hook . tabspaces-mode)
+  ;; :commands (tabspaces-switch-or-create-workspace
+  ;;            tabspaces-open-or-create-project-and-workspace)
+  :custom ((tabspace-use-filtered-buffers-as-default . t)
+           (tabspaces-default-tab . "Work")
+           (tabspaces-remove-to-default . t)
+           (tabspaces-include-buffers . '("*scratch*")))
+  :defer-config
+  ;; hide full buffer list (still available with "b" prefix)
+  (consult-customize consult--source-buffer :hidden t :default nil)
+  ;; set consult-workspace buffer list
+  (defvar consult--source-workspace
+    (list :name     "Workspace Buffers"
+          :narrow   ?w
+          :history  'buffer-name-history
+          :category 'buffer
+          :state    #'consult--buffer-state
+          :default  t
+          :items    (lambda () (consult--buffer-query
+                                :predicate #'tabspaces--local-buffer-p
+                                :sort 'visibility
+                                :as #'buffer-name)))
+
+    "Set workspace buffer list for consult-buffer.")
+  (add-to-list 'consult-buffer-sources 'consult--source-workspace))
 
 (leaf rotate
   :doc "Rotate the layout of emacs"
@@ -1895,9 +1988,7 @@ respectively."
       (consult-line)))
   :advice (;; Optionally tweak the register preview window.
            ;; This adds thin lines, sorting and hides the mode line of the window.
-           (:override register-preview consult-register-window)
-           ;; Optionally replace `completing-read-multiple' with an enhanced version.
-           (:override completing-read-multiple consult-completing-read-multiple))
+           (:override register-preview consult-register-window))
   :config
   ;; Optionally configure preview. The default value
   ;; is 'any, such that any key triggers the preview.
@@ -1937,12 +2028,14 @@ respectively."
            ([remap xref-find-apropos] . consult-lsp-symbols)))
 
   (leaf consult-tramp
-    :load-path "~/.emacs.d/elisp/consult-tramp/"
-    :custom ((tramp-default-method . "ssh"))
-    :commands consult-tramp
-    :config
-    (tramp-set-completion-function "ssh"
-                                   '((tramp-parse-sconfig "~/.ssh/config")))))
+    :straight (consult-tramp
+               :type git
+               :host github
+               :repo "Ladicle/consult-tramp")
+    :custom ((tramp-default-method . "ssh")
+             (consult-tramp-method . "ssh"))
+    :commands consult-tramp)
+  )
 
 (leaf consult-ls-git
   :straight t)
@@ -2062,7 +2155,7 @@ respectively."
              :repo "jojojames/fussy")
   :init
   (leaf fuz
-    :leaf-defer nil
+    :require t
     :straight (fuz
                :type git
                :host github
@@ -2110,7 +2203,7 @@ respectively."
   :custom
   ((corfu-excluded-modes . '(shell-mode eshell-mode))
    (corfu-auto . t)
-   (corfu-auto-delay . 0.2)
+   (corfu-auto-delay . 0.1)
    (corfu-auto-prefix . 2)
    (corfu-preselect-first . nil)
 
@@ -2440,9 +2533,9 @@ respectively."
   :hook after-init-hook)
 
 (leaf org
+  :straight t
   :when window-system
   :doc "Export Framework for Org Mode"
-  :tag "builtin"
   :mode "\\.org\\'"
   :custom
   ((org-directory . "~/org/")
@@ -2497,9 +2590,30 @@ respectively."
                                      ("ms" . "summary"))))
 
   :custom-face (org-document-title . '((t (:inherit t :weight bold :height 1.6))))
-  :defun my/set-org-face
   :preface
-  (defun my/set-org-face (&rest sym-theme)
+  (setq org-format-latex-options
+        '( :foreground default
+           :background default
+           :scale 1.7
+           :html-foreground "Black"
+           :html-background "Transparent"
+           :html-scale 1.0
+           :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
+
+  (defun my/org-mode-hook ()
+    (my/set-org-face))
+
+  :config
+  (require 'org-tempo)   ;; need for org-template
+  (require 'org-indent)  ;; Make sure org-indent face is available
+
+  (leaf org-fragtog
+    :straight t
+    :hook (org-mode-hook . org-fragtog-mode))
+
+  (setq warning-suppress-types (append warning-suppress-types '((org-element-cache))))
+
+  (defun my/set-org-face nil
     ;; Increase the size of various headings
     (interactive)
     (set-face-attribute 'org-document-title nil
@@ -2534,28 +2648,7 @@ respectively."
     ;; Get rid of the background on column views
     (set-face-attribute 'org-column nil :background nil)
     (set-face-attribute 'org-column-title nil :background nil))
-
-  (setq org-format-latex-options
-        '( :foreground default
-           :background default
-           :scale 1.7
-           :html-foreground "Black"
-           :html-background "Transparent"
-           :html-scale 1.0
-           :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
-
-  (defun my/org-mode-hook ()
-    (my/set-org-face))
-
-  :config
-  (require 'org-tempo)   ;; need for org-template
-  (require 'org-indent)  ;; Make sure org-indent face is available
-
-  (leaf org-fragtog
-    :straight t
-    :hook (org-mode-hook . org-fragtog-mode))
-
-  (setq warning-suppress-types (append warning-suppress-types '((org-element-cache)))))
+)
 
 (leaf org-agenda
   :when window-system
@@ -3083,54 +3176,6 @@ respectively."
         org-roam-ui-follow t
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
-
-(leaf orp-paperpile
-  :when window-system
-  :after org-roam
-  :doc "orp-paperpile; Org-Roam-Protocol Paperpile is an interface
-        to comunicate between org-mode and paperpile using org-roam-protocol."
-  :load-path "~/.emacs.d/elisp/orp-paperpile/"
-  :require t
-  :defer-config (orp-activate)
-  :advice (:around org-link-open advice-around-org-link-open)
-  :custom
-  ((orp-paperpile-local-pdf-dir . "~/drive/Paperpile/")
-   (org-roam-capture-ref-templates . '(("r" "ref" plain "%?"
-                                        :target (file+head "lit/${slug}.org"
-                                                           (concat
-                                                            "#+date: %U\n"
-                                                            "#+filetags: Literature\n"
-                                                            "#+title: ${title}"))
-                                        :unnarrowed t))))
-
-  :preface
-  (defun open-external (path)
-    (interactive)
-    (cond
-     ((eq system-type 'darwin)
-      (let ((cmd-list (list
-                       (if (string-prefix-p "chrome-extension" path)
-                           "brave"
-                         "open")
-                       (concat "'" path "'")
-                       "&")))
-        (shell-command (c-concat-separated cmd-list " "))))
-     ((eq system-type 'gnu/linux)
-      (let ((process-connection-type nil))
-        (start-process "" nil "xdg-open" path)))))
-
-  ;; for open paperpile link in external browser
-  (defun advice-around-org-link-open (f link &optional arg)
-    (let ((path (org-element-property :raw-link link))
-          (type (org-element-property :type link)))
-      (if (or (string-match "paperpile" path)
-              (string-match "chrome-extension" path))
-          (let ((path (if (string-equal "file" type)
-                          (cadr (split-string path ":"))
-                        path)))
-            (open-external path)
-            (message "Open: %s" path))
-        (apply f link arg)))))
 
 (leaf org-superstar
   :disabled t
@@ -3710,20 +3755,21 @@ Interactively, URL defaults to the string looking like a url around point."
     (sie-brow/search-in-external-browser sie-brow/prefix-for-google-scholar at-point)))
 
 (leaf eaf
-  :disabled t
   :when (memq window-system '(x))
-  :load-path "~/.emacs.d/elisp/emacs-application-framework/"
+  :load-path "~/src/github.com/emacs-eaf/emacs-application-framework/"
+  :require eaf
   :commands
   (eaf-search-it eaf-open eaf-open-browser eaf-open-browser-with-history eaf-open-pdf-from-history)
   :custom
-                                        ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
-  ((eaf-python-command . "/usr/bin/python")
+  ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
+  (;; (eaf-python-command . "/usr/bin/python")
    (eaf-browser-continue-where-left-off . t)
    (eaf-browser-enable-adblocker . t)
    (browse-url-browser-function . 'eaf-open-browser))
   :config
   (require 'eaf-browser)
   (require 'eaf-pdf-viewer)
+  (add-to-list 'eaf-wm-focus-fix-wms "wlroots wm")
   (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
   (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
   (defalias 'browse-web #'eaf-open-browser)
@@ -3759,11 +3805,10 @@ Interactively, URL defaults to the string looking like a url around point."
   :custom-face
   (org-modern-label . '((t :height 0.9 :inherit t)))
   :custom
-  ((org-modern-star . ["◉" "●" "○" "◇" "✿" "✸" " "])
+  ((org-modern-star . ["◉" "●" "○" "◇" "★" "✸" " "])
    (org-modern-list . '((?+ . "➤")
                         (?* . "-")
-                        (?- . "•"))))
-  )
+                        (?- . "•")))))
 
 (leaf vertico-posframe
   :straight t
@@ -3875,7 +3920,14 @@ Interactively, URL defaults to the string looking like a url around point."
 
 (leaf ansible
   :straight t
-  :hook (ansible-hook . (lambda ()
-                          (lsp-deferred))))
+  :hook ((yaml-mode-hook . (lambda ()
+                             (ansible 1)))
+         (ansible-hook . (lambda ()
+                           (lsp-bridge-mode 1))))
+  
+  :config
+  (require 'lsp-bridge)
+  (add-to-list 'lsp-bridge-single-lang-server-mode-list '(yaml-mode . "ansible-language-server"))
+  )
 
 (provide 'init)
