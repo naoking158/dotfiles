@@ -1654,9 +1654,11 @@ Only in Neotree Buffer:
              )
   :bind (lsp-bridge-mode-map
          :package lsp-bridge
-         ("C-c C-d" . lsp-bridge-popup-documentation)
-         ("C-c C-r" . lsp-bridge-find-references)
+         ("M-." . lsp-bridge-find-def)
+         ("M-," . lsp-bridge-find-def-return)
          ("C-c C-j" . lsp-bridge-find-def-other-window)
+         ("C-c C-r" . lsp-bridge-find-references)
+         ("C-c C-d" . lsp-bridge-popup-documentation)
          ("C-c C-n" . lsp-bridge-diagnostic-jump-next)
          ("C-c C-p" . lsp-bridge-diagnostic-jump-prev)
          ("C-c l d" . lsp-bridge-diagnostic-list)
