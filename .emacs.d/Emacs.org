@@ -2910,7 +2910,6 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
              (consult-tramp-method . "ssh"))
     :commands consult-tramp)
   )
-
 #+end_src
 
 *** consult-ls-git
@@ -4118,63 +4117,65 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
               target)))
   :config
   (setq TeX-engine 'euptex)
+  (setq org-latex-pdf-process (list (my-latexmk-command TeX-engine "-pv" "%f" "%o")))
 
-  (add-hook 'org-export-before-processing-hook 'my-ox-latex-tex-engine-setup)
+  ;; (add-hook 'org-export-before-processing-hook 'my-ox-latex-tex-engine-setup)
 
-  (defun my-ox-latex-tex-engine-setup (backend)
-    (message "backend=%s" backend)
-    (when (equal backend 'latex)
-      (my-ox-latex-engine-set TeX-engine)))
+;;   (defun my-ox-latex-tex-engine-setup (backend)
+;;     (message "backend=%s" backend)
+;;     (when (equal backend 'latex)
+;;       (my-ox-latex-engine-set TeX-engine)))
 
-  (defun my-ox-latex-engine-set (latex)
-    "Set up LATEX environments."
+;;   (defun my-ox-latex-engine-set (latex)
+;;     "Set up LATEX environments."
 
-    (setq org-latex-default-class "jsarticle")
-    (add-to-list 'org-latex-classes
-                 '("research-note"
-                   "\\documentclass[openany]{report}\n
-\\input{../preferences/header.tex}\n
-\\input{..//preferences/preamble_research_note.tex}\n
-\\usepackage[whole]{bxcjkjatype}
-%% \\usepackage{amsmath,amsthm,amssymb}
-%% \\usepackage{mynotestyle}
-%% \\usepackage{preamble}
-[NO-DEFAULT-PACKAGES]
-[PACKAGES]
-[EXTRA]"
-                   ("\\datechapter{%s}" . "\\datechapter{%s}")
-                   ("\\section{%s}" . "\\section*{%s}")
-                   ("\\subsection{%s}" . "\\subsection*{%s}")
-                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")
-                   ))
-    (add-to-list 'org-latex-classes
-                 '("article"
-                   "\\RequirePackage{plautopatch}\n
-\\documentclass[a4p,uplatex,dvipdfmx]{article}\n
-\\input{../preferences/header.tex}"
-                   ("\\section{%s}" . "\\section*{%s}")
-                   ("\\subsection{%s}" . "\\subsection*{%s}")
-                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-    (add-to-list 'org-latex-classes
-                 '("jsarticle"
-                   "\\RequirePackage{plautopatch}\n
-\\documentclass[a4p,uplatex,dvipdfmx]{jsarticle}\n
-\\input{../preferences/header.tex}
-[NO-DEFAULT-PACKAGES]
-[PACKAGES]
-[EXTRA]"
-                   ("\\section{%s}" . "\\section*{%s}")
-                   ("\\subsection{%s}" . "\\subsection*{%s}")
-                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+;;     (setq org-latex-default-class "jsarticle")
+;;     (add-to-list 'org-latex-classes
+;;                  '("research-note"
+;;                    "\\documentclass[openany]{report}\n
+;; \\input{../preferences/header.tex}\n
+;; \\input{..//preferences/preamble_research_note.tex}\n
+;; \\usepackage[whole]{bxcjkjatype}
+;; %% \\usepackage{amsmath,amsthm,amssymb}
+;; %% \\usepackage{mynotestyle}
+;; %% \\usepackage{preamble}
+;; [NO-DEFAULT-PACKAGES]
+;; [PACKAGES]
+;; [EXTRA]"
+;;                    ("\\datechapter{%s}" . "\\datechapter{%s}")
+;;                    ("\\section{%s}" . "\\section*{%s}")
+;;                    ("\\subsection{%s}" . "\\subsection*{%s}")
+;;                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+;;                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
+;;                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")
+;;                    ))
+;;     (add-to-list 'org-latex-classes
+;;                  '("article"
+;;                    "\\RequirePackage{plautopatch}\n
+;; \\documentclass[a4p,uplatex,dvipdfmx]{article}\n
+;; \\input{../preferences/header.tex}"
+;;                    ("\\section{%s}" . "\\section*{%s}")
+;;                    ("\\subsection{%s}" . "\\subsection*{%s}")
+;;                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+;;                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
+;;                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+;;     (add-to-list 'org-latex-classes
+;;                  '("jsarticle"
+;;                    "\\RequirePackage{plautopatch}\n
+;; \\documentclass[a4p,uplatex,dvipdfmx]{jsarticle}\n
+;; \\input{../preferences/header.tex}
+;; [NO-DEFAULT-PACKAGES]
+;; [PACKAGES]
+;; [EXTRA]"
+;;                    ("\\section{%s}" . "\\section*{%s}")
+;;                    ("\\subsection{%s}" . "\\subsection*{%s}")
+;;                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+;;                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
+;;                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
-    (setq org-latex-pdf-process (list (my-latexmk-command TeX-engine "-pv" "%f" "%o")))
-    ))
+    ;; (setq org-latex-pdf-process (list (my-latexmk-command TeX-engine "-pv" "%f" "%o")))
+;;     )
+  )
 
 #+end_src
 
