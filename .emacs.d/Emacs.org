@@ -1667,7 +1667,7 @@ Only in Neotree Buffer:
   :preface
   (defun my/disable-corfu-in-lsp-bridge ()
     (if (bound-and-true-p corfu-mode)
-        (corfu-mode 0)
+        (corfu-mode -1)
       )
     )
   )
