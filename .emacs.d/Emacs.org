@@ -1844,7 +1844,7 @@ Only in Neotree Buffer:
          ("\\.tsx\\'" . typescript-mode))
   :hook (typescript-mode-hook . (lambda ()
                                   (setq-local lsp-disabled-clients '(ts-ls))
-                                  (lsp-deferred)))
+                                  (lsp-bridge-mode)))
   :custom ((typescript-indent-level . 2)
            (typescript-auto-indent-flag . nil))
   :config
