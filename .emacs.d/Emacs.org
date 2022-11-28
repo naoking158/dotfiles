@@ -1975,7 +1975,7 @@ Only in Neotree Buffer:
           ("C-c C-n" . flycheck-next-error)
           ("C-c C-p" . flycheck-previous-error)))
   :hook ((python-mode-hook typescript-mode-hook) . flycheck-mode)
-  :custom (flycheck-display-errors-delay . 0.3)
+  :custom ((flycheck-display-errors-delay . 1))
   :config
   (leaf flycheck-pos-tip
     :straight t
