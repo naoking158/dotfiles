@@ -3044,6 +3044,16 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
              :type git
              :host github
              :repo "jojojames/fussy")
+  :advice (:before corfu--capf-wrapper fussy-wipe-cache)
+  :custom ((completion-styles . '(fussy))
+           (completion-category-defaults . nil)
+           (completion-category-overrides . nil)
+           (fussy-max-candidate-limit . 10000)
+           (fussy-default-regex-fn . 'fussy-pattern-first-letter)
+           (fussy-prefer-prefix . nil)
+           (fussy-filter-fn . 'fussy-filter-orderless-flex)
+           (fussy-use-cache . t))
+
   :init
   (leaf fuz
     :require t
@@ -3055,9 +3065,6 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     (setq fussy-score-fn 'fussy-fuz-score)
     (unless (require 'fuz-core nil t)
       (fuz-build-and-load-dymod)))
-  :custom ((completion-styles . '(fussy))
-           (completion-category-defaults . nil)
-           (completion-category-overrides . nil))
   )
 #+end_src
 
