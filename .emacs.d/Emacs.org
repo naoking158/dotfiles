@@ -1643,9 +1643,12 @@ Only in Neotree Buffer:
            ;; lsp-ui-imenu
            (lsp-ui-imenu-enable . nil)))
 
-(leaf lsp-latex :straight t)
+(leaf lsp-latex
+  :disabled t
+  :straight t)
 
 (leaf lsp-bridge
+  :disabled nil
   :straight (lsp-bridge
              :type git
              :host github
@@ -1842,11 +1845,18 @@ Only in Neotree Buffer:
   :straight t
   :mode (("\\.ts\\'" . typescript-mode)
          ("\\.tsx\\'" . typescript-mode))
-  :hook (typescript-mode-hook . (lambda ()
-                                  (setq-local lsp-disabled-clients '(ts-ls))
-                                  (lsp-bridge-mode)))
   :custom ((typescript-indent-level . 2)
            (typescript-auto-indent-flag . nil))
+  :hook ((hack-local-variables-hook . run-local-vars-mode-hook)
+         (typescript-mode-local-vars-hook . (lambda nil (lsp-bridge-mode))))
+;; (typescript-mode-hook . (lambda ()
+        ;;                           ;; (setq-local lsp-disabled-clients '(ts-ls))
+        ;;                           (lsp-bridge-mode)))
+
+  :preface
+  (defun run-local-vars-mode-hook ()
+    "Run `major-mode' hook after the local variables have been processed."
+    (run-hooks (intern (concat (symbol-name major-mode) "-local-vars-hook"))))
   :config
   ;;; This patch needs to avoid following error:
   ;;; json-parse-error \u0000 is not allowed without JSON_ALLOW_NUL
@@ -5468,15 +5478,14 @@ HTTP encodings, headers, media types, methods, relations and status codes, all s
   :hook ((yaml-mode-hook . (lambda ()
                              (ansible 1)))
          (ansible-hook . (lambda ()
-                           (lsp-bridge-mode 1))))
-  
+                           (lsp-bridge-mode 1)
+                           (if (bound-and-true-p corfu-mode)
+                               (corfu-mode -1)))))
   :config
   (require 'lsp-bridge)
   (add-to-list 'lsp-bridge-single-lang-server-mode-list '(yaml-mode . "ansible-language-server"))
   )
 #+end_src
-
-
 
 * Footer
 :PROPERTIES:
