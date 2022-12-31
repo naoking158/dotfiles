@@ -3,14 +3,18 @@
 
 [core]
 	editor = "vim"
-	pager = "delta"
+  pager = "type delta >/dev/null 2>&1 && exec delta || exec less --tabs=4 -RFX"
+
+[interactive]
+  diffFilter = delta --color-only
 
 [delta]
 	hyperlinks = true
-	line-numbers = true
-	navigate = true
 	side-by-side = true
-	syntax-theme = "zenburn"
+  line-numbers = true
+  keep-plus-minus-markers = true
+  navigate = true
+ 	syntax-theme = "zenburn"
 
 [ghq]
 	root = "~/src"
