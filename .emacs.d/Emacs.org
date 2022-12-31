@@ -2935,119 +2935,100 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 :END:
 
 #+begin_src emacs-lisp
+(leaf orderless
+  :straight t
+  :commands (orderless-filter)
+  :config
+  (setq my--orderless-default-styles
+        '(orderless-prefixes
+          orderless-initialism
+          orderless-regexp))
 
-;; (if (not (executable-find "cmigemo"))
-;;     (leaf orderless
-;;       :straight t
-;;       :require t
-;;       :custom
-;;       '((completion-styles . '(orderless))
-;;         (completion-category-defaults . nil)
-;;         (completion-category-overrides . ((file (styles '(orderless-prefixes
-;;                                                           orderless-initialism
-;;                                                           orderless-regexp)))))))
+  (defun my--orderless-literal-dispatcher (pattern _index _total)
+    "Literal style dispatcher using the equals sign as a suffix.
+It matches PATTERN _INDEX and _TOTAL according to how Orderless
+parses its input."
+    (when (string-suffix-p "=" pattern)
+      `(orderless-literal . ,(substring pattern 0 -1))))
 
-;;   (leaf orderless
-;;     :straight t migemo
-;;     :require t migemo
-;;     :leaf-defer nil
-;;     :bind (:minibuffer-local-completion-map
-;;            ("SPC" . nil)
-;;            ("?" . nil))
-;;     :custom
-;;     '((completion-styles . '(basic substring initials flex orderless))
-;;       (completion-cycle-threshold . 2)
-;;       (completion-flex-nospace . nil)
-;;       (completion-category-defaults . nil)
-;;       (completion-category-overrides
-;;        quote ((file (styles orderless-migemo-style))
-;;               ;; for consult-line
-;;               (citar-reference (styles orderless-migemo-style))
-;;               (command (styles orderless-default-style))
-;;               (consult-location (styles orderless-migemo-style))
-;;               (consult-multi (styles orderless-default-style))
-;;               (imenu (styles orderless-migemo-style))
-;;               (org-roam-node (styles orderless-migemo-style))
-;;               (unicode-name (styles orderless-migemo-style))
-;;               )))
-;;     :config
-;;     (setq my--orderless-default-styles
-;;           '(orderless-prefixes
-;;             orderless-initialism
-;;             orderless-regexp))
+  (defun my--orderless-initialism-dispatcher (pattern _index _total)
+    "Leading initialism  dispatcher using the comma suffix.
+It matches PATTERN _INDEX and _TOTAL according to how Orderless
+parses its input."
+    (when (string-suffix-p "," pattern)
+      `(orderless-initialism . ,(substring pattern 0 -1))))
 
-;;     (defun my--orderless-literal-dispatcher (pattern _index _total)
-;;       "Literal style dispatcher using the equals sign as a suffix.
-;; It matches PATTERN _INDEX and _TOTAL according to how Orderless
-;; parses its input."
-;;       (when (string-suffix-p "=" pattern)
-;;         `(orderless-literal . ,(substring pattern 0 -1))))
+  (defun my--orderless-flex-dispatcher (pattern _index _total)
+    "Flex  dispatcher using the tilde suffix.
+It matches PATTERN _INDEX and _TOTAL according to how Orderless
+parses its input."
+    (when (string-suffix-p "~" pattern)
+      `(orderless-flex . ,(substring pattern 0 -1))))
 
-;;     (defun my--orderless-initialism-dispatcher (pattern _index _total)
-;;       "Leading initialism  dispatcher using the comma suffix.
-;; It matches PATTERN _INDEX and _TOTAL according to how Orderless
-;; parses its input."
-;;       (when (string-suffix-p "," pattern)
-;;         `(orderless-initialism . ,(substring pattern 0 -1))))
+  (setq orderless-matching-styles my--orderless-default-styles)
+  (setq orderless-style-dispatchers '(my--orderless-literal-dispatcher
+                                      my--orderless-initialism-dispatcher
+                                      my--orderless-flex-dispatcher))
 
-;;     (defun my--orderless-flex-dispatcher (pattern _index _total)
-;;       "Flex  dispatcher using the tilde suffix.
-;; It matches PATTERN _INDEX and _TOTAL according to how Orderless
-;; parses its input."
-;;       (when (string-suffix-p "~" pattern)
-;;         `(orderless-flex . ,(substring pattern 0 -1))))
+  (orderless-define-completion-style
+      orderless-default-style
+    (orderless-matching-styles '(orderless-literal
+                                 orderless-prefixes
+                                 orderless-initialism
+                                 orderless-regexp)))
 
-;;     (setq orderless-matching-styles my--orderless-default-styles)
-;;     (setq orderless-style-dispatchers '(my--orderless-literal-dispatcher
-;;                                         my--orderless-initialism-dispatcher
-;;                                         my--orderless-flex-dispatcher))
+  (setq completion-category-overrides
+        '((command (styles orderless-default-style))
+          (consult-multi (styles orderless-default-style))))
 
+  (leaf migemo
+    :when (executable-find "cmigemo")
+    :straight t
+    :require t
+    :custom
+    `((migemo-user-dictionary  . nil)
+      (migemo-regex-dictionary . nil)
+      (migemo-coding-system    . 'utf-8)
+      (migemo-dictionary . ,(cond
+                             ((file-exists-p "/usr/local/share/migemo/utf-8/migemo-dict")
+                              "/usr/local/share/migemo/utf-8/migemo-dict")
+                             ((file-exists-p "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
+                              "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
+                             (t "")))
+      (migemo-isearch-enable-p . t))
+    :config
+    (leaf orderless
+      :config
+      (defun orderless-migemo (component)
+        (let ((pattern (migemo-get-pattern component)))
+          (condition-case nil
+              (progn (string-match-p pattern "") pattern)
+            (invalid-regexp nil))))
 
-;;     (defun orderless-migemo (component)
-;;       (let ((pattern (migemo-get-pattern component)))
-;;         (condition-case nil
-;;             (progn (string-match-p pattern "") pattern)
-;;           (invalid-regexp nil))))
+      (orderless-define-completion-style
+          orderless-migemo-style
+        (orderless-matching-styles '(orderless-literal
+                                     orderless-prefixes
+                                     orderless-initialism
+                                     orderless-regexp
+                                     orderless-migemo)))
 
-;;     (orderless-define-completion-style
-;;      orderless-default-style
-;;      (orderless-matching-styles '(orderless-literal
-;;                                   orderless-prefixes
-;;                                   orderless-initialism
-;;                                   orderless-regexp)))
-
-;;     (orderless-define-completion-style
-;;      orderless-migemo-style
-;;      (orderless-matching-styles '(orderless-literal
-;;                                   orderless-prefixes
-;;                                   orderless-initialism
-;;                                   orderless-regexp
-;;                                   orderless-migemo)))))
-
-;; (leaf migemo
-;;   :when (executable-find "cmigemo")
-;;   :straight t
-;;   :hook (emacs-startup-hook . migemo-init)
-;;   :custom
-;;   `((migemo-user-dictionary  . nil)
-;;     (migemo-regex-dictionary . nil)
-;;     (migemo-coding-system    . 'utf-8)
-;;     (migemo-dictionary . ,(cond
-;;                            ((file-exists-p "/usr/local/share/migemo/utf-8/migemo-dict")
-;;                             "/usr/local/share/migemo/utf-8/migemo-dict")
-;;                            ((file-exists-p "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
-;;                             "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")))
-;;     (migemo-isearch-enable-p . t)))
-
+      (dolist (elm '((file (styles orderless-migemo-style))
+                     ;; for consult-line
+                     (citar-reference (styles orderless-migemo-style))
+                     (consult-location (styles orderless-migemo-style))
+                     (imenu (styles orderless-migemo-style))
+                     (org-roam-node (styles orderless-migemo-style))
+                     (unicode-name (styles orderless-migemo-style))))
+        (add-to-list 'completion-category-overrides elm)))
+    (migemo-init)
+    )
+)
 #+end_src
 
 *** fussy
 
 #+begin_src emacs-lisp
-(leaf orderless
-  :straight t
-  :commands (orderless-filter))
-
 (leaf fussy
   :leaf-defer nil
   :straight (fussy
@@ -3057,7 +3038,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   :advice (:before corfu--capf-wrapper fussy-wipe-cache)
   :custom ((completion-styles . '(fussy))
            (completion-category-defaults . nil)
-           (completion-category-overrides . nil)
+           ;; (completion-category-overrides . nil)
            (fussy-max-candidate-limit . 10000)
            (fussy-default-regex-fn . 'fussy-pattern-first-letter)
            (fussy-prefer-prefix . nil)
