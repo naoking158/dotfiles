@@ -5403,15 +5403,11 @@ HTTP encodings, headers, media types, methods, relations and status codes, all s
 (leaf ansible
   :straight t
   :hook ((yaml-mode-hook . (lambda ()
-                             (ansible 1)))
-         (ansible-hook . (lambda ()
-                           (lsp-bridge-mode 1)
-                           (if (bound-and-true-p corfu-mode)
-                               (corfu-mode -1)))))
+                             (ansible 1)
+                             (lsp-bridge-mode 1))))
   :config
   (require 'lsp-bridge)
-  (add-to-list 'lsp-bridge-single-lang-server-mode-list '(yaml-mode . "ansible-language-server"))
-  )
+  (add-to-list 'lsp-bridge-single-lang-server-mode-list '(yaml-mode . "ansible-language-server")))
 #+end_src
 
 * Footer
