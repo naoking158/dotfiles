@@ -1855,7 +1855,7 @@ Only in Neotree Buffer:
 
 #+begin_src emacs-lisp
 (leaf sh-mode
-  :hook (sh-mode-hook . lsp-deferred))
+  :hook (sh-mode-hook . lsp-bridge-mode))
 #+end_src
 
 ** Productivity
