@@ -3060,7 +3060,12 @@ parses its input."
   :straight t
   :global-minor-mode global-corfu-mode
   :custom
-  ((corfu-excluded-modes . '(shell-mode eshell-mode))
+  ((corfu-excluded-modes . '(shell-mode
+                             eshell-mode
+                             python-mode
+                             yaml-mode
+                             typescript-mode
+                             js-mode))
    (corfu-auto . t)
    (corfu-auto-delay . 0.1)
    (corfu-auto-prefix . 2)
