@@ -1797,11 +1797,8 @@ Only in Neotree Buffer:
   :custom ((typescript-indent-level . 2)
            (typescript-auto-indent-flag . nil))
   :hook ((hack-local-variables-hook . run-local-vars-mode-hook)
-         (typescript-mode-local-vars-hook . (lambda nil (lsp-bridge-mode))))
-;; (typescript-mode-hook . (lambda ()
-        ;;                           ;; (setq-local lsp-disabled-clients '(ts-ls))
-        ;;                           (lsp-bridge-mode)))
-
+         (typescript-mode-local-vars-hook . (lambda nil
+                                              (lsp-bridge-mode))))
   :preface
   (defun run-local-vars-mode-hook ()
     "Run `major-mode' hook after the local variables have been processed."
