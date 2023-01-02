@@ -809,8 +809,8 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 (leaf ui
   :leaf-defer nil
   :hook
-  ((prog-mode-hook latex-mode-hook) . (lambda ()
-                                        (display-line-numbers-mode 1)))
+  ((prog-mode-hook latex-mode-hook yaml-mode-hook) . (lambda ()
+                                                       (display-line-numbers-mode 1)))
 
   :config
   (leaf dashboard
