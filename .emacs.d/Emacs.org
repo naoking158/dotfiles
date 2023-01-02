@@ -482,7 +482,8 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
               (recentf-auto-cleanup . 'never)
               (save-place-mode . 1)
               (save-interprogram-paste-before-kill . t)
-              (indent-tabs-mode . nil))
+              (indent-tabs-mode . nil)
+              (native-comp-async-report-warnings-errors . nil))
     :config
     (defalias 'yes-or-no-p 'y-or-n-p)
     (keyboard-translate 8 127)
