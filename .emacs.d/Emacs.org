@@ -1811,8 +1811,7 @@ Only in Neotree Buffer:
               (lambda (orig &rest rest)
                 (while (re-search-forward "\\u0000" nil t)
                   (replace-match ""))
-                (apply orig rest)))
-  )
+                (apply orig rest))))
 
 (leaf deno-emacs
   :disabled nil
