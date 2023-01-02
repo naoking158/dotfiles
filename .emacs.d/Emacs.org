@@ -1606,7 +1606,6 @@ Only in Neotree Buffer:
   :straight t)
 
 (leaf lsp-bridge
-  :disabled nil
   :straight (lsp-bridge
              :type git
              :host github
@@ -1623,15 +1622,7 @@ Only in Neotree Buffer:
          ("C-c C-n" . lsp-bridge-diagnostic-jump-next)
          ("C-c C-p" . lsp-bridge-diagnostic-jump-prev)
          ("C-c l d" . lsp-bridge-diagnostic-list)
-         ("C-c l r" . lsp-bridge-rename))
-  :hook (lsp-bridge-mode-hook . my/disable-corfu-in-lsp-bridge)
-  :preface
-  (defun my/disable-corfu-in-lsp-bridge ()
-    (if (bound-and-true-p corfu-mode)
-        (corfu-mode -1)
-      )
-    )
-  )
+         ("C-c l r" . lsp-bridge-rename)))
 #+end_src
 
 
