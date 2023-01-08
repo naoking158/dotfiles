@@ -1011,10 +1011,9 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
                                     (t . (bold variable-pitch 1.1))))
       ;; Load choiced theme
       (pcase sym-theme
-        ('modus-dark (load-theme 'modus-vivendi-tinted :no-confirm))
-        ('modus-light (load-theme 'modus-operandi-tinted :no-confirm)))
-      (my--init-tab-bar))
-    )
+        ('modus-dark (load-theme 'modus-vivendi :no-confirm))
+        ('modus-light (load-theme 'modus-operandi :no-confirm)))
+      (my--init-tab-bar)))
 
   (leaf bespoke-themes
     :straight (bespoke-themes
