@@ -135,7 +135,7 @@ done
 declare -r  ORIGIN=$(pwd)
 declare -ri NPROC="${NPROC:=1}"
 if [[ "${VERSION:-}" ]]; then
-    if [[ $VERSION == "29" ]]; then
+    if [[ $VERSION == "30" ]]; then
         VERSION="master"
     else
         VERSION="emacs-${VERSION}"
@@ -173,7 +173,7 @@ function prepare_patches() {
 
     e_newline
     e_arrow "Downloading patches in ${PATCH_DIR}"
-    
+
     for url in "${PATCH_URL[@]}"; do
         curl -LO $url
     done &&
