@@ -4180,15 +4180,6 @@ parses its input."
        :unnarrowed t))))
 
   :defer-config
-  ;; (leaf org-roam-dailies
-  ;;   :after org-roam
-  ;;   :defvar org-roam-dailies-map
-  ;;   :bind-keymap ("C-c n d" . org-roam-dailies-map)
-  ;;   :bind
-  ;;   (:org-roam-dailies-map
-  ;;    ("Y" . org-roam-dailies-capture-yesterday)
-  ;;    ("T" . org-roam-dailies-capture-tomorrow)))
-
   ;; for org-roam-buffer-toggle
   ;; Recommendation in the official manual
   (add-to-list 'display-buffer-alist
@@ -4198,19 +4189,6 @@ parses its input."
                  (window-width . 0.33)
                  (window-height . fit-window-to-buffer)))
   (org-roam-db-autosync-mode))
-
-
-(leaf org-roam-ui
-  :disabled t
-  :after org-roam
-  :load-path "~/.emacs.d/elisp/org-roam-ui/"
-  :straight simple-httpd websocket
-  :commands (org-roam-ui-mode)
-  :config
-  (setq org-roam-ui-sync-theme t
-        org-roam-ui-follow t
-        org-roam-ui-update-on-save t
-        org-roam-ui-open-on-start t))
 
 #+end_src
 
