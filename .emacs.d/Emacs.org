@@ -3059,7 +3059,8 @@ parses its input."
   :straight t
   :global-minor-mode global-corfu-mode
   :custom
-  ((corfu-excluded-modes . '(shell-mode
+  ((corfu-excluded-modes . '(sh-mode
+                             shell-mode
                              eshell-mode
                              python-mode
                              yaml-mode
