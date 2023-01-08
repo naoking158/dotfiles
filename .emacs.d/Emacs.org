@@ -3614,7 +3614,7 @@ parses its input."
 (leaf org-agenda
   :when window-system
   :bind* (("C-c C-a" . my/org-agenda-cache)
-          ("C-c C-m" . jethro/org-inbox-capture))
+          ("C-c C-m" . org-capture))
   :custom
   `((org-agenda-window-setup . 'other-window)
     (org-agenda-block-separator . nil)
@@ -3635,10 +3635,6 @@ parses its input."
      quote
      "%40ITEM(Task) %Effort(EE){:} %CLOCKSUM(Time Spent) %SCHEDULED(Scheduled) %DEADLINE(Deadline)"))
   :preface
-  (defun jethro/set-todo-state-next ()
-    "Visit each parent task and change NEXT states to TODO"
-    (org-todo "NEXT"))
-
   (defun my/org-agenda-cache (&optional regenerate)
     "Show agenda buffer without updating if it exists"
     (interactive "P")
@@ -3648,16 +3644,12 @@ parses its input."
           (org-agenda nil "a"))
       (org-switch-to-buffer-other-window "*Org Agenda*")))
 
-  (defun jethro/org-inbox-capture ()
-    (interactive)
-    "Capture a task in agenda mode."
-    (org-capture))
-
   :defer-config
   (leaf org-agenda
     :hook ((kill-emacs-hook . ladicle/org-clock-out-and-save-when-exit)
            (org-clock-in-hook . jethro/set-todo-state-next)
            (org-clock-in-hook . (lambda ()
+                                  (org-todo "NEXT")
                                   (add-to-list 'frame-title-format
                                                '(:eval org-mode-line-string) t)))
            ;; (org-capture-after-finalize-hook . (lambda ()
@@ -3669,7 +3661,7 @@ parses its input."
            ("i" . org-agenda-clock-in)
            ("r" . jethro/org-agenda-process-inbox-item)
            ("R" . org-agenda-refile)
-           ("c" . jethro/org-inbox-capture)
+           ("c" . org-capture)
            ("q" . quit-window))
     :preface
     (defvar jethro/org-current-effort "1:00"
@@ -3710,33 +3702,33 @@ parses its input."
     (defvar jethro/org-agenda-bulk-process-key ?f
       "Default key for bulk processing inbox items.")
 
-    (defun jethro/bulk-process-entries ()
-      (if (not (null org-agenda-bulk-marked-entries))
-          (let ((entries (reverse org-agenda-bulk-marked-entries))
-                (processed 0)
-                (skipped 0))
-            (dolist (e entries)
-              (let ((pos (text-property-any (point-min) (point-max) 'org-hd-marker e)))
-                (if (not pos)
-                    (progn (message "Skipping removed entry at %s" e)
-                           (cl-incf skipped))
-                  (goto-char pos)
-                  (let (org-loop-over-headlines-in-active-region) (funcall 'jethro/org-agenda-process-inbox-item))
-                  ;; `post-command-hook' is not run yet.  We make sure any
-                  ;; pending log note is processed.
-                  (when (or (memq 'org-add-log-note (default-value 'post-command-hook))
-                            (memq 'org-add-log-note post-command-hook))
-                    (org-add-log-note))
-                  (cl-incf processed))))
-            (org-agenda-redo)
-            (unless org-agenda-persistent-marks (org-agenda-bulk-unmark-all))
-            (message "Acted on %d entries%s%s"
-                     processed
-                     (if (= skipped 0)
-                         ""
-                       (format ", skipped %d (disappeared before their turn)"
-                               skipped))
-                     (if (not org-agenda-persistent-marks) "" " (kept marked)")))))
+    (defun my/bulk-process-entries ()
+      (when-let ((entries (reverse org-agenda-bulk-marked-entries))
+                 (processed 0)
+                 (skipped 0))
+        (dolist (e entries)
+          (let ((pos (text-property-any (point-min) (point-max) 'org-hd-marker e)))
+            (if (not pos)
+                (progn (message "Skipping removed entry at %s" e)
+                       (cl-incf skipped))
+              (goto-char pos)
+              (let (org-loop-over-headlines-in-active-region)
+                (funcall 'jethro/org-agenda-process-inbox-item))
+              ;; `post-command-hook' is not run yet.  We make sure any
+              ;; pending log note is processed.
+              (when (or (memq 'org-add-log-note (default-value 'post-command-hook))
+                        (memq 'org-add-log-note post-command-hook))
+                (org-add-log-note))
+              (cl-incf processed))))
+        (org-agenda-redo)
+        (unless org-agenda-persistent-marks (org-agenda-bulk-unmark-all))
+        (message "Acted on %d entries%s%s"
+                 processed
+                 (if (= skipped 0)
+                     ""
+                   (format ", skipped %d (disappeared before their turn)"
+                           skipped))
+                 (if (not org-agenda-persistent-marks) "" " (kept marked)"))))
 
     (defun jethro/org-process-inbox ()
       "Called in org-agenda-mode, processes all inbox items."
@@ -3768,7 +3760,7 @@ parses its input."
                      ("CANCELLED" . ?c))
      org-fast-tag-selection-single-key nil
      org-todo-keywords '((sequence
-                          "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                         "TODO(t)" "NEXT(n)" "|" "DONE(d)" "PROJECT(p)" "-SUBPJ(s)")
                          (sequence
                           "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)"))
      org-refile-use-outline-path 'file
