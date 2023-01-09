@@ -3741,9 +3741,6 @@ parses its input."
     (require 'org-capture)
     (setq
      gtd/org-agenda-directory (file-truename "~/org/gtd/")
-     org-agenda-files (directory-files gtd/org-agenda-directory t "\\.org$")
-     ;; org-agenda-files (directory-files-recursively
-     ;;                   gtd/org-agenda-directory "\\.org")
      org-outline-path-complete-in-steps nil
      org-log-done 'time
      org-log-into-drawer t
@@ -3763,6 +3760,38 @@ parses its input."
      org-refile-targets '((org-agenda-files . (:level . 1)))
      org-agenda-bulk-custom-functions `((,jethro/org-agenda-bulk-process-key
                                          jethro/org-agenda-process-inbox-item)))
+
+    
+    (defun my/setup-org-agenda ()
+      (interactive)
+      (setq org-agenda-files (directory-files gtd/org-agenda-directory t "\\.org$")
+            org-agenda-custom-commands
+            `(("n" "Agenda and all TODOs"
+               ((agenda "")
+                (alltodo "")))
+              ("a" "Agenda"
+               ((agenda ""
+                        ((org-agenda-span 'week)
+                         (org-deadline-warning-days 365)
+                         (org-agenda-prefix-format " %i %-12:c%?- t % s % e")))
+                (todo "TODO"
+                      ((org-agenda-overriding-header "\nInbox")
+                       (org-agenda-files '(,(concat gtd/org-agenda-directory
+                                                    "inbox.org")))))
+                (todo "NEXT"
+                      ((org-agenda-overriding-header "\nIn Progress")))
+                (alltodo ""
+                         ((org-agenda-overriding-header "\nProjects")
+                          (org-agenda-files (directory-files
+                                             gtd/org-agenda-directory t
+                                             "[^\(inbox\)\(next\)]\\.org$"))))
+                (todo "TODO"
+                      ((org-agenda-overriding-header "\nOne-off Tasks")
+                       (org-agenda-files '(,(concat gtd/org-agenda-directory
+                                                    "next.org")))
+                       (org-agenda-skip-function '(org-agenda-skip-entry-if
+                                                   'deadline)))))))))
+    (my/setup-org-agenda)
 
     (setq journal-directory (expand-file-name "journal" org-directory)
           journal-daily-file (expand-file-name "daily.org" journal-directory)
@@ -3814,34 +3843,7 @@ parses its input."
            ((jethro/is-project-p)
             next-headline)
            (t
-            nil)))))
-
-    (setq org-agenda-custom-commands
-          `(("n" "Agenda and all TODOs"
-             ((agenda "")
-              (alltodo "")))
-            ("a" "Agenda"
-             ((agenda ""
-                      ((org-agenda-span 'week)
-                       (org-deadline-warning-days 365)
-                       (org-agenda-prefix-format " %i %-12:c%?- t % s % e")))
-              (todo "TODO"
-                    ((org-agenda-overriding-header "\nInbox")
-                     (org-agenda-files '(,(concat gtd/org-agenda-directory
-                                                  "inbox.org")))))
-              (todo "NEXT"
-                    ((org-agenda-overriding-header "\nIn Progress")))
-              (alltodo ""
-                       ((org-agenda-overriding-header "\nProjects")
-                        (org-agenda-files (directory-files
-                                           gtd/org-agenda-directory t
-                                           "[^\(inbox\)\(next\)]\\.org$"))))
-              (todo "TODO"
-                    ((org-agenda-overriding-header "\nOne-off Tasks")
-                     (org-agenda-files '(,(concat gtd/org-agenda-directory
-                                                  "next.org")))
-                     (org-agenda-skip-function '(org-agenda-skip-entry-if
-                                                 'deadline))))))))))
+            nil)))))))
 
 #+end_src
 
