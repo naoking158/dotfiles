@@ -85,6 +85,7 @@ a bunch of resources I've found online.
   - [[#org-configuration][Org Configuration]]
   - [[#org-agenda][Org Agenda]]
   - [[#org-babel][Org Babel]]
+  - [[#org-modern][Org-modern]]
   - [[#presentations][Presentations]]
   - [[#cross-reference][Cross Reference]]
   - [[#outline-based-notes-management-and-organizer][Outline-based notes management and organizer]]
@@ -100,32 +101,21 @@ a bunch of resources I've found online.
   - [[#elfeed][Elfeed]]
   - [[#mail][Mail]]
   - [[#notmuch][Notmuch]]
+  - [[#emacs-application-framework][Emacs Application Framework]]
 - [[#server-mode][Server Mode]]
 - [[#trial-packages][Trial Packages]]
   - [[#web-browser-with-emacs-w3m][Web Browser with emacs-w3m]]
-  - [[#tree-sitter][Tree Sitter]]
   - [[#enhance-xwidget-webkit-browser][Enhance xwidget webkit browser]]
   - [[#pdf-tools][PDF Tools]]
   - [[#apple-script-mode][Apple Script Mode]]
   - [[#emacs-jupyter][Emacs Jupyter]]
   - [[#search-in-external-web-browser][Search in external web browser]]
-  - [[#emacs-application-framework][Emacs Application Framework]]
   - [[#browse-at-remote][Browse at remote]]
   - [[#org-inline-anim][Org-inline-anim]]
   - [[#save-frame-and-window-configs-with-burly][Save frame and window configs with Burly]]
-  - [[#atomic-chrome][Atomic-Chrome]]
-  - [[#org-modern][Org-modern]]
-  - [[#vertico-posframe][Vertico-posframe]]
-  - [[#know-your-http-well][Know Your HTTP Well]]
   - [[#csv-mode][CSV-mode]]
   - [[#markdown-preview-mode][Markdown-preview-mode]]
   - [[#mermaid-mode][Mermaid-mode]]
-  - [[#pulser][Pulser]]
-  - [[#imenu-list][imenu-list]]
-  - [[#dockerfile-mode][Dockerfile-mode]]
-  - [[#yaml-mode][yaml-mode]]
-  - [[#go-mode][Go-mode]]
-  - [[#ansible][Ansible]]
 - [[#footer][Footer]]
 :END:
 
@@ -1846,6 +1836,48 @@ Only in Neotree Buffer:
   :hook (sh-mode-hook . lsp-bridge-mode))
 #+end_src
 
+*** Dockerfile-mode
+
+#+begin_src emacs-lisp
+(leaf dockerfile-mode
+  :straight (dockerfile-mode
+             :type git
+             :host github
+             :repo "spotify/dockerfile-mode")
+  :mode "Dockerfile\\'")
+#+end_src
+
+*** yaml-mode
+
+#+begin_src emacs-lisp
+(leaf yaml-mode
+  :straight (yaml-mode
+             :type git
+             :host github
+             :repo "yoshiki/yaml-mode")
+  :mode ("\\.yml\\'" "\\.yaml\\'"))
+#+end_src
+
+*** Go-mode
+
+#+begin_src emacs-lisp
+(leaf go-mode
+  :straight t)
+#+end_src
+
+*** Ansible
+
+#+begin_src emacs-lisp
+(leaf ansible
+  :straight t
+  :hook ((yaml-mode-hook . (lambda ()
+                             (ansible 1)
+                             (lsp-bridge-mode 1))))
+  :config
+  (require 'lsp-bridge)
+  (add-to-list 'lsp-bridge-single-lang-server-mode-list '(yaml-mode . "ansible-language-server")))
+#+end_src
+
 ** Productivity
 *** Syntax checking with Flymake
 :PROPERTIES:
@@ -1910,6 +1942,16 @@ Only in Neotree Buffer:
                                   (add-to-list 'ispell-skip-region-alist
                                                '("[^\000-\377]+"))))))
 
+#+end_src
+
+*** Pulser
+
+#+begin_src emacs-lisp
+(leaf pulsar
+  :straight t
+  :custom ((pulsar-pulse-on-window-change . t)
+           (pulsar-pulse . t))
+  :global-minor-mode pulsar-global-mode)
 #+end_src
 
 
@@ -2066,6 +2108,73 @@ Only in Neotree Buffer:
 
 #+end_src
 
+*** Tree Sitter
+:PROPERTIES:
+:ID:       2B53130F-3718-4EE5-9CF1-1E8C33996939
+:END:
+
+*** Prepare for M1 Mac
+
+https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/88#issuecomment-849338234
+
+To avoid installing x86_64 version, The following steps should be required.
+
+1. Clone [[https://github.com/tree-sitter/tree-sitter.git][tree-sitter]]
+
+   #+begin_src shell
+   cd cli && cargo install --path .
+   #+end_src
+
+2. Clone [[https://github.com/emacs-tree-sitter/elisp-tree-sitter][emacs-tree-sitter]]
+
+   #+begin_src shell
+   # get tree-sitter v0.19.5 - last to put files in a reasonable place
+   sh -c "test -d rust-tree-sitter || git clone https://github.com/tree-sitter/tree-sitter rust-tree-sitter; cd rust-tree-sitter && git fetch && git checkout v0.19.5"
+   sh -c "cd rust-tree-sitter/cli && cargo install --path ."
+
+   sh -c "file core/tsc-dyn.dylib | grep -q arm64 || rm -f core/tsc-dyn.dylib"
+   sh -c "grep -q LOCAL core/DYN-VERSION || printf LOCAL >core/DYN-VERSION"
+   sh -c "grep -q DYN-VERSION bin/build && sed -e '/DYN-VERSION/d' bin/build >bin/build.tmp && mv bin/build.tmp bin/build && chmod +x bin/build || :"
+   sh -c "EMACS=emacs ./bin/setup && EMACS=emacs ./bin/build"
+
+   # ensure all language definitions
+   find langs/repos -type f -name grammar.js -not -path '*/node_modules/*' -not -path '*/ocaml/interface/*' -exec sh -c 'targets=; for grammar_file in "$@"; do grammar_dir="${grammar_file%/*}"; targets="$targets ensure/${grammar_dir##*/}"; done; EMACS=emacs make -j7 $targets' sh {} +
+   #+end_src
+
+
+*** Configurations
+:PROPERTIES:
+:ID:       A58AD346-E923-4E20-BAAA-02B4E1A03A0D
+:END:
+
+#+begin_src emacs-lisp
+
+(leaf tree-sitter
+  :straight t tree-sitter-langs
+  :hook (tree-sitter-after-on-hook . tree-sitter-hl-mode)
+  :global-minor-mode global-tree-sitter-mode
+  :config
+  (add-to-list 'tree-sitter-major-mode-language-alist '(typescript-tsx-mode . tsx))
+  (tree-sitter-hl-add-patterns 'tsx
+    [
+     ;; styled.div``
+     (call_expression
+      function: (member_expression
+                 object: (identifier) @function.call
+                 (.eq? @function.call "styled"))
+      arguments: ((template_string) @property.definition
+                  (.offset! @property.definition 0 1 0 -1)))
+     ;; styled(Component)``
+     (call_expression
+      function: (call_expression
+                 function: (identifier) @function.call
+                 (.eq? @function.call "styled"))
+      arguments: ((template_string) @property.definition
+                  (.offset! @property.definition 0 1 0 -1)))
+     ])
+)
+
+#+end_src
 
 *** Showing Pair of Brackets with Paren
 :PROPERTIES:
@@ -2391,6 +2500,27 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 )
 #+end_src
 
+*** Know Your HTTP Well
+
+https://github.com/for-GET/know-your-http-well
+
+HTTP encodings, headers, media types, methods, relations and status codes, all summarized and linking to their specification.
+
+#+begin_src emacs-lisp
+(leaf know-your-http-well
+  :doc
+  """
+  HTTP encodings, headers, media types, methods, relations and status codes, all summarized and linking to their specification.
+
+  M-x http-header ;; content-type
+  M-x http-method ;; post | POST
+  M-x http-relation ;; describedby
+  M-x http-status-code ;; 500
+  M-x http-status-code ;; not_found | NOT_FOUND
+  """
+  :straight t)
+
+  #+end_src
 
 * Window Management
 
@@ -3046,7 +3176,42 @@ parses its input."
          ("M-DEL" . vertico-directory-delete-word)
          ("C-w"   . vertico-directory-delete-word)
          ("RET"   . vertico-directory-enter)))
+
+(leaf vertico-posframe
+  :straight t
+  :after vertico
+  :when (display-graphic-p)
+  :hook
+  ((vertico-mode-hook . my--enable-vertico-posframe-mode)
+   (before-make-frame-hook . my--disable-vertico-posframe-mode))
+  :custom
+  `((vertico-posframe-poshandler . 'posframe-poshandler-frame-bottom-center)
+    (vertico-posframe-width . 155)
+    (vertico-posframe-border-width . 5)
+    (vertico-multiform-categories . '((file posframe)
+                                      (citar-reference posframe)
+                                      (command posframe)
+                                      (consult-location posframe)
+                                      (consult-multi posframe)
+                                      (org-roam-node posframe)
+                                      (completing-read posframe)
+                                      ))
+    (vertico-multiform-commands . '((consult-imenu buffer)
+                                    (execute-extended-command posframe)
+                                    (helpful-function posframe)
+                                    (helpful-symbol posframe)
+                                    (helpful-variable posframe))))
+  :config
+  (defun my--enable-vertico-posframe-mode ()
+    (vertico-posframe-mode)
+    (vertico-multiform-mode))
+
+  (defun my--disable-vertico-posframe-mode ()
+    (when (not (display-graphic-p))
+      (vertico-posframe-mode -1)
+      (vertico-multiform-mode -1))))
 #+end_src
+
 
 ** Completions in Regions with Corfu
 :PROPERTIES:
@@ -3885,6 +4050,20 @@ parses its input."
   :commands (org-babel-execute:lua))
 #+end_src
 
+** Org-modern
+
+#+begin_src emacs-lisp
+(leaf org-modern
+  :straight t
+  :hook (org-mode-hook . org-modern-mode)
+  :custom-face
+  (org-modern-label . '((t :height 0.9 :inherit t)))
+  :custom
+  ((org-modern-star . ["◉" "●" "○" "◇" "★" "✸" " "])
+   (org-modern-list . '((?+ . "➤")
+                        (?* . "-")
+                        (?- . "•")))))
+#+end_src
 
 ** Presentations
 
@@ -4654,6 +4833,35 @@ mu index
   (load-file "~/src/github.com/naoking158/envs/config-mail/config-mu4e.el"))
 #+end_src
 
+** Emacs Application Framework
+:PROPERTIES:
+:ID:       24FB1875-D6A4-4609-9485-FAAB24E07AA6
+:END:
+
+#+begin_src emacs-lisp
+
+(leaf eaf
+  :when (memq window-system '(x))
+  :load-path "~/src/github.com/emacs-eaf/emacs-application-framework/"
+  :require eaf
+  :commands
+  (eaf-search-it eaf-open eaf-open-browser eaf-open-browser-with-history eaf-open-pdf-from-history)
+  :custom
+  ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
+  (;; (eaf-python-command . "/usr/bin/python")
+   (eaf-browser-continue-where-left-off . t)
+   (eaf-browser-enable-adblocker . t)
+   (browse-url-browser-function . 'eaf-open-browser))
+  :config
+  (require 'eaf-browser)
+  (require 'eaf-pdf-viewer)
+  (add-to-list 'eaf-wm-focus-fix-wms "wlroots wm")
+  (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+  (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+  (defalias 'browse-web #'eaf-open-browser)
+  (eaf-bind-key nil "M-q" eaf-browser-keybinding))
+
+#+end_src
 
 * Server Mode
 :PROPERTIES:
@@ -4750,74 +4958,6 @@ While browsing, remember the following:
 
 #+RESULTS:
 : w3m
-
-** Tree Sitter
-:PROPERTIES:
-:ID:       2B53130F-3718-4EE5-9CF1-1E8C33996939
-:END:
-
-*** Prepare for M1 Mac
-
-https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/88#issuecomment-849338234
-
-To avoid installing x86_64 version, The following steps should be required.
-
-1. Clone [[https://github.com/tree-sitter/tree-sitter.git][tree-sitter]]
-
-   #+begin_src shell
-   cd cli && cargo install --path .
-   #+end_src
-
-2. Clone [[https://github.com/emacs-tree-sitter/elisp-tree-sitter][emacs-tree-sitter]]
-
-   #+begin_src shell
-   # get tree-sitter v0.19.5 - last to put files in a reasonable place
-   sh -c "test -d rust-tree-sitter || git clone https://github.com/tree-sitter/tree-sitter rust-tree-sitter; cd rust-tree-sitter && git fetch && git checkout v0.19.5"
-   sh -c "cd rust-tree-sitter/cli && cargo install --path ."
-
-   sh -c "file core/tsc-dyn.dylib | grep -q arm64 || rm -f core/tsc-dyn.dylib"
-   sh -c "grep -q LOCAL core/DYN-VERSION || printf LOCAL >core/DYN-VERSION"
-   sh -c "grep -q DYN-VERSION bin/build && sed -e '/DYN-VERSION/d' bin/build >bin/build.tmp && mv bin/build.tmp bin/build && chmod +x bin/build || :"
-   sh -c "EMACS=emacs ./bin/setup && EMACS=emacs ./bin/build"
-
-   # ensure all language definitions
-   find langs/repos -type f -name grammar.js -not -path '*/node_modules/*' -not -path '*/ocaml/interface/*' -exec sh -c 'targets=; for grammar_file in "$@"; do grammar_dir="${grammar_file%/*}"; targets="$targets ensure/${grammar_dir##*/}"; done; EMACS=emacs make -j7 $targets' sh {} +
-   #+end_src
-
-
-*** Configurations
-:PROPERTIES:
-:ID:       A58AD346-E923-4E20-BAAA-02B4E1A03A0D
-:END:
-
-#+begin_src emacs-lisp
-
-(leaf tree-sitter
-  :straight t tree-sitter-langs
-  :hook (tree-sitter-after-on-hook . tree-sitter-hl-mode)
-  :global-minor-mode global-tree-sitter-mode
-  :config
-  (add-to-list 'tree-sitter-major-mode-language-alist '(typescript-tsx-mode . tsx))
-  (tree-sitter-hl-add-patterns 'tsx
-    [
-     ;; styled.div``
-     (call_expression
-      function: (member_expression
-                 object: (identifier) @function.call
-                 (.eq? @function.call "styled"))
-      arguments: ((template_string) @property.definition
-                  (.offset! @property.definition 0 1 0 -1)))
-     ;; styled(Component)``
-     (call_expression
-      function: (call_expression
-                 function: (identifier) @function.call
-                 (.eq? @function.call "styled"))
-      arguments: ((template_string) @property.definition
-                  (.offset! @property.definition 0 1 0 -1)))
-     ])
-)
-
-#+end_src
 
 
 ** Enhance xwidget webkit browser
@@ -5117,35 +5257,6 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
     (sie-brow/search-in-external-browser sie-brow/prefix-for-google-scholar at-point)))
 #+end_src
 
-** Emacs Application Framework
-:PROPERTIES:
-:ID:       24FB1875-D6A4-4609-9485-FAAB24E07AA6
-:END:
-
-#+begin_src emacs-lisp
-
-(leaf eaf
-  :when (memq window-system '(x))
-  :load-path "~/src/github.com/emacs-eaf/emacs-application-framework/"
-  :require eaf
-  :commands
-  (eaf-search-it eaf-open eaf-open-browser eaf-open-browser-with-history eaf-open-pdf-from-history)
-  :custom
-  ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
-  (;; (eaf-python-command . "/usr/bin/python")
-   (eaf-browser-continue-where-left-off . t)
-   (eaf-browser-enable-adblocker . t)
-   (browse-url-browser-function . 'eaf-open-browser))
-  :config
-  (require 'eaf-browser)
-  (require 'eaf-pdf-viewer)
-  (add-to-list 'eaf-wm-focus-fix-wms "wlroots wm")
-  (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-  (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-  (defalias 'browse-web #'eaf-open-browser)
-  (eaf-bind-key nil "M-q" eaf-browser-keybinding))
-
-#+end_src
 
 ** Browse at remote
 :PROPERTIES:
@@ -5183,93 +5294,6 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 
 #+end_src
 
-** Atomic-Chrome
-
-#+begin_src emacs-lisp
-(leaf atomic-chrome
-  :straight t
-  :hook (emacs-startup-hook . atomic-chrome-start-server)
-  :custom ((atomic-chrome-enable-auto-update . nil)
-           (atomic-chrome-default-major-mode . 'org-mode)
-           (atomic-chrome-url-major-mode-alist . '(("overleaf\\.com" . tex-mode)))
-           (atomic-chrome-buffer-open-style . 'split)
-           (atomic-chrome-extension-type-list . '(ghost-text))))
-#+end_src
-
-** Org-modern
-
-#+begin_src emacs-lisp
-(leaf org-modern
-  :straight t
-  :hook (org-mode-hook . org-modern-mode)
-  :custom-face
-  (org-modern-label . '((t :height 0.9 :inherit t)))
-  :custom
-  ((org-modern-star . ["◉" "●" "○" "◇" "★" "✸" " "])
-   (org-modern-list . '((?+ . "➤")
-                        (?* . "-")
-                        (?- . "•")))))
-#+end_src
-
-** Vertico-posframe
-
-#+begin_src emacs-lisp
-(leaf vertico-posframe
-  :straight t
-  :after vertico
-  :when (display-graphic-p)
-  :hook
-  ((vertico-mode-hook . my--enable-vertico-posframe-mode)
-   (before-make-frame-hook . my--disable-vertico-posframe-mode))
-  :custom
-  `((vertico-posframe-poshandler . 'posframe-poshandler-frame-bottom-center)
-    (vertico-posframe-width . 155)
-    (vertico-posframe-border-width . 5)
-    (vertico-multiform-categories . '((file posframe)
-                                      (citar-reference posframe)
-                                      (command posframe)
-                                      (consult-location posframe)
-                                      (consult-multi posframe)
-                                      (org-roam-node posframe)
-                                      (completing-read posframe)
-                                      ))
-    (vertico-multiform-commands . '((consult-imenu buffer)
-                                    (execute-extended-command posframe)
-                                    (helpful-function posframe)
-                                    (helpful-symbol posframe)
-                                    (helpful-variable posframe))))
-  :config
-  (defun my--enable-vertico-posframe-mode ()
-    (vertico-posframe-mode)
-    (vertico-multiform-mode))
-
-  (defun my--disable-vertico-posframe-mode ()
-    (when (not (display-graphic-p))
-      (vertico-posframe-mode -1)
-      (vertico-multiform-mode -1))))
-#+end_src
-
-** Know Your HTTP Well
-
-https://github.com/for-GET/know-your-http-well
-
-HTTP encodings, headers, media types, methods, relations and status codes, all summarized and linking to their specification.
-
-#+begin_src emacs-lisp
-(leaf know-your-http-well
-  :doc
-  """
-  HTTP encodings, headers, media types, methods, relations and status codes, all summarized and linking to their specification.
-
-  M-x http-header ;; content-type
-  M-x http-method ;; post | POST
-  M-x http-relation ;; describedby
-  M-x http-status-code ;; 500
-  M-x http-status-code ;; not_found | NOT_FOUND
-  """
-  :straight t)
-
-  #+end_src
 
 ** CSV-mode
 
@@ -5318,66 +5342,6 @@ HTTP encodings, headers, media types, methods, relations and status codes, all s
           map)))
 #+end_src
 
-** Pulser
-
-#+begin_src emacs-lisp
-(leaf pulsar
-  :straight t
-  :custom ((pulsar-pulse-on-window-change . t)
-           (pulsar-pulse . t))
-  :global-minor-mode pulsar-global-mode)
-#+end_src
-
-** imenu-list
-
-#+begin_src emacs-lisp
-(leaf imenu-list
-  :straight t
-  :custom ((imenu-list-focus-after-activation . t)
-           (imenu-list-auto-resize . nil)))
-#+end_src
-
-** Dockerfile-mode
-
-#+begin_src emacs-lisp
-(leaf dockerfile-mode
-  :straight (dockerfile-mode
-             :type git
-             :host github
-             :repo "spotify/dockerfile-mode")
-  :mode "Dockerfile\\'")
-#+end_src
-
-** yaml-mode
-
-#+begin_src emacs-lisp
-(leaf yaml-mode
-  :straight (yaml-mode
-             :type git
-             :host github
-             :repo "yoshiki/yaml-mode")
-  :mode ("\\.yml\\'" "\\.yaml\\'"))
-#+end_src
-
-** Go-mode
-
-#+begin_src emacs-lisp
-(leaf go-mode
-  :straight t)
-#+end_src
-
-** Ansible
-
-#+begin_src emacs-lisp
-(leaf ansible
-  :straight t
-  :hook ((yaml-mode-hook . (lambda ()
-                             (ansible 1)
-                             (lsp-bridge-mode 1))))
-  :config
-  (require 'lsp-bridge)
-  (add-to-list 'lsp-bridge-single-lang-server-mode-list '(yaml-mode . "ansible-language-server")))
-#+end_src
 
 * Footer
 :PROPERTIES:
