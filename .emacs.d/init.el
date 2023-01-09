@@ -225,7 +225,8 @@
               (recentf-auto-cleanup . 'never)
               (save-place-mode . 1)
               (save-interprogram-paste-before-kill . t)
-              (indent-tabs-mode . nil))
+              (indent-tabs-mode . nil)
+              (native-comp-async-report-warnings-errors . nil))
     :config
     (defalias 'yes-or-no-p 'y-or-n-p)
     (keyboard-translate 8 127)
@@ -440,8 +441,8 @@
 (leaf ui
   :leaf-defer nil
   :hook
-  ((prog-mode-hook latex-mode-hook) . (lambda ()
-                                        (display-line-numbers-mode 1)))
+  ((prog-mode-hook latex-mode-hook yaml-mode-hook) . (lambda ()
+                                                       (display-line-numbers-mode 1)))
 
   :config
   (leaf dashboard
@@ -579,16 +580,21 @@
       (doom-themes-treemacs-config)))
 
   (leaf modus-themes
-    :straight t
+    :straight (modus-themes
+               :type git
+               :host gitlab
+               :repo "protesilaos/modus-themes")
+    :require t
     :config
     (defun my/load-modus-theme (sym-theme)
       (setq modus-themes-bold-constructs t
             modus-themes-region '(bg-only no-extend)
-            modus-themes-org-blocks 'gray-background
+            modus-themes-org-blocks 'gray-background ; {nil,'gray-background,'tinted-background}
             modus-themes-mixed-fonts t
             modus-themes-subtle-line-numbers t
             modus-themes-variable-pitch-headings t
             modus-themes-variable-pitch-ui t
+            modus-themes-custom-auto-reload t
             modus-themes-fringes nil
             modus-themes-prompts '(intense gray)
             modus-themes-completions '((matches . (extrabold))
@@ -596,69 +602,18 @@
                                        (popup . (accented intense)))
             modus-themes-paren-match '(underline)
             ;; this is an alist: read the manual or its doc string
-            modus-themes-org-agenda '((header-block . (variable-pitch scale-title))
-                                      (header-date . (grayscale workaholic bold-today))
-                                      (scheduled . uniform)
-                                      (habit . traffic-light-deuteranopia))
             modus-themes-headings '((1 . (bold overline variable-pitch  1.5))
                                     (2 . (bold overline variable-pitch 1.3))
                                     (3 . (bold variable-pitch 1.2))
                                     (4 . (bold variable-pitch 1.15))
+                                    (agenda-date . (1.3))
+                                    (agenda-structure . (variable-pitch 1.5))
                                     (t . (bold variable-pitch 1.1))))
-      ;; Load the theme files before enabling a theme
-      (modus-themes-load-themes)
       ;; Load choiced theme
       (pcase sym-theme
-        ('modus-dark (modus-themes-load-vivendi))
-        ('modus-light (modus-themes-load-operandi)))
-
-      (defvar my-rainbow-region-colors
-        (modus-themes-with-colors
-         `((red . ,red-subtle-bg)
-           (green . ,green-subtle-bg)
-           (yellow . ,yellow-subtle-bg)
-           (blue . ,blue-subtle-bg)
-           (magenta . ,magenta-subtle-bg)
-           (cyan . ,cyan-subtle-bg)))
-        "Sample list of color values for `my-rainbow-region'.")
-
-      (defun my-rainbow-region (color)
-        "Remap buffer-local attribute of `region' using COLOR."
-        (interactive
-         (list
-          (completing-read "Pick a color: " my-rainbow-region-colors)))
-        (face-remap-add-relative
-         'region
-         `( :background ,(alist-get (intern color) my-rainbow-region-colors)
-            :foreground ,(face-attribute 'default :foreground))))
-
-      (defun my-rainbow-region-red ()
-        (my-rainbow-region "red"))
-
-      (add-hook 'prog-mode-hook #'my-rainbow-region-red)
-      (add-hook 'text-mode-hook #'my-rainbow-region-red)
-
-      (defun my--tab-bar-format (tab i)
-        (propertize
-         (format
-          (concat
-           (if (eq (car tab) 'current-tab)
-               "🔥 " "")
-           "%s")
-          (alist-get 'name tab))
-         'face (list (append
-                      (if (eq (car tab) 'current-tab)
-                          '(:inherit modus-themes-tab-active :box t)
-                        '(:inherit modus-themes-tab-inactive))))))
-      (setq tab-bar-tab-name-format-function #'my--tab-bar-format)
-
-      (leaf *flycheck-set-face
-        :straight flycheck-inline
-        :custom-face
-        ((flycheck-inline-info . '((t (:inherit modus-themes-intense-cyan))))
-         (flycheck-inline-warning . '((t (:inherit modus-themes-intense-yellow))))
-         (flycheck-inline-error . '((t (:inherit modus-themes-intense-red))))))
-      ))
+        ('modus-dark (load-theme 'modus-vivendi :no-confirm))
+        ('modus-light (load-theme 'modus-operandi :no-confirm)))
+      (my--init-tab-bar)))
 
   (leaf bespoke-themes
     :straight (bespoke-themes
@@ -722,7 +677,7 @@
     (funcall my-load-theme-func sym-theme))
 
   (defun my/default-theme nil
-    (my/load-theme 'bespoke/dark-theme)
+    (my/load-theme 'modus-light)
     ;; (let ((time
     ;;        (string-to-number
     ;;         (format-time-string "%H"))))
@@ -739,7 +694,8 @@
   :hook (emacs-startup-hook . (lambda nil
                                 (line-number-mode 1)
                                 (column-number-mode 1)
-                                (my/modeline-bespoke)
+                                ;; (my/modeline-bespoke)
+                                (my/modeline-doom)
                                 ;; (if window-system
                                 ;;     (my/modeline-moody)
                                 ;;   (my/modeline-doom))
@@ -812,7 +768,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
       (bespoke-modeline-mode)))
 
   (leaf doom-modeline
-    :when (not window-system)
+    ;; :when (not window-system)
     :doc "A minimal and modern mode-line"
     :req "emacs-25.1" "all-the-icons-2.2.0" "shrink-path-0.2.0" "dash-2.11.0"
     :tag "mode-line" "faces" "emacs>=25.1"
@@ -823,15 +779,16 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
              (doom-modeline-icon . t)
              (doom-modeline-major-mode-icon . nil)
              (doom-modeline-minor-modes . nil)
-             (doom-modeline-hud . t)
+             (doom-modeline-hud . nil)
              (doom-modeline-env-version . t)
-             (doom-modeline-height . 16)
-             (doom-modeline-bar-width . 7)
-             (doom-modeline-lsp . t)
+             (doom-modeline-workspace-name . nil)
              (doom-modeline-github . nil)
              (doom-modeline-persp-name . nil)
+             (doom-modeline-display-default-persp-name . nil)
              (doom-modeline-buffer-state-icon . t)
-             (doom-modeline-env-enable-python . t))
+             (doom-modeline-env-enable-python . t)
+             (doom-modeline-modal . t)
+             )
     :config
     (defun my/modeline-doom nil
       (interactive)
@@ -1099,7 +1056,9 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
            ;; lsp-ui-imenu
            (lsp-ui-imenu-enable . nil)))
 
-(leaf lsp-latex :straight t)
+(leaf lsp-latex
+  :disabled t
+  :straight t)
 
 (leaf lsp-bridge
   :straight (lsp-bridge
@@ -1110,21 +1069,15 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
              )
   :bind (lsp-bridge-mode-map
          :package lsp-bridge
-         ("C-c C-d" . lsp-bridge-popup-documentation)
-         ("C-c C-r" . lsp-bridge-find-references)
+         ("M-." . lsp-bridge-find-def)
+         ("M-," . lsp-bridge-find-def-return)
          ("C-c C-j" . lsp-bridge-find-def-other-window)
+         ("C-c C-r" . lsp-bridge-find-references)
+         ("C-c C-d" . lsp-bridge-popup-documentation)
          ("C-c C-n" . lsp-bridge-diagnostic-jump-next)
          ("C-c C-p" . lsp-bridge-diagnostic-jump-prev)
          ("C-c l d" . lsp-bridge-diagnostic-list)
-         ("C-c l r" . lsp-bridge-rename))
-  :hook (lsp-bridge-mode-hook . my/disable-corfu-in-lsp-bridge)
-  :preface
-  (defun my/disable-corfu-in-lsp-bridge ()
-    (if (bound-and-true-p corfu-mode)
-        (corfu-mode 0)
-      )
-    )
-  )
+         ("C-c l r" . lsp-bridge-rename)))
 
 (leaf helpful
   :straight t
@@ -1254,11 +1207,15 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :straight t
   :mode (("\\.ts\\'" . typescript-mode)
          ("\\.tsx\\'" . typescript-mode))
-  :hook (typescript-mode-hook . (lambda ()
-                                  (setq-local lsp-disabled-clients '(ts-ls))
-                                  (lsp-deferred)))
   :custom ((typescript-indent-level . 2)
            (typescript-auto-indent-flag . nil))
+  :hook ((hack-local-variables-hook . run-local-vars-mode-hook)
+         (typescript-mode-local-vars-hook . (lambda nil
+                                              (lsp-bridge-mode))))
+  :preface
+  (defun run-local-vars-mode-hook ()
+    "Run `major-mode' hook after the local variables have been processed."
+    (run-hooks (intern (concat (symbol-name major-mode) "-local-vars-hook"))))
   :config
   ;;; This patch needs to avoid following error:
   ;;; json-parse-error \u0000 is not allowed without JSON_ALLOW_NUL
@@ -1267,8 +1224,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
               (lambda (orig &rest rest)
                 (while (re-search-forward "\\u0000" nil t)
                   (replace-match ""))
-                (apply orig rest)))
-  )
+                (apply orig rest))))
 
 (leaf deno-emacs
   :disabled nil
@@ -1289,7 +1245,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :mode "\\.md\\'" "\\.spec\\'")
 
 (leaf sh-mode
-  :hook (sh-mode-hook . lsp-deferred))
+  :hook (sh-mode-hook . lsp-bridge-mode))
 
 (leaf flymake
   :disabled t
@@ -1347,7 +1303,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
           ("C-c C-n" . flycheck-next-error)
           ("C-c C-p" . flycheck-previous-error)))
   :hook ((python-mode-hook typescript-mode-hook) . flycheck-mode)
-  :custom (flycheck-display-errors-delay . 0.3)
+  :custom ((flycheck-display-errors-delay . 1))
   :config
   (leaf flycheck-pos-tip
     :straight t
@@ -2040,112 +1996,95 @@ respectively."
 (leaf consult-ls-git
   :straight t)
 
-;; (if (not (executable-find "cmigemo"))
-;;     (leaf orderless
-;;       :straight t
-;;       :require t
-;;       :custom
-;;       '((completion-styles . '(orderless))
-;;         (completion-category-defaults . nil)
-;;         (completion-category-overrides . ((file (styles '(orderless-prefixes
-;;                                                           orderless-initialism
-;;                                                           orderless-regexp)))))))
-
-;;   (leaf orderless
-;;     :straight t migemo
-;;     :require t migemo
-;;     :leaf-defer nil
-;;     :bind (:minibuffer-local-completion-map
-;;            ("SPC" . nil)
-;;            ("?" . nil))
-;;     :custom
-;;     '((completion-styles . '(basic substring initials flex orderless))
-;;       (completion-cycle-threshold . 2)
-;;       (completion-flex-nospace . nil)
-;;       (completion-category-defaults . nil)
-;;       (completion-category-overrides
-;;        quote ((file (styles orderless-migemo-style))
-;;               ;; for consult-line
-;;               (citar-reference (styles orderless-migemo-style))
-;;               (command (styles orderless-default-style))
-;;               (consult-location (styles orderless-migemo-style))
-;;               (consult-multi (styles orderless-default-style))
-;;               (imenu (styles orderless-migemo-style))
-;;               (org-roam-node (styles orderless-migemo-style))
-;;               (unicode-name (styles orderless-migemo-style))
-;;               )))
-;;     :config
-;;     (setq my--orderless-default-styles
-;;           '(orderless-prefixes
-;;             orderless-initialism
-;;             orderless-regexp))
-
-;;     (defun my--orderless-literal-dispatcher (pattern _index _total)
-;;       "Literal style dispatcher using the equals sign as a suffix.
-;; It matches PATTERN _INDEX and _TOTAL according to how Orderless
-;; parses its input."
-;;       (when (string-suffix-p "=" pattern)
-;;         `(orderless-literal . ,(substring pattern 0 -1))))
-
-;;     (defun my--orderless-initialism-dispatcher (pattern _index _total)
-;;       "Leading initialism  dispatcher using the comma suffix.
-;; It matches PATTERN _INDEX and _TOTAL according to how Orderless
-;; parses its input."
-;;       (when (string-suffix-p "," pattern)
-;;         `(orderless-initialism . ,(substring pattern 0 -1))))
-
-;;     (defun my--orderless-flex-dispatcher (pattern _index _total)
-;;       "Flex  dispatcher using the tilde suffix.
-;; It matches PATTERN _INDEX and _TOTAL according to how Orderless
-;; parses its input."
-;;       (when (string-suffix-p "~" pattern)
-;;         `(orderless-flex . ,(substring pattern 0 -1))))
-
-;;     (setq orderless-matching-styles my--orderless-default-styles)
-;;     (setq orderless-style-dispatchers '(my--orderless-literal-dispatcher
-;;                                         my--orderless-initialism-dispatcher
-;;                                         my--orderless-flex-dispatcher))
-
-
-;;     (defun orderless-migemo (component)
-;;       (let ((pattern (migemo-get-pattern component)))
-;;         (condition-case nil
-;;             (progn (string-match-p pattern "") pattern)
-;;           (invalid-regexp nil))))
-
-;;     (orderless-define-completion-style
-;;      orderless-default-style
-;;      (orderless-matching-styles '(orderless-literal
-;;                                   orderless-prefixes
-;;                                   orderless-initialism
-;;                                   orderless-regexp)))
-
-;;     (orderless-define-completion-style
-;;      orderless-migemo-style
-;;      (orderless-matching-styles '(orderless-literal
-;;                                   orderless-prefixes
-;;                                   orderless-initialism
-;;                                   orderless-regexp
-;;                                   orderless-migemo)))))
-
-;; (leaf migemo
-;;   :when (executable-find "cmigemo")
-;;   :straight t
-;;   :hook (emacs-startup-hook . migemo-init)
-;;   :custom
-;;   `((migemo-user-dictionary  . nil)
-;;     (migemo-regex-dictionary . nil)
-;;     (migemo-coding-system    . 'utf-8)
-;;     (migemo-dictionary . ,(cond
-;;                            ((file-exists-p "/usr/local/share/migemo/utf-8/migemo-dict")
-;;                             "/usr/local/share/migemo/utf-8/migemo-dict")
-;;                            ((file-exists-p "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
-;;                             "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")))
-;;     (migemo-isearch-enable-p . t)))
-
 (leaf orderless
   :straight t
-  :commands (orderless-filter))
+  :commands (orderless-filter)
+  :config
+  (setq my--orderless-default-styles
+        '(orderless-prefixes
+          orderless-initialism
+          orderless-regexp))
+
+  (defun my--orderless-literal-dispatcher (pattern _index _total)
+    "Literal style dispatcher using the equals sign as a suffix.
+It matches PATTERN _INDEX and _TOTAL according to how Orderless
+parses its input."
+    (when (string-suffix-p "=" pattern)
+      `(orderless-literal . ,(substring pattern 0 -1))))
+
+  (defun my--orderless-initialism-dispatcher (pattern _index _total)
+    "Leading initialism  dispatcher using the comma suffix.
+It matches PATTERN _INDEX and _TOTAL according to how Orderless
+parses its input."
+    (when (string-suffix-p "," pattern)
+      `(orderless-initialism . ,(substring pattern 0 -1))))
+
+  (defun my--orderless-flex-dispatcher (pattern _index _total)
+    "Flex  dispatcher using the tilde suffix.
+It matches PATTERN _INDEX and _TOTAL according to how Orderless
+parses its input."
+    (when (string-suffix-p "~" pattern)
+      `(orderless-flex . ,(substring pattern 0 -1))))
+
+  (setq orderless-matching-styles my--orderless-default-styles)
+  (setq orderless-style-dispatchers '(my--orderless-literal-dispatcher
+                                      my--orderless-initialism-dispatcher
+                                      my--orderless-flex-dispatcher))
+
+  (orderless-define-completion-style
+      orderless-default-style
+    (orderless-matching-styles '(orderless-literal
+                                 orderless-prefixes
+                                 orderless-initialism
+                                 orderless-regexp)))
+
+  (setq completion-category-overrides
+        '((command (styles orderless-default-style))
+          (consult-multi (styles orderless-default-style))))
+
+  (leaf migemo
+    :when (executable-find "cmigemo")
+    :straight t
+    :require t
+    :custom
+    `((migemo-user-dictionary  . nil)
+      (migemo-regex-dictionary . nil)
+      (migemo-coding-system    . 'utf-8)
+      (migemo-dictionary . ,(cond
+                             ((file-exists-p "/usr/local/share/migemo/utf-8/migemo-dict")
+                              "/usr/local/share/migemo/utf-8/migemo-dict")
+                             ((file-exists-p "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
+                              "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
+                             (t "")))
+      (migemo-isearch-enable-p . t))
+    :config
+    (leaf orderless
+      :config
+      (defun orderless-migemo (component)
+        (let ((pattern (migemo-get-pattern component)))
+          (condition-case nil
+              (progn (string-match-p pattern "") pattern)
+            (invalid-regexp nil))))
+
+      (orderless-define-completion-style
+          orderless-migemo-style
+        (orderless-matching-styles '(orderless-literal
+                                     orderless-prefixes
+                                     orderless-initialism
+                                     orderless-regexp
+                                     orderless-migemo)))
+
+      (dolist (elm '((file (styles orderless-migemo-style))
+                     ;; for consult-line
+                     (citar-reference (styles orderless-migemo-style))
+                     (consult-location (styles orderless-migemo-style))
+                     (imenu (styles orderless-migemo-style))
+                     (org-roam-node (styles orderless-migemo-style))
+                     (unicode-name (styles orderless-migemo-style))))
+        (add-to-list 'completion-category-overrides elm)))
+    (migemo-init)
+    )
+)
 
 (leaf fussy
   :leaf-defer nil
@@ -2153,6 +2092,16 @@ respectively."
              :type git
              :host github
              :repo "jojojames/fussy")
+  :advice (:before corfu--capf-wrapper fussy-wipe-cache)
+  :custom ((completion-styles . '(fussy))
+           (completion-category-defaults . nil)
+           ;; (completion-category-overrides . nil)
+           (fussy-max-candidate-limit . 10000)
+           (fussy-default-regex-fn . 'fussy-pattern-first-letter)
+           (fussy-prefer-prefix . nil)
+           (fussy-filter-fn . 'fussy-filter-orderless-flex)
+           (fussy-use-cache . t))
+
   :init
   (leaf fuz
     :require t
@@ -2164,9 +2113,6 @@ respectively."
     (setq fussy-score-fn 'fussy-fuz-score)
     (unless (require 'fuz-core nil t)
       (fuz-build-and-load-dymod)))
-  :custom ((completion-styles . '(fussy))
-           (completion-category-defaults . nil)
-           (completion-category-overrides . nil))
   )
 
 (leaf marginalia
@@ -2201,7 +2147,13 @@ respectively."
   :straight t
   :global-minor-mode global-corfu-mode
   :custom
-  ((corfu-excluded-modes . '(shell-mode eshell-mode))
+  ((corfu-excluded-modes . '(sh-mode
+                             shell-mode
+                             eshell-mode
+                             python-mode
+                             yaml-mode
+                             typescript-mode
+                             js-mode))
    (corfu-auto . t)
    (corfu-auto-delay . 0.1)
    (corfu-auto-prefix . 2)
@@ -2653,7 +2605,7 @@ respectively."
 (leaf org-agenda
   :when window-system
   :bind* (("C-c C-a" . my/org-agenda-cache)
-          ("C-c C-m" . jethro/org-inbox-capture))
+          ("C-c C-m" . org-capture))
   :custom
   `((org-agenda-window-setup . 'other-window)
     (org-agenda-block-separator . nil)
@@ -2674,10 +2626,6 @@ respectively."
      quote
      "%40ITEM(Task) %Effort(EE){:} %CLOCKSUM(Time Spent) %SCHEDULED(Scheduled) %DEADLINE(Deadline)"))
   :preface
-  (defun jethro/set-todo-state-next ()
-    "Visit each parent task and change NEXT states to TODO"
-    (org-todo "NEXT"))
-
   (defun my/org-agenda-cache (&optional regenerate)
     "Show agenda buffer without updating if it exists"
     (interactive "P")
@@ -2687,28 +2635,18 @@ respectively."
           (org-agenda nil "a"))
       (org-switch-to-buffer-other-window "*Org Agenda*")))
 
-  (defun jethro/org-inbox-capture ()
-    (interactive)
-    "Capture a task in agenda mode."
-    (org-capture))
-
   :defer-config
   (leaf org-agenda
     :hook ((kill-emacs-hook . ladicle/org-clock-out-and-save-when-exit)
-           (org-clock-in-hook . jethro/set-todo-state-next)
            (org-clock-in-hook . (lambda ()
+                                  (org-todo "NEXT")
                                   (add-to-list 'frame-title-format
-                                               '(:eval org-mode-line-string) t)))
-           ;; (org-capture-after-finalize-hook . (lambda ()
-           ;;                                      (setq org-agenda-files
-           ;;                                            (directory-files-recursively
-           ;;                                             org-directory "\\.org$"))))
-           )
+                                               '(:eval org-mode-line-string) t))))
     :bind (org-agenda-mode-map
            ("i" . org-agenda-clock-in)
            ("r" . jethro/org-agenda-process-inbox-item)
            ("R" . org-agenda-refile)
-           ("c" . jethro/org-inbox-capture)
+           ("c" . org-capture)
            ("q" . quit-window))
     :preface
     (defvar jethro/org-current-effort "1:00"
@@ -2749,33 +2687,33 @@ respectively."
     (defvar jethro/org-agenda-bulk-process-key ?f
       "Default key for bulk processing inbox items.")
 
-    (defun jethro/bulk-process-entries ()
-      (if (not (null org-agenda-bulk-marked-entries))
-          (let ((entries (reverse org-agenda-bulk-marked-entries))
-                (processed 0)
-                (skipped 0))
-            (dolist (e entries)
-              (let ((pos (text-property-any (point-min) (point-max) 'org-hd-marker e)))
-                (if (not pos)
-                    (progn (message "Skipping removed entry at %s" e)
-                           (cl-incf skipped))
-                  (goto-char pos)
-                  (let (org-loop-over-headlines-in-active-region) (funcall 'jethro/org-agenda-process-inbox-item))
-                  ;; `post-command-hook' is not run yet.  We make sure any
-                  ;; pending log note is processed.
-                  (when (or (memq 'org-add-log-note (default-value 'post-command-hook))
-                            (memq 'org-add-log-note post-command-hook))
-                    (org-add-log-note))
-                  (cl-incf processed))))
-            (org-agenda-redo)
-            (unless org-agenda-persistent-marks (org-agenda-bulk-unmark-all))
-            (message "Acted on %d entries%s%s"
-                     processed
-                     (if (= skipped 0)
-                         ""
-                       (format ", skipped %d (disappeared before their turn)"
-                               skipped))
-                     (if (not org-agenda-persistent-marks) "" " (kept marked)")))))
+    (defun my/bulk-process-entries ()
+      (when-let ((entries (reverse org-agenda-bulk-marked-entries))
+                 (processed 0)
+                 (skipped 0))
+        (dolist (e entries)
+          (let ((pos (text-property-any (point-min) (point-max) 'org-hd-marker e)))
+            (if (not pos)
+                (progn (message "Skipping removed entry at %s" e)
+                       (cl-incf skipped))
+              (goto-char pos)
+              (let (org-loop-over-headlines-in-active-region)
+                (funcall 'jethro/org-agenda-process-inbox-item))
+              ;; `post-command-hook' is not run yet.  We make sure any
+              ;; pending log note is processed.
+              (when (or (memq 'org-add-log-note (default-value 'post-command-hook))
+                        (memq 'org-add-log-note post-command-hook))
+                (org-add-log-note))
+              (cl-incf processed))))
+        (org-agenda-redo)
+        (unless org-agenda-persistent-marks (org-agenda-bulk-unmark-all))
+        (message "Acted on %d entries%s%s"
+                 processed
+                 (if (= skipped 0)
+                     ""
+                   (format ", skipped %d (disappeared before their turn)"
+                           skipped))
+                 (if (not org-agenda-persistent-marks) "" " (kept marked)"))))
 
     (defun jethro/org-process-inbox ()
       "Called in org-agenda-mode, processes all inbox items."
@@ -2794,8 +2732,9 @@ respectively."
     (require 'org-capture)
     (setq
      gtd/org-agenda-directory (file-truename "~/org/gtd/")
-     org-agenda-files (directory-files-recursively
-                       gtd/org-agenda-directory "\\.org")
+     org-agenda-files (directory-files gtd/org-agenda-directory t "\\.org$")
+     ;; org-agenda-files (directory-files-recursively
+     ;;                   gtd/org-agenda-directory "\\.org")
      org-outline-path-complete-in-steps nil
      org-log-done 'time
      org-log-into-drawer t
@@ -2869,29 +2808,27 @@ respectively."
             nil)))))
 
     (setq org-agenda-custom-commands
-          `(("a" "Agenda"
+          `(("n" "Agenda and all TODOs"
+             ((agenda "")
+              (alltodo "")))
+            ("a" "Agenda"
              ((agenda ""
                       ((org-agenda-span 'week)
                        (org-deadline-warning-days 365)
-                       (org-agenda-prefix-format " %i %-12:c%?- t % s % e")
-                       ))
+                       (org-agenda-prefix-format " %i %-12:c%?- t % s % e")))
               (todo "TODO"
-                    ((org-agenda-overriding-header "Inbox")
+                    ((org-agenda-overriding-header "\nInbox")
                      (org-agenda-files '(,(concat gtd/org-agenda-directory
                                                   "inbox.org")))))
               (todo "NEXT"
-                    ((org-agenda-overriding-header "In Progress")
-                     (org-agenda-files '(,(concat gtd/org-agenda-directory
-                                                  "projects.org")
-                                         ))))
+                    ((org-agenda-overriding-header "\nIn Progress")))
+              (alltodo ""
+                       ((org-agenda-overriding-header "\nProjects")
+                        (org-agenda-files (directory-files
+                                           gtd/org-agenda-directory t
+                                           "[^\(inbox\)\(next\)]\\.org$"))))
               (todo "TODO"
-                    ((org-agenda-overriding-header "Active Projects")
-                     (org-agenda-skip-function #'jethro/skip-projects)
-                     (org-agenda-files '(,(concat gtd/org-agenda-directory
-                                                  "projects.org")
-                                         ))))
-              (todo "TODO"
-                    ((org-agenda-overriding-header "One-off Tasks")
+                    ((org-agenda-overriding-header "\nOne-off Tasks")
                      (org-agenda-files '(,(concat gtd/org-agenda-directory
                                                   "next.org")))
                      (org-agenda-skip-function '(org-agenda-skip-entry-if
@@ -3042,63 +2979,65 @@ respectively."
               target)))
   :config
   (setq TeX-engine 'euptex)
+  (setq org-latex-pdf-process (list (my-latexmk-command TeX-engine "-pv" "%f" "%o")))
 
-  (add-hook 'org-export-before-processing-hook 'my-ox-latex-tex-engine-setup)
+  ;; (add-hook 'org-export-before-processing-hook 'my-ox-latex-tex-engine-setup)
 
-  (defun my-ox-latex-tex-engine-setup (backend)
-    (message "backend=%s" backend)
-    (when (equal backend 'latex)
-      (my-ox-latex-engine-set TeX-engine)))
+;;   (defun my-ox-latex-tex-engine-setup (backend)
+;;     (message "backend=%s" backend)
+;;     (when (equal backend 'latex)
+;;       (my-ox-latex-engine-set TeX-engine)))
 
-  (defun my-ox-latex-engine-set (latex)
-    "Set up LATEX environments."
+;;   (defun my-ox-latex-engine-set (latex)
+;;     "Set up LATEX environments."
 
-    (setq org-latex-default-class "jsarticle")
-    (add-to-list 'org-latex-classes
-                 '("research-note"
-                   "\\documentclass[openany]{report}\n
-\\input{../preferences/header.tex}\n
-\\input{..//preferences/preamble_research_note.tex}\n
-\\usepackage[whole]{bxcjkjatype}
-%% \\usepackage{amsmath,amsthm,amssymb}
-%% \\usepackage{mynotestyle}
-%% \\usepackage{preamble}
-[NO-DEFAULT-PACKAGES]
-[PACKAGES]
-[EXTRA]"
-                   ("\\datechapter{%s}" . "\\datechapter{%s}")
-                   ("\\section{%s}" . "\\section*{%s}")
-                   ("\\subsection{%s}" . "\\subsection*{%s}")
-                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")
-                   ))
-    (add-to-list 'org-latex-classes
-                 '("article"
-                   "\\RequirePackage{plautopatch}\n
-\\documentclass[a4p,uplatex,dvipdfmx]{article}\n
-\\input{../preferences/header.tex}"
-                   ("\\section{%s}" . "\\section*{%s}")
-                   ("\\subsection{%s}" . "\\subsection*{%s}")
-                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-    (add-to-list 'org-latex-classes
-                 '("jsarticle"
-                   "\\RequirePackage{plautopatch}\n
-\\documentclass[a4p,uplatex,dvipdfmx]{jsarticle}\n
-\\input{../preferences/header.tex}
-[NO-DEFAULT-PACKAGES]
-[PACKAGES]
-[EXTRA]"
-                   ("\\section{%s}" . "\\section*{%s}")
-                   ("\\subsection{%s}" . "\\subsection*{%s}")
-                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+;;     (setq org-latex-default-class "jsarticle")
+;;     (add-to-list 'org-latex-classes
+;;                  '("research-note"
+;;                    "\\documentclass[openany]{report}\n
+;; \\input{../preferences/header.tex}\n
+;; \\input{..//preferences/preamble_research_note.tex}\n
+;; \\usepackage[whole]{bxcjkjatype}
+;; %% \\usepackage{amsmath,amsthm,amssymb}
+;; %% \\usepackage{mynotestyle}
+;; %% \\usepackage{preamble}
+;; [NO-DEFAULT-PACKAGES]
+;; [PACKAGES]
+;; [EXTRA]"
+;;                    ("\\datechapter{%s}" . "\\datechapter{%s}")
+;;                    ("\\section{%s}" . "\\section*{%s}")
+;;                    ("\\subsection{%s}" . "\\subsection*{%s}")
+;;                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+;;                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
+;;                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")
+;;                    ))
+;;     (add-to-list 'org-latex-classes
+;;                  '("article"
+;;                    "\\RequirePackage{plautopatch}\n
+;; \\documentclass[a4p,uplatex,dvipdfmx]{article}\n
+;; \\input{../preferences/header.tex}"
+;;                    ("\\section{%s}" . "\\section*{%s}")
+;;                    ("\\subsection{%s}" . "\\subsection*{%s}")
+;;                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+;;                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
+;;                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+;;     (add-to-list 'org-latex-classes
+;;                  '("jsarticle"
+;;                    "\\RequirePackage{plautopatch}\n
+;; \\documentclass[a4p,uplatex,dvipdfmx]{jsarticle}\n
+;; \\input{../preferences/header.tex}
+;; [NO-DEFAULT-PACKAGES]
+;; [PACKAGES]
+;; [EXTRA]"
+;;                    ("\\section{%s}" . "\\section*{%s}")
+;;                    ("\\subsection{%s}" . "\\subsection*{%s}")
+;;                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+;;                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
+;;                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
-    (setq org-latex-pdf-process (list (my-latexmk-command TeX-engine "-pv" "%f" "%o")))
-    ))
+    ;; (setq org-latex-pdf-process (list (my-latexmk-command TeX-engine "-pv" "%f" "%o")))
+;;     )
+  )
 
 (leaf org-roam
   :when window-system
@@ -3145,15 +3084,6 @@ respectively."
        :unnarrowed t))))
 
   :defer-config
-  ;; (leaf org-roam-dailies
-  ;;   :after org-roam
-  ;;   :defvar org-roam-dailies-map
-  ;;   :bind-keymap ("C-c n d" . org-roam-dailies-map)
-  ;;   :bind
-  ;;   (:org-roam-dailies-map
-  ;;    ("Y" . org-roam-dailies-capture-yesterday)
-  ;;    ("T" . org-roam-dailies-capture-tomorrow)))
-
   ;; for org-roam-buffer-toggle
   ;; Recommendation in the official manual
   (add-to-list 'display-buffer-alist
@@ -3163,19 +3093,6 @@ respectively."
                  (window-width . 0.33)
                  (window-height . fit-window-to-buffer)))
   (org-roam-db-autosync-mode))
-
-
-(leaf org-roam-ui
-  :disabled t
-  :after org-roam
-  :load-path "~/.emacs.d/elisp/org-roam-ui/"
-  :straight simple-httpd websocket
-  :commands (org-roam-ui-mode)
-  :config
-  (setq org-roam-ui-sync-theme t
-        org-roam-ui-follow t
-        org-roam-ui-update-on-save t
-        org-roam-ui-open-on-start t))
 
 (leaf org-superstar
   :disabled t
@@ -3921,13 +3838,10 @@ Interactively, URL defaults to the string looking like a url around point."
 (leaf ansible
   :straight t
   :hook ((yaml-mode-hook . (lambda ()
-                             (ansible 1)))
-         (ansible-hook . (lambda ()
-                           (lsp-bridge-mode 1))))
-  
+                             (ansible 1)
+                             (lsp-bridge-mode 1))))
   :config
   (require 'lsp-bridge)
-  (add-to-list 'lsp-bridge-single-lang-server-mode-list '(yaml-mode . "ansible-language-server"))
-  )
+  (add-to-list 'lsp-bridge-single-lang-server-mode-list '(yaml-mode . "ansible-language-server")))
 
 (provide 'init)
