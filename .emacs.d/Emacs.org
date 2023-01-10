@@ -1215,7 +1215,12 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   (meow-setup)
   (meow-global-mode)
   (setq meow-cursor-type-region-cursor '(bar . 3)
-        meow-cursor-type-insert '(bar . 3))
+        meow-cursor-type-insert '(bar . 3)
+        meow-replace-state-name-list '((normal . "<N>")
+                                       (motion . "<M>")
+                                       (keypad . "<K>")
+                                       (insert . "<I>")
+                                       (beacon . "<B>")))
   :hook
   ((meow-insert-exit-hook . (lambda nil
                               (if skk-mode (skk-latin-mode-on))))
