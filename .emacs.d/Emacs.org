@@ -4012,7 +4012,7 @@ parses its input."
 
     (leaf org-capture
       :tag "builtin"
-      :bind ("C-c C-m" . org-capture)
+      :bind* ("C-c C-m" . org-capture)
       :config
       (defun org-journal-find-location ()
         ;; Open today's journal, but specify a non-nil prefix argument in order to
