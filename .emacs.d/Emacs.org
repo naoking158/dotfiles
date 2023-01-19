@@ -1831,7 +1831,9 @@ Only in Neotree Buffer:
 
 #+begin_src emacs-lisp
 (leaf markdown-mode
-  :mode "\\.md\\'" "\\.spec\\'")
+  :mode (("\\.md\\'" . gfm-mode)
+         ("\\.spec\\'" . markdown-mode))
+  :custom (markdown-command . "/usr/bin/multimarkdown"))
 #+end_src
 
 *** Shell
@@ -5331,12 +5333,13 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
   :straight t
   :defer-config
   (setq markdown-preview-stylesheets
-        (list "http://thomasf.github.io/solarized-css/solarized-light.min.css"))
+        (list "https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown-dark.min.css")
+        ;; (list "http://thomasf.github.io/solarized-css/solarized-light.min.css")
+        )
 
   (dolist (elm (list
                 "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"))
-    (add-to-list 'markdown-preview-javascript elm))
-  )
+    (add-to-list 'markdown-preview-javascript elm)))
 #+end_src
 
 ** Mermaid-mode
