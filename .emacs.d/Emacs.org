@@ -1001,7 +1001,7 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
                                     (t . (bold variable-pitch 1.1))))
       ;; Load choiced theme
       (pcase sym-theme
-        ('modus-dark (load-theme 'modus-vivendi :no-confirm))
+        ('modus-dark (load-theme 'modus-vivendi-tinted :no-confirm))
         ('modus-light (load-theme 'modus-operandi :no-confirm)))
       (my--init-tab-bar)))
 
@@ -1067,7 +1067,7 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
     (funcall my-load-theme-func sym-theme))
 
   (defun my/default-theme nil
-    (my/load-theme 'modus-light)
+    (my/load-theme 'modus-dark)
     ;; (let ((time
     ;;        (string-to-number
     ;;         (format-time-string "%H"))))
