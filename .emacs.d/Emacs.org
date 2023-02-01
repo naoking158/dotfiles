@@ -852,15 +852,13 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
   (defun my/change-transparency (&optional num)
     "Sets the transparency of the frame window. 0=transparent/100=opaque"
     (interactive (list
-                  (read-number "Transparency Value 0 - 100 opaque: " 100)))
-    (let ((diff-active-and-inactive-frame 4))
-      (set-frame-parameter nil 'alpha
-                           (cons num (- num diff-active-and-inactive-frame)))
-      (add-to-list 'default-frame-alist
-                   `(alpha . (,num . ,(- num diff-active-and-inactive-frame))))))
+                  (read-number "Transparency Value 0 - 100 opaque: " 92)))
+    (set-frame-parameter nil 'alpha-background num)
+    (add-to-list 'default-frame-alist
+                 `(alpha-background . ,num)))
 
   :config
-  (my/change-transparency 100))
+  (my/change-transparency 92))
 #+end_src
 
 ** Font Configuration
