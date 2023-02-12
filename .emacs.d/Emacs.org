@@ -3403,22 +3403,11 @@ parses its input."
   :url "https://github.com/abo-abo/avy"
   :straight t
   :bind* ("C-q" . avy-goto-char-timer)
-  ;; :init (add-to-list 'avy-styles-alist '(avy-goto-char-timer . pre))
-  ;; :init (add-to-list 'avy-styles-alist '(avy-goto-migemo-timer . pre))
-  :custom ((avy-styles-alist . '(avy-goto-char-timer . pre))
+  :custom ((avy-styles-alist . '((avy-goto-char-timer . pre)))
            (avy-timeout-seconds . 0.5)
            (avy-keys . '( ?q ?e ?r ?u ?o ?p
                           ?a ?s ?d ?f ?g ?h ?j ?l ?'
                           ?c ?v ?b ?n ?, ?/)))
-  ;; :preface
-  ;; (defun avy-goto-migemo-timer (&optional arg)
-  ;;   (interactive "P")
-  ;;   (let ((avy-all-windows (if arg
-  ;;                              (not avy-all-windows)
-  ;;                            avy-all-windows)))
-  ;;     (avy-with avy-goto-migemo-timer
-  ;;       (setq avy--old-cands (avy--read-candidates #'migemo-get-pattern))
-  ;;       (avy-process avy--old-cands))))
   :config
   ;; orverride avy function
   (defun avy-show-dispatch-help ()
