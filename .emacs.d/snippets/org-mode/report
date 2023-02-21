@@ -2,5 +2,5 @@
 # name: report
 # key: report
 # --
-#+BEGIN: clocktable :scope file :maxlevel 5 :block today$0
+#+BEGIN: clocktable :scope agenda :maxlevel 5 :block yesterday
 #+END
