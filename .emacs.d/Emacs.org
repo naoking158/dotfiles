@@ -2941,7 +2941,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
    ([remap goto-line] . consult-goto-line)     ; M-g g
    ([remap repeat-complex-command] . consult-complex-command) ; C-x M-: or C-x Esc Esc
    ([remap org-open-at-point] . consult-outline)
-   ("C-s" . my-consult-line)
+   ("C-c s" . my-consult-line)
    ("C-M-r" . consult-recent-file)
    ("C-x C-o" . consult-file-externally)
    ("C-S-s" . consult-imenu)
