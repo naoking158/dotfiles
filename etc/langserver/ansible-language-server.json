@@ -1,0 +1,19 @@
+{
+  "name": "ansible-language-server",
+  "languageId": "ansible",
+  "command": [
+    "ansible-language-server",
+    "--stdio"
+  ],
+  "settings": {
+    "ansible": {
+      "ansible.path": "/home/sakamoto/.conda/envs/ansible/bin/ansible",
+      "python.interpreterPath": "/home/sakamoto/.conda/envs/ansible/bin/python",
+      "validation": {
+        "enabled": true,
+        "lint.enabled": true,
+        "lint.path": "/home/sakamoto/.conda/envs/ansible/bin/ansible-lint"
+      }
+    }
+  }
+}

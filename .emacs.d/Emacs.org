@@ -1604,8 +1604,9 @@ Only in Neotree Buffer:
              :repo "manateelazycat/lsp-bridge"
              :files (:defaults "*.py" "acm/*" "core/*")
              )
-  :custom ((lsp-bridge-diagnostic-tooltip-border-width . 5)
-           (lsp-bridge-lookup-doc-tooltip-border-width . 5))
+  :custom `((lsp-bridge-diagnostic-tooltip-border-width . 5)
+            (lsp-bridge-lookup-doc-tooltip-border-width . 5)
+            (lsp-bridge-user-langserver-dir . ,(expand-file-name "~/.dotfiles/etc/langserver")))
   :bind (lsp-bridge-mode-map
          :package lsp-bridge
          ("M-." . lsp-bridge-find-def)
