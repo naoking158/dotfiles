@@ -5359,6 +5359,22 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
           map)))
 #+end_src
 
+** Editorconfig
+
+#+begin_src emacs-lisp
+(leaf editorconfig
+  :straight t
+  :global-minor-mode editorconfig-mode)
+#+end_src
+
+** Prettier
+
+#+begin_src emacs-lisp
+(leaf prettier
+  :straight t
+  :custom ((prettier-editorconfig-flag . t)
+           (prettier-prettify-on-save-flag . nil)))
+#+end_src
 
 * Footer
 :PROPERTIES:
