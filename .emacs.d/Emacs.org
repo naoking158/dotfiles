@@ -21,7 +21,6 @@ a bunch of resources I've found online.
   - [[#auto-revert-buffer][Auto revert buffer]]
   - [[#auto-saving-changed-files][Auto-Saving Changed Files]]
   - [[#undo-helper][Undo Helper]]
-  - [[#native-compilation][Native Compilation]]
 - [[#utility-functions][Utility Functions]]
   - [[#toggle-mode-line][Toggle Mode-line]]
   - [[#trim-newline-from-string][Trim newline from string]]
@@ -116,6 +115,8 @@ a bunch of resources I've found online.
   - [[#csv-mode][CSV-mode]]
   - [[#markdown-preview-mode][Markdown-preview-mode]]
   - [[#mermaid-mode][Mermaid-mode]]
+  - [[#editorconfig][Editorconfig]]
+  - [[#prettier][Prettier]]
 - [[#footer][Footer]]
 :END:
 
@@ -179,6 +180,10 @@ a bunch of resources I've found online.
 ;; Avoid popup Async buffer window
 (add-to-list 'display-buffer-alist
              '("^*Async Shell Command*" . (display-buffer-no-window)))
+
+;; Compilation deny package
+(setq comp-deferred-compilation-deny-list (list "jupyter"))
+(setq native-comp-deferred-compilation-deny-list (list "jupyter"))
 
 (provide 'early-init)
 
@@ -631,20 +636,6 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 
 #+end_src
 
-** Native Compilation
-:PROPERTIES:
-:ID:       6E4D21D3-E1F7-4681-AA48-2FA7799DE6D9
-:END:
-
-#+begin_src emacs-lisp
-
-;; Compilation deny package
-(setq comp-deferred-compilation-deny-list (list "jupyter"))
-
-;; native-compile all Elisp files under a directory
-;; (native-compile-async (file-truename "~/.emacs.d/elisp/") 'recursively)
-
-#+end_src
 
 * Utility Functions
 :PROPERTIES:
