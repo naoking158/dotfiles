@@ -53,6 +53,9 @@
 (add-to-list 'display-buffer-alist
              '("^*Async Shell Command*" . (display-buffer-no-window)))
 
+;; Compilation deny package
+(setq comp-deferred-compilation-deny-list (list "jupyter"))
+(setq native-comp-deferred-compilation-deny-list (list "jupyter"))
 (provide 'early-init)
 
 ;;; early-init.el ends here

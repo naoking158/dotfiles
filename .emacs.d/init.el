@@ -346,12 +346,6 @@
   :straight t
   :bind ("C-c u" . vundo))
 
-;; Compilation deny package
-(setq comp-deferred-compilation-deny-list (list "jupyter"))
-
-;; native-compile all Elisp files under a directory
-;; (native-compile-async (file-truename "~/.emacs.d/elisp/") 'recursively)
-
 (defun my/toggle-modeline (&optional arg)
   (interactive)
   (if (or (null mode-line-format) arg)
@@ -485,15 +479,13 @@
   (defun my/change-transparency (&optional num)
     "Sets the transparency of the frame window. 0=transparent/100=opaque"
     (interactive (list
-                  (read-number "Transparency Value 0 - 100 opaque: " 100)))
-    (let ((diff-active-and-inactive-frame 4))
-      (set-frame-parameter nil 'alpha
-                           (cons num (- num diff-active-and-inactive-frame)))
-      (add-to-list 'default-frame-alist
-                   `(alpha . (,num . ,(- num diff-active-and-inactive-frame))))))
+                  (read-number "Transparency Value 0 - 100 opaque: " 85)))
+    (set-frame-parameter nil 'alpha-background num)
+    (add-to-list 'default-frame-alist
+                 `(alpha-background . ,num)))
 
   :config
-  (my/change-transparency 100))
+  (my/change-transparency 85))
 
 (leaf font
   :when window-system
@@ -611,7 +603,7 @@
                                     (t . (bold variable-pitch 1.1))))
       ;; Load choiced theme
       (pcase sym-theme
-        ('modus-dark (load-theme 'modus-vivendi :no-confirm))
+        ('modus-dark (load-theme 'modus-vivendi-tinted :no-confirm))
         ('modus-light (load-theme 'modus-operandi :no-confirm)))
       (my--init-tab-bar)))
 
@@ -677,7 +669,7 @@
     (funcall my-load-theme-func sym-theme))
 
   (defun my/default-theme nil
-    (my/load-theme 'modus-light)
+    (my/load-theme 'modus-dark)
     ;; (let ((time
     ;;        (string-to-number
     ;;         (format-time-string "%H"))))
@@ -811,7 +803,12 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   (meow-setup)
   (meow-global-mode)
   (setq meow-cursor-type-region-cursor '(bar . 3)
-        meow-cursor-type-insert '(bar . 3))
+        meow-cursor-type-insert '(bar . 3)
+        meow-replace-state-name-list '((normal . "<N>")
+                                       (motion . "<M>")
+                                       (keypad . "<K>")
+                                       (insert . "<I>")
+                                       (beacon . "<B>")))
   :hook
   ((meow-insert-exit-hook . (lambda nil
                               (if skk-mode (skk-latin-mode-on))))
@@ -1067,6 +1064,9 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
              :repo "manateelazycat/lsp-bridge"
              :files (:defaults "*.py" "acm/*" "core/*")
              )
+  :custom `((lsp-bridge-diagnostic-tooltip-border-width . 5)
+            (lsp-bridge-lookup-doc-tooltip-border-width . 5)
+            (lsp-bridge-user-langserver-dir . ,(expand-file-name "~/.dotfiles/etc/langserver")))
   :bind (lsp-bridge-mode-map
          :package lsp-bridge
          ("M-." . lsp-bridge-find-def)
@@ -1242,10 +1242,38 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   ((json-mode-standard-file-ext . '(".json" ".jsonc" ".jsonld"))))
 
 (leaf markdown-mode
-  :mode "\\.md\\'" "\\.spec\\'")
+  :mode (("\\.md\\'" . gfm-mode)
+         ("\\.spec\\'" . markdown-mode))
+  :custom (markdown-command . "/usr/bin/multimarkdown"))
 
 (leaf sh-mode
   :hook (sh-mode-hook . lsp-bridge-mode))
+
+(leaf dockerfile-mode
+  :straight (dockerfile-mode
+             :type git
+             :host github
+             :repo "spotify/dockerfile-mode")
+  :mode "Dockerfile\\'")
+
+(leaf yaml-mode
+  :straight (yaml-mode
+             :type git
+             :host github
+             :repo "yoshiki/yaml-mode")
+  :mode ("\\.yml\\'" "\\.yaml\\'"))
+
+(leaf go-mode
+  :straight t)
+
+(leaf ansible
+  :straight t
+  :hook ((yaml-mode-hook . (lambda ()
+                             (ansible 1)
+                             (lsp-bridge-mode 1))))
+  :config
+  (require 'lsp-bridge)
+  (add-to-list 'lsp-bridge-single-lang-server-mode-list '(yaml-mode . "ansible-language-server")))
 
 (leaf flymake
   :disabled t
@@ -1293,6 +1321,12 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
                                   ;; for text mixed English and Japanese
                                   (add-to-list 'ispell-skip-region-alist
                                                '("[^\000-\377]+"))))))
+
+(leaf pulsar
+  :straight t
+  :custom ((pulsar-pulse-on-window-change . t)
+           (pulsar-pulse . t))
+  :global-minor-mode pulsar-global-mode)
 
 (leaf flycheck
   :straight t
@@ -1378,11 +1412,13 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :url "https://github.com/DarthFennec/highlight-indent-guides"
   :straight t
   :hook prog-mode-hook yaml-mode-hook
-  :custom
-  ((highlight-indent-guides-auto-enabled . t)
-   (highlight-indent-guides-responsive . t)
-   (highlight-indent-guides-method . 'character)
-   (highlight-indent-guides-suppress-auto-error . t)))
+  :custom ((highlight-indent-guides-auto-enabled . nil)
+           (highlight-indent-guides-responsive . t)
+           (highlight-indent-guides-method . 'character)
+           (highlight-indent-guides-suppress-auto-error . t))
+  :custom-face ((highlight-indent-guides-odd-face . '((nil (:foreground "#88ca9f"))))
+                (highlight-indent-guides-even-face . '((nil (:foreground "#88ca9f"))))
+                (highlight-indent-guides-character-face . '((nil (:foreground "#2266ae"))))))
 
 (leaf *indent-region-custom
   :doc "This should be used in GUI Emacs to avoid inserting weired characters in CUI Emacs."
@@ -1428,6 +1464,31 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
           (insert "    ") ; else insert four spaces as expected
           ))
       )))
+
+(leaf tree-sitter
+  :straight t tree-sitter-langs
+  :hook (tree-sitter-after-on-hook . tree-sitter-hl-mode)
+  :global-minor-mode global-tree-sitter-mode
+  :config
+  (add-to-list 'tree-sitter-major-mode-language-alist '(typescript-tsx-mode . tsx))
+  (tree-sitter-hl-add-patterns 'tsx
+    [
+     ;; styled.div``
+     (call_expression
+      function: (member_expression
+                 object: (identifier) @function.call
+                 (.eq? @function.call "styled"))
+      arguments: ((template_string) @property.definition
+                  (.offset! @property.definition 0 1 0 -1)))
+     ;; styled(Component)``
+     (call_expression
+      function: (call_expression
+                 function: (identifier) @function.call
+                 (.eq? @function.call "styled"))
+      arguments: ((template_string) @property.definition
+                  (.offset! @property.definition 0 1 0 -1)))
+     ])
+)
 
 (leaf paren
   :hook (emacs-startup-hook . show-paren-mode)
@@ -1647,6 +1708,19 @@ respectively."
            (global-whitespace-mode . t)
            )
 )
+
+(leaf know-your-http-well
+  :doc
+  """
+  HTTP encodings, headers, media types, methods, relations and status codes, all summarized and linking to their specification.
+
+  M-x http-header ;; content-type
+  M-x http-method ;; post | POST
+  M-x http-relation ;; describedby
+  M-x http-status-code ;; 500
+  M-x http-status-code ;; not_found | NOT_FOUND
+  """
+  :straight t)
 
 (leaf winner
   :doc "Restore old window configurations"
@@ -1929,7 +2003,7 @@ respectively."
    ([remap goto-line] . consult-goto-line)     ; M-g g
    ([remap repeat-complex-command] . consult-complex-command) ; C-x M-: or C-x Esc Esc
    ([remap org-open-at-point] . consult-outline)
-   ("C-s" . my-consult-line)
+   ("C-c s" . my-consult-line)
    ("C-M-r" . consult-recent-file)
    ("C-x C-o" . consult-file-externally)
    ("C-S-s" . consult-imenu)
@@ -2051,8 +2125,8 @@ parses its input."
       (migemo-regex-dictionary . nil)
       (migemo-coding-system    . 'utf-8)
       (migemo-dictionary . ,(cond
-                             ((file-exists-p "/usr/local/share/migemo/utf-8/migemo-dict")
-                              "/usr/local/share/migemo/utf-8/migemo-dict")
+                             ((file-exists-p "/usr/share/migemo/utf-8/migemo-dict")
+                              "/usr/share/migemo/utf-8/migemo-dict")
                              ((file-exists-p "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
                               "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
                              (t "")))
@@ -2142,6 +2216,40 @@ parses its input."
          ("M-DEL" . vertico-directory-delete-word)
          ("C-w"   . vertico-directory-delete-word)
          ("RET"   . vertico-directory-enter)))
+
+(leaf vertico-posframe
+  :straight t
+  :after vertico
+  :when (display-graphic-p)
+  :hook
+  ((vertico-mode-hook . my--enable-vertico-posframe-mode)
+   (before-make-frame-hook . my--disable-vertico-posframe-mode))
+  :custom
+  `((vertico-posframe-poshandler . 'posframe-poshandler-frame-bottom-center)
+    (vertico-posframe-width . 155)
+    (vertico-posframe-border-width . 5)
+    (vertico-multiform-categories . '((file posframe)
+                                      (citar-reference posframe)
+                                      (command posframe)
+                                      (consult-location posframe)
+                                      (consult-multi posframe)
+                                      (org-roam-node posframe)
+                                      (completing-read posframe)
+                                      ))
+    (vertico-multiform-commands . '((consult-imenu buffer)
+                                    (execute-extended-command posframe)
+                                    (helpful-function posframe)
+                                    (helpful-symbol posframe)
+                                    (helpful-variable posframe))))
+  :config
+  (defun my--enable-vertico-posframe-mode ()
+    (vertico-posframe-mode)
+    (vertico-multiform-mode))
+
+  (defun my--disable-vertico-posframe-mode ()
+    (when (not (display-graphic-p))
+      (vertico-posframe-mode -1)
+      (vertico-multiform-mode -1))))
 
 (leaf corfu
   :straight t
@@ -2290,22 +2398,11 @@ parses its input."
   :url "https://github.com/abo-abo/avy"
   :straight t
   :bind* ("C-q" . avy-goto-char-timer)
-  ;; :init (add-to-list 'avy-styles-alist '(avy-goto-char-timer . pre))
-  ;; :init (add-to-list 'avy-styles-alist '(avy-goto-migemo-timer . pre))
-  :custom ((avy-styles-alist . '(avy-goto-char-timer . pre))
+  :custom ((avy-styles-alist . '((avy-goto-char-timer . pre)))
            (avy-timeout-seconds . 0.5)
            (avy-keys . '( ?q ?e ?r ?u ?o ?p
                           ?a ?s ?d ?f ?g ?h ?j ?l ?'
                           ?c ?v ?b ?n ?, ?/)))
-  ;; :preface
-  ;; (defun avy-goto-migemo-timer (&optional arg)
-  ;;   (interactive "P")
-  ;;   (let ((avy-all-windows (if arg
-  ;;                              (not avy-all-windows)
-  ;;                            avy-all-windows)))
-  ;;     (avy-with avy-goto-migemo-timer
-  ;;       (setq avy--old-cands (avy--read-candidates #'migemo-get-pattern))
-  ;;       (avy-process avy--old-cands))))
   :config
   ;; orverride avy function
   (defun avy-show-dispatch-help ()
@@ -2604,8 +2701,7 @@ parses its input."
 
 (leaf org-agenda
   :when window-system
-  :bind* (("C-c C-a" . my/org-agenda-cache)
-          ("C-c C-m" . org-capture))
+  :bind* (("C-c C-a" . my/org-agenda-cache))
   :custom
   `((org-agenda-window-setup . 'other-window)
     (org-agenda-block-separator . nil)
@@ -2726,15 +2822,11 @@ parses its input."
       (ignore-errors (org-clock-out) t)
       (save-some-buffers t))
 
-    :defvar (org-capture-templates)
     :config
     (require 'org-habit)
-    (require 'org-capture)
+    ;; (require 'org-capture)
     (setq
      gtd/org-agenda-directory (file-truename "~/org/gtd/")
-     org-agenda-files (directory-files gtd/org-agenda-directory t "\\.org$")
-     ;; org-agenda-files (directory-files-recursively
-     ;;                   gtd/org-agenda-directory "\\.org")
      org-outline-path-complete-in-steps nil
      org-log-done 'time
      org-log-into-drawer t
@@ -2755,23 +2847,37 @@ parses its input."
      org-agenda-bulk-custom-functions `((,jethro/org-agenda-bulk-process-key
                                          jethro/org-agenda-process-inbox-item)))
 
-    (setq journal-directory (expand-file-name "journal" org-directory)
-          journal-daily-file (expand-file-name "daily.org" journal-directory)
-          journal-weekly-file (expand-file-name "weekly.org" journal-directory)
-          journal-monthly-file (expand-file-name "monthly.org" journal-directory)
-          journal-template-directory (expand-file-name "templates" journal-directory)
-          journal-template-daily (expand-file-name "daily.org" journal-template-directory)
-          journal-template-weekly (expand-file-name "weekly.org" journal-template-directory)
-          journal-template-monthly (expand-file-name "monthly.org" journal-template-directory))
 
-    (setq org-capture-templates
-          `(("i" "inbox" entry
-             (file ,(concat gtd/org-agenda-directory "inbox.org"))
-             "* TODO %?")
-            ;; ("d" "daily" entry
-            ;;  (file+headline ,journal-daily-file ,(format-time-string "%Y-%m-%d %A"))
-            ;;  (file ,journal-template-daily))
-            ))
+    (defun my/setup-org-agenda ()
+      (interactive)
+      (setq org-agenda-files (directory-files gtd/org-agenda-directory t "\\.org$")
+            org-agenda-custom-commands
+            `(("n" "Agenda and all TODOs"
+               ((agenda "")
+                (alltodo "")))
+              ("a" "Agenda"
+               ((agenda ""
+                        ((org-agenda-span 'week)
+                         (org-deadline-warning-days 365)
+                         (org-agenda-prefix-format " %i %-12:c%?- t % s % e")))
+                (todo "TODO"
+                      ((org-agenda-overriding-header "\nInbox")
+                       (org-agenda-files '(,(concat gtd/org-agenda-directory
+                                                    "inbox.org")))))
+                (todo "NEXT"
+                      ((org-agenda-overriding-header "\nIn Progress")))
+                (alltodo ""
+                         ((org-agenda-overriding-header "\nProjects")
+                          (org-agenda-files (directory-files
+                                             gtd/org-agenda-directory t
+                                             "[^\(inbox\)\(next\)]\\.org$"))))
+                (todo "TODO"
+                      ((org-agenda-overriding-header "\nOne-off Tasks")
+                       (org-agenda-files '(,(concat gtd/org-agenda-directory
+                                                    "next.org")))
+                       (org-agenda-skip-function '(org-agenda-skip-entry-if
+                                                   'deadline)))))))))
+    (my/setup-org-agenda)
 
     (defun jethro/org-archive-done-tasks ()
       "Archive all done tasks."
@@ -2807,32 +2913,42 @@ parses its input."
            (t
             nil)))))
 
-    (setq org-agenda-custom-commands
-          `(("n" "Agenda and all TODOs"
-             ((agenda "")
-              (alltodo "")))
-            ("a" "Agenda"
-             ((agenda ""
-                      ((org-agenda-span 'week)
-                       (org-deadline-warning-days 365)
-                       (org-agenda-prefix-format " %i %-12:c%?- t % s % e")))
-              (todo "TODO"
-                    ((org-agenda-overriding-header "\nInbox")
-                     (org-agenda-files '(,(concat gtd/org-agenda-directory
-                                                  "inbox.org")))))
-              (todo "NEXT"
-                    ((org-agenda-overriding-header "\nIn Progress")))
-              (alltodo ""
-                       ((org-agenda-overriding-header "\nProjects")
-                        (org-agenda-files (directory-files
-                                           gtd/org-agenda-directory t
-                                           "[^\(inbox\)\(next\)]\\.org$"))))
-              (todo "TODO"
-                    ((org-agenda-overriding-header "\nOne-off Tasks")
-                     (org-agenda-files '(,(concat gtd/org-agenda-directory
-                                                  "next.org")))
-                     (org-agenda-skip-function '(org-agenda-skip-entry-if
-                                                 'deadline))))))))))
+    (leaf org-journal
+      :straight t
+      :custom `((org-journal-file-type . 'yearly)
+                (org-journal-dir . ,(expand-file-name "journal" org-directory))
+                (org-journal-file-format . "%Y")
+                (org-journal-date-format . "%m/%d, %A"))
+      :config
+      (defun org-journal-find-location ()
+        ;; Open today's journal, but specify a non-nil prefix argument in order to
+        ;; inhibit inserting the heading; org-capture will insert the heading.
+        (org-journal-new-entry t)
+        (unless (eq org-journal-file-type 'daily)
+          (org-narrow-to-subtree))
+        (goto-char (point-max))))
+
+    (leaf org-capture
+      :tag "builtin"
+      :bind* ("C-c C-m" . org-capture)
+      :config
+      (defun org-journal-find-location ()
+        ;; Open today's journal, but specify a non-nil prefix argument in order to
+        ;; inhibit inserting the heading; org-capture will insert the heading.
+        (org-journal-new-entry t)
+        (unless (eq org-journal-file-type 'daily)
+          (org-narrow-to-subtree))
+        (goto-char (point-max)))
+
+      (setq org-capture-templates
+            `(("i" "inbox" entry
+               (file ,(concat gtd/org-agenda-directory "inbox.org"))
+               "* TODO %?")
+              ("j" "Journal entry" plain (function org-journal-find-location)
+               "** %(format-time-string org-journal-time-format)%^{Title}\n%i%?"
+               :jump-to-captured t :immediate-finish t))))
+    )
+  )
 
 (setq org-babel-load-languages '((emacs-lisp . t)
                                  (python . t)
@@ -2863,6 +2979,17 @@ parses its input."
 (leaf ob-lua
   :straight org
   :commands (org-babel-execute:lua))
+
+(leaf org-modern
+  :straight t
+  :hook (org-mode-hook . org-modern-mode)
+  :custom-face
+  (org-modern-label . '((t :height 0.9 :inherit t)))
+  :custom
+  ((org-modern-star . ["◉" "●" "○" "◇" "★" "✸" " "])
+   (org-modern-list . '((?+ . "➤")
+                        (?* . "-")
+                        (?- . "•")))))
 
 (leaf org-present
   :when window-system
@@ -3417,37 +3544,39 @@ parses its input."
   :config
   (load-file "~/src/github.com/naoking158/envs/config-mail/config-mu4e.el"))
 
+(leaf eaf
+  :disabled t
+  :when (memq window-system '(x))
+  :straight (eaf
+             :type git
+             :host github
+             :repo "emacs-eaf/emacs-application-framework"
+             :files (:defaults "*"))
+  ;; :load-path "~/src/github.com/emacs-eaf/emacs-application-framework/"
+  :require eaf
+  :commands
+  (eaf-search-it eaf-open eaf-open-browser eaf-open-browser-with-history eaf-open-pdf-from-history)
+  :custom
+  ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
+  (;; (eaf-python-command . "/usr/bin/python")
+   (eaf-browser-continue-where-left-off . t)
+   (eaf-browser-enable-adblocker . t)
+   (browse-url-browser-function . 'eaf-open-browser))
+  :config
+  (require 'eaf-browser)
+  (require 'eaf-pdf-viewer)
+  (add-to-list 'eaf-wm-focus-fix-wms "wlroots wm")
+  (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+  (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+  (defalias 'browse-web #'eaf-open-browser)
+  (eaf-bind-key nil "M-q" eaf-browser-keybinding))
+
 (leaf server
   :doc "Lisp code for GNU Emacs running as server process"
   :tag "builtin"
   :require t
   :bind ("C-x C-c" . server-edit)
   :hook (emacs-startup-hook . server-start))
-
-(leaf tree-sitter
-  :straight t tree-sitter-langs
-  :hook (tree-sitter-after-on-hook . tree-sitter-hl-mode)
-  :global-minor-mode global-tree-sitter-mode
-  :config
-  (add-to-list 'tree-sitter-major-mode-language-alist '(typescript-tsx-mode . tsx))
-  (tree-sitter-hl-add-patterns 'tsx
-    [
-     ;; styled.div``
-     (call_expression
-      function: (member_expression
-                 object: (identifier) @function.call
-                 (.eq? @function.call "styled"))
-      arguments: ((template_string) @property.definition
-                  (.offset! @property.definition 0 1 0 -1)))
-     ;; styled(Component)``
-     (call_expression
-      function: (call_expression
-                 function: (identifier) @function.call
-                 (.eq? @function.call "styled"))
-      arguments: ((template_string) @property.definition
-                  (.offset! @property.definition 0 1 0 -1)))
-     ])
-)
 
 (leaf xwwp
   :disabled t
@@ -3671,27 +3800,6 @@ Interactively, URL defaults to the string looking like a url around point."
     (interactive "P")
     (sie-brow/search-in-external-browser sie-brow/prefix-for-google-scholar at-point)))
 
-(leaf eaf
-  :when (memq window-system '(x))
-  :load-path "~/src/github.com/emacs-eaf/emacs-application-framework/"
-  :require eaf
-  :commands
-  (eaf-search-it eaf-open eaf-open-browser eaf-open-browser-with-history eaf-open-pdf-from-history)
-  :custom
-  ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
-  (;; (eaf-python-command . "/usr/bin/python")
-   (eaf-browser-continue-where-left-off . t)
-   (eaf-browser-enable-adblocker . t)
-   (browse-url-browser-function . 'eaf-open-browser))
-  :config
-  (require 'eaf-browser)
-  (require 'eaf-pdf-viewer)
-  (add-to-list 'eaf-wm-focus-fix-wms "wlroots wm")
-  (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-  (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-  (defalias 'browse-web #'eaf-open-browser)
-  (eaf-bind-key nil "M-q" eaf-browser-keybinding))
-
 (leaf browse-at-remote
   :straight t
   :commands browse-at-remote-get-url
@@ -3707,85 +3815,19 @@ Interactively, URL defaults to the string looking like a url around point."
   :bind* (("C-x C-b w" . burly-bookmark-windows)
           ("C-x C-b f" . burly-bookmark-frames)))
 
-(leaf atomic-chrome
-  :straight t
-  :hook (emacs-startup-hook . atomic-chrome-start-server)
-  :custom ((atomic-chrome-enable-auto-update . nil)
-           (atomic-chrome-default-major-mode . 'org-mode)
-           (atomic-chrome-url-major-mode-alist . '(("overleaf\\.com" . tex-mode)))
-           (atomic-chrome-buffer-open-style . 'split)
-           (atomic-chrome-extension-type-list . '(ghost-text))))
-
-(leaf org-modern
-  :straight t
-  :hook (org-mode-hook . org-modern-mode)
-  :custom-face
-  (org-modern-label . '((t :height 0.9 :inherit t)))
-  :custom
-  ((org-modern-star . ["◉" "●" "○" "◇" "★" "✸" " "])
-   (org-modern-list . '((?+ . "➤")
-                        (?* . "-")
-                        (?- . "•")))))
-
-(leaf vertico-posframe
-  :straight t
-  :after vertico
-  :when (display-graphic-p)
-  :hook
-  ((vertico-mode-hook . my--enable-vertico-posframe-mode)
-   (before-make-frame-hook . my--disable-vertico-posframe-mode))
-  :custom
-  `((vertico-posframe-poshandler . 'posframe-poshandler-frame-bottom-center)
-    (vertico-posframe-width . 155)
-    (vertico-posframe-border-width . 5)
-    (vertico-multiform-categories . '((file posframe)
-                                      (citar-reference posframe)
-                                      (command posframe)
-                                      (consult-location posframe)
-                                      (consult-multi posframe)
-                                      (org-roam-node posframe)
-                                      (completing-read posframe)
-                                      ))
-    (vertico-multiform-commands . '((consult-imenu buffer)
-                                    (execute-extended-command posframe)
-                                    (helpful-function posframe)
-                                    (helpful-symbol posframe)
-                                    (helpful-variable posframe))))
-  :config
-  (defun my--enable-vertico-posframe-mode ()
-    (vertico-posframe-mode)
-    (vertico-multiform-mode))
-
-  (defun my--disable-vertico-posframe-mode ()
-    (when (not (display-graphic-p))
-      (vertico-posframe-mode -1)
-      (vertico-multiform-mode -1))))
-
-(leaf know-your-http-well
-  :doc
-  """
-  HTTP encodings, headers, media types, methods, relations and status codes, all summarized and linking to their specification.
-
-  M-x http-header ;; content-type
-  M-x http-method ;; post | POST
-  M-x http-relation ;; describedby
-  M-x http-status-code ;; 500
-  M-x http-status-code ;; not_found | NOT_FOUND
-  """
-  :straight t)
-
 (leaf csv-mode :straight t)
 
 (leaf markdown-preview-mode
   :straight t
   :defer-config
   (setq markdown-preview-stylesheets
-        (list "http://thomasf.github.io/solarized-css/solarized-light.min.css"))
+        (list "https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown-dark.min.css")
+        ;; (list "http://thomasf.github.io/solarized-css/solarized-light.min.css")
+        )
 
   (dolist (elm (list
                 "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"))
-    (add-to-list 'markdown-preview-javascript elm))
-  )
+    (add-to-list 'markdown-preview-javascript elm)))
 
 (leaf mermaid-mode
   :straight t
@@ -3807,41 +3849,13 @@ Interactively, URL defaults to the string looking like a url around point."
           (define-key map (kbd "C-c C-d d") 'mermaid-open-doc)
           map)))
 
-(leaf pulsar
+(leaf editorconfig
   :straight t
-  :custom ((pulsar-pulse-on-window-change . t)
-           (pulsar-pulse . t))
-  :global-minor-mode pulsar-global-mode)
+  :global-minor-mode editorconfig-mode)
 
-(leaf imenu-list
+(leaf prettier
   :straight t
-  :custom ((imenu-list-focus-after-activation . t)
-           (imenu-list-auto-resize . nil)))
-
-(leaf dockerfile-mode
-  :straight (dockerfile-mode
-             :type git
-             :host github
-             :repo "spotify/dockerfile-mode")
-  :mode "Dockerfile\\'")
-
-(leaf yaml-mode
-  :straight (yaml-mode
-             :type git
-             :host github
-             :repo "yoshiki/yaml-mode")
-  :mode ("\\.yml\\'" "\\.yaml\\'"))
-
-(leaf go-mode
-  :straight t)
-
-(leaf ansible
-  :straight t
-  :hook ((yaml-mode-hook . (lambda ()
-                             (ansible 1)
-                             (lsp-bridge-mode 1))))
-  :config
-  (require 'lsp-bridge)
-  (add-to-list 'lsp-bridge-single-lang-server-mode-list '(yaml-mode . "ansible-language-server")))
+  :custom ((prettier-editorconfig-flag . t)
+           (prettier-prettify-on-save-flag . nil)))
 
 (provide 'init)
