@@ -254,9 +254,12 @@ function build() {
         configureFlags=(
             "--with-modules"
             "--with-json"
-            "--with-native-compilation"
+            "--with-native-compilation=aot"
             "--with-xwidgets"
-	          "--prefix=${PREFIX}"
+            "--with-pgtk"
+	    "--without-x"
+	    "--with-libxml2=/usr/bin/xml2-config"
+            "--prefix=${PREFIX}"
         )
     fi
 
@@ -322,4 +325,3 @@ if [[ -e /opt/homebrew/ ]]; then
 fi
 
 build
-
