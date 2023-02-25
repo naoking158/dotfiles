@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: here
+# key: here
+# --
+HERE = os.path.dirname(__file__)
