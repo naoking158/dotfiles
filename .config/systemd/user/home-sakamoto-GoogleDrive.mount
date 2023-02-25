@@ -1,0 +1,9 @@
+[Unit]
+After=network-online.target
+[Mount]
+Type=rclone
+What=drive:
+Where=/home/sakamoto/GoogleDrive/
+Options=vfs-cache-mode=full,cache-dir=/home/sakamoto/.cache/rclone/
+[Install]
+WantedBy=default.target

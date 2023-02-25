@@ -54,6 +54,8 @@
 !/.config/sway/**
 !/.config/swayr/
 !/.config/swayr/**
+!/.config/systemd/
+!/.config/systemd/**
 !/.config/waybar/
 !/.config/waybar/**
 !/.config/textlint/
@@ -62,6 +64,8 @@
 !/.config/wezterm/**
 !/.config/wofi/
 !/.config/wofi/**
+!/.config/xremap/
+!/.config/xremap/**
 !/.config/yabai/
 !/.config/yabai/**
 !/.config/zsh/

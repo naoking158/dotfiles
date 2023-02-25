@@ -1,0 +1,9 @@
+[Unit]
+After=network-online.target
+[Mount]
+Type=rclone
+What=oneDrive:
+Where=/home/sakamoto/OneDrive/
+Options=vfs-cache-mode=full,cache-dir=/home/sakamoto/.cache/rclone/
+[Install]
+WantedBy=default.target
