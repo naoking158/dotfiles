@@ -1099,7 +1099,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
               (shell-command-to-string
                (format
                 "find %s -maxdepth 1 -type d -name 'miniconda*' | head -n 1"
-                (if (memq window-system '(x))
+                (if (memq window-system '(x pgtk))
                     "/opt"
                   "$HOME")
                 ))))
