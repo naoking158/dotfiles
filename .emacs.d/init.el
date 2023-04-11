@@ -1064,6 +1064,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
              :repo "manateelazycat/lsp-bridge"
              :files (:defaults "*.py" "acm/*" "core/*")
              )
+  :hook (emacs-startup-hook . global-lsp-bridge-mode)
   :custom `((lsp-bridge-diagnostic-tooltip-border-width . 5)
             (lsp-bridge-lookup-doc-tooltip-border-width . 5)
             (lsp-bridge-user-langserver-dir . ,(expand-file-name "~/.dotfiles/etc/langserver")))
@@ -1146,9 +1147,10 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
    (conda-postdeactivate-hook . my/lsp-python-setup-with-conda))
   :preface
   (defun my/lsp-python-setup-with-conda ()
-    (setq-local lsp-bridge-python-command
-                (expand-file-name "bin/python"
-                                  python-shell-virtualenv-root))
+    (setq-local lsp-bridge-python-command "/usr/bin/python3"
+                ;; (expand-file-name "bin/python"
+                ;;                   python-shell-virtualenv-root)
+                )
     (if (bound-and-true-p lsp-bridge-mode)
         (lsp-bridge-restart-process)
       (require 'lsp-bridge)
@@ -2253,7 +2255,7 @@ parses its input."
 
 (leaf corfu
   :straight t
-  :global-minor-mode global-corfu-mode
+  ;; :global-minor-mode global-corfu-mode
   :custom
   ((corfu-excluded-modes . '(sh-mode
                              shell-mode
@@ -3179,7 +3181,7 @@ parses its input."
           ("C-c n i" . org-roam-node-insert)
           ("C-c n c" . org-roam-capture))
   :custom
-  `((org-roam-v2-ack . t)
+  `(;; (org-roam-v2-ack . t)
     (org-roam-directory . ,(file-truename "~/org/braindump/"))
     (org-roam-db-location . ,(expand-file-name
                               "org-roam.db"
@@ -3545,14 +3547,8 @@ parses its input."
   (load-file "~/src/github.com/naoking158/envs/config-mail/config-mu4e.el"))
 
 (leaf eaf
-  :disabled t
   :when (memq window-system '(x))
-  :straight (eaf
-             :type git
-             :host github
-             :repo "emacs-eaf/emacs-application-framework"
-             :files (:defaults "*"))
-  ;; :load-path "~/src/github.com/emacs-eaf/emacs-application-framework/"
+  :load-path "~/src/github.com/emacs-eaf/emacs-application-framework/"
   :require eaf
   :commands
   (eaf-search-it eaf-open eaf-open-browser eaf-open-browser-with-history eaf-open-pdf-from-history)

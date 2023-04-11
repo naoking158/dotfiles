@@ -56,6 +56,7 @@
 ;; Compilation deny package
 (setq comp-deferred-compilation-deny-list (list "jupyter"))
 (setq native-comp-deferred-compilation-deny-list (list "jupyter"))
+
 (provide 'early-init)
 
 ;;; early-init.el ends here
