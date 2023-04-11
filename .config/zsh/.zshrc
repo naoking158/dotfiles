@@ -171,6 +171,13 @@ function peco-cdr () {
 zle -N peco-cdr
 bindkey '^[^R' peco-cdr
 
+function magit() {
+    local git_root=$(git rev-parse --show-toplevel)
+    emacsclient --eval "
+(progn
+  (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1) (magit-status \"$git_root\"))"
+}
+
 # nix home-manager functions
 # function home-update () {
 #     case "$SYSTEM" in
