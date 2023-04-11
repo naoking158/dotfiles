@@ -1062,11 +1062,12 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
              :type git
              :host github
              :repo "manateelazycat/lsp-bridge"
-             :files (:defaults "*.py" "acm/*" "core/*")
-             )
-  :custom `((lsp-bridge-diagnostic-tooltip-border-width . 5)
+             :files (:defaults "*.py" "acm/*" "core/*"))
+  :custom `((lsp-bridge-python-command . "/usr/bin/python3")
+            (lsp-bridge-diagnostic-tooltip-border-width . 5)
             (lsp-bridge-lookup-doc-tooltip-border-width . 5)
-            (lsp-bridge-user-langserver-dir . ,(expand-file-name "~/.dotfiles/etc/langserver")))
+            (lsp-bridge-user-langserver-dir . ,(expand-file-name "~/.dotfiles/etc/langserver"))
+            (lsp-bridge-user-multiserver-dir . ,(expand-file-name "~/.dotfiles/etc/multiserver")))
   :bind (lsp-bridge-mode-map
          :package lsp-bridge
          ("M-." . lsp-bridge-find-def)
@@ -1077,7 +1078,44 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
          ("C-c C-n" . lsp-bridge-diagnostic-jump-next)
          ("C-c C-p" . lsp-bridge-diagnostic-jump-prev)
          ("C-c l d" . lsp-bridge-diagnostic-list)
-         ("C-c l r" . lsp-bridge-rename)))
+         ("C-c l r" . lsp-bridge-rename))
+  :hook ((hack-local-variables-hook . run-local-vars-mode-hook)
+         (yas-global-mode-hook . global-lsp-bridge-mode))
+  :preface
+  (defun run-local-vars-mode-hook ()
+    "Run `major-mode' hook after the local variables have been processed."
+    (run-hooks (intern (concat (symbol-name major-mode) "-local-vars-hook"))))
+  :config
+  ;;; This patch needs to avoid following error:
+  ;;; json-parse-error \u0000 is not allowed without JSON_ALLOW_NUL
+  ;;; ref: https://github.com/emacs-lsp/lsp-mode/issues/2681
+  (advice-add 'json-parse-buffer :around
+              (lambda (orig &rest rest)
+                (while (re-search-forward "\\u0000" nil t)
+                  (replace-match ""))
+                (apply orig rest)))
+
+  (defun local/lsp-bridge-get-single-lang-server-by-project (project-path filepath)
+    (let* ((json-object-type 'plist)
+           (custom-dir (expand-file-name "lsp-bridge/pyright" no-littering-var-directory))
+           (custom-config (expand-file-name "pyright.json" custom-dir))
+           (default-config (json-read-file (expand-file-name "pyright.json" lsp-bridge-user-langserver-dir)))
+           (settings (plist-get default-config :settings))
+           )
+
+      (plist-put settings :pythonPath (executable-find "python"))
+
+      (make-directory (file-name-directory custom-config) t)
+
+      (with-temp-file custom-config
+        (insert (json-encode default-config)))
+
+      custom-config))
+
+  (add-hook 'python-mode-hook
+            (lambda ()
+              (setq-local lsp-bridge-get-single-lang-server-by-project
+                          'local/lsp-bridge-get-single-lang-server-by-project))))
 
 (leaf helpful
   :straight t
@@ -1124,6 +1162,16 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
             )
   :hook (python-mode-hook . my/python-basic-config)
   :preface
+  (defun my/lsp-python-setup-with-conda ()
+    (setq-local lsp-bridge-python-command
+                (expand-file-name "bin/python"
+                                  python-shell-virtualenv-root))
+    (if (bound-and-true-p lsp-bridge-mode)
+        (lsp-bridge-restart-process)
+      (require 'lsp-bridge)
+      (lsp-bridge-mode))
+    )
+
   (defun my/python-basic-config ()
     (setq indent-tabs-mode nil
           python-indent 4
@@ -1195,7 +1243,8 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
          "\\.as[cp]x\\'"
          "\\.erb\\'"
          "\\.mustache\\'"
-         "\\.djhtml\\'"))
+         "\\.djhtml\\'"
+         "\\.vue\\'"))
 
 (leaf *javascript
   :hook
@@ -1209,22 +1258,9 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
          ("\\.tsx\\'" . typescript-mode))
   :custom ((typescript-indent-level . 2)
            (typescript-auto-indent-flag . nil))
-  :hook ((hack-local-variables-hook . run-local-vars-mode-hook)
-         (typescript-mode-local-vars-hook . (lambda nil
-                                              (lsp-bridge-mode))))
-  :preface
-  (defun run-local-vars-mode-hook ()
-    "Run `major-mode' hook after the local variables have been processed."
-    (run-hooks (intern (concat (symbol-name major-mode) "-local-vars-hook"))))
-  :config
-  ;;; This patch needs to avoid following error:
-  ;;; json-parse-error \u0000 is not allowed without JSON_ALLOW_NUL
-  ;;; ref: https://github.com/emacs-lsp/lsp-mode/issues/2681
-  (advice-add 'json-parse-buffer :around
-              (lambda (orig &rest rest)
-                (while (re-search-forward "\\u0000" nil t)
-                  (replace-match ""))
-                (apply orig rest))))
+  ;; :hook (typescript-mode-local-vars-hook . (lambda nil
+  ;;                                      (lsp-bridge-mode)))
+  )
 
 (leaf deno-emacs
   :disabled nil
@@ -1246,8 +1282,8 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
          ("\\.spec\\'" . markdown-mode))
   :custom (markdown-command . "/usr/bin/multimarkdown"))
 
-(leaf sh-mode
-  :hook (sh-mode-hook . lsp-bridge-mode))
+;; (leaf sh-mode
+;;   :hook (sh-mode-hook . lsp-bridge-mode))
 
 (leaf dockerfile-mode
   :straight (dockerfile-mode
@@ -1270,7 +1306,8 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :straight t
   :hook ((yaml-mode-hook . (lambda ()
                              (ansible 1)
-                             (lsp-bridge-mode 1))))
+                             ;; (lsp-bridge-mode 1)
+                             )))
   :config
   (require 'lsp-bridge)
   (add-to-list 'lsp-bridge-single-lang-server-mode-list '(yaml-mode . "ansible-language-server")))
@@ -2252,6 +2289,7 @@ parses its input."
       (vertico-multiform-mode -1))))
 
 (leaf corfu
+  :disabled t
   :straight t
   :global-minor-mode global-corfu-mode
   :custom
@@ -2312,6 +2350,7 @@ parses its input."
   (setq corfu-commit-predicate #'my/corfu-commit-predicate))
 
 (leaf cape
+  :disabled t
   :straight t
   :require t dabbrev
   :custom (cape-dabbrev-min-length . 2)
@@ -3545,14 +3584,8 @@ parses its input."
   (load-file "~/src/github.com/naoking158/envs/config-mail/config-mu4e.el"))
 
 (leaf eaf
-  :disabled t
   :when (memq window-system '(x))
-  :straight (eaf
-             :type git
-             :host github
-             :repo "emacs-eaf/emacs-application-framework"
-             :files (:defaults "*"))
-  ;; :load-path "~/src/github.com/emacs-eaf/emacs-application-framework/"
+  :load-path "~/src/github.com/emacs-eaf/emacs-application-framework/"
   :require eaf
   :commands
   (eaf-search-it eaf-open eaf-open-browser eaf-open-browser-with-history eaf-open-pdf-from-history)
@@ -3857,5 +3890,13 @@ Interactively, URL defaults to the string looking like a url around point."
   :straight t
   :custom ((prettier-editorconfig-flag . t)
            (prettier-prettify-on-save-flag . nil)))
+
+;; (leaf direnv
+;;   :straight t
+;;   :hook (emacs-startup-hook . direnv-mode))
+
+(leaf poetry
+  :straight t
+  :hook (emacs-startup-hook . poetry-tracking-mode))
 
 (provide 'init)
