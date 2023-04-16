@@ -1064,7 +1064,8 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
              :repo "manateelazycat/lsp-bridge"
              :files (:defaults "*.py" "acm/*" "core/*"))
   :hook (emacs-startup-hook . global-lsp-bridge-mode)
-  :custom `((lsp-bridge-diagnostic-tooltip-border-width . 5)
+  :custom `((lsp-bridge-python-command . "/usr/bin/python3")
+            (lsp-bridge-diagnostic-tooltip-border-width . 5)
             (lsp-bridge-lookup-doc-tooltip-border-width . 5)
             (lsp-bridge-user-langserver-dir . ,(expand-file-name "~/.dotfiles/etc/langserver"))
             (lsp-bridge-user-multiserver-dir . ,(expand-file-name "~/.dotfiles/etc/multiserver")))
@@ -1103,9 +1104,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
            (settings (plist-get default-config :settings))
            )
 
-      (plist-put settings :pythonPath (if (file-exists-p ".venv")
-                                          (expand-file-name ".venv/bin/python")
-                                        (executable-find "python")))
+      (plist-put settings :pythonPath (executable-find "python"))
 
       (make-directory (file-name-directory custom-config) t)
 
@@ -1116,19 +1115,8 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 
   (add-hook 'python-mode-hook
             (lambda ()
-              (when (file-exists-p ".venv")
-                (setq-local python-shell-virtualenv-root (expand-file-name ".venv"))
-                ;; (setq-local lsp-bridge-python-command (expand-file-name "bin/python" python-shell-virtualenv-root))
-                )
-
               (setq-local lsp-bridge-get-single-lang-server-by-project
-                          'local/lsp-bridge-get-single-lang-server-by-project)
-              ))
-
-  ;; (add-hook 'pyvenv-post-activate-hooks
-  ;;         (lambda ()
-  ;;           (lsp-bridge-restart-process)))
-  )
+                          'local/lsp-bridge-get-single-lang-server-by-project))))
 
 (leaf helpful
   :straight t
@@ -3911,7 +3899,6 @@ Interactively, URL defaults to the string looking like a url around point."
 
 (leaf poetry
   :straight t
-  ;; :hook (direnv-envrc-mode-hook . poetry-venv-workon)
-  )
+  :hook (emacs-startup-hook . poetry-tracking-mode))
 
 (provide 'init)
