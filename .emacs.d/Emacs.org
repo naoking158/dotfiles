@@ -4351,11 +4351,6 @@ parses its input."
   :doc "Roam Research replica with Org-mode"
   :url "https://github.com/org-roam/org-roam"
   :straight t
-  :straight (emacsql
-             :type git
-             :host github
-             :repo "magit/emacsql"
-             :files (:defaults))
   :bind* (("C-c n l" . org-roam-buffer-toggle)
           ("C-c n f" . org-roam-node-find)
           ("C-c n g" . org-roam-graph)
