@@ -4796,8 +4796,8 @@ Manual is [[https://notmuchmail.org/emacstips/][here]]
            ("." . nil)
            ("." . notmuch-tag-jump))
     :config
-    (add-to-list 'corfu-excluded-modes 'notmuch-message-mode)
-    (add-to-list 'corfu-excluded-modes 'org-msg-edit-mode)
+    ;; (add-to-list 'corfu-excluded-modes 'notmuch-message-mode)
+    ;; (add-to-list 'corfu-excluded-modes 'org-msg-edit-mode)
 
     (setq mark-complete-tags '("+archived" "-inbox" "-todo" "-unread")
           mark-delete-tags '("+del" "-inbox" "-archived" "-unread")

@@ -2070,8 +2070,7 @@ respectively."
    consult-ripgrep consult-git-grep consult-grep
    consult-bookmark consult-recent-file consult-xref
    consult--source-recent-file consult--source-project-recent-file consult--source-bookmark
-   :preview-key (kbd "M-.")
-   ;; :preview-key (list :debounce 0.7 (kbd "M-."))
+   :preview-key "M-."
    )
 
   (leaf consult-dir
@@ -3210,11 +3209,6 @@ parses its input."
   :doc "Roam Research replica with Org-mode"
   :url "https://github.com/org-roam/org-roam"
   :straight t
-  :straight (emacsql
-             :type git
-             :host github
-             :repo "magit/emacsql"
-             :files (:defaults))
   :bind* (("C-c n l" . org-roam-buffer-toggle)
           ("C-c n f" . org-roam-node-find)
           ("C-c n g" . org-roam-graph)
@@ -3538,8 +3532,8 @@ parses its input."
            ("." . nil)
            ("." . notmuch-tag-jump))
     :config
-    (add-to-list 'corfu-excluded-modes 'notmuch-message-mode)
-    (add-to-list 'corfu-excluded-modes 'org-msg-edit-mode)
+    ;; (add-to-list 'corfu-excluded-modes 'notmuch-message-mode)
+    ;; (add-to-list 'corfu-excluded-modes 'org-msg-edit-mode)
 
     (setq mark-complete-tags '("+archived" "-inbox" "-todo" "-unread")
           mark-delete-tags '("+del" "-inbox" "-archived" "-unread")
