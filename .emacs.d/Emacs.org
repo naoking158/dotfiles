@@ -85,6 +85,7 @@ a bunch of resources I've found online.
   - [[#org-agenda][Org Agenda]]
   - [[#org-babel][Org Babel]]
   - [[#org-modern][Org-modern]]
+  - [[#org-download][Org-download]]
   - [[#presentations][Presentations]]
   - [[#cross-reference][Cross Reference]]
   - [[#outline-based-notes-management-and-organizer][Outline-based notes management and organizer]]
@@ -4109,6 +4110,13 @@ parses its input."
                         (?- . "•")))))
 #+end_src
 
+** Org-download
+
+#+begin_src emacs-lisp
+(leaf org-download
+  :straight t
+  :require t)
+#+end_src
 
 ** Presentations
 
