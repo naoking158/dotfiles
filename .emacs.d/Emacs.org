@@ -5378,6 +5378,16 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
   :hook (emacs-startup-hook . poetry-tracking-mode))
 #+end_src
 
+** OpenAPI Preview
+
+#+begin_src emacs-lisp
+(leaf openapi-preview
+  :straight (openapi-preview
+             :type git
+             :host github
+             :repo "merrickluo/openapi-preview"))
+#+end_src
+
 * Footer
 :PROPERTIES:
 :ID:       B2B50080-95ED-4DEC-B99E-B120D1A08233

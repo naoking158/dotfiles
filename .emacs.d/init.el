@@ -3850,4 +3850,10 @@ Interactively, URL defaults to the string looking like a url around point."
   :straight t
   :hook (emacs-startup-hook . poetry-tracking-mode))
 
+(leaf openapi-preview
+  :straight (openapi-preview
+             :type git
+             :host github
+             :repo "merrickluo/openapi-preview"))
+
 (provide 'init)
