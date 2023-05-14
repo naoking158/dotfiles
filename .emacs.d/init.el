@@ -2984,6 +2984,10 @@ parses its input."
                         (?* . "-")
                         (?- . "•")))))
 
+(leaf org-download
+  :straight t
+  :require t)
+
 (leaf org-present
   :when window-system
   :straight t
