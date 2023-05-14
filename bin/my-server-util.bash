@@ -1,7 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 
 function hostname_of() {
     ssh -G $1 | awk '/^hostname / { print $2 }'
+}
+
+function username_of() {
+    ssh -G $1 | awk '/^user / { print $2 }'
 }
 
 function port_of() {
@@ -10,17 +15,33 @@ function port_of() {
 
 function sshtunnel() {
     if [[ $# -ne 3 ]]; then
-        echo "Usage: sshtunnel HOST HOSTPORT LOCALPORT"
+        e_error "Usage: sshtunnel HOST HOSTPORT LOCALPORT"
+        exit 1
     else
         local host=$(hostname_of $1)
+        local user=$(username_of $1)
         local port=$2
         local hostport=$3
 
-        ssh -M -S mdlssh-socket -fNL ${hostport}:${host}:${port} ${MDL} -l ${USER}
-        echo "Tunnel from localhost:$hostport to $hostname:$port has been created."
+        ssh -M -S mdlssh-socket -fNL ${hostport}:${host}:${port} ${MDL} -l ${user}
+        echo "Tunnel from localhost:$hostport to $host:$port has been created."
         echo "Be sure to kill the tunnel after you finish your job, by sshexit $hostport"
     fi
 }
+
+# function sshtunnel() {
+#     if [[ $# -ne 3 ]]; then
+#         echo "Usage: sshtunnel HOST HOSTPORT LOCALPORT"
+#     else
+#         local host=$(hostname_of $1)
+#         local port=$2
+#         local hostport=$3
+
+#         ssh -M -S mdlssh-socket -fNL ${hostport}:${host}:${port} ${MDL} -l ${USER}
+#         echo "Tunnel from localhost:$hostport to $hostname:$port has been created."
+#         echo "Be sure to kill the tunnel after you finish your job, by sshexit $hostport"
+#     fi
+# }
 
 function sshexit() {
     local hostport=$1
