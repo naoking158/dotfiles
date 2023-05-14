@@ -1062,7 +1062,9 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
              :repo "manateelazycat/lsp-bridge"
              :files (:defaults "*.py" "acm/*" "core/*"))
   :hook (emacs-startup-hook . global-lsp-bridge-mode)
-  :custom `((lsp-bridge-python-command . "/usr/bin/python3")
+  :custom `((lsp-bridge-python-command . ,(if (eq window-system 'ns)
+                                              "/opt/homebrew/bin/python3"
+                                            "/usr/bin/python3"))
             (lsp-bridge-diagnostic-tooltip-border-width . 5)
             (lsp-bridge-lookup-doc-tooltip-border-width . 5)
             (lsp-bridge-user-langserver-dir . ,(expand-file-name "~/.dotfiles/etc/langserver"))
