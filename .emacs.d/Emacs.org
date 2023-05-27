@@ -1373,8 +1373,8 @@ Only in Neotree Buffer:
 ** Debugger with Dap Mode
 
 #+begin_src emacs-lisp
-
 (leaf dap-mode
+  :disabled t
   :when window-system
   :straight t
   ;; :after exec-path-from-shell
@@ -1398,7 +1398,6 @@ Only in Neotree Buffer:
   ;;  (python-mode-hook . dap-ui-mode)
   ;;  (python-mode-hook . dap-tooltip-mode))
   )
-
 #+end_src
 
 *** Get Started
@@ -1926,7 +1925,6 @@ To avoid installing x86_64 version, The following steps should be required.
                   (.offset! @property.definition 0 1 0 -1)))
      ])
 )
-
 #+end_src
 
 *** Showing Pair of Brackets with Paren
