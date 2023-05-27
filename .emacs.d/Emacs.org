@@ -759,7 +759,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                                   (bookmarks . 5))))
     :config
     (when window-system
-      (setq dashboard-startup-banner "~/.emacs.d/banner/coffee.png"))
+      (setq dashboard-startup-banner (expand-file-name "~/.emacs.d/banner/coffee.png")))
     (dashboard-setup-startup-hook))
 
   (leaf set-title-bar
@@ -1259,7 +1259,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
    (dired-recursive-deletes . 'always)
    (delete-by-moving-to-trash . t)
    (dired-dwim-target . t)
-   dired-listing-switches . "-AGhlv --group-directories-first --time-style=long-iso")
+   (dired-listing-switches . "-AGhlv --group-directories-first --time-style=long-iso"))
   )
 #+end_src
 
@@ -1476,7 +1476,8 @@ Only in Neotree Buffer:
          ("C-c C-d" . lsp-bridge-popup-documentation)
          ("C-c C-n" . lsp-bridge-diagnostic-jump-next)
          ("C-c C-p" . lsp-bridge-diagnostic-jump-prev)
-         ("C-c l d" . lsp-bridge-diagnostic-list)
+         ("C-c l l" . lsp-bridge-diagnostic-list)
+         ("C-c l c" . lsp-bridge-diagnostic-copy)
          ("C-c l r" . lsp-bridge-rename))
   :preface
   (defun run-local-vars-mode-hook ()
@@ -1867,7 +1868,7 @@ Only in Neotree Buffer:
 :ID:       2B53130F-3718-4EE5-9CF1-1E8C33996939
 :END:
 
-*** Prepare for M1 Mac
+**** Prepare for M1 Mac
 
 https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/88#issuecomment-849338234
 
@@ -1895,14 +1896,12 @@ To avoid installing x86_64 version, The following steps should be required.
    find langs/repos -type f -name grammar.js -not -path '*/node_modules/*' -not -path '*/ocaml/interface/*' -exec sh -c 'targets=; for grammar_file in "$@"; do grammar_dir="${grammar_file%/*}"; targets="$targets ensure/${grammar_dir##*/}"; done; EMACS=emacs make -j7 $targets' sh {} +
    #+end_src
 
-
-*** Configurations
+**** Configurations
 :PROPERTIES:
 :ID:       A58AD346-E923-4E20-BAAA-02B4E1A03A0D
 :END:
 
 #+begin_src emacs-lisp
-
 (leaf tree-sitter
   :straight t tree-sitter-langs
   :hook (tree-sitter-after-on-hook . tree-sitter-hl-mode)
@@ -2711,11 +2710,11 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   ;; :preview-key on a per-command basis using the `consult-customize' macro.
   (consult-customize
    consult-theme
-   :preview-key '(:debounce 0.4 any)
+   :preview-key (list :debounce 0.4 'any)
    consult-ripgrep consult-git-grep consult-grep
    consult-bookmark consult-recent-file consult-xref
    consult--source-recent-file consult--source-project-recent-file consult--source-bookmark
-   :preview-key "M-."
+   ;; :preview-key "M-."
    )
 
   (leaf consult-dir
@@ -2804,7 +2803,10 @@ parses its input."
 
   (leaf migemo
     :when (executable-find "cmigemo")
-    :straight t
+    :straight (migemo
+               :type git
+               :host github
+               :repo "emacs-jp/migemo")
     :require t
     :custom
     `((migemo-user-dictionary  . nil)
@@ -3980,9 +3982,9 @@ parses its input."
             (mapconcat 'identity latex-options " ")))
       (concat "latexmk -gg " options " "
               (cl-case latex
-                ('euptex "-pdfdvi -latex='uplatex "))
+                (euptex "-pdfdvi -latex='uplatex "))
               (cl-case latex
-                ('luatex luatex-option)
+                (luatex luatex-option)
                 (t latex-option))
               "' "
               (if output (concat "-output-directory=" output " "))
