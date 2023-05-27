@@ -78,62 +78,8 @@
 
     (leaf leaf-keywords
       :require t
-      :config (leaf-keywords-init)
-      ;; :init
-      ;; (leaf leaf-convert :straight t)
-      ;; (leaf hydra :straight t)
-      ;; (leaf blackout :straight t)
-
-      ;; (leaf key-chord
-      ;;   :disabled t
-      ;;   :straight t
-      ;;   :hook (emacs-startup-hook . (lambda () (key-chord-mode 1)))
-      ;;   :custom ((key-chord-one-keys-delay . 0.02)
-      ;;            (key-chord-two-keys-delay . 0.03))
-      ;;   :config
-      ;;   (key-chord-define-global "x0" '"\C-x0")
-      ;;   (key-chord-define-global "x1" '"\C-x1")
-      ;;   (key-chord-define-global "x2" '"\C-x2")
-      ;;   (key-chord-define-global "x3" '"\C-x3")
-      ;;   (key-chord-define-global "x5" '"\C-x52"))
-      )
+      :config (leaf-keywords-init))
     )
-
-  ;; (eval-and-compile
-  ;;   (custom-set-variables
-  ;;    '(warning-suppress-types '((comp)))
-  ;;    '(package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-  ;;                         ("nongnu" . "https://elpa.nongnu.org/nongnu/")
-  ;;                         ("melpa" . "https://melpa.org/packages/"))))
-  ;;   (package-initialize)
-  ;;   (unless (package-installed-p 'leaf)
-  ;;     (package-refresh-contents)
-  ;;     (package-install 'leaf))
-
-  ;;   (leaf leaf-keywords
-  ;;     :straight t
-  ;;     :config (leaf-keywords-init)
-  ;;     :init
-  ;;     (leaf leaf-convert :straight t)
-  ;;     (leaf hydra :straight t)
-  ;;     (leaf blackout :straight t)
-
-  ;;     (leaf key-chord
-  ;;       :straight t
-  ;;       :hook (emacs-startup-hook . (lambda () (key-chord-mode 1)))
-  ;;       :custom ((key-chord-one-keys-delay . 0.02)
-  ;;                (key-chord-two-keys-delay . 0.03))
-  ;;       :config
-  ;;       (key-chord-define-global "x0" '"\C-x0")
-  ;;       (key-chord-define-global "x1" '"\C-x1")
-  ;;       (key-chord-define-global "x2" '"\C-x2")
-  ;;       (key-chord-define-global "x3" '"\C-x3")
-  ;;       (key-chord-define-global "x5" '"\C-x52"))
-
-  ;;     (leaf straight
-  ;;       :config
-  ;;       )
-  ;;     ))
   )
 
 (leaf *keep-clean
@@ -457,7 +403,7 @@
                                   (bookmarks . 5))))
     :config
     (when window-system
-      (setq dashboard-startup-banner "~/.emacs.d/banner/coffee.png"))
+      (setq dashboard-startup-banner (expand-file-name "~/.emacs.d/banner/coffee.png")))
     (dashboard-setup-startup-hook))
 
   (leaf set-title-bar
@@ -881,7 +827,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
    (dired-recursive-deletes . 'always)
    (delete-by-moving-to-trash . t)
    (dired-dwim-target . t)
-   dired-listing-switches . "-AGhlv --group-directories-first --time-style=long-iso")
+   (dired-listing-switches . "-AGhlv --group-directories-first --time-style=long-iso"))
   )
 
 (leaf crux
@@ -934,6 +880,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
    (git-gutter:deleted . '((t (:background "#ff79c6"))))))
 
 (leaf dap-mode
+  :disabled t
   :when window-system
   :straight t
   ;; :after exec-path-from-shell
@@ -972,103 +919,24 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :when (version<= "28" emacs-version)
   :straight t)
 
-(leaf lsp-mode
-  :disabled t
-  :doc "LSP mode"
-  :req "emacs-25.1" "dash-2.14.1" "dash-functional-2.14.1" "f-0.20.0" "ht-2.0" "spinner-1.7.3" "markdown-mode-2.3" "lv-0"
-  :url "https://github.com/emacs-lsp/lsp-mode"
-  :url "https://github.com/emacs-lsp/lsp-mode#supported-languages"
-  :url "https://github.com/MaskRay/ccls/wiki/lsp-mode#find-definitionsreferences"
-  :emacs>= 25.1
-  :straight t posframe
-  :commands lsp lsp-deferred
-  :hook ((lsp-mode-hook . lsp-enable-which-key-integration)
-         (lsp-managed-mode-hook . lsp-modeline-diagnostics-mode))
-  :custom `((lsp-keymap-prefix . "C-c l")
-            (read-process-output-max . ,(* 1 1024 1024))  ;; 1MB
-            ;; debug
-            (lsp-auto-guess-root . nil)
-            (lsp-headerline-breadcrumb-enable . t)
-            (lsp-log-io . nil)
-            (lsp-trace . nil)
-            (lsp-print-performance . nil)
-            ;; general
-            (lsp-idle-delay . 0.3)
-            (lsp-document-sync-method . 2)
-            (lsp-response-timeout . 5)
-            (lsp-prefer-flymake . nil)
-            (lsp-completion-enable . t)
-            (lsp-enable-indentation . nil)
-            (lsp-restart . 'ignore)
-            (lsp-completion-provider . :none)
-            (lsp-signature-function . 'lsp-signature-posframe))
-  :config
-  (dolist (regexp '("[\\d\\D]*\\.dat\\'"
-                    "[\\d\\D]*\\.pth\\'"
-                    "[\\d\\D]*\\.npy\\'"
-                    "[/\\\\]\\output\\'"))
-    (add-to-list 'lsp-file-watch-ignored-directories regexp)))
-
-
-(leaf lsp-ui
-  :disabled t
-  :doc "UI modules for lsp-mode"
-  :req "emacs-25.1" "dash-2.14" "dash-functional-1.2.0" "lsp-mode-6.0" "markdown-mode-2.3"
-  :url "https://github.com/emacs-lsp/lsp-ui"
-  :straight t
-  :hook (lsp-mode-hook . lsp-ui-mode)
-  :preface
-  (defun ladicle/toggle-lsp-ui-doc ()
-    (interactive)
-    (if lsp-ui-doc-mode
-        (progn
-          (lsp-ui-doc-mode -1)
-          (lsp-ui-doc--hide-frame))
-      (lsp-ui-doc-mode 1)))
-
-  :bind (lsp-mode-map
-         :package lsp-mode
-         ("C-c C-r" . lsp-ui-peek-find-references)
-         ("C-c C-j" . lsp-ui-peek-find-definitions)
-         ("C-c s"   . lsp-ui-sideline-mode)
-         ("C-c d"   . ladicle/toggle-lsp-ui-doc)
-         ("C-c i"   . lsp-ui-doc-focus-frame))
-  :custom (;; lsp-ui-doc
-           (lsp-ui-doc-header . t)
-           (lsp-ui-doc-delay . 2)
-           (lsp-ui-doc-include-signature . t)
-           (lsp-ui-doc-alignment . 'window)
-           (lsp-ui-doc-max-height . 30)
-           (lsp-ui-doc-show-with-mouse . nil)
-           (lsp-ui-doc-show-with-cursor . t)
-           ;; lsp-ui-sideline
-           (lsp-ui-sideline-enable . nil)
-           (lsp-ui-sideline-ignore-duplicate . t)
-           (lsp-ui-sideline-show-symbol . t)
-           (lsp-ui-sideline-show-hover . t)
-           (lsp-ui-sideline-show-diagnostics . nil)
-           (lsp-ui-sideline-show-code-actions . nil)
-           ;; lsp-ui-imenu
-           (lsp-ui-imenu-enable . nil)))
-
-(leaf lsp-latex
-  :disabled t
-  :straight t)
-
 (leaf lsp-bridge
   :straight (lsp-bridge
              :type git
              :host github
              :repo "manateelazycat/lsp-bridge"
              :files (:defaults "*.py" "acm/*" "core/*"))
-  :hook (emacs-startup-hook . global-lsp-bridge-mode)
+  :hook ((hack-local-variables-hook . run-local-vars-mode-hook)
+         (yas-global-mode-hook . global-lsp-bridge-mode))
   :custom `((lsp-bridge-python-command . ,(if (eq window-system 'ns)
                                               "/opt/homebrew/bin/python3"
                                             "/usr/bin/python3"))
             (lsp-bridge-diagnostic-tooltip-border-width . 5)
             (lsp-bridge-lookup-doc-tooltip-border-width . 5)
             (lsp-bridge-user-langserver-dir . ,(expand-file-name "~/.dotfiles/etc/langserver"))
-            (lsp-bridge-user-multiserver-dir . ,(expand-file-name "~/.dotfiles/etc/multiserver")))
+            (lsp-bridge-user-multiserver-dir . ,(expand-file-name "~/.dotfiles/etc/multiserver"))
+            (lsp-bridge-enable-hover-diagnostic . t)
+            (lsp-bridge-python-multi-lsp-server . "pyright_ruff")
+            (acm-enable-tabnine . nil))
   :bind (lsp-bridge-mode-map
          :package lsp-bridge
          ("M-." . lsp-bridge-find-def)
@@ -1078,10 +946,9 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
          ("C-c C-d" . lsp-bridge-popup-documentation)
          ("C-c C-n" . lsp-bridge-diagnostic-jump-next)
          ("C-c C-p" . lsp-bridge-diagnostic-jump-prev)
-         ("C-c l d" . lsp-bridge-diagnostic-list)
+         ("C-c l l" . lsp-bridge-diagnostic-list)
+         ("C-c l c" . lsp-bridge-diagnostic-copy)
          ("C-c l r" . lsp-bridge-rename))
-  :hook ((hack-local-variables-hook . run-local-vars-mode-hook)
-         (yas-global-mode-hook . global-lsp-bridge-mode))
   :preface
   (defun run-local-vars-mode-hook ()
     "Run `major-mode' hook after the local variables have been processed."
@@ -1094,29 +961,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
               (lambda (orig &rest rest)
                 (while (re-search-forward "\\u0000" nil t)
                   (replace-match ""))
-                (apply orig rest)))
-
-  (defun local/lsp-bridge-get-single-lang-server-by-project (project-path filepath)
-    (let* ((json-object-type 'plist)
-           (custom-dir (expand-file-name "lsp-bridge/pyright" no-littering-var-directory))
-           (custom-config (expand-file-name "pyright.json" custom-dir))
-           (default-config (json-read-file (expand-file-name "pyright.json" lsp-bridge-user-langserver-dir)))
-           (settings (plist-get default-config :settings))
-           )
-
-      (plist-put settings :pythonPath (executable-find "python"))
-
-      (make-directory (file-name-directory custom-config) t)
-
-      (with-temp-file custom-config
-        (insert (json-encode default-config)))
-
-      custom-config))
-
-  (add-hook 'python-mode-hook
-            (lambda ()
-              (setq-local lsp-bridge-get-single-lang-server-by-project
-                          'local/lsp-bridge-get-single-lang-server-by-project))))
+                (apply orig rest))))
 
 (leaf helpful
   :straight t
@@ -1133,21 +978,6 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 (leaf lua-mode
   :straight t)
 
-(when-let* ((miniconda-path
-             (my/trim-newline-from-string
-              (shell-command-to-string
-               (format
-                "find %s -maxdepth 1 -type d -name 'miniconda*' | head -n 1"
-                (if (memq window-system '(x pgtk))
-                    "/opt"
-                  "$HOME")
-                ))))
-            (path-to-venv (expand-file-name "envs/venv" miniconda-path)))
-  (setq path-to-miniconda miniconda-path)
-  (setq path-to-venv-python (expand-file-name "bin/python" path-to-venv))
-  (custom-set-variables '(org-babel-python-command path-to-venv-python))
-  )
-
 (leaf python-mode
   :doc "Python major mode"
   :url "https://gitlab.com/groups/python-mode-devs"
@@ -1157,75 +987,13 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
             (python-indent-guess-indent-offset . t)
             (python-indent-guess-indent-offset-verbose . nil)
             (py-python-command . ,(if (executable-find "python3") "python3"
-                                "python"))
-            (python-shell-virtualenv-root . ,(expand-file-name "envs/venv"
-                                                               path-to-miniconda))
-            )
+                                "python")))
   :hook (python-mode-hook . my/python-basic-config)
   :preface
-  (defun my/lsp-python-setup-with-conda ()
-    (setq-local lsp-bridge-python-command
-                (expand-file-name "bin/python"
-                                  python-shell-virtualenv-root))
-    (if (bound-and-true-p lsp-bridge-mode)
-        (lsp-bridge-restart-process)
-      (require 'lsp-bridge)
-      (lsp-bridge-mode))
-    )
-
   (defun my/python-basic-config ()
     (setq indent-tabs-mode nil
           python-indent 4
           tab-width 4)))
-
-(leaf conda
-  :doc "Work with your conda environments"
-  :req "emacs-24.4" "pythonic-0.1.0" "dash-2.13.0" "s-1.11.0" "f-0.18.2"
-  :url "http://github.com/necaris/conda.el"
-  :when (length> path-to-miniconda 0)
-  :straight t
-  :commands conda-env-activate
-  :custom ((conda-anaconda-home . path-to-miniconda)
-           (conda-env-home-directory . path-to-miniconda))
-  :config
-  (conda-env-initialize-eshell)
-  (conda-env-initialize-interactive-shells)
-  :hook
-  ((conda-postactivate-hook . my/lsp-python-setup-with-conda)
-   (conda-postdeactivate-hook . my/lsp-python-setup-with-conda))
-  :preface
-  (defun my/lsp-python-setup-with-conda ()
-    (setq-local lsp-bridge-python-command "/usr/bin/python3"
-                ;; (expand-file-name "bin/python"
-                ;;                   python-shell-virtualenv-root)
-                )
-    (if (bound-and-true-p lsp-bridge-mode)
-        (lsp-bridge-restart-process)
-      (require 'lsp-bridge)
-      (lsp-bridge-mode))
-  )
-)
-
-(leaf lsp-pyright
-  :disabled t
-  :doc "Python LSP client using Pyright"
-  :req "emacs-26.1" "lsp-mode-7.0" "dash-2.18.0" "ht-2.0"
-  :url "https://github.com/emacs-lsp/lsp-pyright"
-  :when (length> path-to-miniconda 0)
-  :straight t
-  :custom
-  `((lsp-pyright-venv-path . ,(expand-file-name "envs"
-                                                path-to-miniconda)))
-  :hook
-  ((conda-postactivate-hook . my/lsp-pyright-setup-when-conda)
-   (conda-postdeactivate-hook . my/lsp-pyright-setup-when-conda))
-  :preface
-  (defun my/lsp-pyright-setup-when-conda ()
-    (setq-local lsp-pyright-venv-path python-shell-virtualenv-root)
-    (if (bound-and-true-p lsp-mode)
-        (lsp-restart-workspace)
-      (require 'lsp-pyright)
-      (lsp))))
 
 (leaf python-isort :straight t)
 
@@ -1370,12 +1138,8 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 (leaf flycheck
   :straight t
   :bind (("C-c C-n" . flycheck-next-error)
-         ("C-c C-p" . flycheck-previous-error)
-         (:python-mode-map
-          :package python-mode
-          ("C-c C-n" . flycheck-next-error)
-          ("C-c C-p" . flycheck-previous-error)))
-  :hook ((python-mode-hook typescript-mode-hook) . flycheck-mode)
+         ("C-c C-p" . flycheck-previous-error))
+  :hook (typescript-mode-hook . flycheck-mode)
   :custom ((flycheck-display-errors-delay . 1))
   :config
   (leaf flycheck-pos-tip
@@ -1383,7 +1147,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
     :custom (flycheck-pos-tip-timeout . 10)
     :config
     (flycheck-pos-tip-mode))
-  
+
   (leaf flycheck-inline
     :disabled t
     :straight t
@@ -2023,11 +1787,11 @@ respectively."
   ;; :preview-key on a per-command basis using the `consult-customize' macro.
   (consult-customize
    consult-theme
-   :preview-key '(:debounce 0.4 any)
+   :preview-key (list :debounce 0.4 'any)
    consult-ripgrep consult-git-grep consult-grep
    consult-bookmark consult-recent-file consult-xref
    consult--source-recent-file consult--source-project-recent-file consult--source-bookmark
-   :preview-key "M-."
+   ;; :preview-key "M-."
    )
 
   (leaf consult-dir
@@ -2043,12 +1807,6 @@ respectively."
     :straight t
     :bind (("C-s-f" . consult-ghq-find)
            ("C-s-g" . consult-ghq-grep)))
-
-  (leaf consult-lsp
-    :after lsp-mode
-    :straight t
-    :bind (lsp-mode-map
-           ([remap xref-find-apropos] . consult-lsp-symbols)))
 
   (leaf consult-tramp
     :straight (consult-tramp
@@ -2111,7 +1869,10 @@ parses its input."
 
   (leaf migemo
     :when (executable-find "cmigemo")
-    :straight t
+    :straight (migemo
+               :type git
+               :host github
+               :repo "emacs-jp/migemo")
     :require t
     :custom
     `((migemo-user-dictionary  . nil)
@@ -3096,9 +2857,9 @@ parses its input."
             (mapconcat 'identity latex-options " ")))
       (concat "latexmk -gg " options " "
               (cl-case latex
-                ('euptex "-pdfdvi -latex='uplatex "))
+                (euptex "-pdfdvi -latex='uplatex "))
               (cl-case latex
-                ('luatex luatex-option)
+                (luatex luatex-option)
                 (t latex-option))
               "' "
               (if output (concat "-output-directory=" output " "))
