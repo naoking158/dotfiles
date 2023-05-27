@@ -27,7 +27,6 @@
 (setq debug-on-error nil
       init-file-debug t
       user-full-name "Naoki Sakamoto"
-      user-mail-address "naoki@bbo.cs.tsukuba.ac.jp"
       user-login-name "naoking158"
       package-enable-at-startup nil
       package-native-compile t)
