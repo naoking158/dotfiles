@@ -14,12 +14,6 @@ fi
 
 typeset -U path cdpath fpath manpath
 
-# for profile in ${(z)NIX_PROFILES}; do
-#   fpath+=($profile/share/zsh/site-functions $profile/share/zsh/$ZSH_VERSION/functions $profile/share/zsh/vendor-completions)
-# done
-
-# HELPDIR="/nix/store/q7bjpj8q0jx429nna2zpnzw5z8k946q5-zsh-5.8/share/zsh/$ZSH_VERSION/help"
-
 # Use emacs keymap as the default.
 bindkey -e
 
@@ -178,43 +172,6 @@ function magit() {
   (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1) (magit-status \"$git_root\"))"
 }
 
-# nix home-manager functions
-# function home-update () {
-#     case "$SYSTEM" in
-#         "macos" ) home-manager switch -f $XDG_CONFIG_HOME/nixpkgs/macos.nix ;;
-#         * ) home-manager switch -f $XDG_CONFIG_HOME/nixpkgs/linux.nix ;;
-#     esac
-#  }
-
-#  function home-package () {
-#      if [[ $# = 0 ]]; then
-#         home-manager packages
-#     else
-#         home-manager packages | grep $@
-#     fi
-# }
-
-
-
-
-# Oh-My-Zsh/Prezto calls compinit during initialization,
-# calling it twice causes slight start up slowdown
-# as all $fpath entries will be traversed again.
-
-
-
-
-
-
-# Environment variables
-# . "/Users/naoki/.nix-profile/etc/profile.d/hm-session-vars.sh"
-
-
-
-
-
-
-
 
 # History options should be set in .zshrc and after oh-my-zsh sourcing.
 # See https://github.com/nix-community/home-manager/issues/177.
@@ -340,5 +297,3 @@ alias -g G='| grep'
 
 # To customize prompt, run `p10k configure` or edit ~/.config/zsh/.p10k.zsh.
 [[ ! -f ~/.config/zsh/.p10k.zsh ]] || source ~/.config/zsh/.p10k.zsh
-
-eval "$(direnv hook zsh)"
