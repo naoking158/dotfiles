@@ -1,14 +1,16 @@
 # Set global environment variables
 [[ -f "${HOME}/.profile" ]] && source "${HOME}/.profile"
 
-if type brew &>/dev/null
-then
+if type brew &>/dev/null; then
   FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 
   autoload -Uz compinit && compinit
 
   autoload -U bashcompinit && bashcompinit
-  source $(brew --prefix)/etc/bash_completion.d/az
+
+  if [[ -e $(brew --prefix)/etc/bash_completion.d/az ]]; then
+      source $(brew --prefix)/etc/bash_completion.d/az
+  fi
 fi
 
 
