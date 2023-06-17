@@ -1349,6 +1349,13 @@ Only in Neotree Buffer:
 )
 
 #+end_src
+*** Forge
+
+#+begin_src emacs-lisp
+(leaf forge
+  :after magit
+  :straight t)
+#+end_src
 
 *** Git Gutter
 :PROPERTIES:

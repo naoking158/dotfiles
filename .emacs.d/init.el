@@ -865,6 +865,10 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
     :hook (magit-log-mode-hook . emoji-cheat-sheet-plus-display-mode))
 )
 
+(leaf forge
+  :after magit
+  :straight t)
+
 (leaf git-gutter
   :doc "Port of Sublime Text plugin GitGutter"
   :req "emacs-24.3"
