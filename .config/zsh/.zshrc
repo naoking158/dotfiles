@@ -167,13 +167,6 @@ function peco-cdr () {
 zle -N peco-cdr
 bindkey '^[^R' peco-cdr
 
-function magit() {
-    local git_root=$(git rev-parse --show-toplevel)
-    emacsclient --eval "
-(progn
-  (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1) (magit-status \"$git_root\"))"
-}
-
 
 # History options should be set in .zshrc and after oh-my-zsh sourcing.
 # See https://github.com/nix-community/home-manager/issues/177.

@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+
+set -Ceu
+
+git_root=$(git rev-parse --show-toplevel)
+
+TERM=xterm-direct emacs -q -nw --eval "
+(progn
+  (add-to-list 'load-path (locate-user-emacs-file \"straight/build/dash\"))
+  (add-to-list 'load-path (locate-user-emacs-file \"straight/build/compat\"))
+  (add-to-list 'load-path (locate-user-emacs-file \"straight/build/transient\"))
+  (add-to-list 'load-path (locate-user-emacs-file \"straight/build/transient-dwim\"))
+  (add-to-list 'load-path (locate-user-emacs-file \"straight/build/with-editor\"))
+  (add-to-list 'load-path (locate-user-emacs-file \"straight/build/git-commit\"))
+  (add-to-list 'load-path (locate-user-emacs-file \"straight/build/magit\"))
+  (add-to-list 'load-path (locate-user-emacs-file \"straight/build/magit-section\"))
+  (add-to-list 'load-path (locate-user-emacs-file \"straight/build/modus-themes\"))
+  (require 'modus-themes)
+  (load-theme 'modus-vivendi-tinted :no-confirm)
+
+  (require 'magit)
+  (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1) (magit-status \"${git_root}\"))"
