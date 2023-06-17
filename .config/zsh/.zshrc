@@ -191,23 +191,10 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/Users/sakamoto/miniconda/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/Users/sakamoto/miniconda/etc/profile.d/conda.sh" ]; then
-        source /Users/sakamoto/miniconda/etc/profile.d/conda.sh
-    elif [ -f /opt/miniconda3/etc/profile.d/conda.sh ]; then
-        source /opt/miniconda3/etc/profile.d/conda.sh
-    else
-        export PATH="/Users/sakamoto/miniconda/bin:$PATH"
-    fi
+# rye
+if [[ -e "$HOME/.rye/env" ]]; then
+    source "$HOME/.rye/env"
 fi
-unset __conda_setup
-# <<< conda initialize <<<
-
 
 # Aliases
 alias ..='cd ..'
@@ -278,8 +265,8 @@ alias push4='ssh vm4 "rm -rf ~/work/VMOperateTool" && myrsync -u vm4 ~/src/githu
 # alias xargs='gxargs'
 
 
-dev_vm="vm5"
-dev_pkg="SeminarSetup"
+dev_vm="vm4"
+dev_pkg="VMOperateTool"
 alias dpull='ssh ${dev_vm} "bash ~/work/${dev_pkg}/utils/download.sh" && myrsync -d ${dev_vm} ~/work/${dev_pkg}/ ~/src/github.com/fixpoint/${dev_pkg}/'
 alias dpush='ssh ${dev_vm} "rm -rf ~/work/${dev_pkg}" && myrsync -u ${dev_vm} ~/src/github.com/fixpoint/${dev_pkg}/ ~/work/${dev_pkg}/'
 

@@ -1921,15 +1921,14 @@ parses its input."
              :host github
              :repo "jojojames/fussy")
   :advice (:before corfu--capf-wrapper fussy-wipe-cache)
-  :custom ((completion-styles . '(fussy))
-           (completion-category-defaults . nil)
-           ;; (completion-category-overrides . nil)
+  :custom ((completion-category-defaults . nil)
+           (completion-category-overrides . nil)
            (fussy-max-candidate-limit . 10000)
            (fussy-default-regex-fn . 'fussy-pattern-first-letter)
            (fussy-prefer-prefix . nil)
            (fussy-filter-fn . 'fussy-filter-orderless-flex)
            (fussy-use-cache . t))
-
+  :config (push 'fussy completion-styles)
   :init
   (leaf fuz
     :require t
@@ -3614,8 +3613,15 @@ Interactively, URL defaults to the string looking like a url around point."
 ;;   :hook (emacs-startup-hook . direnv-mode))
 
 (leaf poetry
+  :disabled t
   :straight t
   :hook (emacs-startup-hook . poetry-tracking-mode))
+
+(leaf pyvenv
+  :straight (pyvenv
+             :type git
+             :host github
+             :repo "jorgenschaefer/pyvenv"))
 
 (leaf openapi-preview
   :straight (openapi-preview

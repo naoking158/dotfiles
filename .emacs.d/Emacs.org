@@ -120,6 +120,8 @@ a bunch of resources I've found online.
   - [[#prettier][Prettier]]
   - [[#direnv][Direnv]]
   - [[#poetry][Poetry]]
+  - [[#pyvenv][Pyvenv]]
+  - [[#openapi-preview][OpenAPI Preview]]
 - [[#footer][Footer]]
 :END:
 
@@ -270,6 +272,8 @@ By setting ~exec-profile~ to ~t~, profiling startup time is executed.
   (add-hook 'emacs-startup-hook #'efs/display-startup-time))
 
 #+end_src
+
+#+RESULTS:
 
 * Package Management
 :PROPERTIES:
@@ -2857,15 +2861,14 @@ parses its input."
              :host github
              :repo "jojojames/fussy")
   :advice (:before corfu--capf-wrapper fussy-wipe-cache)
-  :custom ((completion-styles . '(fussy))
-           (completion-category-defaults . nil)
-           ;; (completion-category-overrides . nil)
+  :custom ((completion-category-defaults . nil)
+           (completion-category-overrides . nil)
            (fussy-max-candidate-limit . 10000)
            (fussy-default-regex-fn . 'fussy-pattern-first-letter)
            (fussy-prefer-prefix . nil)
            (fussy-filter-fn . 'fussy-filter-orderless-flex)
            (fussy-use-cache . t))
-
+  :config (push 'fussy completion-styles)
   :init
   (leaf fuz
     :require t
@@ -5123,8 +5126,19 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 
 #+begin_src emacs-lisp
 (leaf poetry
+  :disabled t
   :straight t
   :hook (emacs-startup-hook . poetry-tracking-mode))
+#+end_src
+
+** Pyvenv
+
+#+begin_src emacs-lisp
+(leaf pyvenv
+  :straight (pyvenv
+             :type git
+             :host github
+             :repo "jorgenschaefer/pyvenv"))
 #+end_src
 
 ** OpenAPI Preview
