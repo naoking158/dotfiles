@@ -1727,7 +1727,7 @@ respectively."
   :config
   (defun affe-orderless-regexp-compiler (input _type _ignorecase)
     (setq input (orderless-pattern-compiler input))
-    (cons input (lambda (str) (orderless--highlight input str))))
+    (cons input (apply-partially #'orderless--highlight input)))
   (setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
   (consult-customize affe-grep :preview-key (kbd "M-.")))
 
@@ -1828,49 +1828,9 @@ respectively."
 (leaf orderless
   :straight t
   :commands (orderless-filter)
+  :custom ((completion-category-overrides . ((command (styles orderless-default-style))
+                                             (consult-multi (styles orderless-default-style)))))
   :config
-  (setq my--orderless-default-styles
-        '(orderless-prefixes
-          orderless-initialism
-          orderless-regexp))
-
-  (defun my--orderless-literal-dispatcher (pattern _index _total)
-    "Literal style dispatcher using the equals sign as a suffix.
-It matches PATTERN _INDEX and _TOTAL according to how Orderless
-parses its input."
-    (when (string-suffix-p "=" pattern)
-      `(orderless-literal . ,(substring pattern 0 -1))))
-
-  (defun my--orderless-initialism-dispatcher (pattern _index _total)
-    "Leading initialism  dispatcher using the comma suffix.
-It matches PATTERN _INDEX and _TOTAL according to how Orderless
-parses its input."
-    (when (string-suffix-p "," pattern)
-      `(orderless-initialism . ,(substring pattern 0 -1))))
-
-  (defun my--orderless-flex-dispatcher (pattern _index _total)
-    "Flex  dispatcher using the tilde suffix.
-It matches PATTERN _INDEX and _TOTAL according to how Orderless
-parses its input."
-    (when (string-suffix-p "~" pattern)
-      `(orderless-flex . ,(substring pattern 0 -1))))
-
-  (setq orderless-matching-styles my--orderless-default-styles)
-  (setq orderless-style-dispatchers '(my--orderless-literal-dispatcher
-                                      my--orderless-initialism-dispatcher
-                                      my--orderless-flex-dispatcher))
-
-  (orderless-define-completion-style
-      orderless-default-style
-    (orderless-matching-styles '(orderless-literal
-                                 orderless-prefixes
-                                 orderless-initialism
-                                 orderless-regexp)))
-
-  (setq completion-category-overrides
-        '((command (styles orderless-default-style))
-          (consult-multi (styles orderless-default-style))))
-
   (leaf migemo
     :when (executable-find "cmigemo")
     :straight (migemo
@@ -1900,10 +1860,8 @@ parses its input."
 
       (orderless-define-completion-style
           orderless-migemo-style
-        (orderless-matching-styles '(orderless-literal
-                                     orderless-prefixes
-                                     orderless-initialism
-                                     orderless-regexp
+        (orderless-matching-styles '(orderless-regexp
+                                     orderless-flex
                                      orderless-migemo)))
 
       (dolist (elm '((file (styles orderless-migemo-style))
@@ -1919,32 +1877,43 @@ parses its input."
 )
 
 (leaf fussy
-  :leaf-defer nil
-  :straight (fussy
-             :type git
-             :host github
-             :repo "jojojames/fussy")
-  :advice (:before corfu--capf-wrapper fussy-wipe-cache)
+  :straight t
   :custom ((completion-category-defaults . nil)
            (completion-category-overrides . nil)
-           (fussy-max-candidate-limit . 10000)
-           (fussy-default-regex-fn . 'fussy-pattern-first-letter)
-           (fussy-prefer-prefix . nil)
            (fussy-filter-fn . 'fussy-filter-orderless-flex)
-           (fussy-use-cache . t))
+           (fussy-score-fn . 'fussy-fuz-score))
   :config (push 'fussy completion-styles)
   :init
   (leaf fuz
+    :straight (fuz :type git :host github :repo "rustify-emacs/fuz.el")
     :require t
-    :straight (fuz
-               :type git
-               :host github
-               :repo "rustify-emacs/fuz.el")
     :config
     (setq fussy-score-fn 'fussy-fuz-score)
     (unless (require 'fuz-core nil t)
-      (fuz-build-and-load-dymod)))
-  )
+      (fuz-build-and-load-dymod))))
+
+;; (leaf flx-rs
+;;   :straight
+;;   (flx-rs
+;;    :repo "jcs-elpa/flx-rs"
+;;    :fetcher github
+;;    :files (:defaults "bin"))
+;;   :config
+;;   (setq fussy-score-fn 'flx-rs-score)
+;;   (flx-rs-load-dyn))
+
+;; (leaf fussy
+;;   :straight t
+;;   :config
+;;   (push 'fussy completion-styles)
+;;   (setq
+;;    ;; For example, project-find-file uses 'project-files which uses
+;;    ;; substring completion by default. Set to nil to make sure it's using
+;;    ;; flx.
+;;    completion-category-defaults nil
+;;    completion-category-overrides nil
+;;    fussy-score-fn 'fussy-fuz-bin-score
+;;    ))
 
 (leaf marginalia
   :straight t
