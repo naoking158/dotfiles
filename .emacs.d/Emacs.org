@@ -1878,64 +1878,12 @@ Only in Neotree Buffer:
 :ID:       2B53130F-3718-4EE5-9CF1-1E8C33996939
 :END:
 
-**** Prepare for M1 Mac
-
-https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/88#issuecomment-849338234
-
-To avoid installing x86_64 version, The following steps should be required.
-
-1. Clone [[https://github.com/tree-sitter/tree-sitter.git][tree-sitter]]
-
-   #+begin_src shell
-   cd cli && cargo install --path .
-   #+end_src
-
-2. Clone [[https://github.com/emacs-tree-sitter/elisp-tree-sitter][emacs-tree-sitter]]
-
-   #+begin_src shell
-   # get tree-sitter v0.19.5 - last to put files in a reasonable place
-   sh -c "test -d rust-tree-sitter || git clone https://github.com/tree-sitter/tree-sitter rust-tree-sitter; cd rust-tree-sitter && git fetch && git checkout v0.19.5"
-   sh -c "cd rust-tree-sitter/cli && cargo install --path ."
-
-   sh -c "file core/tsc-dyn.dylib | grep -q arm64 || rm -f core/tsc-dyn.dylib"
-   sh -c "grep -q LOCAL core/DYN-VERSION || printf LOCAL >core/DYN-VERSION"
-   sh -c "grep -q DYN-VERSION bin/build && sed -e '/DYN-VERSION/d' bin/build >bin/build.tmp && mv bin/build.tmp bin/build && chmod +x bin/build || :"
-   sh -c "EMACS=emacs ./bin/setup && EMACS=emacs ./bin/build"
-
-   # ensure all language definitions
-   find langs/repos -type f -name grammar.js -not -path '*/node_modules/*' -not -path '*/ocaml/interface/*' -exec sh -c 'targets=; for grammar_file in "$@"; do grammar_dir="${grammar_file%/*}"; targets="$targets ensure/${grammar_dir##*/}"; done; EMACS=emacs make -j7 $targets' sh {} +
-   #+end_src
-
-**** Configurations
-:PROPERTIES:
-:ID:       A58AD346-E923-4E20-BAAA-02B4E1A03A0D
-:END:
 
 #+begin_src emacs-lisp
-(leaf tree-sitter
-  :straight t tree-sitter-langs
-  :hook (tree-sitter-after-on-hook . tree-sitter-hl-mode)
-  :global-minor-mode global-tree-sitter-mode
-  :config
-  (add-to-list 'tree-sitter-major-mode-language-alist '(typescript-tsx-mode . tsx))
-  (tree-sitter-hl-add-patterns 'tsx
-    [
-     ;; styled.div``
-     (call_expression
-      function: (member_expression
-                 object: (identifier) @function.call
-                 (.eq? @function.call "styled"))
-      arguments: ((template_string) @property.definition
-                  (.offset! @property.definition 0 1 0 -1)))
-     ;; styled(Component)``
-     (call_expression
-      function: (call_expression
-                 function: (identifier) @function.call
-                 (.eq? @function.call "styled"))
-      arguments: ((template_string) @property.definition
-                  (.offset! @property.definition 0 1 0 -1)))
-     ])
-)
+(leaf treesit-auto
+  :straight t
+  :global-minor-mode global-treesit-auto-mode
+  :custom (treesit-auto-install . t))
 #+end_src
 
 *** Showing Pair of Brackets with Paren
