@@ -28,7 +28,6 @@ set -Ceu
 PATCH_URL=(
     "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-28/fix-window-role.patch"
     "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-28/system-appearance.patch"
-    "https://raw.githubusercontent.com/TheVaffel/emacs/master/emacs_background_transparency.patch"
 )
 
 function e_error() {
@@ -247,7 +246,6 @@ function build() {
             "--with-imagemagick"
             "--with-xml2"
 	          "--with-xwidgets"
-            "--with-cairo"
 	          "--prefix=${PREFIX}"
         )
     elif is_manjaro; then
@@ -257,8 +255,8 @@ function build() {
             "--with-native-compilation=aot"
             "--with-xwidgets"
             "--with-pgtk"
-	    "--without-x"
-	    "--with-libxml2=/usr/bin/xml2-config"
+	          "--without-x"
+	          "--with-libxml2=/usr/bin/xml2-config"
             "--prefix=${PREFIX}"
         )
     fi
