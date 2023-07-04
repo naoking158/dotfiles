@@ -2852,6 +2852,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
          ("RET"   . vertico-directory-enter)))
 
 (leaf vertico-posframe
+  :disabled t
   :straight t
   :after vertico
   :when (display-graphic-p)

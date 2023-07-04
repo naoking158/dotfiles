@@ -1924,6 +1924,7 @@ respectively."
          ("RET"   . vertico-directory-enter)))
 
 (leaf vertico-posframe
+  :disabled t
   :straight t
   :after vertico
   :when (display-graphic-p)
