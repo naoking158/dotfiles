@@ -54,6 +54,7 @@
 (package-initialize)
 
 (defun init-skk nil
+  (add-to-list 'load-path "~/.emacs.d/straight/build/ddskk/")
   (require 'skk)
 
   (setq default-input-method "japanese-skk"
