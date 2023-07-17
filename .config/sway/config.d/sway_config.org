@@ -87,7 +87,7 @@ include $colorscheme
 ** Display
 
 #+begin_src conf
-output DP-3 pos 0 1440 res 3840x1600
+output DP-1 pos 0 1440 res 3840x1600
 output HDMI-A-1 pos 200 0 res 3440x1440
 #+end_src
 
