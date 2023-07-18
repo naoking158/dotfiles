@@ -965,7 +965,11 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
               (lambda (orig &rest rest)
                 (while (re-search-forward "\\u0000" nil t)
                   (replace-match ""))
-                (apply orig rest))))
+                (apply orig rest)))
+
+  (add-to-list 'lsp-bridge-single-lang-server-mode-list '(svelte-mode . "svelte"))
+  (add-to-list 'lsp-bridge-default-mode-hooks 'svelte-mode-hook)
+)
 
 (leaf helpful
   :straight t
@@ -3582,5 +3586,8 @@ Interactively, URL defaults to the string looking like a url around point."
              :type git
              :host github
              :repo "merrickluo/openapi-preview"))
+
+(leaf svelte-mode
+  :straight t)
 
 (provide 'init)
