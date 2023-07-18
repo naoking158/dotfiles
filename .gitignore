@@ -38,6 +38,8 @@
 !/.config/cron/**
 !/.config/fish/
 !/.config/fish/*.fish
+!/.config/fontconfig/
+!/.config/fontconfig/**
 !/.config/git/
 !/.config/git/**
 !/.config/libskk/
