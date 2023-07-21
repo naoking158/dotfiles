@@ -4113,12 +4113,11 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 #+begin_src emacs-lisp
 
 (leaf *org-image-size-adjuster
-  :advice
-  (:before
-   org-toggle-inline-images
-   (lambda (&rest args)
-     (setq-local org-image-actual-width
-                 (truncate (* 0.8 (window-text-width nil t))))))
+  :advice (:before
+           org-toggle-inline-images
+           (lambda (&rest args)
+             (setq-local org-image-actual-width
+                         (truncate (* 0.8 (window-text-width nil t))))))
   )
 
 #+end_src

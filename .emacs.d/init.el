@@ -2976,12 +2976,11 @@ respectively."
       (org-display-inline-images))))
 
 (leaf *org-image-size-adjuster
-  :advice
-  (:before
-   org-toggle-inline-images
-   (lambda (&rest args)
-     (setq-local org-image-actual-width
-                 (truncate (* 0.8 (window-text-width nil t))))))
+  :advice (:before
+           org-toggle-inline-images
+           (lambda (&rest args)
+             (setq-local org-image-actual-width
+                         (truncate (* 0.8 (window-text-width nil t))))))
   )
 
 (leaf org-appear
