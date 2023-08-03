@@ -61,7 +61,6 @@ a bunch of resources I've found online.
 - [[#completion-system][Completion System]]
   - [[#duplicate-line-or-selected-regions-with-duplicate-thing][Duplicate line or selected regions with Duplicate-thing]]
   - [[#multiple-cursors][Multiple cursors]]
-  - [[#asynchronous-fuzzy-finder-with-affe][Asynchronous Fuzzy Finder with Affe]]
   - [[#completion-actions-with-embark][Completion Actions with Embark]]
   - [[#consult-commands][Consult Commands]]
   - [[#improved-candidate-filtering-with-orderless][Improved Candidate Filtering with Orderless]]
@@ -2571,30 +2570,6 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 
 #+end_src
 
-** Asynchronous Fuzzy Finder with Affe
-:PROPERTIES:
-:ID:       CC2220A9-9320-432B-B839-A3125E03ACDB
-:END:
-
-#+begin_src emacs-lisp
-
-(leaf affe
-  :straight t
-  :after orderless
-  :bind (("C-c C-g" . affe-grep)
-         ("C-c C-f" . affe-find))
-  :custom
-  ;; Use Orderless
-  ((affe-find-command . "fd --color=never --full-path --no-ignore --hidden --exclude \".git\"")
-   (affe-grep-command . "rg --null --color=never --max-columns=1000 --no-heading --no-ignore --hidden --smart-case --line-number -v ^$ --glob=\"!.git\" ."))
-  :config
-  (defun affe-orderless-regexp-compiler (input _type _ignorecase)
-    (setq input (orderless-pattern-compiler input))
-    (cons input (apply-partially #'orderless--highlight input)))
-  (setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
-  (consult-customize affe-grep :preview-key (kbd "M-.")))
-
-#+end_src
 
 ** Completion Actions with Embark
 :PROPERTIES:
