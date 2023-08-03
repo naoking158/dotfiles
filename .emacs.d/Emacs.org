@@ -2623,9 +2623,9 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
    ([remap org-open-at-point] . consult-outline)
    ("C-c s" . my-consult-line)
    ("C-M-r" . consult-recent-file)
-   ("C-x C-o" . consult-file-externally)
    ("C-S-s" . consult-imenu)
-   ;; ("C-c C-g" . consult-grep)
+   ("C-c g" . consult-ripgrep)
+   ("C-c f" . consult-find)
    ("C-c C-j" . consult-mark))
   :preface
   (defun my-consult-line (&optional at-point)
