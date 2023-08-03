@@ -1699,22 +1699,6 @@ respectively."
       (4 (mc/mark-all-dwim nil))
       (1 (mark-sexp 1)))))
 
-(leaf affe
-  :straight t
-  :after orderless
-  :bind (("C-c C-g" . affe-grep)
-         ("C-c C-f" . affe-find))
-  :custom
-  ;; Use Orderless
-  ((affe-find-command . "fd --color=never --full-path --no-ignore --hidden --exclude \".git\"")
-   (affe-grep-command . "rg --null --color=never --max-columns=1000 --no-heading --no-ignore --hidden --smart-case --line-number -v ^$ --glob=\"!.git\" ."))
-  :config
-  (defun affe-orderless-regexp-compiler (input _type _ignorecase)
-    (setq input (orderless-pattern-compiler input))
-    (cons input (apply-partially #'orderless--highlight input)))
-  (setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
-  (consult-customize affe-grep :preview-key (kbd "M-.")))
-
 (leaf embark
   :straight t embark-consult
   :bind (("C-," . embark-act)
@@ -1751,9 +1735,9 @@ respectively."
    ([remap org-open-at-point] . consult-outline)
    ("C-c s" . my-consult-line)
    ("C-M-r" . consult-recent-file)
-   ("C-x C-o" . consult-file-externally)
    ("C-S-s" . consult-imenu)
-   ;; ("C-c C-g" . consult-grep)
+   ("C-c g" . consult-ripgrep)
+   ("C-c f" . consult-find)
    ("C-c C-j" . consult-mark))
   :preface
   (defun my-consult-line (&optional at-point)
@@ -1805,9 +1789,6 @@ respectively."
              (consult-tramp-method . "ssh"))
     :commands consult-tramp)
   )
-
-(leaf consult-ls-git
-  :straight t)
 
 (leaf orderless
   :straight t
