@@ -2290,9 +2290,6 @@ respectively."
    (org-fontify-quote-and-verse-blocks . t)
    (org-hide-block-startup . nil)
    (org-startup-folded . 'content)
-
-   ;; (org-adapt-indentation . t)
-   ;; (org-indent-indentation-per-level . 2)
    (org-edit-src-content-indentation . 0)
    (org-startup-indented . t)
 
@@ -2327,6 +2324,7 @@ respectively."
                                      ("ts" . "src typescript")
                                      ("d" . "definition")
                                      ("t" . "theorem")
+                                     ("m" . "src mermaid :exports none :file ")
                                      ("mc" . "quoting")
                                      ("mq" . "question")
                                      ("mt" . "todo")
@@ -2348,7 +2346,6 @@ respectively."
 
   :config
   (require 'org-tempo)   ;; need for org-template
-  (require 'org-indent)  ;; Make sure org-indent face is available
 
   (leaf org-fragtog
     :straight t
@@ -2382,7 +2379,6 @@ respectively."
     (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
     (set-face-attribute 'org-formula nil :inherit 'fixed-pitch)
     (set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-indent t :inherit '(org-hide fixed-pitch))
     (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
     (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
     (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
@@ -2680,10 +2676,11 @@ respectively."
   :custom-face
   (org-modern-label . '((t :height 0.9 :inherit t)))
   :custom
-  ((org-modern-star . ["◉" "●" "○" "◇" "★" "✸" " "])
+  ((org-modern-star . ["◉" "○" "◈" "◇" "✳" "★" "✸"])
    (org-modern-list . '((?+ . "➤")
-                        (?* . "-")
-                        (?- . "•")))))
+                        (?* . "•")
+                        (?- . "-")))
+   (org-modern-hide-stars . 'leading)))
 
 (leaf org-download
   :straight t
