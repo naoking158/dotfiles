@@ -3705,10 +3705,11 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   :custom-face
   (org-modern-label . '((t :height 0.9 :inherit t)))
   :custom
-  ((org-modern-star . ["◉" "●" "○" "◇" "★" "✸" " "])
+  ((org-modern-star . ["◉" "○" "◈" "◇" "✳" "★" "✸"])
    (org-modern-list . '((?+ . "➤")
-                        (?* . "-")
-                        (?- . "•")))))
+                        (?* . "•")
+                        (?- . "-")))
+   (org-modern-hide-stars . 'leading)))
 #+end_src
 
 ** Org-download
