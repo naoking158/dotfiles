@@ -3334,6 +3334,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                                      ("ts" . "src typescript")
                                      ("d" . "definition")
                                      ("t" . "theorem")
+                                     ("m" . "src mermaid :exports none :file ")
                                      ("mc" . "quoting")
                                      ("mq" . "question")
                                      ("mt" . "todo")
