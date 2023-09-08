@@ -692,6 +692,9 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 #+end_src
 
 ** Presentation
+:PROPERTIES:
+:ID:       3bb0f0a8-f998-4792-b2c8-48557098b646
+:END:
 
 #+begin_src emacs-lisp
 
@@ -707,6 +710,9 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 #+end_src
 
 ** Bibtex Indent
+:PROPERTIES:
+:ID:       bbea9dd8-5f37-4458-a617-18c241a51c05
+:END:
 
 #+begin_src emacs-lisp
 
@@ -794,13 +800,13 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
   (defun my/change-transparency (&optional num)
     "Sets the transparency of the frame window. 0=transparent/100=opaque"
     (interactive (list
-                  (read-number "Transparency Value 0 - 100 opaque: " 85)))
+                  (read-number "Transparency Value 0 - 100 opaque: " 95)))
     (set-frame-parameter nil 'alpha-background num)
     (add-to-list 'default-frame-alist
                  `(alpha-background . ,num)))
 
   :config
-  (my/change-transparency 85))
+  (my/change-transparency 95))
 #+end_src
 
 ** Font Configuration
@@ -942,8 +948,7 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
       ;; Load choiced theme
       (pcase sym-theme
         ('modus-dark (load-theme 'modus-vivendi-tinted :no-confirm))
-        ('modus-light (load-theme 'modus-operandi :no-confirm)))
-      (my--init-tab-bar)))
+        ('modus-light (load-theme 'modus-operandi :no-confirm)))))
 
   (leaf bespoke-themes
     :straight (bespoke-themes
@@ -967,10 +972,8 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
        `user
        `(org-agenda-clocking ((t :foreground ,bespoke-salient)))
        `(org-agenda-done ((t :foreground ,bespoke-faded :strike-through nil))))
-      
-      (my/set-org-face)
 
-      (my--init-tab-bar)
+      (my/set-org-face)
       (set-face-attribute 'tab-bar nil
                           :background bespoke-modeline
                           :foreground bespoke-foreground
@@ -1023,6 +1026,9 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
 #+end_src
 
 ** Modeline Configuration
+:PROPERTIES:
+:ID:       5e265cf7-e8c3-4018-91a1-43701bad7305
+:END:
 
 #+begin_src emacs-lisp
 
@@ -1139,6 +1145,9 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 
 * Keyboard Bindings
 ** Modal Editing with Meow
+:PROPERTIES:
+:ID:       3bf18ebf-fc47-49b8-80aa-6738bec52aa9
+:END:
 
 
 #+begin_src emacs-lisp
@@ -1350,6 +1359,9 @@ Only in Neotree Buffer:
 
 #+end_src
 *** Forge
+:PROPERTIES:
+:ID:       8841b57d-e251-418b-9bad-97b1d36430ee
+:END:
 
 #+begin_src emacs-lisp
 (leaf forge
@@ -1381,7 +1393,19 @@ Only in Neotree Buffer:
 #+end_src
 
 
+*** Magit-delta
+:PROPERTIES:
+:ID:       e51f8781-8c1c-4f34-9974-dfe593cfc3d7
+:END:
+
+#+begin_src emacs-lisp
+(leaf magit-delta
+  :straight t)
+#+end_src
 ** Debugger with Dap Mode
+:PROPERTIES:
+:ID:       bfff3e15-0f68-4e8a-95c0-effa1fc17730
+:END:
 
 #+begin_src emacs-lisp
 (leaf dap-mode
@@ -1464,19 +1488,21 @@ Only in Neotree Buffer:
              :type git
              :host github
              :repo "manateelazycat/lsp-bridge"
-             :files (:defaults "*.py" "acm/*" "core/*"))
+             :files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
+             :build (:not compile))
   :hook ((hack-local-variables-hook . run-local-vars-mode-hook)
          (yas-global-mode-hook . global-lsp-bridge-mode))
   :custom `((lsp-bridge-python-command . ,(if (eq window-system 'ns)
                                               "/opt/homebrew/bin/python3"
-                                            "/usr/bin/python3"))
-            (lsp-bridge-diagnostic-tooltip-border-width . 5)
-            (lsp-bridge-lookup-doc-tooltip-border-width . 5)
-            (lsp-bridge-user-langserver-dir . ,(expand-file-name "~/.dotfiles/etc/langserver"))
-            (lsp-bridge-user-multiserver-dir . ,(expand-file-name "~/.dotfiles/etc/multiserver"))
+                                            (expand-file-name "~/.dotfiles/etc/lsp-bridge-env/.venv/bin/python3")))
+            (lsp-bridge-enable-completion-in-minibuffer . t)
+            (lsp-bridge-signature-show-function . 'message)
+            ;; (lsp-bridge-user-langserver-dir . ,(expand-file-name "~/.dotfiles/etc/langserver"))
+            ;; (lsp-bridge-user-multiserver-dir . ,(expand-file-name "~/.dotfiles/etc/multiserver"))
             (lsp-bridge-enable-hover-diagnostic . t)
             (lsp-bridge-python-multi-lsp-server . "pyright_ruff")
-            (acm-enable-tabnine . nil))
+            (acm-enable-tabnine . nil)
+            (acm-enable-codeium . t))
   :bind (lsp-bridge-mode-map
          :package lsp-bridge
          ("M-." . lsp-bridge-find-def)
@@ -1530,6 +1556,9 @@ Only in Neotree Buffer:
 #+end_src
 
 *** Lua
+:PROPERTIES:
+:ID:       5fa92fb0-06c4-4f5b-827a-eec16433af59
+:END:
 
 #+begin_src emacs-lisp
 (leaf lua-mode
@@ -1580,7 +1609,8 @@ Only in Neotree Buffer:
   :custom ((web-mode-markup-indent-offset . 2)
            (web-mode-css-indent-offset . 2)
            (web-mode-code-indent-offset . 2))
-  :mode ("\\.phtml\\'"
+  :mode ("\\.html\\'"
+         "\\.phtml\\'"
          "\\.tpl\\.php\\'"
          "\\.[agj]sp\\'"
          "\\.as[cp]x\\'"
@@ -1591,6 +1621,9 @@ Only in Neotree Buffer:
 #+end_src
 
 *** JavaScript
+:PROPERTIES:
+:ID:       ce098f26-1217-49b0-b69a-0f0cd6db9a53
+:END:
 
 #+begin_src emacs-lisp
 
@@ -1603,6 +1636,9 @@ Only in Neotree Buffer:
 #+end_src
 
 *** TypeScript
+:PROPERTIES:
+:ID:       f23d8e72-9453-4630-9b3a-3c25a250ff9c
+:END:
 
 #+begin_src emacs-lisp
 (leaf typescript-mode
@@ -1627,6 +1663,9 @@ Only in Neotree Buffer:
 #+end_src
 
 *** JSON
+:PROPERTIES:
+:ID:       55cc69e2-8160-4b9a-be65-89590a76897c
+:END:
 
 #+begin_src emacs-lisp
 (leaf json-mode
@@ -1636,6 +1675,9 @@ Only in Neotree Buffer:
 #+end_src
 
 *** Markdown
+:PROPERTIES:
+:ID:       ba4b8a80-1f21-429f-a2db-3b866cb30598
+:END:
 
 #+begin_src emacs-lisp
 (leaf markdown-mode
@@ -1645,6 +1687,9 @@ Only in Neotree Buffer:
 #+end_src
 
 *** Shell
+:PROPERTIES:
+:ID:       401dcc88-8194-4271-8956-3e034cc51f1a
+:END:
 
 #+begin_src emacs-lisp
 ;; (leaf sh-mode
@@ -1652,6 +1697,9 @@ Only in Neotree Buffer:
 #+end_src
 
 *** Dockerfile-mode
+:PROPERTIES:
+:ID:       b6aa1cd1-6480-46f4-89ed-71d19a6c4839
+:END:
 
 #+begin_src emacs-lisp
 (leaf dockerfile-mode
@@ -1663,6 +1711,9 @@ Only in Neotree Buffer:
 #+end_src
 
 *** yaml-mode
+:PROPERTIES:
+:ID:       6df5d1be-e673-476e-95a7-9933eeb032b7
+:END:
 
 #+begin_src emacs-lisp
 (leaf yaml-mode
@@ -1674,6 +1725,9 @@ Only in Neotree Buffer:
 #+end_src
 
 *** Go-mode
+:PROPERTIES:
+:ID:       8c18d30c-fd30-4585-ad6f-b509cbe3ac83
+:END:
 
 #+begin_src emacs-lisp
 (leaf go-mode
@@ -1681,6 +1735,9 @@ Only in Neotree Buffer:
 #+end_src
 
 *** Ansible
+:PROPERTIES:
+:ID:       3c804681-1bdf-45ac-b1d8-b02ebed339ae
+:END:
 
 #+begin_src emacs-lisp
 (leaf ansible
@@ -1761,6 +1818,9 @@ Only in Neotree Buffer:
 #+end_src
 
 *** Pulser
+:PROPERTIES:
+:ID:       4ae89180-6a8f-40ff-893f-088c1a07ef9a
+:END:
 
 #+begin_src emacs-lisp
 (leaf pulsar
@@ -2065,6 +2125,9 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 #+end_src
 
 *** Line Highlight with LIN
+:PROPERTIES:
+:ID:       26904d3a-10f4-456d-a3ad-c1e3ed1b4b2c
+:END:
 
 :PROPERTIES:
 :ID:       FDAF3AFD-70D4-48BB-8A55-EFFD8EE7FF7B
@@ -2193,6 +2256,9 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 #+end_src
 
 *** Managing Whitespaces with whitespace
+:PROPERTIES:
+:ID:       1fe97d2c-476d-4660-b14d-e03c95d9b8d2
+:END:
 
 #+begin_src emacs-lisp
 (leaf whitespace
@@ -2215,6 +2281,9 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 #+end_src
 
 *** Know Your HTTP Well
+:PROPERTIES:
+:ID:       b7328135-b20d-46d9-9d7f-7624b9c664b9
+:END:
 
 https://github.com/for-GET/know-your-http-well
 
@@ -2274,7 +2343,7 @@ Window management commands are accessible by prefix =C-x w=
   :bind* ("C-t" . ace-window)
   :custom (aw-keys . '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
   :custom-face
-  ((aw-leading-char-face . '((t (:height 4.0 :foreground "#f1fa8c")))))
+  ((aw-leading-char-face . '((t (:height 4.0 :foreground "red")))))
   :config
   (defun my--switch-window (&optional num)
     (interactive "P")
@@ -2294,6 +2363,9 @@ Window management commands are accessible by prefix =C-x w=
 #+end_src
 
 *** Another implementation of my--switch-window
+:PROPERTIES:
+:ID:       ed56290a-b2aa-4c5b-bd8b-3dea42726539
+:END:
 
 #+begin_src emacs-lisp
 
@@ -2315,6 +2387,9 @@ Window management commands are accessible by prefix =C-x w=
 #+end_src
 
 ** Window Movement with windmove
+:PROPERTIES:
+:ID:       0eb9f40f-8826-48e6-bf0d-fe12c27631bf
+:END:
 
 #+begin_src emacs-lisp
 
@@ -2380,6 +2455,9 @@ Window management commands are accessible by prefix =C-x w=
 
 
 ** Split and follow
+:PROPERTIES:
+:ID:       eee65492-f4d7-4eff-94ca-e540b97f046d
+:END:
 #+begin_src emacs-lisp
 (defun split-and-follow-horizontally ()
   "Split and follow horizontally."
@@ -2417,7 +2495,7 @@ Window management commands are accessible by prefix =C-x w=
            (tab-bar-close-button-show . nil)
            (tab-bar-select-tab-modifiers . '(meta)))
 
-  ;; :hook (emacs-startup-hook . my--init-tab-bar)
+  :hook (emacs-startup-hook . my--init-tab-bar)
   :config
   (defun my/tab-new-with-name (&optional name)
     (interactive "sName: ")
@@ -2738,6 +2816,9 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 #+end_src
 
 *** fussy
+:PROPERTIES:
+:ID:       45db9a8b-dd56-4638-9103-1152c9ffa825
+:END:
 
 #+begin_src emacs-lisp
 (leaf fussy
@@ -2994,6 +3075,9 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 #+end_src
 
 ** Colorful icons for completion with kind-icon
+:PROPERTIES:
+:ID:       8ae9d8ff-5b42-42d3-bc2a-46d13cb0ee56
+:END:
 
 #+begin_src emacs-lisp
 
@@ -3009,6 +3093,9 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 
 
 ** Front-end for citation with Citar
+:PROPERTIES:
+:ID:       8a8e08e1-28cf-4323-a41e-a80091184685
+:END:
 
 #+begin_src emacs-lisp
 
@@ -3231,6 +3318,9 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 #+end_src
 
 ** Nix Mode
+:PROPERTIES:
+:ID:       2f2a58e9-8e25-4892-bbac-fddeb7326ee2
+:END:
 
 #+begin_src emacs-lisp
 (leaf nix-mode
@@ -3698,6 +3788,9 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 #+end_src
 
 ** Org-modern
+:PROPERTIES:
+:ID:       c4d17b5b-9f46-4755-8275-9383f794c62a
+:END:
 
 #+begin_src emacs-lisp
 (leaf org-modern
@@ -3714,6 +3807,9 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 #+end_src
 
 ** Org-download
+:PROPERTIES:
+:ID:       41ca5970-5a8c-4134-9932-b07759773230
+:END:
 
 #+begin_src emacs-lisp
 (leaf org-download
@@ -4292,6 +4388,9 @@ From the search buffer there are a number of ways to interact with entries. Entr
 :END:
 
 *** General Settings
+:PROPERTIES:
+:ID:       cb56211c-1c97-4c1a-95d4-14f9d61bdd62
+:END:
 
 #+begin_src emacs-lisp
 (leaf mail-general
@@ -4300,6 +4399,9 @@ From the search buffer there are a number of ways to interact with entries. Entr
 #+end_src
 
 ** Notmuch
+:PROPERTIES:
+:ID:       82ca56e2-cd3d-40f9-9a9c-a8ea873507bb
+:END:
 
 Manual is [[https://notmuchmail.org/emacstips/][here]]
 
@@ -4429,6 +4531,9 @@ Manual is [[https://notmuchmail.org/emacstips/][here]]
 #+end_src
 
 *** Notmuch-transient
+:PROPERTIES:
+:ID:       08871979-510f-4ab6-bbe5-d11bedfe7c9e
+:END:
 
 #+begin_src emacs-lisp
 (leaf notmuch-transient
@@ -4450,6 +4555,9 @@ Manual is [[https://notmuchmail.org/emacstips/][here]]
 #+end_src
 
 *** ol-notmuch
+:PROPERTIES:
+:ID:       85a901ef-5f0f-4efa-ae0a-ead7a6731e3b
+:END:
 
 #+begin_src emacs-lisp
 (leaf ol-notmuch
@@ -4474,6 +4582,9 @@ mu index
 #+end_src
 
 **** Config
+:PROPERTIES:
+:ID:       44f695dc-d668-4345-b105-4ab273f1a501
+:END:
 
 #+begin_src emacs-lisp
 (leaf *config-mu4e
@@ -4490,7 +4601,8 @@ mu index
 #+begin_src emacs-lisp
 
 (leaf eaf
-  :when (memq window-system '(x))
+  :disabled t
+  :when (memq window-system '(x pgtk))
   :load-path "~/src/github.com/emacs-eaf/emacs-application-framework/"
   :require eaf
   :commands
@@ -4502,13 +4614,15 @@ mu index
    (eaf-browser-enable-adblocker . t)
    (browse-url-browser-function . 'eaf-open-browser))
   :config
+  ;; run (M-x eaf-install-and-update) at first time
   (require 'eaf-browser)
   (require 'eaf-pdf-viewer)
   (add-to-list 'eaf-wm-focus-fix-wms "wlroots wm")
   (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
   (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-  (defalias 'browse-web #'eaf-open-browser)
-  (eaf-bind-key nil "M-q" eaf-browser-keybinding))
+  ;; (defalias 'browse-web #'eaf-open-browser)
+  (eaf-bind-key nil "M-q" eaf-browser-keybinding)
+  )
 
 #+end_src
 
@@ -4923,6 +5037,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** Org-inline-anim
+:PROPERTIES:
+:ID:       b9e7ff28-7e6d-4129-9db8-8dfe87688c7e
+:END:
 
 #+begin_src emacs-lisp
 
@@ -4933,6 +5050,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** Save frame and window configs with Burly
+:PROPERTIES:
+:ID:       d4e21974-5042-4145-a6c1-ab00cb7096bc
+:END:
 
 #+begin_src emacs-lisp
 
@@ -4945,12 +5065,18 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 
 
 ** CSV-mode
+:PROPERTIES:
+:ID:       dfb5287a-e3bf-473d-bf98-850942e1f414
+:END:
 
 #+begin_src emacs-lisp
 (leaf csv-mode :straight t)
 #+end_src
 
 ** Markdown-preview-mode
+:PROPERTIES:
+:ID:       bf787c9b-9449-46b4-9e6b-d9dc7d3e16b6
+:END:
 
 #+begin_src emacs-lisp
 (leaf markdown-preview-mode
@@ -4967,6 +5093,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** Mermaid-mode
+:PROPERTIES:
+:ID:       71c6f771-c208-4c7c-9521-f106418c015e
+:END:
 
 #+begin_src emacs-lisp
 
@@ -4992,6 +5121,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** Editorconfig
+:PROPERTIES:
+:ID:       f118d959-269c-447e-962c-5707fd1f02a3
+:END:
 
 #+begin_src emacs-lisp
 (leaf editorconfig
@@ -5000,6 +5132,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** Prettier
+:PROPERTIES:
+:ID:       199f9a01-7f72-43fd-a921-51184b59bc15
+:END:
 
 #+begin_src emacs-lisp
 (leaf prettier
@@ -5009,6 +5144,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** Direnv
+:PROPERTIES:
+:ID:       0ce20a53-d842-4f89-9432-03608cabb1ac
+:END:
 
 #+begin_src emacs-lisp
 ;; (leaf direnv
@@ -5017,6 +5155,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** Poetry
+:PROPERTIES:
+:ID:       03d13a45-8b16-4612-ae51-56484777265b
+:END:
 
 #+begin_src emacs-lisp
 (leaf poetry
@@ -5026,6 +5167,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** Pyvenv
+:PROPERTIES:
+:ID:       6b33c1cd-a0da-41db-9b47-a823b56bdf45
+:END:
 
 #+begin_src emacs-lisp
 (leaf pyvenv
@@ -5036,6 +5180,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** OpenAPI Preview
+:PROPERTIES:
+:ID:       0be3b197-4eed-4bd2-908e-4f0a1295be7f
+:END:
 
 #+begin_src emacs-lisp
 (leaf openapi-preview
@@ -5046,6 +5193,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** Svelte-mode
+:PROPERTIES:
+:ID:       a8772d45-8938-4ba4-8b90-28af88ce3a3d
+:END:
 
 #+begin_src emacs-lisp
 (leaf svelte-mode

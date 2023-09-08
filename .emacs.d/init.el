@@ -425,13 +425,13 @@
   (defun my/change-transparency (&optional num)
     "Sets the transparency of the frame window. 0=transparent/100=opaque"
     (interactive (list
-                  (read-number "Transparency Value 0 - 100 opaque: " 85)))
+                  (read-number "Transparency Value 0 - 100 opaque: " 95)))
     (set-frame-parameter nil 'alpha-background num)
     (add-to-list 'default-frame-alist
                  `(alpha-background . ,num)))
 
   :config
-  (my/change-transparency 85))
+  (my/change-transparency 95))
 
 (leaf font
   :when window-system
@@ -550,8 +550,7 @@
       ;; Load choiced theme
       (pcase sym-theme
         ('modus-dark (load-theme 'modus-vivendi-tinted :no-confirm))
-        ('modus-light (load-theme 'modus-operandi :no-confirm)))
-      (my--init-tab-bar)))
+        ('modus-light (load-theme 'modus-operandi :no-confirm)))))
 
   (leaf bespoke-themes
     :straight (bespoke-themes
@@ -575,10 +574,8 @@
        `user
        `(org-agenda-clocking ((t :foreground ,bespoke-salient)))
        `(org-agenda-done ((t :foreground ,bespoke-faded :strike-through nil))))
-      
-      (my/set-org-face)
 
-      (my--init-tab-bar)
+      (my/set-org-face)
       (set-face-attribute 'tab-bar nil
                           :background bespoke-modeline
                           :foreground bespoke-foreground
@@ -883,6 +880,9 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
    (git-gutter:added . '((t (:background "#50fa7b"))))
    (git-gutter:deleted . '((t (:background "#ff79c6"))))))
 
+(leaf magit-delta
+  :straight t)
+
 (leaf dap-mode
   :disabled t
   :when window-system
@@ -928,19 +928,21 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
              :type git
              :host github
              :repo "manateelazycat/lsp-bridge"
-             :files (:defaults "*.py" "acm/*" "core/*"))
+             :files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
+             :build (:not compile))
   :hook ((hack-local-variables-hook . run-local-vars-mode-hook)
          (yas-global-mode-hook . global-lsp-bridge-mode))
   :custom `((lsp-bridge-python-command . ,(if (eq window-system 'ns)
                                               "/opt/homebrew/bin/python3"
-                                            "/usr/bin/python3"))
-            (lsp-bridge-diagnostic-tooltip-border-width . 5)
-            (lsp-bridge-lookup-doc-tooltip-border-width . 5)
-            (lsp-bridge-user-langserver-dir . ,(expand-file-name "~/.dotfiles/etc/langserver"))
-            (lsp-bridge-user-multiserver-dir . ,(expand-file-name "~/.dotfiles/etc/multiserver"))
+                                            (expand-file-name "~/.dotfiles/etc/lsp-bridge-env/.venv/bin/python3")))
+            (lsp-bridge-enable-completion-in-minibuffer . t)
+            (lsp-bridge-signature-show-function . 'message)
+            ;; (lsp-bridge-user-langserver-dir . ,(expand-file-name "~/.dotfiles/etc/langserver"))
+            ;; (lsp-bridge-user-multiserver-dir . ,(expand-file-name "~/.dotfiles/etc/multiserver"))
             (lsp-bridge-enable-hover-diagnostic . t)
             (lsp-bridge-python-multi-lsp-server . "pyright_ruff")
-            (acm-enable-tabnine . nil))
+            (acm-enable-tabnine . nil)
+            (acm-enable-codeium . t))
   :bind (lsp-bridge-mode-map
          :package lsp-bridge
          ("M-." . lsp-bridge-find-def)
@@ -1015,7 +1017,8 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :custom ((web-mode-markup-indent-offset . 2)
            (web-mode-css-indent-offset . 2)
            (web-mode-code-indent-offset . 2))
-  :mode ("\\.phtml\\'"
+  :mode ("\\.html\\'"
+         "\\.phtml\\'"
          "\\.tpl\\.php\\'"
          "\\.[agj]sp\\'"
          "\\.as[cp]x\\'"
@@ -1486,7 +1489,7 @@ respectively."
   :bind* ("C-t" . ace-window)
   :custom (aw-keys . '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
   :custom-face
-  ((aw-leading-char-face . '((t (:height 4.0 :foreground "#f1fa8c")))))
+  ((aw-leading-char-face . '((t (:height 4.0 :foreground "red")))))
   :config
   (defun my--switch-window (&optional num)
     (interactive "P")
@@ -1596,7 +1599,7 @@ respectively."
            (tab-bar-close-button-show . nil)
            (tab-bar-select-tab-modifiers . '(meta)))
 
-  ;; :hook (emacs-startup-hook . my--init-tab-bar)
+  :hook (emacs-startup-hook . my--init-tab-bar)
   :config
   (defun my/tab-new-with-name (&optional name)
     (interactive "sName: ")
@@ -3236,7 +3239,8 @@ respectively."
   (load-file "~/src/github.com/naoking158/envs/config-mail/config-mu4e.el"))
 
 (leaf eaf
-  :when (memq window-system '(x))
+  :disabled t
+  :when (memq window-system '(x pgtk))
   :load-path "~/src/github.com/emacs-eaf/emacs-application-framework/"
   :require eaf
   :commands
@@ -3248,13 +3252,15 @@ respectively."
    (eaf-browser-enable-adblocker . t)
    (browse-url-browser-function . 'eaf-open-browser))
   :config
+  ;; run (M-x eaf-install-and-update) at first time
   (require 'eaf-browser)
   (require 'eaf-pdf-viewer)
   (add-to-list 'eaf-wm-focus-fix-wms "wlroots wm")
   (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
   (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-  (defalias 'browse-web #'eaf-open-browser)
-  (eaf-bind-key nil "M-q" eaf-browser-keybinding))
+  ;; (defalias 'browse-web #'eaf-open-browser)
+  (eaf-bind-key nil "M-q" eaf-browser-keybinding)
+  )
 
 (leaf server
   :doc "Lisp code for GNU Emacs running as server process"
