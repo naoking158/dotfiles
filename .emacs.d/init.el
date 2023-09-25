@@ -1434,11 +1434,22 @@ respectively."
                                       :background "#4C566A"
                                       :inherit 'normal)))
   :config
-  (if (memq window-system '(x))
+  (if (memq window-system '(x pgtk))
       (setq skk-jisyo "~/.skk-jisyo")
     (progn
       (setq skk-server-host "localhost")
-      (setq skk-server-portnum 1178))))
+      (setq skk-server-portnum 1178)))
+
+  (defun my-variable-watcher-for-skk-henkan-mode (symbol newval operation where)
+    "Watcher function for variable `skk-henkan-mode'."
+    (if (memq newval '(active on))
+        (setq-local lsp-bridge-complete-manually t)
+      (setq-local lsp-bridge-complete-manually nil))
+    )
+
+  (add-variable-watcher 'skk-henkan-mode 'my-variable-watcher-for-skk-henkan-mode)
+
+)
 
 (leaf whitespace
   :straight t
