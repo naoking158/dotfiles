@@ -94,6 +94,7 @@ a bunch of resources I've found online.
   - [[#auto-show-markup-symbols][Auto-show Markup Symbols]]
   - [[#auto-tangle-configuration-files][Auto-tangle Configuration Files]]
   - [[#update-table-of-contents-on-save][Update Table of Contents on Save]]
+  - [[#edit-indirect][Edit-indirect]]
 - [[#latex-mode][LaTeX Mode]]
 - [[#applications][Applications]]
   - [[#competitive-programming-with-oj---online-judge][Competitive Programming with oj - Online Judge]]
@@ -4245,6 +4246,16 @@ It's nice to have a table of contents section for long literate configuration fi
   :straight t
   :hook (org-babel-pre-tangle-hook . org-make-toc-mode))
 
+#+end_src
+
+** Edit-indirect
+:PROPERTIES:
+:ID:       18a3eea6-c6a7-4c0d-bb76-670e72b3a151
+:END:
+
+#+begin_src emacs-lisp
+(leaf edit-indirect
+  :straight t)
 #+end_src
 
 * LaTeX Mode

@@ -2997,6 +2997,9 @@ respectively."
   :straight t
   :hook (org-babel-pre-tangle-hook . org-make-toc-mode))
 
+(leaf edit-indirect
+  :straight t)
+
 (leaf *latex
   :when window-system
   :config
