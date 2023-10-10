@@ -61,7 +61,7 @@ autoload -Uz _zinit
 # builtins
 function chpwd() {
     if [[ $(pwd) != $HOME ]]; then;
-        exa -a --icons
+        eza -a --icons
     fi
 }
 
@@ -244,10 +244,10 @@ alias gc='g commit -m'
 alias grep='grep --color=auto'
 alias gs='g status'
 alias ja_latex='latexmk -pvc'
-alias la='exa -a'
-alias ll='exa -l -g --icons'
+alias la='eza -a'
+alias ll='eza -l -g --icons'
 alias lla='ll -a'
-alias ls='exa'
+alias ls='eza'
 # alias nc-list='nix-channel --list'
 # alias nc-update='nix-channel --update'
 # alias ne-search='nix-env -qa'
@@ -255,7 +255,7 @@ alias rg='rg --color=auto --no-ignore --hidden --glob="!.git" --line-number'
 alias rm='~/src/github.com/naoking158/rm-alternative/rm-alternative.bash'
 alias sudo='sudo '
 alias tgz='f() { env COPYFILE_DISABLE=1 tar zcvf $1 --exclude=".DS_Store" ${@:2}; unset -f f; }; f'
-alias tree='exa --tree --level 3 -a --ignore-glob "node_modules|.git|.cache" --icons'
+alias tree='eza --tree --level 3 -a --ignore-glob "node_modules|.git|.cache" --icons'
 alias pull3='ssh vm3 "bash ~/work/VMOperateTool/utils/download.sh" && myrsync -d vm3 ~/work/VMOperateTool/ ~/src/github.com/fixpoint/VMOperateTool/'
 alias push3='ssh vm3 "rm -rf ~/work/VMOperateTool" && myrsync -u vm3 ~/src/github.com/fixpoint/VMOperateTool/ ~/work/VMOperateTool/'
 alias pull4='ssh vm4 "bash ~/work/VMOperateTool/utils/download.sh" && myrsync -d vm4 ~/work/VMOperateTool/ ~/src/github.com/fixpoint/VMOperateTool/'
