@@ -1822,8 +1822,8 @@ respectively."
       (migemo-regex-dictionary . nil)
       (migemo-coding-system    . 'utf-8)
       (migemo-dictionary . ,(cond
-                             ((file-exists-p "/usr/share/migemo/utf-8/migemo-dict")
-                              "/usr/share/migemo/utf-8/migemo-dict")
+                             ((file-exists-p "/usr/local/share/migemo/utf-8/migemo-dict")
+                              "/usr/local/share/migemo/utf-8/migemo-dict")
                              ((file-exists-p "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
                               "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
                              (t "")))
