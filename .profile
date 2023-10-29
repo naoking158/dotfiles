@@ -23,37 +23,10 @@ fi
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
-# github
-export G_USER=$(git config user.name)
-export G_ROOT=$(git config ghq.root)
-export G_REPO=$(eval echo ${G_ROOT}/github.com/${G_USER})
-
-# Python path
-[[ -e $G_REPO ]] && export PYTHONPATH=$G_REPO
-
-# Neptune api token
-[[ -e $G_REPO/envs/neptune_api_token ]] && {
-    export NEPTUNE_API_TOKEN=$(cat $G_REPO/envs/neptune_api_token);
-}
-
-# Miniconda path
-if [[ -e $HOME/miniconda ]]; then
-    export MINICONDA=$HOME/miniconda
-elif [[ -e $HOME/miniconda3 ]]; then
-    export MINICONDA=$HOME/miniconda3
-elif [[ -e /opt/miniconda3 ]]; then
-    export MINICONDA=/opt/miniconda3
-fi
-
 # Set cargo path
 [[ -e $HOME/.cargo/env ]] && . "$HOME/.cargo/env"
 if [[ -e $HOME/.cargo/bin ]]; then
     PATH="$HOME/.cargo/bin:$PATH"
-fi
-
-# Set homebrew path
-if [[ $SYSTEM == "macos" ]] && [[ -e "/opt/homebrew" ]]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
 # Set npm path

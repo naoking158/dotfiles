@@ -1,19 +1,26 @@
-if type brew &>/dev/null; then
-  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-
-  autoload -Uz compinit && compinit
-
-  autoload -U bashcompinit && bashcompinit
-
-  if [[ -e $(brew --prefix)/etc/bash_completion.d/az ]]; then
-      source $(brew --prefix)/etc/bash_completion.d/az
-  fi
+# Set homebrew path
+if [[ $SYSTEM == "macos" ]] && [[ -e "/opt/homebrew" ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+    if type brew &>/dev/null; then
+        FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+        if [[ -e $(brew --prefix)/etc/bash_completion.d/az ]]; then
+            source $(brew --prefix)/etc/bash_completion.d/az
+        fi
+    fi
 fi
+
+# github
+export G_USER=$(git config user.name)
+export G_ROOT=$(git config ghq.root)
+export G_REPO=$(eval echo ${G_ROOT}/github.com/${G_USER})
+
+# Python path
+[[ -e $G_REPO ]] && export PYTHONPATH=$G_REPO
 
 # builtins
 function chpwd() {
     if [[ $(pwd) != $HOME ]]; then;
-        exa -a --icons
+        eza -a --icons
     fi
 }
 
@@ -83,15 +90,15 @@ alias gs='g status'
 alias gas='g add -A && gs'
 alias gc='g commit -m'
 alias grep='grep --color=auto'
-alias la='exa -a'
-alias ll='exa -l -g --icons'
+alias la='eza -a'
+alias ll='eza -l -g --icons'
 alias lla='ll -a'
-alias ls='exa'
+alias ls='eza'
 alias rg='rg --color=auto --no-ignore --hidden --glob="!.git" --line-number'
 alias rm='~/src/github.com/naoking158/rm-alternative/rm-alternative.bash'
 alias sudo='sudo '
 alias tgz='f() { env COPYFILE_DISABLE=1 tar zcvf $1 --exclude=".DS_Store" ${@:2}; unset -f f; }; f'
-alias tree='exa --tree --level 3 -a --ignore-glob "node_modules|.git|.cache" --icons'
+alias tree='eza --tree --level 3 -a --ignore-glob "node_modules|.git|.cache" --icons'
 alias pull3='ssh vm3 "bash ~/work/VMOperateTool/utils/download.sh" && myrsync -d vm3 ~/work/VMOperateTool/ ~/src/github.com/fixpoint/VMOperateTool/'
 alias push3='ssh vm3 "rm -rf ~/work/VMOperateTool" && myrsync -u vm3 ~/src/github.com/fixpoint/VMOperateTool/ ~/work/VMOperateTool/'
 alias pull4='ssh vm4 "bash ~/work/VMOperateTool/utils/download.sh" && myrsync -d vm4 ~/work/VMOperateTool/ ~/src/github.com/fixpoint/VMOperateTool/'
@@ -104,3 +111,10 @@ dev_vm="vm4"
 dev_pkg="VMOperateTool"
 alias dpull='ssh ${dev_vm} "bash ~/work/${dev_pkg}/utils/download.sh" && myrsync -d ${dev_vm} ~/work/${dev_pkg}/ ~/src/github.com/fixpoint/${dev_pkg}/'
 alias dpush='ssh ${dev_vm} "rm -rf ~/work/${dev_pkg}" && myrsync -u ${dev_vm} ~/src/github.com/fixpoint/${dev_pkg}/ ~/work/${dev_pkg}/'
+
+# Global Aliases
+alias -g G='| grep'
+
+autoload -Uz compinit && compinit -i
+autoload -U bashcompinit && bashcompinit
+typeset -U path cdpath fpath manpath

@@ -1,5 +1,3 @@
-typeset -U path cdpath fpath manpath
-
 # Use emacs keymap as the default.
 bindkey -e
 
@@ -22,6 +20,3 @@ setopt HIST_EXPIRE_DUPS_FIRST
 setopt SHARE_HISTORY
 unsetopt EXTENDED_HISTORY
 setopt autocd
-
-# Global Aliases
-alias -g G='| grep'
