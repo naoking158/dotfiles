@@ -1,0 +1,78 @@
+# `sheldon` configuration file
+# ----------------------------
+#
+# You can modify this file directly or you can use one of the following
+# `sheldon` commands which are provided to assist in editing the config file:
+#
+# - `sheldon add` to add a new plugin to the config file
+# - `sheldon edit` to open up the config file in the default editor
+# - `sheldon remove` to remove a plugin from the config file
+#
+# See the documentation for more https://github.com/rossmacarthur/sheldon#readme
+
+shell = "zsh"
+
+[templates]
+defer = "{{ hooks | get: \"pre\" | nl }}{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}{{ hooks | get: \"post\" | nl }}"
+
+[plugins.zsh-defer]
+github = "romkatv/zsh-defer"
+
+[plugins.powerlevel10k]
+github = "romkatv/powerlevel10k"
+use = ["{{ name }}.zsh-theme"]
+hooks.post = '''
+ZLE_RPROMPT_INDENT=0
+[[ ! -f ${ZDOTDIR}/.p10k.zsh ]] || source ${ZDOTDIR}/.p10k.zsh
+# powerlevel10k-instant-prompt
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+'''
+
+[plugins.fast-syntax-highlighting]
+github = "zdharma-continuum/fast-syntax-highlighting"
+
+[plugins.zsh-history-substring-search]
+github = "zsh-users/zsh-history-substring-search"
+apply = ["defer"]
+hooks.post = '''
+# bind UP and DOWN keys
+bindkey "${terminfo[kcuu1]}" history-substring-search-up
+bindkey "${terminfo[kcud1]}" history-substring-search-down
+
+# bind UP and DOWN arrow keys (compatibility fallback)
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+
+# for Emacs bindings
+bindkey -M emacs '^P' history-substring-search-up
+bindkey -M emacs '^N' history-substring-search-down
+'''
+
+[plugins.zsh-autosuggestions]
+github = "zsh-users/zsh-autosuggestions"
+use = ["{{ name }}.zsh"]
+apply = ["defer"]
+
+[plugins.zsh-completions]
+github = "zsh-users/zsh-completions"
+apply = ["defer"]
+
+[plugins.bd]
+github = "Tarrasch/zsh-bd"
+use = ["bd.zsh"]
+apply = ["defer"]
+
+[plugins.ls_colors]
+github = "trapd00r/LS_COLORS"
+use = ["lscolors.sh"]
+
+
+# [plugins.docker-completion]
+# remote = "https://github.com/docker/cli/blob/master/contrib/completion/zsh/_docker"
+# apply = ["fpath"]
+
+# [plugins.firewalld-completion]
+# remote = "https://gist.githubusercontent.com/darkxanter/6abf535fa7586f38d78181f6d00c9d98/raw/8cab860aedddac77a85da1bf9a0afad7cefe1615/_firewalld"
+# apply = ["fpath"]

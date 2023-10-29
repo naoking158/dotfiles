@@ -19,45 +19,6 @@ typeset -U path cdpath fpath manpath
 # Use emacs keymap as the default.
 bindkey -e
 
-declare -A ZINIT
-
-##############################################################
-# ZINIT https://github.com/zdharma-continuum/zinit
-##############################################################
-ZINIT[HOME_DIR]="$XDG_CACHE_HOME/zsh/zinit"
-ZINIT[BIN_DIR]="$ZINIT[HOME_DIR]/bin"
-ZINIT[PLUGINS_DIR]="$ZINIT[HOME_DIR]/plugins"
-ZINIT[ZCOMPDUMP_PATH]="$XDG_CACHE_HOME/zsh/zcompdump"
-# export ZINIT[OPTIMIZE_OUT_DISK_ACCESSES]=1
-export ZPFX="$ZINIT[HOME_DIR]/polaris"
-
-local __ZINIT="$ZINIT[BIN_DIR]/zinit.zsh"
-
-if [[ ! -f "$__ZINIT" ]]; then
-  if (( $+commands[git] )); then
-    git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT[BIN_DIR]"
-  else
-    echo 'git not found' >&2
-    exit 1
-  fi
-fi
-
-source "$__ZINIT"
-autoload -Uz _zinit
-(( ${+_comps} )) && _comps[zinit]=_zinit
-
-# Utilities & enhancements {{{
-  zinit ice wait lucid
-  zinit light https://github.com/zsh-users/zsh-history-substring-search
-  # bind UP and DOWN keys
-  bindkey "${terminfo[kcuu1]}" history-substring-search-up
-  bindkey "${terminfo[kcud1]}" history-substring-search-down
-
-  # bind UP and DOWN arrow keys (compatibility fallback)
-  bindkey '^[[A' history-substring-search-up
-  bindkey '^[[B' history-substring-search-down
-# }}}
-
 # builtins
 function chpwd() {
     if [[ $(pwd) != $HOME ]]; then;
@@ -71,67 +32,10 @@ add-zsh-hook chpwd chpwd_recent_dirs
 zstyle ':completion:*' recent-dirs-insert both
 zstyle ':chpwd:*' recent-dirs-default true
 zstyle ':chpwd:*' recent-dirs-max 1000
-# zstyle ':chpwd:*' recent-dirs-file "$HOME/.cache/chpwd-recent-dirs"
 
 #visual editor
 autoload -Uz edit-command-line; zle -N edit-command-line
-# bindkey -M vicmd v edit-command-line
 bindkey "^X^E" edit-command-line
-
-# zinit plugins
-zinit wait lucid for \
-     atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay" \
-         zdharma-continuum/fast-syntax-highlighting \
-     atload"!_zsh_autosuggest_start" \
-         zsh-users/zsh-autosuggestions \
-     blockf \
-         zsh-users/zsh-completions \
-     as"blockf; completion; snippet" \
-         https://github.com/esc/conda-zsh-completion/blob/master/_conda \
-     as"blockf; completion; snippet" \
-         https://github.com/docker/cli/blob/master/contrib/completion/zsh/_docker \
-     as"blockf; completion; snippet" \
-         https://gist.githubusercontent.com/darkxanter/6abf535fa7586f38d78181f6d00c9d98/raw/8cab860aedddac77a85da1bf9a0afad7cefe1615/_firewalld
-
-
-zinit wait lucid for \
-    atclone"curl -sOL https://github.com/ohmyzsh/ohmyzsh/raw/master/plugins/tmux/tmux.extra.conf" \
-        OMZP::tmux
-
-zinit ice pick"bd.zsh"; zinit light Tarrasch/zsh-bd
-
-zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
-    atpull'%atclone' pick"clrs.zsh" nocompile'!' \
-    atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
-zinit light trapd00r/LS_COLORS
-
-zinit ice depth=1; zinit light romkatv/powerlevel10k
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-zinit lucid from:'gh-r' \
-        as:'program' \
-        pick:'delta*/delta' \
-        light-mode \
-        for @dandavison/delta
-
-zinit ice from"gh-r" as"command"
-zinit light junegunn/fzf
-zinit ice lucid as"command" id-as"junegunn/fzf-tmux" pick"bin/fzf-tmux"
-zinit light junegunn/fzf
-zinit ice lucid multisrc"shell/{completion,key-bindings}.zsh" id-as"junegunn/fzf_completions" pick"/dev/null"
-zinit light junegunn/fzf
-
-zinit ice from"gh" as"command" pick"*/ghq"
-zinit light x-motemen/ghq
-
-zinit light mollifier/anyframe
-bindkey '^x^b' anyframe-widget-cdr
-bindkey '^x^f' anyframe-widget-insert-filename
-bindkey '^x^g' anyframe-widget-cd-ghq-repository
-bindkey '^x^k' anyframe-widget-kill
-bindkey '^x^r' anyframe-widget-put-history
-zstyle ":anyframe:selector:" use fzf-tmux
-
 
 # move repositories with peco
 function peco-src () {
@@ -186,11 +90,6 @@ setopt autocd
 
 source $HOME/.dotfiles/bin/my-server-util.bash
 
-# powerlevel10k-instant-prompt
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
 # rye
 if [[ -e "$HOME/.rye/env" ]]; then
     source "$HOME/.rye/env"
@@ -200,45 +99,17 @@ fi
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
-alias __gorilla1='ssh _gorilla1'
-alias __gorilla2='ssh _gorilla2'
-alias __gorilla3='ssh _gorilla3'
-alias __gorilla4='ssh _gorilla4'
-alias __gorilla5='ssh _gorilla5'
-alias __kingkong='ssh _kingkong'
-alias __zeus='ssh _zeus'
-alias _gorilla1='ssh gorilla1'
-alias _gorilla2='ssh gorilla2'
-alias _gorilla3='ssh gorilla3'
-alias _gorilla4='ssh gorilla4'
-alias _gorilla5='ssh gorilla5'
-alias _kingkong='ssh kingkong'
-alias _mdl='ssh _mdl'
-alias _zeus='ssh zeus'
-alias _vm1='ssh vm1'
-alias _vm2='ssh vm2'
-alias _vm3='ssh vm3'
-alias _vm4='ssh vm4'
-alias _vm5='ssh vm5'
-alias _exp='ssh exp'
-alias _kubota='ssh kubota'
-alias _utm='ssh utm'
-alias c='conda'
-alias ca='c activate'
-alias ce='c env'
-alias ci='c install'
-alias cs='c search'
 alias diff='diff --color=auto'
 alias dua='/usr/bin/du -shc * | sort -h'
 alias e='emacsclient'
 alias ed='emacs -nw --daemon'
 alias ekill='emacsclient -e "(kill-emacs)"'
-alias en_latex='latexmk -e "$bibtex=q/bibtex/" -pdf -pvc'
 alias enw='TERM=xterm-direct emacsclient -nw'
 alias eq='emacs -q'
 alias eql='eq -l'
 alias fd='fd --color=auto --full-path --no-ignore --hidden --exclude ".git"'
 alias g='git'
+alias gs='g status'
 alias gas='g add -A && gs'
 alias gc='g commit -m'
 alias grep='grep --color=auto'
@@ -275,7 +146,14 @@ alias dpush='ssh ${dev_vm} "rm -rf ~/work/${dev_pkg}" && myrsync -u ${dev_vm} ~/
 # Global Aliases
 alias -g G='| grep'
 
-# Named Directory Hashes
 
-# To customize prompt, run `p10k configure` or edit ~/.config/zsh/.p10k.zsh.
-[[ ! -f ~/.config/zsh/.p10k.zsh ]] || source ~/.config/zsh/.p10k.zsh
+export SHELDON_CONFIG_DIR="$ZDOTDIR/sheldon"
+sheldon_cache="$SHELDON_CONFIG_DIR/sheldon.zsh"
+sheldon_toml="$SHELDON_CONFIG_DIR/plugins.toml"
+if [[ ! -r "$sheldon_cache" || "$sheldon_toml" -nt "$sheldon_cache" ]]; then
+  sheldon source > $sheldon_cache
+fi
+source "$sheldon_cache"
+unset sheldon_cache sheldon_toml
+
+# eval "$(sheldon source)"
