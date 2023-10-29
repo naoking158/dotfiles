@@ -1,8 +1,10 @@
 {
     "global": {
+        "ask_for_confirmation_before_quitting": true,
         "check_for_updates_on_startup": true,
         "show_in_menu_bar": false,
-        "show_profile_name_in_menu_bar": false
+        "show_profile_name_in_menu_bar": false,
+        "unsafe_ui": false
     },
     "profiles": [
         {
@@ -15,6 +17,96 @@
                     "mouse_motion_to_scroll.speed": 100
                 },
                 "rules": [
+                  {
+                  "description": "Open Emacs by pressing right-shift twice",
+                  "manipulators": [
+                    {
+                    "type": "basic",
+                    "conditions": [
+                      {
+                      "type": "variable_if",
+                      "name": "r_shift",
+                      "value": 1
+                    }
+                    ],
+                    "from": { "key_code": "right_shift" },
+                    "to": [
+                      { "shell_command": "source ~/.profile && open -a Emacs.app" }
+                    ]
+                  },
+                    {
+                    "type": "basic",
+                    "conditions": [
+                      {
+                      "type": "variable_if",
+                      "name": "r_shift",
+                      "value": 0
+                    }
+                    ],
+                    "from": {
+                      "key_code": "right_shift",
+                      "modifiers": { "optional": [ "any" ] }
+                    },
+                    "to": [
+                      { "set_variable": { "name": "r_shift", "value": 1 } },
+                      { "key_code": "right_shift" }
+                    ],
+                    "to_delayed_action": {
+                      "to_if_invoked": [
+                        { "set_variable": { "name": "r_shift", "value": 0 } }
+                      ],
+                      "to_if_canceled": [
+                        { "set_variable": { "name": "r_shift", "value": 0 } }
+                      ]
+                    }
+                  }
+                  ]
+                },
+                  {
+                  "description": "Open Vivaldi by pressing right-option twice",
+                  "manipulators": [
+                    {
+                    "type": "basic",
+                    "conditions": [
+                      {
+                      "type": "variable_if",
+                      "name": "r_option",
+                      "value": 1
+                    }
+                    ],
+                    "from": { "key_code": "right_option" },
+                    "to": [
+                      { "shell_command": "open -a vivaldi" }
+                    ]
+                  },
+                    {
+                    "type": "basic",
+                    "conditions": [
+                      {
+                      "type": "variable_if",
+                      "name": "r_option",
+                      "value": 0
+                    }
+                    ],
+                    "from": {
+                      "key_code": "right_option",
+                      "modifiers": { "optional": [ "any" ] }
+                    },
+                    "to": [
+                      { "set_variable": { "name": "r_option", "value": 1 } },
+                      { "key_code": "right_option" }
+                    ],
+                    "to_delayed_action": {
+                      "to_if_invoked": [
+                        { "set_variable": { "name": "r_option", "value": 0 } }
+                      ],
+                      "to_if_canceled": [
+                        { "set_variable": { "name": "r_option", "value": 0 } }
+                      ]
+                    }
+                  }
+                  ]
+                },
                     {
                         "description": "from [right_shift + Spacebar] to [^] (shift+6)",
                         "manipulators": [
@@ -906,146 +998,6 @@
                                 "type": "basic"
                             }
                         ]
-                    },
-                    {
-                        "description": "Open Brave by pressing right-option twice",
-                        "manipulators": [
-                            {
-                                "conditions": [
-                                    {
-                                        "name": "r_option",
-                                        "type": "variable_if",
-                                        "value": 1
-                                    }
-                                ],
-                                "from": {
-                                    "key_code": "right_option"
-                                },
-                                "to": [
-                                    {
-                                        "shell_command": "open -a 'brave browser'"
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "conditions": [
-                                    {
-                                        "name": "r_option",
-                                        "type": "variable_if",
-                                        "value": 0
-                                    }
-                                ],
-                                "from": {
-                                    "key_code": "right_option",
-                                    "modifiers": {
-                                        "optional": [
-                                            "any"
-                                        ]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "set_variable": {
-                                            "name": "r_option",
-                                            "value": 1
-                                        }
-                                    },
-                                    {
-                                        "key_code": "right_option"
-                                    }
-                                ],
-                                "to_delayed_action": {
-                                    "to_if_canceled": [
-                                        {
-                                            "set_variable": {
-                                                "name": "r_option",
-                                                "value": 0
-                                            }
-                                        }
-                                    ],
-                                    "to_if_invoked": [
-                                        {
-                                            "set_variable": {
-                                                "name": "r_option",
-                                                "value": 0
-                                            }
-                                        }
-                                    ]
-                                },
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "Open Emacs by pressing right-shift twice",
-                        "manipulators": [
-                            {
-                                "conditions": [
-                                    {
-                                        "name": "r_shift",
-                                        "type": "variable_if",
-                                        "value": 1
-                                    }
-                                ],
-                                "from": {
-                                    "key_code": "right_shift"
-                                },
-                                "to": [
-                                    {
-                                        "shell_command": "open ~/.nix-profile/Applications/Emacs.app"
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "conditions": [
-                                    {
-                                        "name": "r_shift",
-                                        "type": "variable_if",
-                                        "value": 0
-                                    }
-                                ],
-                                "from": {
-                                    "key_code": "right_shift",
-                                    "modifiers": {
-                                        "optional": [
-                                            "any"
-                                        ]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "set_variable": {
-                                            "name": "r_shift",
-                                            "value": 1
-                                        }
-                                    },
-                                    {
-                                        "key_code": "right_shift"
-                                    }
-                                ],
-                                "to_delayed_action": {
-                                    "to_if_canceled": [
-                                        {
-                                            "set_variable": {
-                                                "name": "r_shift",
-                                                "value": 0
-                                            }
-                                        }
-                                    ],
-                                    "to_if_invoked": [
-                                        {
-                                            "set_variable": {
-                                                "name": "r_shift",
-                                                "value": 0
-                                            }
-                                        }
-                                    ]
-                                },
-                                "type": "basic"
-                            }
-                        ]
                     }
                 ]
             },
@@ -1192,7 +1144,8 @@
                                 }
                             ]
                         }
-                    ]
+                    ],
+                    "treat_as_built_in_keyboard": false
                 },
                 {
                     "disable_built_in_keyboard_if_exists": false,
@@ -1205,7 +1158,8 @@
                     },
                     "ignore": false,
                     "manipulate_caps_lock_led": true,
-                    "simple_modifications": []
+                    "simple_modifications": [],
+                    "treat_as_built_in_keyboard": false
                 },
                 {
                     "disable_built_in_keyboard_if_exists": false,
@@ -1249,7 +1203,8 @@
                                 }
                             ]
                         }
-                    ]
+                    ],
+                    "treat_as_built_in_keyboard": false
                 },
                 {
                     "disable_built_in_keyboard_if_exists": false,
@@ -1262,7 +1217,8 @@
                     },
                     "ignore": false,
                     "manipulate_caps_lock_led": false,
-                    "simple_modifications": []
+                    "simple_modifications": [],
+                    "treat_as_built_in_keyboard": false
                 },
                 {
                     "disable_built_in_keyboard_if_exists": false,
@@ -1275,7 +1231,8 @@
                     },
                     "ignore": false,
                     "manipulate_caps_lock_led": true,
-                    "simple_modifications": []
+                    "simple_modifications": [],
+                    "treat_as_built_in_keyboard": false
                 },
                 {
                     "disable_built_in_keyboard_if_exists": false,
@@ -1288,7 +1245,8 @@
                     },
                     "ignore": false,
                     "manipulate_caps_lock_led": true,
-                    "simple_modifications": []
+                    "simple_modifications": [],
+                    "treat_as_built_in_keyboard": false
                 },
                 {
                     "disable_built_in_keyboard_if_exists": false,
@@ -1301,7 +1259,78 @@
                     },
                     "ignore": true,
                     "manipulate_caps_lock_led": false,
-                    "simple_modifications": []
+                    "simple_modifications": [],
+                    "treat_as_built_in_keyboard": false
+                },
+                {
+                    "disable_built_in_keyboard_if_exists": false,
+                    "fn_function_keys": [],
+                    "identifiers": {
+                        "is_keyboard": true,
+                        "is_pointing_device": false,
+                        "product_id": 835,
+                        "vendor_id": 1452
+                    },
+                    "ignore": false,
+                    "manipulate_caps_lock_led": true,
+                    "simple_modifications": [],
+                    "treat_as_built_in_keyboard": false
+                },
+                {
+                    "disable_built_in_keyboard_if_exists": false,
+                    "fn_function_keys": [],
+                    "identifiers": {
+                        "is_keyboard": false,
+                        "is_pointing_device": true,
+                        "product_id": 835,
+                        "vendor_id": 1452
+                    },
+                    "ignore": true,
+                    "manipulate_caps_lock_led": false,
+                    "simple_modifications": [],
+                    "treat_as_built_in_keyboard": false
+                },
+                {
+                    "disable_built_in_keyboard_if_exists": false,
+                    "fn_function_keys": [],
+                    "identifiers": {
+                        "is_keyboard": false,
+                        "is_pointing_device": true,
+                        "product_id": 32792,
+                        "vendor_id": 1149
+                    },
+                    "ignore": true,
+                    "manipulate_caps_lock_led": false,
+                    "simple_modifications": [],
+                    "treat_as_built_in_keyboard": false
+                },
+                {
+                    "disable_built_in_keyboard_if_exists": false,
+                    "fn_function_keys": [],
+                    "identifiers": {
+                        "is_keyboard": false,
+                        "is_pointing_device": true,
+                        "product_id": 613,
+                        "vendor_id": 76
+                    },
+                    "ignore": true,
+                    "manipulate_caps_lock_led": false,
+                    "simple_modifications": [],
+                    "treat_as_built_in_keyboard": false
+                },
+                {
+                    "disable_built_in_keyboard_if_exists": false,
+                    "fn_function_keys": [],
+                    "identifiers": {
+                        "is_keyboard": true,
+                        "is_pointing_device": true,
+                        "product_id": 45091,
+                        "vendor_id": 1133
+                    },
+                    "ignore": true,
+                    "manipulate_caps_lock_led": true,
+                    "simple_modifications": [],
+                    "treat_as_built_in_keyboard": false
                 }
             ],
             "fn_function_keys": [
@@ -1311,7 +1340,7 @@
                     },
                     "to": [
                         {
-                            "consumer_key_code": "display_brightness_decrement"
+                            "key_code": "f1"
                         }
                     ]
                 },
@@ -1321,7 +1350,7 @@
                     },
                     "to": [
                         {
-                            "consumer_key_code": "display_brightness_increment"
+                            "key_code": "f2"
                         }
                     ]
                 },
@@ -1449,26 +1478,6 @@
                     "to": [
                         {
                             "consumer_key_code": "rewind"
-                        }
-                    ]
-                },
-                {
-                    "from": {
-                        "key_code": "f1"
-                    },
-                    "to": [
-                        {
-                            "consumer_key_code": "display_brightness_decrement"
-                        }
-                    ]
-                },
-                {
-                    "from": {
-                        "key_code": "f2"
-                    },
-                    "to": [
-                        {
-                            "consumer_key_code": "display_brightness_increment"
                         }
                     ]
                 },

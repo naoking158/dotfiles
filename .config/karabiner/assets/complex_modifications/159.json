@@ -47,7 +47,7 @@
             ]
         },
         {
-            "description": "Open Brave by pressing right-option twice",
+            "description": "Open Vivaldi by pressing right-option twice",
             "manipulators": [
                 {
                     "type": "basic",
@@ -60,7 +60,7 @@
                     ],
                     "from": { "key_code": "right_option" },
                     "to": [
-                        { "shell_command": "open -a 'brave browser'" }
+                        { "shell_command": "open -a vivaldi" }
                     ]
                 },
                 {
@@ -91,51 +91,6 @@
                 }
             ]
         },
-        // {
-        //     "description": "Open Safari by pressing right-option twice",
-        //     "manipulators": [
-        //         {
-        //             "type": "basic",
-        //             "conditions": [
-        //                 {
-        //                     "type": "variable_if",
-        //                     "name": "r_option",
-        //                     "value": 1
-        //                 }
-        //             ],
-        //             "from": { "key_code": "right_option" },
-        //             "to": [
-        //                 { "shell_command": "open -a safari" }
-        //             ]
-        //         },
-        //         {
-        //             "type": "basic",
-        //             "conditions": [
-        //                 {
-        //                     "type": "variable_if",
-        //                     "name": "r_option",
-        //                     "value": 0
-        //                 }
-        //             ],
-        //             "from": {
-        //                 "key_code": "right_option",
-        //                 "modifiers": { "optional": [ "any" ] }
-        //             },
-        //             "to": [
-        //                 { "set_variable": { "name": "r_option", "value": 1 } },
-        //                 { "key_code": "right_option" }
-        //             ],
-        //             "to_delayed_action": {
-        //                 "to_if_invoked": [
-        //                     { "set_variable": { "name": "r_option", "value": 0 } }
-        //                 ],
-        //                 "to_if_canceled": [
-        //                     { "set_variable": { "name": "r_option", "value": 0 } }
-        //                 ]
-        //             }
-        //         }
-        //     ]
-        // },
         {
             "description": "Open Terminal.app by pressing left-option twice",
             "manipulators": [
