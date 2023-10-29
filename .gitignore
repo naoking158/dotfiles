@@ -26,6 +26,7 @@
 !/.tmux/plugins/
 !/.tmux/plugins/tpm/
 !/.zshrc
+*.zwc
 
 !/.config/
 !/.config/alacritty/
