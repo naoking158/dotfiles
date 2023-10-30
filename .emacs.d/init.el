@@ -1859,7 +1859,7 @@ respectively."
   :straight t
   :custom ((completion-category-defaults . nil)
            (completion-category-overrides . nil)
-           (fussy-filter-fn . 'fussy-filter-orderless-flex)
+           (fussy-filter-fn . 'fussy-filter-default)
            (fussy-score-fn . 'fussy-fuz-score))
   :config (push 'fussy completion-styles)
   :init
