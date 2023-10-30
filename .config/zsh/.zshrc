@@ -1,5 +1,5 @@
 # Set global environment variables
-[[ -f "${HOME}/.profile" ]] && source "${HOME}/.profile"
+[[ -n ${SYSTEM:-} ]] || [[ -f "${HOME}/.profile" ]] && source "${HOME}/.profile"
 
 # source command override technique
 function source {

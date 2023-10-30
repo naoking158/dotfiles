@@ -25,6 +25,7 @@ apply = ["defer"]
 
 [plugins.fast-syntax-highlighting]
 github = "zdharma-continuum/fast-syntax-highlighting"
+apply = ["defer"]
 
 [plugins.zsh-history-substring-search]
 github = "zsh-users/zsh-history-substring-search"
@@ -70,8 +71,4 @@ fi
 
 [plugins.docker-completion]
 remote = "https://github.com/docker/cli/blob/master/contrib/completion/zsh/_docker"
-apply = ["fpath"]
-
-# [plugins.firewalld-completion]
-# remote = "https://gist.githubusercontent.com/darkxanter/6abf535fa7586f38d78181f6d00c9d98/raw/8cab860aedddac77a85da1bf9a0afad7cefe1615/_firewalld"
-# apply = ["fpath"]
+apply = ["fpath", "defer"]
