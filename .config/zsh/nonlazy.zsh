@@ -11,7 +11,6 @@ HISTSIZE="10000"
 SAVEHIST="10000"
 
 HISTFILE="${HOME}/.local/share/zsh/history"
-# mkdir -p "$(dirname '$HISTFILE')"
 
 setopt HIST_FCNTL_LOCK
 setopt HIST_IGNORE_DUPS

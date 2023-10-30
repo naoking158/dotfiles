@@ -5,7 +5,9 @@ set -Ceu
 
 git_root=$(git rev-parse --show-toplevel)
 
-TERM=xterm-direct emacs -q -nw --eval "
+[[ $COLORTERM == "truecolor" ]] || export TERM=xterm-direct
+
+emacs -q -nw --eval "
 (progn
   (add-to-list 'load-path (locate-user-emacs-file \"straight/build/dash\"))
   (add-to-list 'load-path (locate-user-emacs-file \"straight/build/compat\"))
