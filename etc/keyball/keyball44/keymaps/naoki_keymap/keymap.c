@@ -70,3 +70,14 @@ void oledkit_render_info_user(void) {
     keyball_oled_render_layerinfo();
 }
 #endif
+
+uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case LT(2,KC_SPC):
+            return QUICK_TAP_TERM - 100;
+        case LT(1,KC_SPC):
+            return QUICK_TAP_TERM - 100;
+        default:
+            return QUICK_TAP_TERM;
+    }
+}
