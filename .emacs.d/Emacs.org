@@ -1684,7 +1684,7 @@ Only in Neotree Buffer:
 (leaf markdown-mode
   :mode (("\\.md\\'" . gfm-mode)
          ("\\.spec\\'" . markdown-mode))
-  :custom (markdown-command . "/usr/bin/multimarkdown"))
+  :custom (markdown-command . "multimarkdown"))
 #+end_src
 
 *** Shell

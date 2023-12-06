@@ -1061,7 +1061,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
 (leaf markdown-mode
   :mode (("\\.md\\'" . gfm-mode)
          ("\\.spec\\'" . markdown-mode))
-  :custom (markdown-command . "/usr/bin/multimarkdown"))
+  :custom (markdown-command . "multimarkdown"))
 
 ;; (leaf sh-mode
 ;;   :hook (sh-mode-hook . lsp-bridge-mode))
