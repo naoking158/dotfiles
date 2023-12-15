@@ -12,9 +12,6 @@
 
 shell = "zsh"
 
-[templates]
-defer = "{{ hooks | get: \"pre\" | nl }}{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}{{ hooks | get: \"post\" | nl }}"
-
 [plugins.zsh-defer]
 github = "romkatv/zsh-defer"
 
@@ -72,3 +69,6 @@ fi
 [plugins.docker-completion]
 remote = "https://github.com/docker/cli/blob/master/contrib/completion/zsh/_docker"
 apply = ["fpath", "defer"]
+
+[templates]
+defer = "{{ hooks | get: \"pre\" | nl }}{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}{{ hooks | get: \"post\" | nl }}"
