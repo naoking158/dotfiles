@@ -403,7 +403,7 @@
                                   (bookmarks . 5))))
     :config
     (when window-system
-      (setq dashboard-startup-banner (expand-file-name "~/.emacs.d/banner/coffee.png")))
+      (setq dashboard-startup-banner (expand-file-name "~/.emacs.d/etc/banner/coffee.png")))
     (dashboard-setup-startup-hook))
 
   (leaf set-title-bar
@@ -1374,7 +1374,7 @@ respectively."
   :straight t
   :hook (emacs-startup-hook . yas-global-mode)
   :custom ((yas-indent-line . 'fixed)
-           (yas-snippet-dirs . `(,(file-truename "~/.emacs.d/snippets/"))))
+           (yas-snippet-dirs . `(,(file-truename "~/.emacs.d/etc/snippets/"))))
   :bind ((yas-keymap
           ("<tab>" . nil))  ;; conflict with company/coruf
          (yas-minor-mode-map
@@ -3282,99 +3282,6 @@ respectively."
   :require t
   :bind ("C-x C-c" . server-edit)
   :hook (emacs-startup-hook . server-start))
-
-(leaf xwwp
-  :disabled t
-  :when (or (<= emacs-major-version 27)
-            (memq window-system '(ns darwin)))
-  :straight t
-  :custom (browse-url-browser-function . 'xwidget-webkit-browse-url)
-  :bind (("C-c s" . xwwp)
-         (xwidget-webkit-mode-map
-          ("v" . xwwp-follow-link)
-          ([remap kill-ring-save] . xwidget-webkit-copy-selection-as-kill)
-          ([remap xwidget-webkit-browse-url] . xwwp)))
-  :advice (:override xwwp-browse-url-other-window
-                     my/xwwp-browse-url-other-window)
-  :preface
-  (defun my/xwwp-browse-url-other-window (url &optional new-session)
-    "Ask xwidget-webkit to browse URL.
-NEW-SESSION specifies whether to create a new xwidget-webkit session.
-Interactively, URL defaults to the string looking like a url around point."
-    (interactive (progn
-                   (require 'browse-url)
-                   (browse-url-interactive-arg "xwidget-webkit URL: "
-                                               ;;(xwidget-webkit-current-url)
-                                               )))
-    (or (featurep 'xwidget-internal)
-        (user-error "Your Emacs was not compiled with xwidgets support"))
-    (when (stringp url)
-      (if new-session
-          (xwidget-webkit-new-session url)
-        (progn (xwidget-webkit-goto-url url)
-               (switch-to-buffer (xwidget-buffer
-                                  (xwidget-webkit-current-session))))))))
-
-(leaf webkit
-  :disabled t
-  :when (and (eq 28 emacs-major-version)
-             (memq window-system '(x pgtk)))
-  :load-path "~/.emacs.d/elisp/emacs-webkit/"
-  :require t webkit-ace webkit-dark
-  ;; :init
-  ;; ;; This must be set before webkit.el is loaded so certain hooks aren't installed
-  ;; (setq webkit-own-window t)
-  :bind (("C-c s" . webkit))
-  :config
-  ;; If you don't care so much about privacy and want to give your data to google
-  (setq webkit-search-prefix "https://google.com/search?q=")
-
-  ;; Specify a different set of characters use in the link hints
-  ;; For example the following are more convienent if you use dvorak
-  (setq webkit-ace-chars "asdfjkl;")
-
-  ;; If you want history saved in a different place or
-  ;; Set to `nil' to if you don't want history saved to file (will stay in memory)
-  (setq webkit-history-file
-        (expand-file-name "webkit-history" no-littering-etc-directory))
-
-  ;; If you want cookies saved in a different place or
-  ;; Set to `nil' to if you don't want cookies saved
-  (setq webkit-cookie-file
-        (expand-file-name "cookies" no-littering-etc-directory))
-
-  ;; Set webkit as the default browse-url browser
-  ;; (setq browse-url-browser-function 'webkit-browse-url)
-  ;; (setq browse-url-browser-function 'browse-url-default-browser)
-
-  ;; Force webkit to always open a new session instead of reusing a current one
-  (setq webkit-browse-url-force-new t)
-
-  ;; Globally disable javascript
-  ;; (add-hook 'webkit-new-hook #'webkit-enable-javascript)
-
-  ;; Override the "loading:" mode line indicator with an icon from `all-the-icons.el'
-  ;; You could also use a unicode icon like ↺
-  (defun webkit--display-progress (progress)
-    (setq webkit--progress-formatted
-          (if (equal progress 100.0)
-              ""
-            (format "%s%.0f%%  " (all-the-icons-faicon "spinner") progress)))
-    (force-mode-line-update))
-
-  ;; Set action to be taken on a download request. Predefined actions are
-  ;; `webkit-download-default', `webkit-download-save', and `webkit-download-open'
-  ;; where the save function saves to the download directory, the open function
-  ;; opens in a temp buffer and the default function interactively prompts.
-  (setq webkit-download-action-alist '(("\\.pdf\\'" . webkit-download-open)
-                                       ("\\.png\\'" . webkit-download-save)
-                                       (".*" . webkit-download-default)))
-
-  ;; Globally use a proxy
-  ;; (add-hook 'webkit-new-hook (lambda () (webkit-set-proxy "socks://localhost:8000")))
-
-  ;; Globally use the simple dark mode
-  (setq webkit-dark-mode t))
 
 (leaf pdf-tools
   :straight t

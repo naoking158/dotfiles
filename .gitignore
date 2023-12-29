@@ -103,6 +103,8 @@
 !/.emacs.d/skk-get-jisyo/SKK-JISYO.Huge.utf8
 !/.emacs.d/snippets/
 !/.emacs.d/snippets/**
+!/.emacs.d/etc/
+!/.emacs.d/etc/**
 
 ## Linux
 !/.config/i3/
