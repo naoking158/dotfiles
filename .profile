@@ -23,6 +23,12 @@ fi
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
+# Set homebrew path
+if [[ $SYSTEM == "macos" && -e "/opt/homebrew" ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+    FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+fi
+
 # Set cargo path
 [[ -e $HOME/.cargo/env ]] && . "$HOME/.cargo/env"
 if [[ -e $HOME/.cargo/bin ]]; then

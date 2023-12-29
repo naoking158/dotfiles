@@ -1,14 +1,3 @@
-# Set homebrew path
-if [[ $SYSTEM == "macos" ]] && [[ -e "/opt/homebrew" ]]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-    if type brew &>/dev/null; then
-        FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-        if [[ -e $(brew --prefix)/etc/bash_completion.d/az ]]; then
-            source $(brew --prefix)/etc/bash_completion.d/az
-        fi
-    fi
-fi
-
 # github
 export G_USER=$(git config user.name)
 export G_ROOT=$(git config ghq.root)
@@ -116,5 +105,19 @@ alias dpush='ssh ${dev_vm} "rm -rf ~/work/${dev_pkg}" && myrsync -u ${dev_vm} ~/
 alias -g G='| grep'
 
 autoload -Uz compinit && compinit -i
+
+# az.completion
 autoload -U bashcompinit && bashcompinit
+local ZSH_COMPLETION_PATH=${HOME}/.cache/zsh/completions
+if type az > /dev/null 2>&1; then
+    if [[ ! -e ${ZSH_COMPLETION_PATH}/az.completion ]]; then
+        mkdir -p $ZSH_COMPLETION_PATH
+        curl -sL 'https://raw.githubusercontent.com/Azure/azure-cli/dev/az.completion'\
+             -o "${ZSH_COMPLETION_PATH}/az.completion"
+    fi
+
+    source ${ZSH_COMPLETION_PATH}/az.completion
+fi
+
+
 typeset -U path cdpath fpath manpath
