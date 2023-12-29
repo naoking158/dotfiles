@@ -358,7 +358,7 @@ print(json.dumps(result))
 #+begin_src conf
 
 # Background
-set $background $HOME/.dotfiles/wallpapers/sea_and_mountain.jpg
+set $background $HOME/.dotfiles/etc/wallpapers/sea_and_mountain.jpg
 output * bg $background fill
 #+end_src
 
