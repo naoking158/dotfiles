@@ -73,6 +73,9 @@
 !/.config/yabai/**
 !/.config/zsh/
 !/.config/zsh/**
+!/.config/tmux/
+!/.config/tmux/tmux.conf
+
 
 !/.config/karabiner/
 !/.config/karabiner/karabiner.json
