@@ -738,7 +738,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :straight t
   :after consult
   :leaf-defer nil
-  :load-path "~/.emacs.d/elisp/meow-config/"
+  :load-path "~/.emacs.d/etc/meow-config/"
   :config
   (require 'meow-keybindings)
   (meow-setup)
