@@ -1,1 +1,0 @@
-/Users/naoki/.dotfiles/bin/fish/my-server-util.fish

@@ -1,1 +1,0 @@
-/Users/naoki/.dotfiles/bin/fish/fish_user_key_bindings.fish
