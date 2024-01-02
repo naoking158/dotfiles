@@ -1,0 +1,3 @@
+[".config/tmux/plugins/tpm"]
+type = "file"
+url = "https://github.com/tmux-plugins/tpm"

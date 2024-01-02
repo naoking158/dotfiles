@@ -1,5 +1,0 @@
-{
-  "name": "svelte",
-  "languageId": "svelte",
-  "command": [ "svelteserver", "--stdio" ]
-}
