@@ -116,7 +116,7 @@ a bunch of resources I've found online.
   - [[#markdown-preview-mode][Markdown-preview-mode]]
   - [[#mermaid-mode][Mermaid-mode]]
   - [[#editorconfig][Editorconfig]]
-  - [[#prettier][Prettier]]
+  - [[#format-all][Format-all]]
   - [[#direnv][Direnv]]
   - [[#poetry][Poetry]]
   - [[#pyvenv][Pyvenv]]
@@ -5060,16 +5060,12 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
   :global-minor-mode editorconfig-mode)
 #+end_src
 
-** Prettier
-:PROPERTIES:
-:ID:       199f9a01-7f72-43fd-a921-51184b59bc15
-:END:
+
+** Format-all
 
 #+begin_src emacs-lisp
-(leaf prettier
-  :straight t
-  :custom ((prettier-editorconfig-flag . t)
-           (prettier-prettify-on-save-flag . nil)))
+(leaf format-all
+  :straight t)
 #+end_src
 
 ** Direnv
