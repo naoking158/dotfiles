@@ -457,8 +457,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                                          "GPG_AGENT_INFO"
                                          "LANG"
                                          "LC_CTYPE"
-                                         "NIX_SSL_CERT_FILE"
-                                         "NIX_PATH"
+                                         "NODE_PATH"
                                          "PYTHONPATH"
                                          "NEPTUNE_API_TOKEN")))
     :config
@@ -1514,7 +1513,9 @@ Only in Neotree Buffer:
          ("C-c C-p" . lsp-bridge-diagnostic-jump-prev)
          ("C-c l l" . lsp-bridge-diagnostic-list)
          ("C-c l c" . lsp-bridge-diagnostic-copy)
-         ("C-c l r" . lsp-bridge-rename))
+         ("C-c l r" . lsp-bridge-rename)
+         ("M-p" . acm-doc-scroll-up)
+         ("M-n" . acm-doc-scroll-down))
   :preface
   (defun run-local-vars-mode-hook ()
     "Run `major-mode' hook after the local variables have been processed."
