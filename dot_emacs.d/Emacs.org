@@ -769,7 +769,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                                   (bookmarks . 5))))
     :config
     (when window-system
-      (setq dashboard-startup-banner (expand-file-name "~/.emacs.d/banner/coffee.png")))
+      (setq dashboard-startup-banner (expand-file-name "~/.emacs.d/etc/banner/coffee.png")))
     (dashboard-setup-startup-hook))
 
   (leaf set-title-bar
@@ -4508,6 +4508,7 @@ From the search buffer there are a number of ways to interact with entries. Entr
 
 #+begin_src emacs-lisp
 (leaf mail-general
+  :disabled t
   :require t
   :load-path "~/src/github.com/naoking158/envs/config-mail/")
 #+end_src
@@ -5247,6 +5248,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 
 
 ** Format-all
+:PROPERTIES:
+:ID:       5460d222-04cb-4ebb-a9e8-4cbfff0a2f5f
+:END:
 
 #+begin_src emacs-lisp
 (leaf format-all
