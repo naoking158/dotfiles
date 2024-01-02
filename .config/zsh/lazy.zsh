@@ -119,5 +119,25 @@ if type az > /dev/null 2>&1; then
     source ${ZSH_COMPLETION_PATH}/az.completion
 fi
 
+# Set cargo path
+[[ -e $HOME/.cargo/env ]] && . "$HOME/.cargo/env"
+if [[ -e $HOME/.cargo/bin ]]; then
+    PATH="$HOME/.cargo/bin:$PATH"
+fi
+
+# Set npm path
+if [[ -e "${HOME}/.npm" ]]; then
+    npm config set prefix '~/.npm'
+    PATH="$HOME/.npm/bin:$PATH"
+    NODE_PATH="$HOME/.npm/lib/node_modules"
+fi
+
+# Set Go path
+if type go >/dev/null 2>&1; then
+    export GOPATH=$(go env GOPATH)
+    PATH="${PATH}:${GOPATH}/bin"
+fi
+export PATH
+
 
 typeset -U path cdpath fpath manpath

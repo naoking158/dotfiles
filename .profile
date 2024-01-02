@@ -29,24 +29,6 @@ if [[ $SYSTEM == "macos" && -e "/opt/homebrew" ]]; then
     FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 fi
 
-# Set cargo path
-[[ -e $HOME/.cargo/env ]] && . "$HOME/.cargo/env"
-if [[ -e $HOME/.cargo/bin ]]; then
-    PATH="$HOME/.cargo/bin:$PATH"
-fi
-
-# Set npm path
-if [[ $SYSTEM == "manjaro" ]] && [[ -e "${HOME}/.npm" ]]; then
-    npm config set prefix '~/.npm'
-    PATH="$HOME/.npm/bin:$PATH"
-fi
-
-# Set Go path
-if type go >/dev/null 2>&1; then
-    export GOPATH=$(go env GOPATH)
-    PATH="${PATH}:${GOPATH}/bin"
-fi
-
 if type emacs >/dev/null 2>&1; then
     export EDITOR="emacsclient -nw --alternate-editor='emacs -Q -nw'"
 else
