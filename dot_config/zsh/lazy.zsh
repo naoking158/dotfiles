@@ -119,11 +119,8 @@ if type az > /dev/null 2>&1; then
     source ${ZSH_COMPLETION_PATH}/az.completion
 fi
 
-# Set cargo path
-[[ -e $HOME/.cargo/env ]] && . "$HOME/.cargo/env"
-if [[ -e $HOME/.cargo/bin ]]; then
-    PATH="$HOME/.cargo/bin:$PATH"
-fi
+# Set nvm path
+[[ -e /usr/share/nvm/init-nvm.sh ]] && source /usr/share/nvm/init-nvm.sh
 
 # Set npm path
 if [[ -e "${HOME}/.npm" ]]; then
