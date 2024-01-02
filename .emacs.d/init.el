@@ -200,8 +200,7 @@
                                          "GPG_AGENT_INFO"
                                          "LANG"
                                          "LC_CTYPE"
-                                         "NIX_SSL_CERT_FILE"
-                                         "NIX_PATH"
+                                         "NODE_PATH"
                                          "PYTHONPATH"
                                          "NEPTUNE_API_TOKEN")))
     :config
@@ -954,7 +953,9 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
          ("C-c C-p" . lsp-bridge-diagnostic-jump-prev)
          ("C-c l l" . lsp-bridge-diagnostic-list)
          ("C-c l c" . lsp-bridge-diagnostic-copy)
-         ("C-c l r" . lsp-bridge-rename))
+         ("C-c l r" . lsp-bridge-rename)
+         ("M-p" . acm-doc-scroll-up)
+         ("M-n" . acm-doc-scroll-down))
   :preface
   (defun run-local-vars-mode-hook ()
     "Run `major-mode' hook after the local variables have been processed."
@@ -1016,7 +1017,10 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :straight t
   :custom ((web-mode-markup-indent-offset . 2)
            (web-mode-css-indent-offset . 2)
-           (web-mode-code-indent-offset . 2))
+           (web-mode-code-indent-offset . 2)
+           (web-mode-part-padding . 0)
+           (web-mode-style-padding . 0)
+           (web-mode-script-padding . 0))
   :mode ("\\.html\\'"
          "\\.phtml\\'"
          "\\.tpl\\.php\\'"
@@ -1025,7 +1029,11 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
          "\\.erb\\'"
          "\\.mustache\\'"
          "\\.djhtml\\'"
-         "\\.vue\\'"))
+         "\\.vue\\'"
+         )
+  :config
+  (define-derived-mode vue-mode web-mode "Vue")
+  (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode)))
 
 (leaf *javascript
   :hook
@@ -3465,10 +3473,8 @@ respectively."
   :straight t
   :global-minor-mode editorconfig-mode)
 
-(leaf prettier
-  :straight t
-  :custom ((prettier-editorconfig-flag . t)
-           (prettier-prettify-on-save-flag . nil)))
+(leaf format-all
+  :straight t)
 
 ;; (leaf direnv
 ;;   :straight t
