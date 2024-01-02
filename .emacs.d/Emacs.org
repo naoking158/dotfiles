@@ -1604,12 +1604,14 @@ Only in Neotree Buffer:
 :END:
 
 #+begin_src emacs-lisp
-
 (leaf web-mode
   :straight t
   :custom ((web-mode-markup-indent-offset . 2)
            (web-mode-css-indent-offset . 2)
-           (web-mode-code-indent-offset . 2))
+           (web-mode-code-indent-offset . 2)
+           (web-mode-part-padding . 0)
+           (web-mode-style-padding . 0)
+           (web-mode-script-padding . 0))
   :mode ("\\.html\\'"
          "\\.phtml\\'"
          "\\.tpl\\.php\\'"
@@ -1618,7 +1620,11 @@ Only in Neotree Buffer:
          "\\.erb\\'"
          "\\.mustache\\'"
          "\\.djhtml\\'"
-         "\\.vue\\'"))
+         "\\.vue\\'"
+         )
+  :config
+  (define-derived-mode vue-mode web-mode "Vue")
+  (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode)))
 #+end_src
 
 *** JavaScript
@@ -1662,6 +1668,7 @@ Only in Neotree Buffer:
   :require deno-fmt
   :hook (typescript-mode-hook . deno-fmt-mode))
 #+end_src
+
 
 *** JSON
 :PROPERTIES:
