@@ -1,3 +1,208 @@
+#+TITLE: Emacs Configuration
+#+PROPERTY: header-args:emacs-lisp :tangle (file-truename "~/.emacs.d/init.el")
+
+This is an ongoing evolution of my original Emacs configuration files, inspired by
+a bunch of resources I've found online.
+
+* Table of Contents
+:PROPERTIES:
+:TOC:      :include all :depth 2 :force (ignore) :ignore (this) :local (nothing)
+:END:
+:CONTENTS:
+- [[#table-of-contents][Table of Contents]]
+- [[#early-init][Early-Init]]
+- [[#header][Header]]
+- [[#startup-performance][Startup Performance]]
+- [[#package-management][Package Management]]
+- [[#keep-emacsd-clean][Keep .emacs.d Clean]]
+- [[#general-configuration][General Configuration]]
+  - [[#properties-of-builtin][Properties of builtin]]
+  - [[#change-modifiers][Change modifiers]]
+  - [[#auto-revert-buffer][Auto revert buffer]]
+  - [[#auto-saving-changed-files][Auto-Saving Changed Files]]
+  - [[#undo-helper][Undo Helper]]
+- [[#utility-functions][Utility Functions]]
+  - [[#toggle-mode-line][Toggle Mode-line]]
+  - [[#trim-newline-from-string][Trim newline from string]]
+  - [[#sort-sexpresions][Sort Sexpresions]]
+  - [[#command-log-mode][Command Log Mode]]
+  - [[#presentation][Presentation]]
+  - [[#bibtex-indent][Bibtex Indent]]
+- [[#basic-ui-configuration][Basic UI Configuration]]
+  - [[#user-interface][User Interface]]
+  - [[#frame-transparency][Frame Transparency]]
+  - [[#font-configuration][Font Configuration]]
+  - [[#theme-configuration][Theme Configuration]]
+  - [[#modeline-configuration][Modeline Configuration]]
+- [[#keyboard-bindings][Keyboard Bindings]]
+  - [[#modal-editing-with-meow][Modal Editing with Meow]]
+  - [[#keybinding-panel-which-key][Keybinding Panel (which-key)]]
+  - [[#transient-commands][Transient Commands]]
+- [[#file-browsing][File Browsing]]
+  - [[#dired][Dired]]
+  - [[#opening-files-externally][Opening Files Externally]]
+  - [[#neotree][NeoTree]]
+- [[#development][Development]]
+  - [[#git][Git]]
+  - [[#debugger-with-dap-mode][Debugger with Dap Mode]]
+  - [[#projects-management][Projects Management]]
+  - [[#language][Language]]
+  - [[#productivity][Productivity]]
+- [[#window-management][Window Management]]
+  - [[#window-history-with-winner-mode][Window History with winner-mode]]
+  - [[#window-selection-with-ace-window][Window Selection with ace-window]]
+  - [[#window-movement-with-windmove][Window Movement with windmove]]
+  - [[#resize-window][Resize Window]]
+  - [[#split-and-follow][Split and follow]]
+  - [[#tab-management][Tab management]]
+  - [[#rotate-window-layout][Rotate Window Layout]]
+  - [[#set-margins][Set Margins]]
+  - [[#control-buffer-placement][Control Buffer Placement]]
+- [[#completion-system][Completion System]]
+  - [[#duplicate-line-or-selected-regions-with-duplicate-thing][Duplicate line or selected regions with Duplicate-thing]]
+  - [[#multiple-cursors][Multiple cursors]]
+  - [[#completion-actions-with-embark][Completion Actions with Embark]]
+  - [[#consult-commands][Consult Commands]]
+  - [[#improved-candidate-filtering-with-orderless][Improved Candidate Filtering with Orderless]]
+  - [[#completion-annotations-with-marginalia][Completion Annotations with Marginalia]]
+  - [[#vertical-minibuffer-ui-and-completion-with-vertico][Vertical Minibuffer UI and Completion with Vertico]]
+  - [[#completions-in-regions-with-corfu][Completions in Regions with Corfu]]
+  - [[#colorful-icons-for-completion-with-kind-icon][Colorful icons for completion with kind-icon]]
+  - [[#front-end-for-citation-with-citar][Front-end for citation with Citar]]
+- [[#moving-in-buffer][Moving in buffer]]
+  - [[#jumping-with-avy][Jumping with Avy]]
+  - [[#jumping-beginningend-of-line-with-mwim][Jumping beginning/end of line with mwim]]
+- [[#shell][Shell]]
+  - [[#eshell][Eshell]]
+  - [[#fish-mode][Fish Mode]]
+  - [[#nix-mode][Nix Mode]]
+  - [[#vterm-mode][Vterm Mode]]
+- [[#runtime-performance][Runtime Performance]]
+  - [[#silent-garbage-collection-with-gcmh][Silent Garbage collection with gcmh]]
+- [[#org-mode][Org Mode]]
+  - [[#org-configuration][Org Configuration]]
+  - [[#org-agenda][Org Agenda]]
+  - [[#org-babel][Org Babel]]
+  - [[#org-modern][Org-modern]]
+  - [[#org-download][Org-download]]
+  - [[#presentations][Presentations]]
+  - [[#cross-reference][Cross Reference]]
+  - [[#outline-based-notes-management-and-organizer][Outline-based notes management and organizer]]
+  - [[#org-roam][Org Roam]]
+  - [[#bullets][Bullets]]
+  - [[#image-handling][Image Handling]]
+  - [[#auto-show-markup-symbols][Auto-show Markup Symbols]]
+  - [[#auto-tangle-configuration-files][Auto-tangle Configuration Files]]
+  - [[#update-table-of-contents-on-save][Update Table of Contents on Save]]
+  - [[#edit-indirect][Edit-indirect]]
+- [[#latex-mode][LaTeX Mode]]
+- [[#applications][Applications]]
+  - [[#competitive-programming-with-oj---online-judge][Competitive Programming with oj - Online Judge]]
+  - [[#elfeed][Elfeed]]
+  - [[#mail][Mail]]
+  - [[#notmuch][Notmuch]]
+  - [[#emacs-application-framework][Emacs Application Framework]]
+- [[#server-mode][Server Mode]]
+- [[#trial-packages][Trial Packages]]
+  - [[#web-browser-with-emacs-w3m][Web Browser with emacs-w3m]]
+  - [[#enhance-xwidget-webkit-browser][Enhance xwidget webkit browser]]
+  - [[#pdf-tools][PDF Tools]]
+  - [[#apple-script-mode][Apple Script Mode]]
+  - [[#emacs-jupyter][Emacs Jupyter]]
+  - [[#search-in-external-web-browser][Search in external web browser]]
+  - [[#browse-at-remote][Browse at remote]]
+  - [[#org-inline-anim][Org-inline-anim]]
+  - [[#save-frame-and-window-configs-with-burly][Save frame and window configs with Burly]]
+  - [[#csv-mode][CSV-mode]]
+  - [[#markdown-preview-mode][Markdown-preview-mode]]
+  - [[#mermaid-mode][Mermaid-mode]]
+  - [[#editorconfig][Editorconfig]]
+  - [[#format-all][Format-all]]
+  - [[#direnv][Direnv]]
+  - [[#poetry][Poetry]]
+  - [[#pyvenv][Pyvenv]]
+  - [[#openapi-preview][OpenAPI Preview]]
+  - [[#svelte-mode][Svelte-mode]]
+- [[#footer][Footer]]
+:END:
+
+* Early-Init
+:PROPERTIES:
+:ID:       4A8E2D78-CE01-4769-A784-49956617A4E5
+:END:
+#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
+
+;;; early-init.el --- Early Initialization. -*- lexical-binding: t no-byte-compile: t -*-
+;;; Commentary:
+;;
+;; Emacs 27 introduces early-init.el, which is run before init.el,
+;; before package and UI initialization happens.
+;;
+;;; Code:
+
+;; Speed up startup
+(defvar default-file-name-handler-alist file-name-handler-alist)
+(setq file-name-handler-alist nil)
+(setq gc-cons-threshold most-positive-fixnum)
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            "Restore defalut values after startup."
+            (setq file-name-handler-alist default-file-name-handler-alist
+                  gc-cons-threshold (* 1024 1024 1024))))
+
+;; basic
+(prefer-coding-system 'utf-8)
+(set-file-name-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-clipboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(set-default 'buffer-file-coding-system 'utf-8)
+(setq debug-on-error nil
+      init-file-debug t
+      user-full-name "Naoki Sakamoto"
+      user-login-name "naoking158"
+      package-enable-at-startup nil
+      package-native-compile t)
+
+;; (when-let ((fish (executable-find "fish")))
+;;   (setq shell-file-name fish))
+
+;; GUI
+(setq default-frame-alist '((line-spacing . 2)
+                            (vertical-scroll-bars)
+                            (menu-bar-lines . 0)
+                            (tool-bar-lines . 0)
+                            (left-fringe . 10)
+                            (right-fringe . 10)
+                            (width . 150)
+                            (height . 80)))
+
+(setq inhibit-splash-screen t
+      frame-inhibit-implied-resize t
+      byte-compile-warnings '(cl-functions))
+
+;; Avoid popup Async buffer window
+(add-to-list 'display-buffer-alist
+             '("^*Async Shell Command*" . (display-buffer-no-window)))
+
+;; Compilation deny package
+(setq comp-deferred-compilation-deny-list (list "jupyter"))
+(setq native-comp-deferred-compilation-deny-list (list "jupyter"))
+
+(provide 'early-init)
+
+;;; early-init.el ends here
+
+#+end_src
+
+* Header
+:PROPERTIES:
+:ID:       875737C6-80FB-4110-B49A-6A330AE8CCB9
+:END:
+
+#+begin_src emacs-lisp
+
 ;;; init.el --- My init.el  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
@@ -8,6 +213,20 @@
 
 ;; this enables this running method
 ;;   emacs -q -l ~/.debug.emacs.d/{{pkg}}/init.el
+
+#+end_src
+
+#+RESULTS:
+
+
+* Startup Performance
+:PROPERTIES:
+:ID:       B395D503-F0B0-4B02-9500-C8056B6E9C6C
+:END:
+
+By setting ~exec-profile~ to ~t~, profiling startup time is executed.
+
+#+begin_src emacs-lisp
 
 (setq exec-profile nil)
 
@@ -53,6 +272,16 @@
              gcs-done))
   (add-hook 'emacs-startup-hook #'efs/display-startup-time))
 
+#+end_src
+
+#+RESULTS:
+
+* Package Management
+:PROPERTIES:
+:ID:       C4215126-C0C1-4BFE-A22B-73E377BD39D1
+:END:
+
+#+begin_src emacs-lisp
 (prog1 'leaf-setup
   (eval-and-compile
     ;; Setup straight
@@ -81,6 +310,22 @@
       :config (leaf-keywords-init))
     )
   )
+
+#+end_src
+
+#+RESULTS:
+: leaf-setup
+
+* Keep .emacs.d Clean
+:PROPERTIES:
+:ID:       68D98540-9112-4C5B-B6FC-A196DF4068B0
+:END:
+
+I don't want a bunch of transient files showing up as untracked in the Git repo so I move them all to another location.
+
+The location is managed by [[https://github.com/emacscollective/no-littering][no-littering]].
+
+#+begin_src emacs-lisp
 
 (leaf *keep-clean
   :config
@@ -131,6 +376,19 @@
     :config
     (setq auto-save-file-name-transforms
           `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
+#+end_src
+
+* General Configuration
+:PROPERTIES:
+:ID:       0F30392B-61E3-40B7-B4AA-2BF98C2D7FB1
+:END:
+
+** Properties of builtin
+:PROPERTIES:
+:ID:       F4A50035-4AB2-4522-B5A1-BD084961259A
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf *general-configrations
   :config
@@ -211,6 +469,15 @@
     :tag "builtin"
     :custom (eldoc-idle-delay . 0.1)))
 
+#+end_src
+
+** Change modifiers
+:PROPERTIES:
+:ID:       1997DC11-746D-435F-856F-6B03B1925032
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf change-system-configuration
   :leaf-defer nil
   :bind (("M-o" . finder-current-dir-open)
@@ -247,12 +514,30 @@
              (ns-right-command-modifier . 'super)
              (ns-use-proxy-icon . nil))))
 
+#+end_src
+
+** Auto revert buffer
+:PROPERTIES:
+:ID:       AE3048B3-2584-49C4-86FB-DEF38673A935
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf autorevert
   :doc "revert buffers when files on disk change"
   :tag "builtin"
   :custom ((auto-revert-interval . 1)
            (global-auto-revert-non-file-buffers . t))
   :config (global-auto-revert-mode 1))
+
+#+end_src
+
+** Auto-Saving Changed Files
+:PROPERTIES:
+:ID:       5028583E-9EBB-4837-80C2-C35655D22F02
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf super-save
   :doc "Auto-save buffers, based on your activity."
@@ -270,6 +555,15 @@
   ;; save on find-file
   (add-to-list 'super-save-hook-triggers 'find-file-hook)
   (super-save-mode +1))
+
+#+end_src
+
+** Undo Helper
+:PROPERTIES:
+:ID:       C5CFEC97-06DC-4DEB-ADEF-F006CF72C3FF
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf undo-tree
   :disabled t
@@ -291,6 +585,20 @@
   :straight t
   :bind ("C-c u" . vundo))
 
+#+end_src
+
+
+* Utility Functions
+:PROPERTIES:
+:ID:       87D7535C-5EBF-42CD-B733-2599F3494455
+:END:
+
+** Toggle Mode-line
+:PROPERTIES:
+:ID:       5DDB2728-C9EC-49A9-BE1A-B37C517430B3
+:END:
+#+begin_src emacs-lisp
+
 (defun my/toggle-modeline (&optional arg)
   (interactive)
   (if (or (null mode-line-format) arg)
@@ -298,12 +606,30 @@
     (setq-local mode-line-format nil)
     (force-mode-line-update)))
 
+#+end_src
+
+** Trim newline from string
+:PROPERTIES:
+:ID:       7A1535E8-FE3A-443B-8A05-BDB5F4C6703B
+:END:
+
+#+begin_src emacs-lisp
+
 (defun my/trim-newline-from-string (string)
   (let ((len (length string)))
     (cond
      ((and (> len 0) (eql (aref string (- len 1)) ?\n))
       (substring string 0 (- len 1)))
      (t string))))
+
+#+end_src
+
+** Sort Sexpresions
+:PROPERTIES:
+:ID:       0AA191D5-BD1A-48D0-AC53-CBEA2EFC3B9E
+:END:
+
+#+begin_src emacs-lisp
 
 ;; https://github.com/alphapapa/unpackaged.el#sort-sexps
 (defun my-sort-sexps (beg end)
@@ -350,9 +676,27 @@
                         (insert-before-markers real)
                         (delete-region (point) (marker-position end)))))))))
 
+#+end_src
+
+** Command Log Mode
+:PROPERTIES:
+:ID:       A06BF380-B5A0-4248-9110-CF1C080882ED
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf command-log-mode
   :straight t
   :commands command-log-mode)
+
+#+end_src
+
+** Presentation
+:PROPERTIES:
+:ID:       3bb0f0a8-f998-4792-b2c8-48557098b646
+:END:
+
+#+begin_src emacs-lisp
 
 (defun my/toggle-presentation (fontsize)
   (interactive (list
@@ -362,6 +706,15 @@
     (my/toggle-modeline my/presentation)
     (tab-bar-mode (if my/presentation 1 'toggle))
     (my/set-font-size fontsize)))
+
+#+end_src
+
+** Bibtex Indent
+:PROPERTIES:
+:ID:       bbea9dd8-5f37-4458-a617-18c241a51c05
+:END:
+
+#+begin_src emacs-lisp
 
 (defun my/bibtex-indent-in-buffer nil
   "Align indent and equal symbol"
@@ -376,6 +729,20 @@
               (re-search-forward "\@")
               (bibtex-fill-entry))
           (error (setq is-failed t)))))))
+
+#+end_src
+
+* Basic UI Configuration
+:PROPERTIES:
+:ID:       55BAFA5B-FF42-4569-98F4-E85A27ACAE9A
+:END:
+
+** User Interface
+:PROPERTIES:
+:ID:       735D7760-356D-455C-B488-4BAE98A35A10
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf ui
   :leaf-defer nil
@@ -402,7 +769,7 @@
                                   (bookmarks . 5))))
     :config
     (when window-system
-      (setq dashboard-startup-banner (expand-file-name "~/.emacs.d/etc/banner/coffee.png")))
+      (setq dashboard-startup-banner (expand-file-name "~/.emacs.d/banner/coffee.png")))
     (dashboard-setup-startup-hook))
 
   (leaf set-title-bar
@@ -418,6 +785,15 @@
     :tag "builtin"
     :hook (text-mode-hook . visual-line-mode)))
 
+#+end_src
+
+** Frame Transparency
+:PROPERTIES:
+:ID:       9DF6B944-43E5-402A-BE9F-AF4A23F79B73
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf *frame-transparency
   :when window-system
   :preface
@@ -431,6 +807,20 @@
 
   :config
   (my/change-transparency 95))
+#+end_src
+
+** Font Configuration
+:PROPERTIES:
+:ID:       33497084-41F6-44A1-8AC0-3AFDA7FFFEC1
+:END:
+
+Since Apple does not support the CBDT/CBLC (color bitmap data table/color bitmap location table) color emoji format that Google and some others use for their emoji, the Noto Color Emoji can not be used in Mac.
+
+Instead, I use *the compiled emoji fonts* uploaded in https://github.com/vXBaKeRXv/vxbakerxv.github.io/tree/master/repo/debs.
+
+For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-your-macbook-f99da72cf126.
+
+#+begin_src emacs-lisp
 
 (leaf font
   :when window-system
@@ -493,6 +883,15 @@
                     (t 'normal))))
       (my/set-font-weight weight))
     (my/set-font-size my-fontsize)))
+
+#+end_src
+
+** Theme Configuration
+:PROPERTIES:
+:ID:       EEAB6FE0-6139-455B-934C-27C06F0470CB
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf themes
   :hook (emacs-startup-hook . my/default-theme)
@@ -624,6 +1023,15 @@
   (column-number-mode)
   (setq inhibit-compacting-font-caches t))
 
+#+end_src
+
+** Modeline Configuration
+:PROPERTIES:
+:ID:       5e265cf7-e8c3-4018-91a1-43701bad7305
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf *modelines
   :hook (emacs-startup-hook . (lambda nil
                                 (line-number-mode 1)
@@ -733,11 +1141,22 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
              (minions-prominent-modes . '(defining-kbd-macro ;; flymake-mode
                                                              )))))
 
+#+end_src
+
+* Keyboard Bindings
+** Modal Editing with Meow
+:PROPERTIES:
+:ID:       3bf18ebf-fc47-49b8-80aa-6738bec52aa9
+:END:
+
+
+#+begin_src emacs-lisp
+
 (leaf meow
   :straight t
   :after consult
   :leaf-defer nil
-  :load-path "~/.emacs.d/etc/meow-config/"
+  :load-path "~/.emacs.d/elisp/meow-config/"
   :config
   (require 'meow-keybindings)
   (meow-setup)
@@ -763,6 +1182,16 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
                      (if skk-mode (skk-j-mode-on))
                      (meow-append))))))
 
+#+end_src
+
+
+** Keybinding Panel (which-key)
+:PROPERTIES:
+:ID:       22BC7283-60A4-4BC8-88B4-1D7958E8C345
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf which-key
   :doc "Display available keybindings in popup"
   :req "emacs-24.4"
@@ -783,6 +1212,15 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
                                           "\\1"))))
   :global-minor-mode t)
 
+#+end_src
+
+** Transient Commands
+:PROPERTIES:
+:ID:       969836D1-7B4A-4EC2-86C2-6DCE273A7EAD
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf transient
   :doc "Transient commands"
   :req "emacs-25.1"
@@ -797,6 +1235,17 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
     :url "https://github.com/conao3/transient-dwim.el"
     :straight t
     :bind ("M-=" . transient-dwim-dispatch)))
+
+#+end_src
+
+* File Browsing
+
+** Dired
+:PROPERTIES:
+:ID:       7B15B2B4-0502-4935-AE2D-57270ABB1D11
+:END:
+
+#+begin_src emacs-lisp
 
 ;; (leaf dired
 ;;   :straight dired-collapse
@@ -825,10 +1274,46 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
    (dired-dwim-target . t)
    (dired-listing-switches . "-AGhlv --group-directories-first --time-style=long-iso"))
   )
+#+end_src
+
+
+** Opening Files Externally
+:PROPERTIES:
+:ID:       14A7495E-07F8-4FA0-9D5F-F3C392125443
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf crux
   :straight t
   :bind ("C-S-k" . crux-top-join-line))
+
+#+end_src
+
+
+** NeoTree
+:PROPERTIES:
+:ID:       5DFA1940-4922-4481-8CCC-9A8BC862C7F2
+:END:
+
+Keybindings
+
+Only in Neotree Buffer:
+
++ =n= next line, p previous line。
++ =SPC= or =RET= or =TAB= Open current item if it is a file. Fold/Unfold current item if it is a directory.
++ =U= Go up a directory
++ =g= Refresh
++ =A= Maximize/Minimize the NeoTree Window
++ =H= Toggle display hidden files
++ =O= Recursively open a directory
++ =C-c C-n= Create a file or create a directory if filename ends with a ‘/’
++ =C-c C-d= Delete a file or a directory.
++ =C-c C-r= Rename a file or a directory.
++ =C-c C-c= Change the root directory.
++ =C-c C-p= Copy a file or a directory.
+
+#+begin_src emacs-lisp
 
 (leaf neotree
   :straight t all-the-icons
@@ -839,6 +1324,17 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
            (neo-window-fixed-size . nil)
            (neo-confirm-create-file . 'y-or-n-p)
            (neo-confirm-create-directory . 'y-or-n-p)))
+
+#+end_src
+
+* Development
+** Git
+*** Magit
+:PROPERTIES:
+:ID:       57099EC8-7F82-4B38-A4D6-428C9215F31F
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf magit
   :doc "A Git porcelain inside Emacs."
@@ -861,9 +1357,24 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
     :hook (magit-log-mode-hook . emoji-cheat-sheet-plus-display-mode))
 )
 
+#+end_src
+*** Forge
+:PROPERTIES:
+:ID:       8841b57d-e251-418b-9bad-97b1d36430ee
+:END:
+
+#+begin_src emacs-lisp
 (leaf forge
   :after magit
   :straight t)
+#+end_src
+
+*** Git Gutter
+:PROPERTIES:
+:ID:       13171497-5635-4D7E-A969-8CECF29BB14A
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf git-gutter
   :doc "Port of Sublime Text plugin GitGutter"
@@ -879,9 +1390,24 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
    (git-gutter:added . '((t (:background "#50fa7b"))))
    (git-gutter:deleted . '((t (:background "#ff79c6"))))))
 
+#+end_src
+
+
+*** Magit-delta
+:PROPERTIES:
+:ID:       e51f8781-8c1c-4f34-9974-dfe593cfc3d7
+:END:
+
+#+begin_src emacs-lisp
 (leaf magit-delta
   :straight t)
+#+end_src
+** Debugger with Dap Mode
+:PROPERTIES:
+:ID:       bfff3e15-0f68-4e8a-95c0-effa1fc17730
+:END:
 
+#+begin_src emacs-lisp
 (leaf dap-mode
   :disabled t
   :when window-system
@@ -907,6 +1433,32 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   ;;  (python-mode-hook . dap-ui-mode)
   ;;  (python-mode-hook . dap-tooltip-mode))
   )
+#+end_src
+
+*** Get Started
+- =dap-debug=: Select a template to execute
+- =dap-debug-last=: Run the most recent template
+- =dap-debug-recent=: Select a recent template to run
+- =dap-disconnect=: Disconnect from the debugging session (output buffer retained)
+- =dap-delete-session=: Delete the current session (output buffer will be deleted)
+- =dap-delete-all-sessions=: Clean up all debugging sessions
+
+*** Breakpoints
+- =dap-breakpoint-toggle=: Toggle a breakpoint on the current line
+- =dap-breakpoint-delete-all=: Delete all breakpoints in the workspace
+- =dap-breakpoint-condition=: Set condition for breakpoint
+- =dap-breakpoint-log-message=: Set hit condition, number of hits before breakpoint stops.
+- =dap-breakpoint-log-message=: Set log message for breakpoint (interpolate expressions with {})
+- =dap-ui-breakpoints=: Show breakpoints panel
+
+
+
+** Projects Management
+:PROPERTIES:
+:ID:       B887BCAD-C177-4C2B-8655-1304091A35AF
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf projectile
   :when (version< emacs-version "28")
@@ -922,6 +1474,15 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :when (version<= "28" emacs-version)
   :straight t)
 
+#+end_src
+
+** Language
+*** Language Server Support with LSP-mode
+:PROPERTIES:
+:ID:       87866DFF-1C8E-4735-8871-63E754812DAF
+:END:
+
+#+begin_src emacs-lisp
 (leaf lsp-bridge
   :straight (lsp-bridge
              :type git
@@ -973,6 +1534,14 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   (add-to-list 'lsp-bridge-single-lang-server-mode-list '(svelte-mode . "svelte"))
   (add-to-list 'lsp-bridge-default-mode-hooks 'svelte-mode-hook)
 )
+#+end_src
+
+*** Emacs Lisp
+:PROPERTIES:
+:ID:       FD410FBA-E2FA-441C-9883-C739500E4BF5
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf helpful
   :straight t
@@ -986,9 +1555,24 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :straight t
   :bind (("C-c e" . macrostep-expand)))
 
+#+end_src
+
+*** Lua
+:PROPERTIES:
+:ID:       5fa92fb0-06c4-4f5b-827a-eec16433af59
+:END:
+
+#+begin_src emacs-lisp
 (leaf lua-mode
   :straight t)
+#+end_src
 
+*** Python
+:PROPERTIES:
+:ID:       9C320B3B-BEB9-40A0-A0DF-9587475A9D88
+:END:
+
+#+begin_src emacs-lisp
 (leaf python-mode
   :doc "Python major mode"
   :url "https://gitlab.com/groups/python-mode-devs"
@@ -1012,7 +1596,15 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :straight t
   :custom ((blacken-line-length . 91)
            (blacken-skip-string-normalization . t)))
+#+end_src
 
+
+*** HTML
+:PROPERTIES:
+:ID:       8A817B4F-518D-40C2-BCEE-2573EACF9E9D
+:END:
+
+#+begin_src emacs-lisp
 (leaf web-mode
   :straight t
   :custom ((web-mode-markup-indent-offset . 2)
@@ -1034,6 +1626,14 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :config
   (define-derived-mode vue-mode web-mode "Vue")
   (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode)))
+#+end_src
+
+*** JavaScript
+:PROPERTIES:
+:ID:       ce098f26-1217-49b0-b69a-0f0cd6db9a53
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf *javascript
   :hook
@@ -1041,6 +1641,14 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
                     (make-local-variable 'js-indent-level)
                     (setq js-indent-level 2))))
 
+#+end_src
+
+*** TypeScript
+:PROPERTIES:
+:ID:       f23d8e72-9453-4630-9b3a-3c25a250ff9c
+:END:
+
+#+begin_src emacs-lisp
 (leaf typescript-mode
   :straight t
   :mode (("\\.ts\\'" . typescript-mode)
@@ -1060,37 +1668,87 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
              :includes deno-fmt)
   :require deno-fmt
   :hook (typescript-mode-hook . deno-fmt-mode))
+#+end_src
 
+
+*** JSON
+:PROPERTIES:
+:ID:       55cc69e2-8160-4b9a-be65-89590a76897c
+:END:
+
+#+begin_src emacs-lisp
 (leaf json-mode
   :straight t
   :custom
   ((json-mode-standard-file-ext . '(".json" ".jsonc" ".jsonld"))))
+#+end_src
 
+*** Markdown
+:PROPERTIES:
+:ID:       ba4b8a80-1f21-429f-a2db-3b866cb30598
+:END:
+
+#+begin_src emacs-lisp
 (leaf markdown-mode
   :mode (("\\.md\\'" . gfm-mode)
          ("\\.spec\\'" . markdown-mode))
   :custom (markdown-command . "multimarkdown"))
+#+end_src
 
+*** Shell
+:PROPERTIES:
+:ID:       401dcc88-8194-4271-8956-3e034cc51f1a
+:END:
+
+#+begin_src emacs-lisp
 ;; (leaf sh-mode
 ;;   :hook (sh-mode-hook . lsp-bridge-mode))
+#+end_src
 
+*** Dockerfile-mode
+:PROPERTIES:
+:ID:       b6aa1cd1-6480-46f4-89ed-71d19a6c4839
+:END:
+
+#+begin_src emacs-lisp
 (leaf dockerfile-mode
   :straight (dockerfile-mode
              :type git
              :host github
              :repo "spotify/dockerfile-mode")
   :mode "Dockerfile\\'")
+#+end_src
 
+*** yaml-mode
+:PROPERTIES:
+:ID:       6df5d1be-e673-476e-95a7-9933eeb032b7
+:END:
+
+#+begin_src emacs-lisp
 (leaf yaml-mode
   :straight (yaml-mode
              :type git
              :host github
              :repo "yoshiki/yaml-mode")
   :mode ("\\.yml\\'" "\\.yaml\\'"))
+#+end_src
 
+*** Go-mode
+:PROPERTIES:
+:ID:       8c18d30c-fd30-4585-ad6f-b509cbe3ac83
+:END:
+
+#+begin_src emacs-lisp
 (leaf go-mode
   :straight t)
+#+end_src
 
+*** Ansible
+:PROPERTIES:
+:ID:       3c804681-1bdf-45ac-b1d8-b02ebed339ae
+:END:
+
+#+begin_src emacs-lisp
 (leaf ansible
   :straight t
   :hook ((yaml-mode-hook . (lambda ()
@@ -1100,6 +1758,15 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :config
   (require 'lsp-bridge)
   (add-to-list 'lsp-bridge-single-lang-server-mode-list '(yaml-mode . "ansible-language-server")))
+#+end_src
+
+** Productivity
+*** Syntax checking with Flymake
+:PROPERTIES:
+:ID:       FBF95B4E-4C56-4934-B0E9-23D0DAB6BD37
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf flymake
   :disabled t
@@ -1135,6 +1802,15 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
              (flymake-posframe-note-prefix . "✏️ ")))
   )
 
+#+end_src
+
+*** Spell checking with flyspell
+:PROPERTIES:
+:ID:       B9A58FDF-05D7-4727-BDCD-4907A11ABC13
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf flyspell
   ;; :hook (LaTeX-mode-hook org-mode-hook markdown-mode-hook text-mode-hook)
   :config
@@ -1148,11 +1824,28 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
                                   (add-to-list 'ispell-skip-region-alist
                                                '("[^\000-\377]+"))))))
 
+#+end_src
+
+*** Pulser
+:PROPERTIES:
+:ID:       4ae89180-6a8f-40ff-893f-088c1a07ef9a
+:END:
+
+#+begin_src emacs-lisp
 (leaf pulsar
   :straight t
   :custom ((pulsar-pulse-on-window-change . t)
            (pulsar-pulse . t))
   :global-minor-mode pulsar-global-mode)
+#+end_src
+
+
+*** Textlint with Flycheck
+:PROPERTIES:
+:ID:       E823FF2D-5DB1-4BF2-98DB-A18062B623FB
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf flycheck
   :straight t
@@ -1227,6 +1920,15 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
     :config
     (add-hook 'flycheck-mode-hook #'flycheck-set-indication-mode)))
 
+#+end_src
+
+*** Indent checking with highlight-indent-guides
+:PROPERTIES:
+:ID:       BF1D8C1E-1ED3-4B41-A3F5-0295C163418B
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf highlight-indent-guides
   :blackout
   :doc "Minor mode to highlight indentation"
@@ -1242,10 +1944,27 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
                 (highlight-indent-guides-even-face . '((nil (:foreground "#88ca9f"))))
                 (highlight-indent-guides-character-face . '((nil (:foreground "#2266ae"))))))
 
+#+end_src
+
+*** Tree Sitter
+:PROPERTIES:
+:ID:       2B53130F-3718-4EE5-9CF1-1E8C33996939
+:END:
+
+
+#+begin_src emacs-lisp
 (leaf treesit-auto
   :straight t
   :global-minor-mode global-treesit-auto-mode
   :custom (treesit-auto-install . t))
+#+end_src
+
+*** Showing Pair of Brackets with Paren
+:PROPERTIES:
+:ID:       DDCDF00F-9DC8-47FD-8DFD-68B9B21E8A02
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf paren
   :hook (emacs-startup-hook . show-paren-mode)
@@ -1256,6 +1975,15 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   ((show-paren-style . 'mixed)
    (show-paren-when-point-inside-paren . t)
    (show-paren-when-point-in-periphery . t)))
+
+#+end_src
+
+*** Smart Parens
+:PROPERTIES:
+:ID:       D988D9B4-1415-40F3-B73D-E1B7C6195F17
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf smartparens
   :straight t
@@ -1332,11 +2060,33 @@ respectively."
               (double-quote . "\"")
               (back-quote . "`"))))
 
+#+end_src
+
+
+*** Highlighting Brackets with Rainbow Delimiters
+:PROPERTIES:
+:ID:       3EF97CF6-3B0C-4FEC-A58C-4AA9A82942FC
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf rainbow-delimiters
   :doc "Highlight brackets according to their depth"
   :url "https://github.com/Fanael/rainbow-delimiters"
   :straight t
   :hook (prog-mode-hook . rainbow-delimiters-mode))
+
+#+end_src
+
+*** Rainbow Mode
+:PROPERTIES:
+:ID:       C5F9C388-FBB4-46CB-AA0E-7E71FECBCAB3
+:END:
+
+Sets the background of HTML color strings in buffers to be the color mentioned.
+
+
+#+begin_src emacs-lisp
 
 (leaf rainbow-mode
   :doc "Colorize color names in buffers"
@@ -1360,6 +2110,17 @@ respectively."
            (rainbow-r-colors-major-mode-list . '(ess-mode)))
   :hook (prog-mode-hook))
 
+#+end_src
+
+*** Visual Feedback on Some Operations
+:PROPERTIES:
+:ID:       7D0A5B1F-2E04-46C1-B40C-C4E89180EAB4
+:END:
+
+
+
+#+begin_src emacs-lisp
+
 (leaf volatile-highlights
   :doc "Minor mode for visual feedback on some operations."
   :url "http://www.emacswiki.org/emacs/download/volatile-highlights.el"
@@ -1370,6 +2131,19 @@ respectively."
   (vhl/default-face quote
                     ((nil (:foreground "#FF3333" :background "#FFCDCD")))))
 
+#+end_src
+
+*** Line Highlight with LIN
+:PROPERTIES:
+:ID:       26904d3a-10f4-456d-a3ad-c1e3ed1b4b2c
+:END:
+
+:PROPERTIES:
+:ID:       FDAF3AFD-70D4-48BB-8A55-EFFD8EE7FF7B
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf lin
   :straight t
   :custom ((lin-mode-hooks . '(text-mode-hook prog-mode-hook notmuch-search-mode-hook))
@@ -1378,11 +2152,21 @@ respectively."
   (global-hl-line-mode)
   (lin-global-mode 1))
 
+#+end_src
+
+
+*** Snippets
+:PROPERTIES:
+:ID:       A418447A-324A-4000-B617-52D45DB69CAE
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf yasnippet
   :straight t
   :hook (emacs-startup-hook . yas-global-mode)
   :custom ((yas-indent-line . 'fixed)
-           (yas-snippet-dirs . `(,(file-truename "~/.emacs.d/etc/snippets/"))))
+           (yas-snippet-dirs . `(,(file-truename "~/.emacs.d/snippets/"))))
   :bind ((yas-keymap
           ("<tab>" . nil))  ;; conflict with company/coruf
          (yas-minor-mode-map
@@ -1391,6 +2175,15 @@ respectively."
           ("C-c y v" . yas-visit-snippet-file)
           ("C-c y l" . yas-describe-tables)
           ("C-c y g" . yas-reload-all))))
+
+#+end_src
+
+*** Google Translate
+:PROPERTIES:
+:ID:       0A7A0E73-9951-4039-9314-4E9E7805FAFE
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf google-translate
   :straight t popup
@@ -1404,10 +2197,32 @@ respectively."
   (defun my--google-translate--search-tkk-override-advice ()
     "Search TKK." (list 430675 2721866130)))
 
+#+end_src
+
+*** Writable Grep
+:PROPERTIES:
+:ID:       889d446b-7e66-4870-9ca0-313fd2d097ca
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf wgrep
   :straight t
   :bind (grep-mode-map
          ("e" . wgrep-change-to-wgrep-mode)))
+
+#+end_src
+
+
+*** DDSKK
+:PROPERTIES:
+:ID:       D4DD8E44-349F-4870-B0F3-C434BFBA6222
+:END:
+
+- 個人辞書を =UTF-8= に変換しておく
+- =skk-auto-okuri-process= は =nil= にしておかないと， =いぞん (izonn)= など一部の文字の変換ができなくなる.
+
+#+begin_src emacs-lisp
 
 (leaf skk
   :straight ddskk
@@ -1458,7 +2273,14 @@ respectively."
   (add-variable-watcher 'skk-henkan-mode 'my-variable-watcher-for-skk-henkan-mode)
 
 )
+#+end_src
 
+*** Managing Whitespaces with whitespace
+:PROPERTIES:
+:ID:       1fe97d2c-476d-4660-b14d-e03c95d9b8d2
+:END:
+
+#+begin_src emacs-lisp
 (leaf whitespace
   :straight t
   :commands whitespace-mode
@@ -1476,7 +2298,18 @@ respectively."
            (global-whitespace-mode . t)
            )
 )
+#+end_src
 
+*** Know Your HTTP Well
+:PROPERTIES:
+:ID:       b7328135-b20d-46d9-9d7f-7624b9c664b9
+:END:
+
+https://github.com/for-GET/know-your-http-well
+
+HTTP encodings, headers, media types, methods, relations and status codes, all summarized and linking to their specification.
+
+#+begin_src emacs-lisp
 (leaf know-your-http-well
   :doc
   """
@@ -1490,6 +2323,19 @@ respectively."
   """
   :straight t)
 
+  #+end_src
+
+* Window Management
+
+Window management commands are accessible by prefix =C-x w=
+
+** Window History with winner-mode
+:PROPERTIES:
+:ID:       E95C41F6-D98A-4489-80E6-298CDEB889A0
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf winner
   :doc "Restore old window configurations"
   :tag "builtin"
@@ -1498,6 +2344,15 @@ respectively."
          ("C-x w r")
          ("C-x w u"))
   :hook (emacs-startup-hook . winner-mode))
+
+#+end_src
+
+** Window Selection with ace-window
+:PROPERTIES:
+:ID:       A6B04DF4-7F0D-433B-9162-354A5B7E4B00
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf ace-window
   :doc "Quickly switch windows."
@@ -1525,6 +2380,15 @@ respectively."
     (global-set-key (vector (append '(super) (list (+ i 1 ?0))))
                     #'my--switch-window)))
 
+#+end_src
+
+*** Another implementation of my--switch-window
+:PROPERTIES:
+:ID:       ed56290a-b2aa-4c5b-bd8b-3dea42726539
+:END:
+
+#+begin_src emacs-lisp
+
 (defun my--switch-window (num)
   (let* ((wnd-list (aw-window-list))
          (wnd-num (- (min num (length wnd-list)) 1))
@@ -1540,11 +2404,29 @@ respectively."
            (lambda nil (interactive) (my--switch-window ,elm))))
        (number-sequence 1 9))))
 
+#+end_src
+
+** Window Movement with windmove
+:PROPERTIES:
+:ID:       0eb9f40f-8826-48e6-bf0d-fe12c27631bf
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf *windmove
   :bind (("s-h" . windmove-left)
          ("s-j" . windmove-down)
          ("s-k" . windmove-up)
          ("s-l" . windmove-right)))
+
+#+end_src
+
+** Resize Window
+:PROPERTIES:
+:ID:       66A46ED2-02C6-40B4-B9CA-901361FA7461
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf my-window-resizer
   :doc "Control window size and position."
@@ -1589,6 +2471,14 @@ respectively."
                  (message "Quit")
                  (throw 'end-flag t))))))))
 
+#+end_src
+
+
+** Split and follow
+:PROPERTIES:
+:ID:       eee65492-f4d7-4eff-94ca-e540b97f046d
+:END:
+#+begin_src emacs-lisp
 (defun split-and-follow-horizontally ()
   "Split and follow horizontally."
   (interactive)
@@ -1604,6 +2494,13 @@ respectively."
   (balance-windows)
   (other-window 1))
 (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
+#+end_src
+** Tab management
+:PROPERTIES:
+:ID:       E76C0A4A-586E-4086-B576-99102F0D9724
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf tab-bar
   :doc "frame-local tabs with named persistent window configurations"
@@ -1662,6 +2559,14 @@ respectively."
 
     "Set workspace buffer list for consult-buffer.")
   (add-to-list 'consult-buffer-sources 'consult--source-workspace))
+#+end_src
+
+** Rotate Window Layout
+:PROPERTIES:
+:ID:       CB3337CE-AE80-4668-B754-7BC007AACA12
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf rotate
   :doc "Rotate the layout of emacs"
@@ -1671,11 +2576,32 @@ respectively."
   :chord (("rl" . rotate-layout)
           ("rw" . rotate-window)))
 
+#+end_src
+
+
+** Set Margins
+:PROPERTIES:
+:ID:       4837B3E1-C7EF-4300-B52B-184ED9123165
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf visual-fill-column
   :straight t
   :custom ((visual-fill-column-width . 88)
            (visual-fill-column-center-text . t))
   :hook (org-mode-hook . visual-fill-column-mode))
+
+#+end_src
+
+** Control Buffer Placement
+:PROPERTIES:
+:ID:       0993136C-F04A-42D0-8FBC-C143A5991F04
+:END:
+
+Emacs' default buffer placement algorithm is pretty disruptive if you like setting up window layouts a certain way in your workflow.  The =display-buffer-alist= variable controls this behavior and you can customize it to prevent Emacs from popping up new windows when you run commands.
+
+#+begin_src emacs-lisp
 
 (setq display-buffer-base-action
       '(display-buffer-reuse-mode-window
@@ -1688,12 +2614,31 @@ respectively."
 ;; (setq split-height-threshold nil)
 ;; (setq split-width-threshold nil)
 
+#+end_src
+
+* Completion System
+** Duplicate line or selected regions with Duplicate-thing
+:PROPERTIES:
+:ID:       8C227C3B-7CCF-44D5-8D77-6928499CCDF4
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf duplicate-thing
   :doc "Duplicate current line & selection"
   :tag "selection" "line" "duplicate" "command" "convenience"
   :url "https://github.com/ongaeshi/duplicate-thing"
   :straight t
   :bind ("M-c" . duplicate-thing))
+
+#+end_src
+
+** Multiple cursors
+:PROPERTIES:
+:ID:       6CF0AEB8-66DA-4730-8E60-A34059225471
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf multiple-cursors
   :doc "Multiple cursors for Emacs."
@@ -1721,6 +2666,16 @@ respectively."
       (4 (mc/mark-all-dwim nil))
       (1 (mark-sexp 1)))))
 
+#+end_src
+
+
+** Completion Actions with Embark
+:PROPERTIES:
+:ID:       3478F4D8-F6AC-493B-BAC8-C69D4D2CBF30
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf embark
   :straight t embark-consult
   :bind (("C-," . embark-act)
@@ -1739,6 +2694,15 @@ respectively."
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                  nil
                  (window-parameters (mode-line-format . none)))))
+
+#+end_src
+
+** Consult Commands
+:PROPERTIES:
+:ID:       DCD9365F-8EE8-46EB-9EF0-722894C88A55
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf consult
   :straight t
@@ -1811,7 +2775,14 @@ respectively."
              (consult-tramp-method . "ssh"))
     :commands consult-tramp)
   )
+#+end_src
 
+** Improved Candidate Filtering with Orderless
+:PROPERTIES:
+:ID:       D7AA94B4-0150-454B-B68D-15C7F78D554D
+:END:
+
+#+begin_src emacs-lisp
 (leaf orderless
   :straight t
   :commands (orderless-filter)
@@ -1862,7 +2833,14 @@ respectively."
     (migemo-init)
     )
 )
+#+end_src
 
+*** fussy
+:PROPERTIES:
+:ID:       45db9a8b-dd56-4638-9103-1152c9ffa825
+:END:
+
+#+begin_src emacs-lisp
 (leaf fussy
   :straight t
   :custom ((completion-category-defaults . nil)
@@ -1901,12 +2879,29 @@ respectively."
 ;;    completion-category-overrides nil
 ;;    fussy-score-fn 'fussy-fuz-bin-score
 ;;    ))
+#+end_src
+
+** Completion Annotations with Marginalia
+:PROPERTIES:
+:ID:       478D315B-CDE3-4945-8F9D-51C22E6276F8
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf marginalia
   :straight t
   :require t
   :after vertico
   :global-minor-mode t)
+
+#+end_src
+
+** Vertical Minibuffer UI and Completion with Vertico
+:PROPERTIES:
+:ID:       5EF084C2-FF2B-4EB9-B299-667014183874
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf vertico
   :straight (vertico
@@ -1964,6 +2959,15 @@ respectively."
     (when (not (display-graphic-p))
       (vertico-posframe-mode -1)
       (vertico-multiform-mode -1))))
+#+end_src
+
+
+** Completions in Regions with Corfu
+:PROPERTIES:
+:ID:       84C57683-673C-4ED5-8305-2C3C3D3DAD0C
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf corfu
   :disabled t
@@ -2088,6 +3092,15 @@ respectively."
   :bind* (("M-/" . dabbrev-expand)
           ("C-M-/" . dabbrev-completion)))
 
+#+end_src
+
+** Colorful icons for completion with kind-icon
+:PROPERTIES:
+:ID:       8ae9d8ff-5b42-42d3-bc2a-46d13cb0ee56
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf kind-icon
   :straight t
   :after corfu
@@ -2096,6 +3109,15 @@ respectively."
   (kind-icon-default-face . 'corfu-default)
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+#+end_src
+
+
+** Front-end for citation with Citar
+:PROPERTIES:
+:ID:       8a8e08e1-28cf-4323-a41e-a80091184685
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf citar
   :disabled t
@@ -2106,6 +3128,17 @@ respectively."
   :custom
   ((citar-bibliography . '("~/org/braindump/preferences/ref.bib"))
    (citar-latex-cite-commands . '((("cite" "citet" "citep") . (t))))))
+
+#+end_src
+
+
+* Moving in buffer
+** Jumping with Avy
+:PROPERTIES:
+:ID:       EC8B3264-A96A-4622-9A16-A8E7AED23B11
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf avy
   :doc "Jump to arbitrary positions in visible text and select text quickly."
@@ -2230,6 +3263,15 @@ respectively."
       (select-window
        (cdr (ring-ref avy-ring 0))))
     t))
+#+end_src
+
+
+** Jumping beginning/end of line with mwim
+:PROPERTIES:
+:ID:       D8F51490-CACF-4A50-B0B8-2ADC6B58951B
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf mwim
   :doc "Switch between the beginning/end of line or code"
@@ -2238,6 +3280,17 @@ respectively."
   :straight t
   :bind (("C-a" . mwim-beginning-of-code-or-line)
          ("C-e" . mwim-end-of-code-or-line)))
+
+#+end_src
+
+* Shell
+
+** Eshell
+:PROPERTIES:
+:ID:       9B62F055-8080-4CFB-939E-89A80EFB5365
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf eshell
   :bind* ("C-x m" . eshell)
@@ -2267,15 +3320,40 @@ respectively."
     (setq eshell-prompt-function #'eshell-p10k-prompt-function
           eshell-prompt-regexp eshell-p10k-prompt-string)))
 
+#+end_src
+
+** Fish Mode
+:PROPERTIES:
+:ID:       BD30FB24-87F8-4503-BCE5-2DC188CF290C
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf fish-mode
   :doc "Major mode for fish shell scripts"
   :req "emacs-24"
   :tag "shell" "fish" "emacs>=24"
   :straight t)
 
+#+end_src
+
+** Nix Mode
+:PROPERTIES:
+:ID:       2f2a58e9-8e25-4892-bbac-fddeb7326ee2
+:END:
+
+#+begin_src emacs-lisp
 (leaf nix-mode
   :straight t
   :mode "\\.nix\\'")
+#+end_src
+
+** Vterm Mode
+:PROPERTIES:
+:ID:       112E45C3-62F0-4088-B8AC-43003F942FEA
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf vterm
   :straight t
@@ -2291,11 +3369,31 @@ respectively."
              )
     ))
 
+#+end_src
+
+* Runtime Performance
+** Silent Garbage collection with gcmh
+:PROPERTIES:
+:ID:       92B6AEEC-6518-4EEA-9E45-5A58BEDCB289
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf gcmh
   :straight t
   :blackout
   :custom (gcmh-verbose . nil)
   :hook after-init-hook)
+
+#+end_src
+
+* Org Mode
+** Org Configuration
+:PROPERTIES:
+:ID:       702a5da5-bea0-40e1-805c-f950b76d4012
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf org
   :straight t
@@ -2410,6 +3508,14 @@ respectively."
     (set-face-attribute 'org-column nil :background nil)
     (set-face-attribute 'org-column-title nil :background nil))
 )
+#+end_src
+
+** Org Agenda
+:PROPERTIES:
+:ID:       8BD07743-2B52-489B-B44C-ECBDA35CD5FB
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf org-agenda
   :when window-system
@@ -2661,6 +3767,14 @@ respectively."
                :jump-to-captured t :immediate-finish t))))
     )
   )
+#+end_src
+
+** Org Babel
+:PROPERTIES:
+:ID:       085EBDA5-B180-4BB0-A2CA-45FEC0742421
+:END:
+
+#+begin_src emacs-lisp
 
 (setq org-babel-load-languages '((emacs-lisp . t)
                                  (python . t)
@@ -2691,7 +3805,14 @@ respectively."
 (leaf ob-lua
   :straight org
   :commands (org-babel-execute:lua))
+#+end_src
 
+** Org-modern
+:PROPERTIES:
+:ID:       c4d17b5b-9f46-4755-8275-9383f794c62a
+:END:
+
+#+begin_src emacs-lisp
 (leaf org-modern
   :straight t
   :hook (org-mode-hook . org-modern-mode)
@@ -2703,10 +3824,29 @@ respectively."
                         (?* . "•")
                         (?- . "-")))
    (org-modern-hide-stars . 'leading)))
+#+end_src
 
+** Org-download
+:PROPERTIES:
+:ID:       41ca5970-5a8c-4134-9932-b07759773230
+:END:
+
+#+begin_src emacs-lisp
 (leaf org-download
   :straight t
   :require t)
+#+end_src
+
+** Presentations
+
+*** org-present
+:PROPERTIES:
+:ID:       C6039D29-54FA-4E04-BC1A-BE0425E792EC
+:END:
+
+=org-present= is the package I use for giving presentations in Emacs.
+
+#+begin_src emacs-lisp
 
 (leaf org-present
   :when window-system
@@ -2752,6 +3892,15 @@ respectively."
     (org-present-next)
     (dw/org-present-prepare-slide)))
 
+#+end_src
+
+** Cross Reference
+:PROPERTIES:
+:ID:       0F7789E4-399A-496C-B163-1D6A4DABFC47
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf xref
   :doc "Cross-referencing commands"
   :req "emacs-26.3"
@@ -2759,9 +3908,30 @@ respectively."
   :straight t
   :after org)
 
+#+end_src
+
+
+** Outline-based notes management and organizer
+*** Export framework Configuration
+:PROPERTIES:
+:ID:       C538E5FB-6070-4743-B75E-E723492B91A0
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf ox
   :doc "Export Framework for Org Mode"
   :custom (org-export-backends . '(ascii html latex beamer odt org extra)))
+
+#+end_src
+
+
+*** Export Hugo Markdown
+:PROPERTIES:
+:ID:       E2113B7A-0BAC-403F-BAFB-67F6B6E9D76F
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf ox-hugo
   :when window-system
@@ -2797,6 +3967,16 @@ respectively."
   ;; ")
   ;;                  'append))
   )
+
+#+end_src
+
+
+*** Export Latex
+:PROPERTIES:
+:ID:       4DBD2DF5-46B9-4132-B769-08B27E5E33DF
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf ox-latex
   :when window-system
@@ -2883,6 +4063,15 @@ respectively."
 ;;     )
   )
 
+#+end_src
+
+
+** Org Roam
+:PROPERTIES:
+:ID:       2304CA71-831A-46DB-B88C-38ECB7178BAB
+:END:
+
+#+begin_src emacs-lisp
 (leaf org-roam
   :when window-system
   :doc "Roam Research replica with Org-mode"
@@ -2934,6 +4123,15 @@ respectively."
                  (window-width . 0.33)
                  (window-height . fit-window-to-buffer)))
   (org-roam-db-autosync-mode))
+#+end_src
+
+
+** Bullets
+:PROPERTIES:
+:ID:       3EE7D4BD-5E91-4BAA-89E6-7011F7936B77
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf org-superstar
   :disabled t
@@ -2946,6 +4144,17 @@ respectively."
    (org-superstar-item-bullet-alist . '((?+ . ?➤)
                                         (?* . ?-)
                                         (?- . ?•)))))
+
+#+end_src
+
+
+** Image Handling
+*** Insert Clipboard Image
+:PROPERTIES:
+:ID:       C654D00B-A808-4567-81DF-FF5E2A312454
+:END:
+
+#+begin_src emacs-lisp
 
 (setq paste-cmd (cond
                  ((executable-find "pngpaste")
@@ -2975,6 +4184,15 @@ respectively."
           (insert (concat "[[file:" filename "]]")))
       (org-display-inline-images))))
 
+#+end_src
+
+*** Adjust Inline Image Size
+:PROPERTIES:
+:ID:       5B20E29B-13D3-4D56-A488-DDDFFD505365
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf *org-image-size-adjuster
   :advice (:before
            org-toggle-inline-images
@@ -2983,9 +4201,29 @@ respectively."
                          (truncate (* 0.8 (window-text-width nil t))))))
   )
 
+#+end_src
+
+** Auto-show Markup Symbols
+:PROPERTIES:
+:ID:       3A1C4173-A2A0-4BAB-BCF2-34809552E796
+:END:
+
+This package makes it much easier to edit Org documents when =org-hide-emphasis-markers= is turned on.  It temporarily shows the emphasis markers around certain markup elements when you place your cursor inside of them.  No more fumbling around with ~=~ and ~*~ characters!
+
+#+begin_src emacs-lisp
+
 (leaf org-appear
   :straight t
   :hook org-mode-hook)
+
+#+end_src
+
+** Auto-tangle Configuration Files
+:PROPERTIES:
+:ID:       B67C93C4-B55C-4122-997E-65D4B38764EE
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf *auto-tangle-configuration
   :hook (org-mode-hook . (lambda ()
@@ -3001,12 +4239,39 @@ respectively."
       (let ((org-confirm-babel-evaluate nil))
         (org-babel-tangle)))))
 
+#+end_src
+
+** Update Table of Contents on Save
+:PROPERTIES:
+:ID:       13DD0191-EB5C-47D0-A7C2-14CAA61F30BD
+:END:
+
+It's nice to have a table of contents section for long literate configuration files (like this one!) so I use =org-make-toc= to automatically update the ToC in any header with a property named =TOC=.
+
+#+begin_src emacs-lisp
+
 (leaf org-make-toc
   :straight t
   :hook (org-babel-pre-tangle-hook . org-make-toc-mode))
 
+#+end_src
+
+** Edit-indirect
+:PROPERTIES:
+:ID:       18a3eea6-c6a7-4c0d-bb76-670e72b3a151
+:END:
+
+#+begin_src emacs-lisp
 (leaf edit-indirect
   :straight t)
+#+end_src
+
+* LaTeX Mode
+:PROPERTIES:
+:ID:       D8E085BF-A7E1-48F4-B7F1-BD3B0F942A7F
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf *latex
   :when window-system
@@ -3067,6 +4332,15 @@ respectively."
     ((reftex-ref-style-default-list . '("Cleveref"))
      (reftex-cite-format . 'natbib))))
 
+#+end_src
+
+* Applications
+** Competitive Programming with oj - Online Judge
+:PROPERTIES:
+:ID:       D816F044-D812-4957-85E6-4288FB4A8A6B
+:END:
+
+#+begin_src emacs-lisp
 (leaf oj
   :when window-system
   :doc "Competitive programming tools client for AtCoder, Codeforces"
@@ -3079,7 +4353,35 @@ respectively."
            (oj-home-dir . "~/drive/work/coder/AtCoder")
            (oj-submit-args quote
                            ("-y" "--wait=0"))))
+#+end_src
 
+
+** Elfeed
+:PROPERTIES:
+:ID:       66D649D3-84C7-44D7-8F23-E549647FF0CE
+:END:
+
+For a complete documentation visit the official elfeed page: https://github.com/skeeto/elfeed
+
+Running the interactive function elfeed will pop up the *elfeed-search* buffer, which will display feed items.
+
++ =g=: refresh view of the feed listing
++ =G=: fetch feed updates from the servers
++ =s=: update the search filter (see tags)
++ =c=: clear the search filter
+
+From the search buffer there are a number of ways to interact with entries. Entries are selected by placing the point over an entry. Multiple entries are selected at once by using an active region.
+
++ =RET=: view selected entry in a buffer
++ =b=: open selected entries in your browser (browse-url)
++ =y=: copy selected entries URL to the clipboard
++ =r=: mark selected entries as read
++ =u=: mark selected entries as unread
++ =+=: add a specific tag to selected entries
++ =-=: remove a specific tag from selected entries
+
+
+#+begin_src emacs-lisp
 (leaf elfeed
   :when window-system
   :straight t
@@ -3106,11 +4408,34 @@ respectively."
      ("https://www.reddit.com/r/apple.rss" Apple)
      ("https://www.reddit.com/r/mac.rss" Mac)
      ("https://www.reddit.com/r/AppleWatch.rss" AppleWatch)))))
+#+end_src
 
+
+
+** Mail
+:PROPERTIES:
+:ID:       708C16FF-B967-4E17-8846-C73B711FC9F5
+:END:
+
+*** General Settings
+:PROPERTIES:
+:ID:       cb56211c-1c97-4c1a-95d4-14f9d61bdd62
+:END:
+
+#+begin_src emacs-lisp
 (leaf mail-general
   :require t
   :load-path "~/src/github.com/naoking158/envs/config-mail/")
+#+end_src
 
+** Notmuch
+:PROPERTIES:
+:ID:       82ca56e2-cd3d-40f9-9a9c-a8ea873507bb
+:END:
+
+Manual is [[https://notmuchmail.org/emacstips/][here]]
+
+#+begin_src emacs-lisp
 ;;; Notmuch (mail indexer and mail user agent (MUA))
 ;; I install notmuch from the distro's repos because the CLI program is
 ;; not dependent on Emacs.  Though the package also includes notmuch.el
@@ -3233,7 +4558,14 @@ respectively."
             (,(kbd "u") ("+unread") "Mark as unread")))
     )
   )
+#+end_src
 
+*** Notmuch-transient
+:PROPERTIES:
+:ID:       08871979-510f-4ab6-bbe5-d11bedfe7c9e
+:END:
+
+#+begin_src emacs-lisp
 (leaf notmuch-transient
   :straight t
   :after notmuch
@@ -3250,15 +4582,53 @@ respectively."
    (:notmuch-show-mode-map :package notmuch
                            ("=" . nil)
                            ("=" . notmuch-show-mode-transient))))
+#+end_src
 
+*** ol-notmuch
+:PROPERTIES:
+:ID:       85a901ef-5f0f-4efa-ae0a-ead7a6731e3b
+:END:
+
+#+begin_src emacs-lisp
 (leaf ol-notmuch
   :straight t
   :after notmuch)
+#+end_src
 
+*** Mu4e
+**** Prepare
+
+https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-03.org
+
+#+begin_src shell
+mbsync -a
+
+mu init --maildir=~/Mail \
+   --my-address=naoki@bbo.cs.tsukuba.ac.jp \
+   --my-address=nok.skmt.snow@gmail.com \
+   --my-address=s1930160@s.tsukuba.ac.jp
+
+mu index
+#+end_src
+
+**** Config
+:PROPERTIES:
+:ID:       44f695dc-d668-4345-b105-4ab273f1a501
+:END:
+
+#+begin_src emacs-lisp
 (leaf *config-mu4e
   :disabled t
   :config
   (load-file "~/src/github.com/naoking158/envs/config-mail/config-mu4e.el"))
+#+end_src
+
+** Emacs Application Framework
+:PROPERTIES:
+:ID:       24FB1875-D6A4-4609-9485-FAAB24E07AA6
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf eaf
   :disabled t
@@ -3284,13 +4654,211 @@ respectively."
   (eaf-bind-key nil "M-q" eaf-browser-keybinding)
   )
 
+#+end_src
+
+* Server Mode
+:PROPERTIES:
+:ID:       829CCBA5-3D95-42AE-8D68-4AACC53C2DF8
+:END:
+
+#+begin_src emacs-lisp
 (leaf server
   :doc "Lisp code for GNU Emacs running as server process"
   :tag "builtin"
   :require t
   :bind ("C-x C-c" . server-edit)
   :hook (emacs-startup-hook . server-start))
+#+end_src
 
+* Trial Packages
+** Web Browser with emacs-w3m
+:PROPERTIES:
+:ID:       9A644B4B-58DA-42CC-9B82-A891A204FA05
+:END:
+
+[[https://github.com/emacs-w3m/emacs-w3m][Emacs-w3m]] is an Emacs interface to w3m.
+
+While browsing, remember the following:
+
+- TAB to jump from link to link.
+- RETURN to follow a link
+- SPACE to move down the page
+- b to move up the page
+- B to move back in the history
+- M to open the URL in Firefox
+- I to open the image if it didn’t show up correctly
+- c to copy the URL of the current page in the kill ring.
+- u to copy the URL of the link in the kill ring.
+- a to bookmark this page
+- v to look at the bookmarks
+- s to look through the page history for this session.
+
+#+begin_src emacs-lisp :tangle no
+(leaf ace-link
+  :straight t
+  :config (ace-link-setup-default))
+
+(leaf w3m
+  :straight t ace-link
+  :require t
+  :init
+  ;; (setq browse-url-browser-function 'w3m-browse-url)
+  (setq w3m-use-cookies t)
+  :hook (;; clean up the w3m buffers:
+         (w3m-display-functions-hook . w3m-hide-stuff)
+         (w3m-mode-hook . ace-link-mode))
+  :bind (("C-c w w" . w3m)
+         ("C-c w o" . browse-url-at-point)
+         ("C-c w s" . w3m-search)
+         (w3m-mode-map
+          ("q" . quit-window)
+          ("&" . w3m-view-url-with-external-browser)))
+  ;; :config
+  ;; Web Page Cleanup
+
+  ;; Navigating some sites in a text browser is a bit painful, but we could have some functions that either move the cursor passed the header to the start of the content, or actually remove some of the content.
+
+  ;; Google Search
+  ;; Don’t need to actually remove stuff when search in Google, as I really just need to jump ahead and skip the header:
+  ;; (defun w3m-skip-in-google ()
+  ;;   "For a Google Search, skip to the first result."
+  ;;   (beginning-of-buffer)
+  ;;   (search-forward-regexp "[0-9, ]+ results")
+  ;;   (forward-line 2)
+  ;;   (recenter-top-bottom 0))
+
+  ;; Stack Overflow
+  ;; Without a clear enough label, searching for the start of content will always be fragile. We’ll look for the start of the first column.
+
+  ;; Stack Overflow has a lot of text that isn’t helpful to someone in a text-based browser, so I would like to remove the voting and other parts. Not sure how to do it, since the columns are of variable width.
+  ;; (defun w3m-skip-in-stackoverflow ()
+  ;;   (beginning-of-buffer)
+  ;;   (search-forward-regexp "^   ")
+  ;;   (forward-line -2)
+  ;;   (recenter-top-bottom 0))
+
+  ;; Web Site Dispatch Function
+  ;; Add a hook to the w3m-display-functions to match the URL to see which function we need to call:
+  ;; (defun w3m-hide-stuff (url)
+  ;;   "Call screen cleaning functions for the W3M based on the URL."
+  ;;   (interactive)
+  ;;   (cond ((string-match "google\.com/search" url) (w3m-skip-in-google))
+  ;;         ((string-match "clojuredocs.org" url) (w3m-skip-in-clojuredocs))
+  ;;         ((string-match "stackoverflow.com" url) (w3m-skip-in-stackoverflow))
+  ;;         ))
+  )
+#+end_src
+
+#+RESULTS:
+: w3m
+
+
+** Enhance xwidget webkit browser
+:PROPERTIES:
+:ID:       00E1AB83-81A1-4A8E-A58E-BEB657E8EDAF
+:END:
+
+#+begin_src emacs-lisp
+(leaf xwwp
+  :disabled t
+  :when (or (<= emacs-major-version 27)
+            (memq window-system '(ns darwin)))
+  :straight t
+  :custom (browse-url-browser-function . 'xwidget-webkit-browse-url)
+  :bind (("C-c s" . xwwp)
+         (xwidget-webkit-mode-map
+          ("v" . xwwp-follow-link)
+          ([remap kill-ring-save] . xwidget-webkit-copy-selection-as-kill)
+          ([remap xwidget-webkit-browse-url] . xwwp)))
+  :advice (:override xwwp-browse-url-other-window
+                     my/xwwp-browse-url-other-window)
+  :preface
+  (defun my/xwwp-browse-url-other-window (url &optional new-session)
+    "Ask xwidget-webkit to browse URL.
+NEW-SESSION specifies whether to create a new xwidget-webkit session.
+Interactively, URL defaults to the string looking like a url around point."
+    (interactive (progn
+                   (require 'browse-url)
+                   (browse-url-interactive-arg "xwidget-webkit URL: "
+                                               ;;(xwidget-webkit-current-url)
+                                               )))
+    (or (featurep 'xwidget-internal)
+        (user-error "Your Emacs was not compiled with xwidgets support"))
+    (when (stringp url)
+      (if new-session
+          (xwidget-webkit-new-session url)
+        (progn (xwidget-webkit-goto-url url)
+               (switch-to-buffer (xwidget-buffer
+                                  (xwidget-webkit-current-session))))))))
+
+(leaf webkit
+  :disabled t
+  :when (and (eq 28 emacs-major-version)
+             (memq window-system '(x pgtk)))
+  :load-path "~/.emacs.d/elisp/emacs-webkit/"
+  :require t webkit-ace webkit-dark
+  ;; :init
+  ;; ;; This must be set before webkit.el is loaded so certain hooks aren't installed
+  ;; (setq webkit-own-window t)
+  :bind (("C-c s" . webkit))
+  :config
+  ;; If you don't care so much about privacy and want to give your data to google
+  (setq webkit-search-prefix "https://google.com/search?q=")
+
+  ;; Specify a different set of characters use in the link hints
+  ;; For example the following are more convienent if you use dvorak
+  (setq webkit-ace-chars "asdfjkl;")
+
+  ;; If you want history saved in a different place or
+  ;; Set to `nil' to if you don't want history saved to file (will stay in memory)
+  (setq webkit-history-file
+        (expand-file-name "webkit-history" no-littering-etc-directory))
+
+  ;; If you want cookies saved in a different place or
+  ;; Set to `nil' to if you don't want cookies saved
+  (setq webkit-cookie-file
+        (expand-file-name "cookies" no-littering-etc-directory))
+
+  ;; Set webkit as the default browse-url browser
+  ;; (setq browse-url-browser-function 'webkit-browse-url)
+  ;; (setq browse-url-browser-function 'browse-url-default-browser)
+
+  ;; Force webkit to always open a new session instead of reusing a current one
+  (setq webkit-browse-url-force-new t)
+
+  ;; Globally disable javascript
+  ;; (add-hook 'webkit-new-hook #'webkit-enable-javascript)
+
+  ;; Override the "loading:" mode line indicator with an icon from `all-the-icons.el'
+  ;; You could also use a unicode icon like ↺
+  (defun webkit--display-progress (progress)
+    (setq webkit--progress-formatted
+          (if (equal progress 100.0)
+              ""
+            (format "%s%.0f%%  " (all-the-icons-faicon "spinner") progress)))
+    (force-mode-line-update))
+
+  ;; Set action to be taken on a download request. Predefined actions are
+  ;; `webkit-download-default', `webkit-download-save', and `webkit-download-open'
+  ;; where the save function saves to the download directory, the open function
+  ;; opens in a temp buffer and the default function interactively prompts.
+  (setq webkit-download-action-alist '(("\\.pdf\\'" . webkit-download-open)
+                                       ("\\.png\\'" . webkit-download-save)
+                                       (".*" . webkit-download-default)))
+
+  ;; Globally use a proxy
+  ;; (add-hook 'webkit-new-hook (lambda () (webkit-set-proxy "socks://localhost:8000")))
+
+  ;; Globally use the simple dark mode
+  (setq webkit-dark-mode t))
+#+end_src
+
+** PDF Tools
+:PROPERTIES:
+:ID:       F8397827-76ED-41E2-9857-992B2BC4EF1D
+:END:
+
+#+begin_src emacs-lisp
 (leaf pdf-tools
   :straight t
   :mode ("\\.pdf\\'" . pdf-view-mode)
@@ -3315,9 +4883,30 @@ respectively."
      ("h" . pdf-annot-add-highlight-markup-annotation)
      ("s" . pdf-annot-add-strikeout-markup-annotation)
      ("u" . pdf-annot-add-underline-markup-annotation))))
+#+end_src
 
+** Apple Script Mode
+:PROPERTIES:
+:ID:       1ACA04C2-1F7F-44C5-A32B-CE0283DCA6DB
+:END:
+#+begin_src emacs-lisp
 (leaf applescript-mode :straight t)
+#+end_src
 
+** Emacs Jupyter
+:PROPERTIES:
+:ID:       4f42d25d-a7e3-4a7b-9a39-975f1d79631c
+:END:
+
+
+TODO: =ansi-color--find-face= is renamed to =ansi-color--face-vec-face= in emacs-29
+
+Disabling native compilation is for avoid the issue: https://github.com/nnicandro/emacs-jupyter/issues/297#issuecomment-778924175
+
+
+To enable support for Jupyter based source code blocks, add jupyter to org-babel-load-languages. Ensure the jupyter entry is added last since loading ob-jupyter depends on the value of variables such as org-src-lang-modes and org-babel-tangle-lang-exts.
+
+#+begin_src emacs-lisp
 (leaf jupyter
   :disabled t
   :straight jupyter websocket
@@ -3337,7 +4926,22 @@ respectively."
                 [remap jupyter-org-hydra/body] nil)
     (define-key jupyter-org-interaction-mode-map
                 (kbd "C-c C-.") #'jupyter-org-hydra/body)))
+#+end_src
 
+*** Enable lsp in org-code-block
+:PROPERTIES:
+:ID:       725ED664-EA71-4344-A509-458228B9A6CD
+:END:
+
+- https://github.com/emacs-lsp/lsp-mode/issues/2842#issuecomment-870807018
+- https://github.com/emacs-lsp/lsp-mode/issues/655#issuecomment-592331844
+
+- =:file filename= or =:tangle filename= のどちらかを書く
+- =:tangle= の場合は下記の関数を用意することで，code-block に入ったときにバッファ名が filename になる
+- バッファ全体に適用するならこう
+  =#+PROPERTY: header-args:jupyter-python :file tmp.py=
+
+#+begin_src emacs-lisp
 (leaf org-babel
   :after org python-mode
   :config
@@ -3348,7 +4952,32 @@ respectively."
   ;;   (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
   ;;   (my/python-basic-config))
   )
+#+end_src
 
+
+*** Preparation
+
+1. Install =jupyterlab= and =ipykernel= to both of base and Virtual env
+
+2. Create kernel in virtual env
+   #+begin_src shell
+   conda activate ENVNAME
+   ipython install kernel --user --name=ENVNAME
+
+   # or
+
+   python -m ipykernel install --user --name=ENVNAME
+   #+end_src
+
+
+*** How to use it?
+
+** Search in external web browser
+:PROPERTIES:
+:ID:       AAFDC789-E681-4214-B095-578ACAA5F843
+:END:
+
+#+begin_src emacs-lisp
 (leaf sie-brow
   :disabled t
   :doc "Sie-Brow; Search in external browser with keywords
@@ -3419,6 +5048,15 @@ respectively."
     "Search in Google Scholar."
     (interactive "P")
     (sie-brow/search-in-external-browser sie-brow/prefix-for-google-scholar at-point)))
+#+end_src
+
+
+** Browse at remote
+:PROPERTIES:
+:ID:       D593E6DF-F5FF-48BB-9137-805205B140BF
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf browse-at-remote
   :straight t
@@ -3426,17 +5064,51 @@ respectively."
   :custom (browse-at-remote-prefer-symbolic . nil)
   :bind ("M-g r" . browse-at-remote))
 
+#+end_src
+
+** Org-inline-anim
+:PROPERTIES:
+:ID:       b9e7ff28-7e6d-4129-9db8-8dfe87688c7e
+:END:
+
+#+begin_src emacs-lisp
+
 (leaf org-inline-anim
   :straight t
   :hook (org-mode-hook . org-inline-anim-mode))
+
+#+end_src
+
+** Save frame and window configs with Burly
+:PROPERTIES:
+:ID:       d4e21974-5042-4145-a6c1-ab00cb7096bc
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf burly
   :straight t
   :bind* (("C-x C-b w" . burly-bookmark-windows)
           ("C-x C-b f" . burly-bookmark-frames)))
 
-(leaf csv-mode :straight t)
+#+end_src
 
+
+** CSV-mode
+:PROPERTIES:
+:ID:       dfb5287a-e3bf-473d-bf98-850942e1f414
+:END:
+
+#+begin_src emacs-lisp
+(leaf csv-mode :straight t)
+#+end_src
+
+** Markdown-preview-mode
+:PROPERTIES:
+:ID:       bf787c9b-9449-46b4-9e6b-d9dc7d3e16b6
+:END:
+
+#+begin_src emacs-lisp
 (leaf markdown-preview-mode
   :straight t
   :defer-config
@@ -3448,6 +5120,14 @@ respectively."
   (dolist (elm (list
                 "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"))
     (add-to-list 'markdown-preview-javascript elm)))
+#+end_src
+
+** Mermaid-mode
+:PROPERTIES:
+:ID:       71c6f771-c208-4c7c-9521-f106418c015e
+:END:
+
+#+begin_src emacs-lisp
 
 (leaf mermaid-mode
   :straight t
@@ -3468,36 +5148,91 @@ respectively."
           (define-key map (kbd "C-c C-d o") 'mermaid-open-browser)
           (define-key map (kbd "C-c C-d d") 'mermaid-open-doc)
           map)))
+#+end_src
 
+** Editorconfig
+:PROPERTIES:
+:ID:       f118d959-269c-447e-962c-5707fd1f02a3
+:END:
+
+#+begin_src emacs-lisp
 (leaf editorconfig
   :straight t
   :global-minor-mode editorconfig-mode)
+#+end_src
 
+
+** Format-all
+
+#+begin_src emacs-lisp
 (leaf format-all
   :straight t)
+#+end_src
 
+** Direnv
+:PROPERTIES:
+:ID:       0ce20a53-d842-4f89-9432-03608cabb1ac
+:END:
+
+#+begin_src emacs-lisp
 ;; (leaf direnv
 ;;   :straight t
 ;;   :hook (emacs-startup-hook . direnv-mode))
+#+end_src
 
+** Poetry
+:PROPERTIES:
+:ID:       03d13a45-8b16-4612-ae51-56484777265b
+:END:
+
+#+begin_src emacs-lisp
 (leaf poetry
   :disabled t
   :straight t
   :hook (emacs-startup-hook . poetry-tracking-mode))
+#+end_src
 
+** Pyvenv
+:PROPERTIES:
+:ID:       6b33c1cd-a0da-41db-9b47-a823b56bdf45
+:END:
+
+#+begin_src emacs-lisp
 (leaf pyvenv
   :straight (pyvenv
              :type git
              :host github
              :repo "jorgenschaefer/pyvenv"))
+#+end_src
 
+** OpenAPI Preview
+:PROPERTIES:
+:ID:       0be3b197-4eed-4bd2-908e-4f0a1295be7f
+:END:
+
+#+begin_src emacs-lisp
 (leaf openapi-preview
   :straight (openapi-preview
              :type git
              :host github
              :repo "merrickluo/openapi-preview"))
+#+end_src
 
+** Svelte-mode
+:PROPERTIES:
+:ID:       a8772d45-8938-4ba4-8b90-28af88ce3a3d
+:END:
+
+#+begin_src emacs-lisp
 (leaf svelte-mode
   :straight t)
+#+end_src
 
+* Footer
+:PROPERTIES:
+:ID:       B2B50080-95ED-4DEC-B99E-B120D1A08233
+:END:
+
+#+begin_src emacs-lisp
 (provide 'init)
+#+end_src

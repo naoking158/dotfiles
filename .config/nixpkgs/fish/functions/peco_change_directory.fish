@@ -1,1 +1,0 @@
-/Users/naoki/.dotfiles/bin/fish/peco_change_directory.fish

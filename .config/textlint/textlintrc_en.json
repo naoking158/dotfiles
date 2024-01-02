@@ -1,9 +1,0 @@
-{
-  "rules": {
-    "alex": true,
-    "common-misspellings": true,
-    "ginger": true,
-    "write-good": true,
-    "en-max-word-count": true,
-  }
-}
