@@ -6,7 +6,7 @@ keymap:
       not: [Alacritty, emacs, virt-manager]
     remap:
       # Hack for skk
-      C-j: C-Backslash
+      # C-j: C-Backslash
       # Send C-k
       C-Shift-k: C-k
       # Send C-/

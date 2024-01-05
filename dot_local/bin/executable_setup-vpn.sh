@@ -4,6 +4,10 @@
 set -Ceu
 set -x
 
+if [[ -z ${1:-} ]]; then
+    echo "An argument 'up' or 'down' is required."
+    return 1
+fi
 
 case $1 in
     "up")
@@ -11,7 +15,7 @@ case $1 in
         vpncmd localhost /CLIENT /CMD AccountConnect sakamoto
         echo "Wait for 5 seconds..."
         sleep 5
-        dhcpcd vpn_vpn-fp
+        dhcpcd --noipv6 vpn_vpn-fp
         ip route add 10.0.0.0/8 via 10.224.192.1 dev vpn_vpn-fp proto static metric 200 onlink
         ip route add 20.48.61.83 via 10.224.192.1 dev vpn_vpn-fp proto static metric 200 onlink
         ip route del default via 10.224.192.1 dev vpn_vpn-fp proto dhcp src 10.224.192.11
