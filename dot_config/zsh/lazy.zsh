@@ -122,13 +122,6 @@ fi
 # Set nvm path
 [[ -e /usr/share/nvm/init-nvm.sh ]] && source /usr/share/nvm/init-nvm.sh
 
-# Set npm path
-if [[ -e "${HOME}/.npm" ]]; then
-    npm config set prefix '~/.npm'
-    PATH="$HOME/.npm/bin:$PATH"
-    NODE_PATH="$HOME/.npm/lib/node_modules"
-fi
-
 # Set Go path
 if type go >/dev/null 2>&1; then
     export GOPATH=$(go env GOPATH)
@@ -137,4 +130,4 @@ fi
 export PATH
 
 
-typeset -U path cdpath fpath manpath
+typeset -gU path cdpath fpath manpath
