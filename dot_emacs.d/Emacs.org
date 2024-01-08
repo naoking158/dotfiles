@@ -5316,6 +5316,18 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
   :straight t)
 #+end_src
 
+** Ellama for Ollama communication
+
+#+begin_src emacs-lisp
+(leaf ellama
+  :straight (ellama
+             :type git
+             :host github
+             :repo "s-kostyaev/ellama")
+  :config
+  (require 'llm-ollama))
+#+end_src
+
 * Footer
 :PROPERTIES:
 :ID:       B2B50080-95ED-4DEC-B99E-B120D1A08233
