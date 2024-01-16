@@ -360,6 +360,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
   (leaf recentf
     :require no-littering
     :custom ((recentf-exclude . `(".recentf"
+                                  "recentf"
                                   "bookmarks"
                                   "org-recent-headings.dat"
                                   "^/tmp\\.*"
@@ -367,7 +368,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                                   "/TAGS$"
                                   ,no-littering-var-directory
                                   ,no-littering-etc-directory))
-             (recentf-save-file . "~/.emacs.d/.recentf")
+             `(recentf-save-file . ,(no-littering-expand-var-file-name "recentf"))
              (recentf-max-saved-items . 2000)
              (recentf-auto-cleanup . 'never))
     :global-minor-mode t)
