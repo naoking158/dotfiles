@@ -1,3 +1,6 @@
+# Set global environment variables
+[[ -f "${HOME}/.profile" ]] && source "${HOME}/.profile"
+
 # source command override technique
 function source {
   ensure_zcompiled $1
@@ -11,9 +14,6 @@ function ensure_zcompiled {
   fi
 }
 ensure_zcompiled $ZDOTDIR/.zshrc
-
-# Set global environment variables
-[[ -f "${HOME}/.profile" ]] && source "${HOME}/.profile"
 
 # sheldon
 if ! type sheldon >/dev/null 2>&1; then
