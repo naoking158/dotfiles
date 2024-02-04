@@ -4,7 +4,7 @@ export G_ROOT=$(git config ghq.root)
 export G_REPO=$(eval echo ${G_ROOT}/github.com/${G_USER})
 
 # Python path
-[[ -e $G_REPO ]] && export PYTHONPATH=$G_REPO
+# [[ -e $G_REPO ]] && export PYTHONPATH=$G_REPO
 
 # builtins
 function chpwd() {

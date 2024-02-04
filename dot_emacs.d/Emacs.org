@@ -123,6 +123,7 @@ a bunch of resources I've found online.
   - [[#pyvenv][Pyvenv]]
   - [[#openapi-preview][OpenAPI Preview]]
   - [[#svelte-mode][Svelte-mode]]
+  - [[#ellama-for-ollama-communication][Ellama for Ollama communication]]
 - [[#footer][Footer]]
 :END:
 
@@ -1582,8 +1583,10 @@ Only in Neotree Buffer:
                                             (expand-file-name "~/.emacs.d/etc/lsp-bridge/.venv/bin/python3")))
             (lsp-bridge-enable-completion-in-minibuffer . t)
             (lsp-bridge-signature-show-function . 'message)
-            ;; (lsp-bridge-user-langserver-dir . ,(expand-file-name "~/.dotfiles/etc/langserver"))
-            ;; (lsp-bridge-user-multiserver-dir . ,(expand-file-name "~/.dotfiles/etc/multiserver"))
+            (lsp-bridge-user-langserver-dir . ,(if (file-exists-p "~/.emacs.d/etc/lsp-bridge/langserver")
+                                                   (expand-file-name "~/.emacs.d/etc/lsp-bridge/langserver")))
+            (lsp-bridge-user-multiserver-dir . ,(if (file-exists-p "~/.emacs.d/etc/lsp-bridge/multiserver")
+                                                    (expand-file-name "~/.emacs.d/etc/lsp-bridge/multiserver")))
             (lsp-bridge-enable-hover-diagnostic . t)
             (lsp-bridge-python-multi-lsp-server . "pyright_ruff")
             (acm-enable-tabnine . nil)
@@ -5318,6 +5321,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** Ellama for Ollama communication
+:PROPERTIES:
+:ID:       4018d66f-e209-4175-b59a-630396e15e60
+:END:
 
 #+begin_src emacs-lisp
 (leaf ellama
