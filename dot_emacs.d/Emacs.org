@@ -124,6 +124,7 @@ a bunch of resources I've found online.
   - [[#openapi-preview][OpenAPI Preview]]
   - [[#svelte-mode][Svelte-mode]]
   - [[#ellama-for-ollama-communication][Ellama for Ollama communication]]
+  - [[#plantuml][PlantUML]]
 - [[#footer][Footer]]
 :END:
 
@@ -1590,7 +1591,7 @@ Only in Neotree Buffer:
             (lsp-bridge-enable-hover-diagnostic . t)
             (lsp-bridge-python-multi-lsp-server . "pyright_ruff")
             (acm-enable-tabnine . nil)
-            (acm-enable-codeium . t))
+            (acm-enable-codeium . nil))
   :bind (lsp-bridge-mode-map
          :package lsp-bridge
          ("M-." . lsp-bridge-find-def)
@@ -5335,6 +5336,19 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
   (require 'llm-ollama))
 #+end_src
 
+** PlantUML
+:PROPERTIES:
+:ID:       5080c682-07f6-4685-a943-7734ece65e3c
+:END:
+
+#+begin_src emacs-lisp
+(leaf plantuml-mode
+  :straight t
+  :mode "\\.pu\\'"
+  :custom ((plantuml-jar-path . "~/plantuml.jar")
+           (plantuml-exec-mode . 'jar)
+           (plantuml-indent-level . 4)))
+#+end_src
 * Footer
 :PROPERTIES:
 :ID:       B2B50080-95ED-4DEC-B99E-B120D1A08233
