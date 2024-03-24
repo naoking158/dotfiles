@@ -3,7 +3,7 @@
 keymap:
   - name: Emacs-like keybind
     application:
-      not: [Alacritty, emacs, virt-manager]
+      not: [Alacritty, emacs, virt-manager, code-url-handler]
     remap:
       # Hack for skk
       # C-j: C-Backslash
