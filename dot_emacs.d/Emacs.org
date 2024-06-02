@@ -1588,6 +1588,7 @@ Only in Neotree Buffer:
                                                     (expand-file-name "~/.emacs.d/etc/lsp-bridge/multiserver")))
             (lsp-bridge-enable-hover-diagnostic . t)
             (lsp-bridge-python-multi-lsp-server . "pyright_ruff")
+            (acm-enable-copilot . nil)
             (acm-enable-tabnine . nil)
             (acm-enable-codeium . nil))
   :bind ((lsp-bridge-mode-map
