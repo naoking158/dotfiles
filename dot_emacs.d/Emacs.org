@@ -171,14 +171,15 @@ a bunch of resources I've found online.
 ;;   (setq shell-file-name fish))
 
 ;; GUI
-(setq default-frame-alist '((line-spacing . 2)
-                            (vertical-scroll-bars)
+(setq default-frame-alist '((vertical-scroll-bars)
                             (menu-bar-lines . 0)
                             (tool-bar-lines . 0)
                             (left-fringe . 10)
                             (right-fringe . 10)
                             (width . 150)
                             (height . 80)))
+
+(setq-default line-spacing 0.3)
 
 (setq inhibit-splash-screen t
       frame-inhibit-implied-resize t
