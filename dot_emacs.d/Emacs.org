@@ -1590,20 +1590,21 @@ Only in Neotree Buffer:
             (lsp-bridge-python-multi-lsp-server . "pyright_ruff")
             (acm-enable-tabnine . nil)
             (acm-enable-codeium . nil))
-  :bind (lsp-bridge-mode-map
-         :package lsp-bridge
-         ("M-." . lsp-bridge-find-def)
-         ("M-," . lsp-bridge-find-def-return)
-         ("C-c C-j" . lsp-bridge-find-def-other-window)
-         ("C-c C-r" . lsp-bridge-find-references)
-         ("C-c C-d" . lsp-bridge-popup-documentation)
-         ("C-c C-n" . lsp-bridge-diagnostic-jump-next)
-         ("C-c C-p" . lsp-bridge-diagnostic-jump-prev)
-         ("C-c l l" . lsp-bridge-diagnostic-list)
-         ("C-c l c" . lsp-bridge-diagnostic-copy)
-         ("C-c l r" . lsp-bridge-rename)
-         ("M-p" . acm-doc-scroll-up)
-         ("M-n" . acm-doc-scroll-down))
+  :bind ((lsp-bridge-mode-map
+          :package lsp-bridge
+          ("M-." . lsp-bridge-find-def)
+          ("M-," . lsp-bridge-find-def-return)
+          ("C-c C-j" . lsp-bridge-find-def-other-window)
+          ("C-c C-r" . lsp-bridge-find-references)
+          ("C-c C-d" . lsp-bridge-popup-documentation)
+          ("C-c C-n" . lsp-bridge-diagnostic-jump-next)
+          ("C-c C-p" . lsp-bridge-diagnostic-jump-prev)
+          ("C-c l l" . lsp-bridge-diagnostic-list)
+          ("C-c l c" . lsp-bridge-diagnostic-copy)
+          ("C-c l r" . lsp-bridge-rename))
+         (acm-mode-map
+          :package acm
+          ("C-j" . skk-kakutei)))
   :preface
   (defun run-local-vars-mode-hook ()
     "Run `major-mode' hook after the local variables have been processed."
