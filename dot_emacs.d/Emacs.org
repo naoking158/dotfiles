@@ -5332,8 +5332,25 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
              :type git
              :host github
              :repo "s-kostyaev/ellama")
+  :init
+  ;; setup key bindings
+  (setopt ellama-keymap-prefix "C-c e")
+
   :config
-  (require 'llm-ollama))
+  (require 'llm-ollama)
+  (setopt ellama-providers
+		      '(
+            ("git-commit-message" . (make-llm-ollama
+                                     :chat-model "tavernari/git-commit-message"
+                                     :embedding-model "tavernari/git-commit-message"))
+            ("llama3" . (make-llm-ollama
+                         :chat-model "llama3:8b-instruct-fp16"
+                         :embedding-model "llama3:8b-instruct-fp16"))
+            ("codestral" . (make-llm-ollama
+                            :chat-model "codestral:22b"
+                            :embedding-model "codestral:22b"))
+            ))
+  )
 #+end_src
 
 ** PlantUML
