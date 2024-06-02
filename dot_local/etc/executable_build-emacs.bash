@@ -27,7 +27,7 @@ function help () {
 set -Ceu
 PATCH_URL=(
     "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-28/fix-window-role.patch"
-    "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-28/system-appearance.patch"
+    "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-30/system-appearance.patch"
 )
 
 function e_error() {
@@ -242,7 +242,7 @@ function build() {
         configureFlags=(
             "--with-modules"
             "--with-json"
-            "--with-native-compilation"
+            "--with-native-compilation=aot"
             "--with-imagemagick"
             "--with-xml2"
 	          "--with-xwidgets"
