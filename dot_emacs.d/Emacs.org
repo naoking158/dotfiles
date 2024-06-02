@@ -2254,7 +2254,7 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
   :straight t
   :hook (emacs-startup-hook . yas-global-mode)
   :custom ((yas-indent-line . 'fixed)
-           (yas-snippet-dirs . `(,(file-truename "~/.emacs.d/snippets/"))))
+           (yas-snippet-dirs . `(,(file-truename "~/.emacs.d/etc/snippets/"))))
   :bind ((yas-keymap
           ("<tab>" . nil))  ;; conflict with company/coruf
          (yas-minor-mode-map
