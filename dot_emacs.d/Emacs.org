@@ -1639,9 +1639,9 @@ Only in Neotree Buffer:
           ("C-c h c" . helpful-command)
           ("C-c h k" . helpful-key)))
 
-(leaf macrostep
-  :straight t
-  :bind (("C-c e" . macrostep-expand)))
+;; (leaf macrostep
+;;   :straight t
+;;   :bind (("C-c e" . macrostep-expand)))
 
 #+end_src
 
