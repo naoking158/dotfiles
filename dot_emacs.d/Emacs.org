@@ -1579,9 +1579,7 @@ Only in Neotree Buffer:
              :build (:not compile))
   :hook ((hack-local-variables-hook . run-local-vars-mode-hook)
          (yas-global-mode-hook . global-lsp-bridge-mode))
-  :custom `((lsp-bridge-python-command . ,(if (eq window-system 'ns)
-                                              "/opt/homebrew/bin/python3"
-                                            (expand-file-name "~/.emacs.d/etc/lsp-bridge/.venv/bin/python3")))
+  :custom `((lsp-bridge-python-command . ,(expand-file-name "~/.emacs.d/etc/lsp-bridge/.venv/bin/python3"))
             (lsp-bridge-enable-completion-in-minibuffer . t)
             (lsp-bridge-signature-show-function . 'message)
             (lsp-bridge-user-langserver-dir . ,(if (file-exists-p "~/.emacs.d/etc/lsp-bridge/langserver")
