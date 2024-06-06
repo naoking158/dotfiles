@@ -3645,9 +3645,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   (leaf org-agenda
     :hook ((kill-emacs-hook . ladicle/org-clock-out-and-save-when-exit)
            (org-clock-in-hook . (lambda ()
-                                  (org-todo "NEXT")
-                                  (add-to-list 'frame-title-format
-                                               '(:eval org-mode-line-string) t))))
+                                  (org-todo "NEXT"))))
     :bind (org-agenda-mode-map
            ("i" . org-agenda-clock-in)
            ("r" . jethro/org-agenda-process-inbox-item)
@@ -4206,6 +4204,8 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
        :unnarrowed t))))
 
   :defer-config
+  ;; If you're using a vertical completion framework, you might want a more informative completion interface
+  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
   ;; for org-roam-buffer-toggle
   ;; Recommendation in the official manual
   (add-to-list 'display-buffer-alist
