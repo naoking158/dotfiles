@@ -2678,7 +2678,7 @@ Window management commands are accessible by prefix =C-x w=
 
 (leaf visual-fill-column
   :straight t
-  :custom ((visual-fill-column-width . 88)
+  :custom ((visual-fill-column-width . 120)
            (visual-fill-column-center-text . t))
   :hook (org-mode-hook . visual-fill-column-mode))
 
