@@ -1014,7 +1014,7 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
     (funcall my-load-theme-func sym-theme))
 
   (defun my/default-theme nil
-    (my/load-theme 'modus-dark)
+    (my/load-theme 'modus-light)
     ;; (let ((time
     ;;        (string-to-number
     ;;         (format-time-string "%H"))))
@@ -1121,6 +1121,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
     :custom ((doom-modeline-buffer-file-name-style . 'truncate-except-project)
              (doom-modeline-project-detection . 'auto)
              (doom-modeline-icon . t)
+             (doom-modeline-unicode-fallback . t)
              (doom-modeline-major-mode-icon . nil)
              (doom-modeline-minor-modes . nil)
              (doom-modeline-hud . t)
@@ -1132,6 +1133,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
              (doom-modeline-buffer-state-icon . t)
              (doom-modeline-env-enable-python . t)
              (doom-modeline-modal . nil)
+             (doom-modeline-buffer-encoding . nil)
              )
     :config
     (defun my/modeline-doom nil
@@ -4440,7 +4442,7 @@ It's nice to have a table of contents section for long literate configuration fi
   :url "https://github.com/conao3/oj.el"
   :straight t
   :commands oj-prepare oj-test oj-submit
-  :custom ((oj-default-online-judge quote atcoder)
+  :custom ((oj-default-online-judge . 'atcoder)
            (oj-compiler-python . "cpython")
            (oj-home-dir . "~/drive/work/coder/AtCoder")
            (oj-submit-args quote
@@ -4689,21 +4691,6 @@ Manual is [[https://notmuchmail.org/emacstips/][here]]
 #+end_src
 
 *** Mu4e
-**** Prepare
-
-https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Mail-03.org
-
-#+begin_src shell
-mbsync -a
-
-mu init --maildir=~/Mail \
-   --my-address=naoki@bbo.cs.tsukuba.ac.jp \
-   --my-address=nok.skmt.snow@gmail.com \
-   --my-address=s1930160@s.tsukuba.ac.jp
-
-mu index
-#+end_src
-
 **** Config
 :PROPERTIES:
 :ID:       44f695dc-d668-4345-b105-4ab273f1a501
