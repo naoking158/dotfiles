@@ -2334,6 +2334,8 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
   :custom ((default-input-method . "japanese-skk")
            (skk-jisyo-code . 'utf-8)
            (skk-large-jisyo . nil)
+           (skk-server-host . "localhost")
+           (skk-server-portnum . 1179)
            (skk-backup-jisyo . "~/.skk-jisyo.BAK")
            (skk-save-jisyo-instantly . t)
            (skk-share-private-jisyo . t)
@@ -2359,10 +2361,7 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
                                       :inherit 'normal)))
   :config
   (if (memq window-system '(x pgtk))
-      (setq skk-jisyo "~/.skk-jisyo")
-    (progn
-      (setq skk-server-host "localhost")
-      (setq skk-server-portnum 1179)))
+      (setq skk-jisyo "~/.skk-jisyo"))
 
   (defun my-variable-watcher-for-skk-henkan-mode (symbol newval operation where)
     "Watcher function for variable `skk-henkan-mode'."
