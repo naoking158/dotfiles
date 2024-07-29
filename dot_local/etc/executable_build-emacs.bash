@@ -134,13 +134,13 @@ done
 declare -r  ORIGIN=$(pwd)
 declare -ri NPROC="${NPROC:=1}"
 if [[ "${VERSION:-}" ]]; then
-    if [[ $VERSION == "30" ]]; then
+    if [[ $VERSION == "31" || $VERSION == "latest" ]]; then
         VERSION="master"
     else
         VERSION="emacs-${VERSION}"
     fi
 else
-    VERSION="emacs-28"
+    VERSION="emacs-30"
 fi
 declare -r VERSION=$VERSION
 declare -r  WORK_DIR="${WORK_DIR:=${HOME}/src/emacs}"
@@ -149,7 +149,7 @@ declare -r  TARBALL_NAME="${VERSION}.tgz"
 declare -r  TARBALL_FILE="${TARBALL_DIR}/${TARBALL_NAME}"
 declare -r  TARBALL_URL="https://github.com/emacs-mirror/emacs/tarball/${VERSION}"
 declare -r  TARBALL_EXTRACED_DIR="${WORK_DIR}/sources/${VERSION}"
-declare -r  PREFIX="${PREFIX:=${HOME}/.local}"
+# declare -r  PREFIX="${PREFIX:=${HOME}/.local}"
 
 if is_macos; then
     declare -r makeCMD="gmake"
@@ -246,7 +246,7 @@ function build() {
             "--with-imagemagick"
             "--with-xml2"
 	          "--with-xwidgets"
-	          "--prefix=${PREFIX}"
+            "--with-tree-sitter"
         )
     elif is_manjaro; then
         configureFlags=(
@@ -257,7 +257,7 @@ function build() {
             "--with-pgtk"
 	          "--without-x"
 	          "--with-libxml2=/usr/bin/xml2-config"
-            "--prefix=${PREFIX}"
+            "--with-tree-sitter"
         )
     fi
 
