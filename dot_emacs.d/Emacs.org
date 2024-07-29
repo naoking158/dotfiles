@@ -1691,7 +1691,7 @@ Only in Neotree Buffer:
 #+end_src
 
 
-*** HTML
+*** Web
 :PROPERTIES:
 :ID:       8A817B4F-518D-40C2-BCEE-2573EACF9E9D
 :END:
@@ -1714,10 +1714,19 @@ Only in Neotree Buffer:
          "\\.mustache\\'"
          "\\.djhtml\\'"
          "\\.vue\\'"
+         "\\.ejs\\'"
          )
   :config
   (define-derived-mode vue-mode web-mode "Vue")
-  (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode)))
+  (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
+
+  (leaf emmet-mode
+    :straight t
+    :hook web-mode-hook
+    :bind (:emmet-mode-keymap
+           ("C-j" . skk-kakutei)
+           ("C-c e" . emmet-expand-line)))
+  )
 #+end_src
 
 *** JavaScript
