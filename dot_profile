@@ -35,15 +35,15 @@ if [[ -e $HOME/.cargo/bin ]]; then
     PATH="$HOME/.cargo/bin:$PATH"
 fi
 
-# Set npm path
-if type npm >/dev/null 2>&1; then
-    npm config set prefix '~/.npm'
-fi
+# # Set npm path
+# if type npm >/dev/null 2>&1; then
+#     npm config set prefix '~/.npm'
+# fi
 
-if [[ -e "${HOME}/.npm" ]]; then
-    PATH="$HOME/.npm/bin:$PATH"
-    NODE_PATH="$HOME/.npm/lib/node_modules"
-fi
+# if [[ -e "${HOME}/.npm" ]]; then
+#     PATH="$HOME/.npm/bin:$PATH"
+#     NODE_PATH="$HOME/.npm/lib/node_modules"
+# fi
 
 if type emacs >/dev/null 2>&1; then
     export EDITOR="emacsclient -nw --alternate-editor='emacs -Q -nw'"

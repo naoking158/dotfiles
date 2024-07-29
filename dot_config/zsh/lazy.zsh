@@ -119,14 +119,12 @@ if type az > /dev/null 2>&1; then
     source ${ZSH_COMPLETION_PATH}/az.completion
 fi
 
-# Set nvm path
-[[ -e /usr/share/nvm/init-nvm.sh ]] && source /usr/share/nvm/init-nvm.sh
-
 # Set Go path
 if type go >/dev/null 2>&1; then
     export GOPATH=$(go env GOPATH)
     PATH="${PATH}:${GOPATH}/bin"
 fi
+
 export PATH
 
 
