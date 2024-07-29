@@ -14,26 +14,26 @@
   "layer": "top",
 
   // If height property would be not present, it'd be calculated dynamically
-  "height": 30,
+  "height": 18,
   "position": "top",
 
   "modules-left": ["custom/menu", "sway/workspaces", "custom/scratchpad"],
   "modules-center": ["clock", "custom/weather", "custom/wf-recorder", "sway/mode"],
   "modules-right": [
     // informational
-    "sway/language",
-    "custom/github",
+    // "sway/language",
+    // "custom/github",
     "custom/clipboard",
-    "custom/zeit",
+    // "custom/zeit",
     "cpu",
     "temperature",
     "memory",
-    "battery",
+    // "battery",
 
     // connecting
     "network",
     "bluetooth",
-    "custom/valent",
+    // "custom/valent",
 
     // media
     "custom/playerctl",
