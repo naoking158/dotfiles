@@ -6,7 +6,7 @@
 $ chezmoi init --apply git@github.com:naoking158/dotfiles.git
 #+end_src
 
-See [Set up a new machine with a single command](https://www.chezmoi.io/quick-start/#set-up-a-new-machine-with-a-single-command) for more detail.
+See [[https://www.chezmoi.io/quick-start/#set-up-a-new-machine-with-a-single-command][Set up a new machine with a single command]] for more detail.
 
 ** License
 
