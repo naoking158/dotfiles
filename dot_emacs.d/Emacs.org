@@ -1841,7 +1841,15 @@ Only in Neotree Buffer:
 
 #+begin_src emacs-lisp
 (leaf go-mode
-  :straight t)
+  :straight t
+  :hook ((go-ts-mode-hook . my/go-basic-config)
+         (before-save-hook . gofmt-before-save))
+  :preface
+  (defun my/go-basic-config ()
+    (setq-local indent-tabs-mode t
+                tab-width 2
+                go-ts-mode-indent-offset 2))
+  )
 #+end_src
 
 *** Ansible
@@ -1859,6 +1867,14 @@ Only in Neotree Buffer:
   :config
   (require 'lsp-bridge)
   (add-to-list 'lsp-bridge-single-lang-server-mode-list '(yaml-mode . "ansible-language-server")))
+#+end_src
+
+*** SQL
+
+#+begin_src emacs-lisp
+(leaf sql-indent
+  :straight t
+  :hook (go-ts-mode-hook . sqlind-minor-mode))
 #+end_src
 
 ** Productivity
@@ -2276,7 +2292,6 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
           ("C-c y v" . yas-visit-snippet-file)
           ("C-c y l" . yas-describe-tables)
           ("C-c y g" . yas-reload-all))))
-
 #+end_src
 
 *** Google Translate
