@@ -5356,12 +5356,12 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
             ("git-commit-message" . (make-llm-ollama
                                      :chat-model "tavernari/git-commit-message"
                                      :embedding-model "tavernari/git-commit-message"))
-            ("llama3" . (make-llm-ollama
-                         :chat-model "llama3:8b-instruct-fp16"
-                         :embedding-model "llama3:8b-instruct-fp16"))
-            ("codestral" . (make-llm-ollama
-                            :chat-model "codestral:22b"
-                            :embedding-model "codestral:22b"))
+            ("llama3.1" . (make-llm-ollama
+                           :chat-model "llama3.1"
+                           :embedding-model "llama3.1"))
+            ("phi3" . (make-llm-ollama
+                       :chat-model "phi3:14b"
+                       :embedding-model "phi3:14b"))
             ))
   )
 #+end_src
