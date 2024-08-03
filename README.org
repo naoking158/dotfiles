@@ -1,46 +1,12 @@
 * Dotfiles
 
-** Status
-
-As of writing (2022-02-20) it works for me on my machine.
-- *macOS* Monterey 12.2.1 (M1)
-- *[[https://github.com/tmux/tmux/wiki][Tmux]]* 3.2a
-- *Emacs* 28.0.91
-
-Note: You can clone or fork them freely, but I don't guarantee that they fit you.
-
-
 ** 🛠️ Installation
 
-1. Downloads this repository
-2. Deploy (i.e., *copy* or *create symlink*) dot files to your home directory; ~make deploy~
-3. *Optional*: Run all programs for setup in =./etc/init/= directory
-
-Also, you can do that by running the installation command below.
-
-| Tools | The installation command                                                               |
-|-------+----------------------------------------------------------------------------------------|
-| cURL  | bash -c "$(curl -fsSL raw.githubusercontent.com/naoking158/dotfiles/main/etc/install)" |
-| Wget  | bash -c "$(wget -qO - raw.githubusercontent.com/naoking158/dotfiles/main/etc/install)" |
-
-
-** 🔃 Updating
-
 #+begin_src shell
-make update
+$ chezmoi init --apply git@github.com:naoking158/dotfiles.git
 #+end_src
 
-It just run this command.
-#+begin_src shell
-git pull origin main
-#+end_src
-
-
-** 💡 Inspiration
-
-- [[https://github.com/b4b4r07/dotfiles]]
-- [[https://qiita.com/b4b4r07/items/b70178e021bef12cd4a2#fnref2][最強の dotfiles 駆動開発と GitHub で管理する運用方法]]
-
+See [Set up a new machine with a single command](https://www.chezmoi.io/quick-start/#set-up-a-new-machine-with-a-single-command) for more detail.
 
 ** License
 
