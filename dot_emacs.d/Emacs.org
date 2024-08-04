@@ -929,9 +929,9 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
     :require t
     :config
     (defun my/load-modus-theme (sym-theme)
-      (setq modus-themes-bold-constructs t
+      (setq modus-themes-disable-other-themes t
+            modus-themes-bold-constructs t
             modus-themes-region '(bg-only no-extend)
-            modus-themes-org-blocks 'gray-background ; {nil,'gray-background,'tinted-background}
             modus-themes-mixed-fonts t
             modus-themes-subtle-line-numbers t
             modus-themes-variable-pitch-headings t
@@ -953,8 +953,8 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
                                     (t . (bold variable-pitch 1.1))))
       ;; Load choiced theme
       (pcase sym-theme
-        ('modus-dark (load-theme 'modus-vivendi-tinted :no-confirm))
-        ('modus-light (load-theme 'modus-operandi :no-confirm)))))
+        ('modus-dark (load-theme 'modus-vivendi-tritanopia :no-confirm))
+        ('modus-light (load-theme 'modus-operandi-tritanopia :no-confirm)))))
 
   (leaf bespoke-themes
     :straight (bespoke-themes
@@ -1016,14 +1016,7 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
     (funcall my-load-theme-func sym-theme))
 
   (defun my/default-theme nil
-    (my/load-theme 'modus-light)
-    ;; (let ((time
-    ;;        (string-to-number
-    ;;         (format-time-string "%H"))))
-    ;;   (if (and (> time 5) (< time 18))
-    ;;       (my/load-theme 'modus-light)
-    ;;     (my/load-theme 'modus-dark)))
-    )
+    (my/load-theme 'modus-dark))
 
   :config
   (column-number-mode)
