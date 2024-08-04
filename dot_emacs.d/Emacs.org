@@ -2095,88 +2095,31 @@ Only in Neotree Buffer:
 
 #+end_src
 
-*** Smart Parens
+*** Pair edit with puni
 :PROPERTIES:
 :ID:       D988D9B4-1415-40F3-B73D-E1B7C6195F17
 :END:
 
 #+begin_src emacs-lisp
-
-(leaf smartparens
-  :straight t
-  :init (require 'smartparens-config)
-  :hook ((prog-mode-hook . turn-on-smartparens-mode)
-         ((python-mode-hook
-           emacs-lisp-mode
-           lisp-interaction-mode
-           LaTeX-mode-hook) . turn-on-smartparens-strict-mode))
-  :bind (smartparens-mode-map
-         ("C-M-a" . sp-beginning-of-sexp)
-         ("C-M-e" . sp-end-of-sexp)
-
-         ("C-M-n" . sp-next-sexp)
-         ("C-M-p" . sp-previous-sexp)
-
-         ("C-S-f" . sp-forward-symbol)
-         ("C-S-b" . sp-backward-symbol)
-
-         ("C-<right>" . sp-forward-slurp-sexp)
-         ("C-<left>" . sp-forward-barf-sexp)
-         ("M-<left>" . sp-backward-slurp-sexp)
-         ("M-<right>" . sp-backward-barf-sexp)
-
-         ("C-M-k" . sp-kill-sexp)
-         ("C-k" . sp-kill-hybrid-sexp)
-         ("M-k" . sp-backward-kill-sexp)
-         ("C-M-w" . sp-copy-sexp)
-         ("C-M-d" . sp-delete-region)
-
-         ("M-<backspace>" . backward-kill-word)
-         ;; ([remap sp-backward-kill-word] . backward-kill-ward)
-
-         ;; ("M-s" . sp-unwrap-sexp)
-         ("M-s" . sp-splice-sexp) ;; depth-changing commands
-         ("M-<up>" . sp-splice-sexp-killing-backward)
-         ("M-<down>" . sp-splice-sexp-killing-forward)
-         ("M-r" . sp-splice-sexp-killing-around)
-
-         ("C-c (" . wrap-with-parens)
-         ("C-c [" . wrap-with-brackets)
-         ("C-c {" . wrap-with-braces)
-         ("C-c '" . wrap-with-single-quotes)
-         ("C-c \"" . wrap-with-double-quotes)
-         ("C-c _" . wrap-with-underscores)
-         ("C-c `" . wrap-with-back-quotes)
-         )
-  :preface
-  (defmacro def-pairs (pairs)
-    "Define functions for pairing. PAIRS is an alist of (NAME . STRING)
-conses, where NAME is the function name that will be created and
-STRING is a single-character string that marks the opening character.
-
-  (def-pairs ((paren . \"(\")
-              (bracket . \"[\"))
-
-defines the functions WRAP-WITH-PAREN and WRAP-WITH-BRACKET,
-respectively."
-    `(progn
-       ,@(cl-loop for (key . val) in pairs
-                  collect
-                  `(defun ,(read (concat
-                                  "wrap-with-"
-                                  (prin1-to-string key)
-                                  "s"))
-                       (&optional arg)
-                     (interactive "p")
-                     (sp-wrap-with-pair ,val)))))
-
-  (def-pairs ((paren . "(")
-              (bracket . "[")
-              (brace . "{")
-              (single-quote . "'")
-              (double-quote . "\"")
-              (back-quote . "`"))))
-
+(leaf puni
+  :straight (puni
+             :type git
+             :host github
+             :repo "AmaiKinono/puni")
+  :global-minor-mode puni-global-mode
+  :bind (puni-mode-map
+         ("C-)" . puni-slurp-forward)
+         ("C-}" . puni-barf-forward)
+         ("M-(" . puni-wrap-round)
+         ("M-s" . puni-splice)
+         ("M-r" . puni-raise)
+         ("M-U" . puni-splice-killing-backward)
+         ("M-z" . puni-squeeze))
+  :config
+  (leaf elec-pair
+    :doc "Automatic parenthesis pairing"
+    :global-minor-mode electric-pair-mode)
+  )
 #+end_src
 
 
