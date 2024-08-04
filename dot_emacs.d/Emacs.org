@@ -1681,8 +1681,7 @@ Only in Neotree Buffer:
   :preface
   (defun my/python-basic-config ()
     (setq indent-tabs-mode nil
-          python-indent 4
-          tab-width 4)))
+          python-indent 4)))
 
 (leaf python-isort :straight t)
 
@@ -2570,7 +2569,6 @@ Window management commands are accessible by prefix =C-x w=
 (leaf tab-bar
   :doc "frame-local tabs with named persistent window configurations"
   :tag "builtin"
-  :require t
   :bind (("C-x t n" . tab-new)
          ("C-x t r" . tab-bar-rename-tab)
          ("s-]" . tab-bar-switch-to-next-tab)
@@ -2579,8 +2577,7 @@ Window management commands are accessible by prefix =C-x w=
            (tab-bar-new-button-show . nil)
            (tab-bar-close-button-show . nil)
            (tab-bar-select-tab-modifiers . '(meta)))
-
-  :hook (emacs-startup-hook . my--init-tab-bar)
+  :hook (after-init-hook . my--init-tab-bar)
   :config
   (defun my/tab-new-with-name (&optional name)
     (interactive "sName: ")
@@ -2921,29 +2918,6 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     (setq fussy-score-fn 'fussy-fuz-score)
     (unless (require 'fuz-core nil t)
       (fuz-build-and-load-dymod))))
-
-;; (leaf flx-rs
-;;   :straight
-;;   (flx-rs
-;;    :repo "jcs-elpa/flx-rs"
-;;    :fetcher github
-;;    :files (:defaults "bin"))
-;;   :config
-;;   (setq fussy-score-fn 'flx-rs-score)
-;;   (flx-rs-load-dyn))
-
-;; (leaf fussy
-;;   :straight t
-;;   :config
-;;   (push 'fussy completion-styles)
-;;   (setq
-;;    ;; For example, project-find-file uses 'project-files which uses
-;;    ;; substring completion by default. Set to nil to make sure it's using
-;;    ;; flx.
-;;    completion-category-defaults nil
-;;    completion-category-overrides nil
-;;    fussy-score-fn 'fussy-fuz-bin-score
-;;    ))
 #+end_src
 
 ** Completion Annotations with Marginalia
@@ -5298,9 +5272,15 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
   :init
   ;; setup key bindings
   (setopt ellama-keymap-prefix "C-c e")
-
+  :custom ((ellama-language . "Japanese"))
   :config
   (require 'llm-ollama)
+  (setopt ellama-provider
+	        (make-llm-ollama
+	         ;; this model should be pulled to use it
+	         ;; value should be the same as you print in terminal during pull
+	         :chat-model "llama3.1"
+	         :embedding-model "llama3.1"))
   (setopt ellama-providers
 		      '(
             ("git-commit-message" . (make-llm-ollama
@@ -5313,6 +5293,10 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
                        :chat-model "phi3:14b"
                        :embedding-model "phi3:14b"))
             ))
+  ;; Translation llm provider
+  (setopt ellama-translation-provider (make-llm-ollama
+                                       :chat-model "llama3.1"
+                                       :embedding-model "llama3.1"))
   )
 #+end_src
 
@@ -5329,6 +5313,17 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
            (plantuml-exec-mode . 'jar)
            (plantuml-indent-level . 4)))
 #+end_src
+
+** Reformatter
+
+#+begin_src emacs-lisp
+(leaf reformatter
+  :straight (reformatter
+             :type git
+             :host github
+             :repo "purcell/emacs-reformatter"))
+#+end_src
+
 * Footer
 :PROPERTIES:
 :ID:       B2B50080-95ED-4DEC-B99E-B120D1A08233
