@@ -125,6 +125,7 @@ a bunch of resources I've found online.
   - [[#svelte-mode][Svelte-mode]]
   - [[#ellama-for-ollama-communication][Ellama for Ollama communication]]
   - [[#plantuml][PlantUML]]
+  - [[#reformatter][Reformatter]]
 - [[#footer][Footer]]
 :END:
 
@@ -413,6 +414,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
         (setq dired-listing-switches "-al --group-directories-first")))
     :custom '((fill-column . 82)
               (tab-width . 2)
+              (indent-tabs-mode . nil)
               (frame-resize-pixelwise . t)
               (enable-recursive-minibuffers . t)
               (create-lockfiles)
@@ -1843,12 +1845,18 @@ Only in Neotree Buffer:
 (leaf go-mode
   :straight t
   :hook ((go-ts-mode-hook . my/go-basic-config)
-         (before-save-hook . gofmt-before-save))
+         (go-ts-mode-hook . go-format-on-save-mode))
+  :custom (gofmt-command . "goimports")
   :preface
   (defun my/go-basic-config ()
     (setq-local indent-tabs-mode t
                 tab-width 2
                 go-ts-mode-indent-offset 2))
+  :config
+  ;; ref: https://magnus.therning.org/2023-11-16-using-the-golang-mode-shipped-with-emacs.html
+  (reformatter-define go-format
+    :program "goimports"
+    :args '("/dev/stdin"))
   )
 #+end_src
 
@@ -1873,8 +1881,7 @@ Only in Neotree Buffer:
 
 #+begin_src emacs-lisp
 (leaf sql-indent
-  :straight t
-  :hook (go-ts-mode-hook . sqlind-minor-mode))
+  :straight t)
 #+end_src
 
 ** Productivity
