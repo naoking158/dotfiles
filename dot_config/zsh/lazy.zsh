@@ -101,10 +101,10 @@ alias push4='ssh vm4 "rm -rf ~/work/VMOperateTool" && myrsync -u vm4 ~/src/githu
 # alias push='ssh vm5 "rm -rf ~/work/ToolsOnKE" && myrsync -u vm5 ~/src/github.com/fixpoint/ToolsOnKE/ ~/work/ToolsOnKE/'
 # alias xargs='gxargs'
 
-dev_vm="vm4"
-dev_pkg="VMOperateTool"
-alias dpull='ssh ${dev_vm} "bash ~/work/${dev_pkg}/utils/download.sh" && myrsync -d ${dev_vm} ~/work/${dev_pkg}/ ~/src/github.com/fixpoint/${dev_pkg}/'
-alias dpush='ssh ${dev_vm} "rm -rf ~/work/${dev_pkg}" && myrsync -u ${dev_vm} ~/src/github.com/fixpoint/${dev_pkg}/ ~/work/${dev_pkg}/'
+dev_vm="vm1"
+dev_pkg="MHLW_AlertPortal"
+alias dpull='ssh ${dev_vm} "bash ~/${dev_pkg}/utils/download.sh" && myrsync -d ${dev_vm} ~/${dev_pkg}/ ~/src/github.com/fixpoint/${dev_pkg}/'
+alias dpush='ssh ${dev_vm} "rm -rf ~/${dev_pkg}" && myrsync -u ${dev_vm} ~/src/github.com/fixpoint/${dev_pkg}/ ~/${dev_pkg}/'
 
 # Global Aliases
 alias -g G='| grep'
