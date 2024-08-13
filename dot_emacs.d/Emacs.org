@@ -2105,7 +2105,7 @@ Only in Neotree Buffer:
              :type git
              :host github
              :repo "AmaiKinono/puni")
-  :global-minor-mode puni-global-mode
+  :hook (prog-mode-hook . puni-mode)
   :bind (puni-mode-map
          ("C-)" . puni-slurp-forward)
          ("C-}" . puni-barf-forward)
