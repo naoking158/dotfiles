@@ -2076,7 +2076,8 @@ Only in Neotree Buffer:
 (leaf treesit-auto
   :straight t
   :global-minor-mode global-treesit-auto-mode
-  :custom (treesit-auto-install . t))
+  :custom ((treesit-auto-install . t)
+           (treesit-font-lock-level . 4)))
 #+end_src
 
 *** Showing Pair of Brackets with Paren
