@@ -2224,8 +2224,7 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 (leaf yasnippet
   :straight t
   :hook (emacs-startup-hook . yas-global-mode)
-  :custom ((yas-indent-line . 'fixed)
-           (yas-snippet-dirs . `(,(file-truename "~/.emacs.d/etc/snippets/"))))
+  :custom ((yas-indent-line . 'fixed))
   :bind ((yas-keymap
           ("<tab>" . nil))  ;; conflict with company/coruf
          (yas-minor-mode-map
@@ -2233,7 +2232,10 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
           ("C-c y n" . yas-new-snippet)
           ("C-c y v" . yas-visit-snippet-file)
           ("C-c y l" . yas-describe-tables)
-          ("C-c y g" . yas-reload-all))))
+          ("C-c y g" . yas-reload-all)))
+  :config
+  (add-to-list 'yas-snippet-dirs (file-truename "~/.emacs.d/etc/snippets/"))
+  (leaf yasnippet-snippets :straight t))
 #+end_src
 
 *** Google Translate
