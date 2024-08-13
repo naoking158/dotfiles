@@ -1836,19 +1836,23 @@ Only in Neotree Buffer:
 #+begin_src emacs-lisp
 (leaf go-mode
   :straight t
-  :hook ((go-ts-mode-hook . my/go-basic-config)
-         (go-ts-mode-hook . go-format-on-save-mode))
   :custom (gofmt-command . "goimports")
-  :preface
-  (defun my/go-basic-config ()
-    (setq-local indent-tabs-mode t
-                tab-width 2
-                go-ts-mode-indent-offset 2))
   :config
-  ;; ref: https://magnus.therning.org/2023-11-16-using-the-golang-mode-shipped-with-emacs.html
-  (reformatter-define go-format
-    :program "goimports"
-    :args '("/dev/stdin"))
+  (leaf go-ts-mode
+    :hook ((go-ts-mode-hook . my/go-basic-config)
+           ;; (go-ts-mode-hook . go-format-on-save-mode)
+           )
+    :preface
+    (defun my/go-basic-config ()
+      (setq-local indent-tabs-mode t
+                  tab-width 2
+                  go-ts-mode-indent-offset 2))
+    :config
+    ;; ref: https://magnus.therning.org/2023-11-16-using-the-golang-mode-shipped-with-emacs.html
+    (reformatter-define go-format
+      :program "goimports"
+      :args '("/dev/stdin"))
+    )
   )
 #+end_src
 
