@@ -2832,77 +2832,26 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   )
 #+end_src
 
-** Improved Candidate Filtering with Orderless
+** Candidate Filtering
 :PROPERTIES:
 :ID:       D7AA94B4-0150-454B-B68D-15C7F78D554D
-:END:
-
-#+begin_src emacs-lisp
-(leaf orderless
-  :straight t
-  :commands (orderless-filter)
-  :custom ((completion-category-overrides . ((command (styles orderless-default-style))
-                                             (consult-multi (styles orderless-default-style)))))
-  :config
-  (leaf migemo
-    :when (executable-find "cmigemo")
-    :straight (migemo
-               :type git
-               :host github
-               :repo "emacs-jp/migemo")
-    :require t
-    :custom
-    `((migemo-user-dictionary  . nil)
-      (migemo-regex-dictionary . nil)
-      (migemo-coding-system    . 'utf-8)
-      (migemo-dictionary . ,(cond
-                             ((file-exists-p "/usr/local/share/migemo/utf-8/migemo-dict")
-                              "/usr/local/share/migemo/utf-8/migemo-dict")
-                             ((file-exists-p "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
-                              "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
-                             (t "")))
-      (migemo-isearch-enable-p . t))
-    :config
-    (leaf orderless
-      :config
-      (defun orderless-migemo (component)
-        (let ((pattern (migemo-get-pattern component)))
-          (condition-case nil
-              (progn (string-match-p pattern "") pattern)
-            (invalid-regexp nil))))
-
-      (orderless-define-completion-style
-          orderless-migemo-style
-        (orderless-matching-styles '(orderless-regexp
-                                     orderless-flex
-                                     orderless-migemo)))
-
-      (dolist (elm '((file (styles orderless-migemo-style))
-                     ;; for consult-line
-                     (citar-reference (styles orderless-migemo-style))
-                     (consult-location (styles orderless-migemo-style))
-                     (imenu (styles orderless-migemo-style))
-                     (org-roam-node (styles orderless-migemo-style))
-                     (unicode-name (styles orderless-migemo-style))))
-        (add-to-list 'completion-category-overrides elm)))
-    (migemo-init)
-    )
-)
-#+end_src
-
-*** fussy
-:PROPERTIES:
-:ID:       45db9a8b-dd56-4638-9103-1152c9ffa825
 :END:
 
 #+begin_src emacs-lisp
 (leaf fussy
   :straight t
   :custom ((completion-category-defaults . nil)
-           (completion-category-overrides . nil)
+           (completion-category-overrides . ((command (styles fussy basic))
+                                             (consult-multi (styles fussy basic))))
            (fussy-filter-fn . 'fussy-filter-default)
            (fussy-score-fn . 'fussy-fuz-score))
-  :config (push 'fussy completion-styles)
+  :config
+  (push 'fussy completion-styles)
+  (with-eval-after-load 'acm
+    ;; use setq because fussy-score-fn is not included in match type 
+    ;; (setq acm-candidate-match-function fussy-filter-fn)
+    (setopt acm-candidate-match-function 'regexp-quote))
+
   :init
   (leaf fuz
     :straight (fuz :type git :host github :repo "rustify-emacs/fuz.el")
@@ -2911,6 +2860,62 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     (setq fussy-score-fn 'fussy-fuz-score)
     (unless (require 'fuz-core nil t)
       (fuz-build-and-load-dymod))))
+
+;; (leaf orderless
+;;   :straight t
+;;   :commands (orderless-filter)
+;;   :custom ((completion-category-overrides . ((command (styles orderless-default-style))
+;;                                              (consult-multi (styles orderless-default-style)))))
+;;   :config
+  
+
+  
+;;   (leaf migemo
+;;     :when (executable-find "cmigemo")
+;;     :straight (migemo
+;;                :type git
+;;                :host github
+;;                :repo "emacs-jp/migemo")
+;;     :require t
+;;     :custom
+;;     `((migemo-user-dictionary  . nil)
+;;       (migemo-regex-dictionary . nil)
+;;       (migemo-coding-system    . 'utf-8)
+;;       (migemo-dictionary . ,(cond
+;;                              ((file-exists-p "/usr/local/share/migemo/utf-8/migemo-dict")
+;;                               "/usr/local/share/migemo/utf-8/migemo-dict")
+;;                              ((file-exists-p "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
+;;                               "/opt/homebrew/opt/cmigemo/share/migemo/utf-8/migemo-dict")
+;;                              (t "")))
+;;       (migemo-isearch-enable-p . t))
+;;     :config
+;;     (leaf orderless
+;;       :config
+;;       (defun orderless-migemo (component)
+;;         (let ((pattern (migemo-get-pattern component)))
+;;           (condition-case nil
+;;               (progn (string-match-p pattern "") pattern)
+;;             (invalid-regexp nil))))
+
+;;       (orderless-define-completion-style
+;;           orderless-migemo-style
+;;         (orderless-matching-styles '(orderless-regexp
+;;                                      orderless-flex
+;;                                      orderless-migemo)))
+
+;;       (dolist (elm '((file (styles orderless-migemo-style))
+;;                      ;; for consult-line
+;;                      (citar-reference (styles orderless-migemo-style))
+;;                      (consult-location (styles orderless-migemo-style))
+;;                      (imenu (styles orderless-migemo-style))
+;;                      (org-roam-node (styles orderless-migemo-style))
+;;                      (unicode-name (styles orderless-migemo-style))))
+;;         (add-to-list 'completion-category-overrides elm)))
+;;     (migemo-init)
+;;     )
+;; )
+
+
 #+end_src
 
 ** Completion Annotations with Marginalia
