@@ -61,6 +61,11 @@ if [[ -e "$HOME/.rye/env" ]]; then
     source "$HOME/.rye/env"
 fi
 
+# mise
+if type mise >/dev/null 2>&1; then
+    eval "$($(which mise) activate zsh)"
+fi
+
 # Aliases
 alias ..='cd ..'
 alias ...='cd ../..'
