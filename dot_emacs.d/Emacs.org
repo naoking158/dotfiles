@@ -63,7 +63,7 @@ a bunch of resources I've found online.
   - [[#multiple-cursors][Multiple cursors]]
   - [[#completion-actions-with-embark][Completion Actions with Embark]]
   - [[#consult-commands][Consult Commands]]
-  - [[#improved-candidate-filtering-with-orderless][Improved Candidate Filtering with Orderless]]
+  - [[#candidate-filtering][Candidate Filtering]]
   - [[#completion-annotations-with-marginalia][Completion Annotations with Marginalia]]
   - [[#vertical-minibuffer-ui-and-completion-with-vertico][Vertical Minibuffer UI and Completion with Vertico]]
   - [[#completions-in-regions-with-corfu][Completions in Regions with Corfu]]
@@ -1877,6 +1877,9 @@ Only in Neotree Buffer:
 #+end_src
 
 *** SQL
+:PROPERTIES:
+:ID:       3788BA7F-8D2F-4750-B409-E508AC9CBD71
+:END:
 
 #+begin_src emacs-lisp
 (leaf sql-indent
@@ -5323,6 +5326,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** Reformatter
+:PROPERTIES:
+:ID:       31F3A879-B6F9-4186-B199-848BC36DFB02
+:END:
 
 #+begin_src emacs-lisp
 (leaf reformatter
