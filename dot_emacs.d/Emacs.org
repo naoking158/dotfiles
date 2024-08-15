@@ -1800,7 +1800,7 @@ Only in Neotree Buffer:
 ;;   :hook (sh-mode-hook . lsp-bridge-mode))
 #+end_src
 
-*** Dockerfile-mode
+*** Docker
 :PROPERTIES:
 :ID:       b6aa1cd1-6480-46f4-89ed-71d19a6c4839
 :END:
@@ -1812,6 +1812,9 @@ Only in Neotree Buffer:
              :host github
              :repo "spotify/dockerfile-mode")
   :mode "Dockerfile\\'")
+
+(leaf docker-compose-mode
+  :straight t)
 #+end_src
 
 *** yaml-mode
