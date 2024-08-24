@@ -950,7 +950,10 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
                                     (4 . (bold variable-pitch 1.15))
                                     (agenda-date . (1.3))
                                     (agenda-structure . (variable-pitch 1.5))
-                                    (t . (bold variable-pitch 1.1))))
+                                    (t . (bold variable-pitch 1.1)))
+            modus-vivendi-tritanopia-palette-overrides '((bg-main "#040D12")
+                                                         (bg-dim "#1E201E"))
+            )
       ;; Load choiced theme
       (pcase sym-theme
         ('modus-dark (load-theme 'modus-vivendi-tritanopia :no-confirm))
