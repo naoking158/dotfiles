@@ -519,7 +519,6 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
              (ns-right-option-modifier . 'meta)
              (ns-right-command-modifier . 'super)
              (ns-use-proxy-icon . nil))))
-
 #+end_src
 
 ** Auto revert buffer
@@ -1516,10 +1515,10 @@ Only in Neotree Buffer:
                         (add-hook 'dap-stopped-hook
                                   #'(lambda (arg)
                                       (call-interactively #'dap-hydra)))))
-  ;; ((dap-stopped-hook . (lambda (arg) (call-interactively #'dap-hydra)))
-  ;;  (python-mode-hook . dap-mode)
-  ;;  (python-mode-hook . dap-ui-mode)
-  ;;  (python-mode-hook . dap-tooltip-mode))
+  ((dap-stopped-hook . (lambda (arg) (call-interactively #'dap-hydra)))
+   (python-mode-hook . dap-mode)
+   (python-mode-hook . dap-ui-mode)
+   (python-mode-hook . dap-tooltip-mode))
   )
 #+end_src
 
