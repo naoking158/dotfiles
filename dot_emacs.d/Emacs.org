@@ -1582,17 +1582,21 @@ Only in Neotree Buffer:
          (yas-global-mode-hook . global-lsp-bridge-mode))
   :custom `((lsp-bridge-python-command . ,(expand-file-name "~/.emacs.d/etc/lsp-bridge/.venv/bin/python3"))
             (lsp-bridge-enable-completion-in-minibuffer . t)
+            (lsp-bridge-enable-completion-in-string . t)
             (lsp-bridge-signature-show-function . 'message)
+            (lsp-bridge-enable-hover-diagnostic . t)
             (lsp-bridge-user-langserver-dir . ,(if (file-exists-p "~/.emacs.d/etc/lsp-bridge/langserver")
                                                    (expand-file-name "~/.emacs.d/etc/lsp-bridge/langserver")))
             (lsp-bridge-user-multiserver-dir . ,(if (file-exists-p "~/.emacs.d/etc/lsp-bridge/multiserver")
                                                     (expand-file-name "~/.emacs.d/etc/lsp-bridge/multiserver")))
-            (lsp-bridge-enable-hover-diagnostic . t)
             (lsp-bridge-python-multi-lsp-server . "pyright_ruff")
+            (acm-enable-icon . t)
+            (acm-enable-quick-access . t)
             (acm-enable-copilot . nil)
             (acm-enable-tabnine . nil)
             (acm-enable-codeium . nil))
-  :bind ((lsp-bridge-mode-map
+  :defun (acm-doc-scroll-up acm-doc-scroll-down)
+  :bind ((:lsp-bridge-mode-map
           :package lsp-bridge
           ("M-." . lsp-bridge-find-def)
           ("M-," . lsp-bridge-find-def-return)
@@ -1603,10 +1607,15 @@ Only in Neotree Buffer:
           ("C-c C-p" . lsp-bridge-diagnostic-jump-prev)
           ("C-c l l" . lsp-bridge-diagnostic-list)
           ("C-c l c" . lsp-bridge-diagnostic-copy)
-          ("C-c l r" . lsp-bridge-rename))
-         (acm-mode-map
+          ("C-c l r" . lsp-bridge-rename)
+          ("M-p" . lsp-bridge-popup-documentation-scroll-down)
+          ("M-n" . lsp-bridge-popup-documentation-scroll-up)
+          )
+         (:acm-mode-map
           :package acm
-          ("C-j" . skk-kakutei)))
+          ("C-j" . skk-kakutei)
+          )
+         )
   :preface
   (defun run-local-vars-mode-hook ()
     "Run `major-mode' hook after the local variables have been processed."
@@ -1623,7 +1632,18 @@ Only in Neotree Buffer:
 
   (add-to-list 'lsp-bridge-single-lang-server-mode-list '(svelte-mode . "svelte"))
   (add-to-list 'lsp-bridge-default-mode-hooks 'svelte-mode-hook)
-)
+
+  (add-to-list 'lsp-bridge-default-mode-hooks 'vue-mode-hook)
+  (add-to-list 'lsp-bridge-multi-lang-server-mode-list '(vue-mode . "volar_emmet"))
+  
+  (add-to-list 'lsp-bridge-default-mode-hooks 'vue-ts-mode-hook)
+  (add-to-list 'lsp-bridge-multi-lang-server-mode-list '(vue-ts-mode . "volar_emmet"))
+
+  (setq lsp-bridge-get-project-path-by-filepath
+        (lambda (filepath)
+          (let ((root (locate-dominating-file filepath "package.json")))
+            (when root (expand-file-name root)))))
+  )
 #+end_src
 
 *** Emacs Lisp
