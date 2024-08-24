@@ -1738,20 +1738,28 @@ Only in Neotree Buffer:
          "\\.erb\\'"
          "\\.mustache\\'"
          "\\.djhtml\\'"
-         "\\.vue\\'"
          "\\.ejs\\'"
+         "\\.vue\\'"
          )
   :config
   (define-derived-mode vue-mode web-mode "Vue")
   (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
-
-  (leaf emmet-mode
-    :straight t
-    :hook web-mode-hook
-    :bind (:emmet-mode-keymap
-           ("C-j" . skk-kakutei)
-           ("C-c e" . emmet-expand-line)))
   )
+
+(leaf vue-ts-mode
+  :disabled t
+  :straight (vue-ts-mode
+             :type git
+             :host github
+             :repo "8uff3r/vue-ts-mode")
+  :mode "\\.vue\\'")
+
+(leaf emmet-mode
+  :straight t
+  :hook web-mode-hook vue-ts-mode-hook
+  :bind (:emmet-mode-keymap
+         ("C-j" . skk-kakutei)
+         ("C-c e" . emmet-expand-line)))
 #+end_src
 
 *** JavaScript
@@ -2008,10 +2016,12 @@ Only in Neotree Buffer:
   :straight t
   :bind (("C-c C-n" . flycheck-next-error)
          ("C-c C-p" . flycheck-previous-error))
-  :hook (typescript-mode-hook . flycheck-mode)
-  :custom ((flycheck-display-errors-delay . 1))
+  :hook typescript-mode-hook vue-mode-hook vue-ts-mode-hook
+  :custom ((flycheck-display-errors-delay . 0.8))
   :config
+  (flycheck-add-mode 'javascript-eslint 'vue-mode)
   (leaf flycheck-pos-tip
+    :disabled t
     :straight t
     :custom (flycheck-pos-tip-timeout . 10)
     :config
@@ -2155,12 +2165,13 @@ Only in Neotree Buffer:
          ("M-s" . puni-splice)
          ("M-r" . puni-raise)
          ("M-U" . puni-splice-killing-backward)
-         ("M-z" . puni-squeeze))
-  :config
-  (leaf elec-pair
-    :doc "Automatic parenthesis pairing"
-    :global-minor-mode electric-pair-mode)
+         ("M-z" . puni-squeeze))  
   )
+
+(leaf elec-pair
+  :doc "Automatic parenthesis pairing"
+  :global-minor-mode electric-pair-mode
+  :hook (emmet-mode-hook . (lambda nil (electric-pair-local-mode -1))))
 #+end_src
 
 
