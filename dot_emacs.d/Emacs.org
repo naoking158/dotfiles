@@ -1714,6 +1714,14 @@ Only in Neotree Buffer:
 :END:
 
 #+begin_src emacs-lisp
+(leaf add-node-modules-path
+  :straight (add-node-modules-path
+             :type git
+             :host github
+             :repo "codesuki/add-node-modules-path")
+  :hook ((vue-mode-hook js-mode-hook typescript-mode-hook) . add-node-modules-path)
+  :custom (add-node-modules-path-command . '("echo \"$(npm root)/.bin\"")))
+
 (leaf web-mode
   :straight t
   :custom ((web-mode-markup-indent-offset . 2)
