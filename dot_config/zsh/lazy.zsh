@@ -130,6 +130,13 @@ if type go >/dev/null 2>&1; then
     PATH="${PATH}:${GOPATH}/bin"
 fi
 
+# # set global npm bin path
+# if type npm >/dev/null 2>&1; then
+#     local p
+#     p="$(npm prefix --location=global)/bin"
+#     PATH="${PATH}:${p}"
+# fi
+
 export PATH
 
 
