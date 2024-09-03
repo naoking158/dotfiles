@@ -288,7 +288,7 @@ function build() {
     e_newline && e_done "Emacs Build processes are completed!" || exit 1
 
     if is_macos; then
-        cp "${HOME}/.dotfiles/etc/helper/emacs-cli.bash" "${SOURCE_DIR}/nextstep/Emacs.app/Contents/MacOS/bin/emacs"
+        cp "${HOME}/.local/etc/helper/emacs-cli.bash" "${SOURCE_DIR}/nextstep/Emacs.app/Contents/MacOS/bin/emacs"
         chmod +x "${SOURCE_DIR}/nextstep/Emacs.app/Contents/MacOS/bin/emacs"
 
         cd ${SOURCE_DIR}/nextstep/
