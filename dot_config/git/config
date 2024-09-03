@@ -34,5 +34,9 @@
 [user]
 	email = "29372455+naoking158@users.noreply.github.com"
 	name = "naoking158"
+
 [github]
 	user = naoking158
+
+[url "git@github.com:"]
+  insteadOf = https://github.com/
