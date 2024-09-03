@@ -130,6 +130,12 @@ if type go >/dev/null 2>&1; then
     PATH="${PATH}:${GOPATH}/bin"
 fi
 
+# setup direnv
+if type direnv >/dev/null 2>&1; then
+    eval "$(direnv hook zsh)"
+fi
+
+
 # # set global npm bin path
 # if type npm >/dev/null 2>&1; then
 #     local p

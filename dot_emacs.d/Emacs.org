@@ -1714,6 +1714,7 @@ Only in Neotree Buffer:
 
 #+begin_src emacs-lisp
 (leaf add-node-modules-path
+  :disabled t
   :straight (add-node-modules-path
              :type git
              :host github
@@ -5257,9 +5258,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 :END:
 
 #+begin_src emacs-lisp
-;; (leaf direnv
-;;   :straight t
-;;   :hook (emacs-startup-hook . direnv-mode))
+(leaf direnv
+  :straight t
+  :hook (emacs-startup-hook . direnv-mode))
 #+end_src
 
 ** Poetry
