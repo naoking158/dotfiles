@@ -136,6 +136,11 @@ if type direnv >/dev/null 2>&1; then
 fi
 
 
+if command -v ngrok &>/dev/null; then
+    eval "$(ngrok completion)"
+fi
+
+
 # # set global npm bin path
 # if type npm >/dev/null 2>&1; then
 #     local p
