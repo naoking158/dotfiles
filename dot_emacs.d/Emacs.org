@@ -1037,11 +1037,9 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
   :hook (emacs-startup-hook . (lambda nil
                                 (line-number-mode 1)
                                 (column-number-mode 1)
+                                ;; (my/modeline-lambda)
                                 ;; (my/modeline-bespoke)
                                 (my/modeline-doom)
-                                ;; (if window-system
-                                ;;     (my/modeline-moody)
-                                ;;   (my/modeline-doom))
                                 ))
   :preface
   (leaf moody
@@ -1115,7 +1113,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
     :tag "mode-line" "faces" "emacs>=25.1"
     :url "https://github.com/seagle0128/doom-modeline"
     :straight t
-    :custom ((doom-modeline-buffer-file-name-style . 'truncate-except-project)
+    :custom ((doom-modeline-buffer-file-name-style . 'truncate-upto-root)
              (doom-modeline-project-detection . 'auto)
              (doom-modeline-icon . t)
              (doom-modeline-unicode-fallback . t)
@@ -1128,7 +1126,6 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
              (doom-modeline-persp-name . nil)
              (doom-modeline-display-default-persp-name . nil)
              (doom-modeline-buffer-state-icon . t)
-             (doom-modeline-env-enable-python . t)
              (doom-modeline-modal . nil)
              (doom-modeline-buffer-encoding . nil)
              )
