@@ -2820,7 +2820,8 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
    ("C-S-s" . consult-imenu)
    ("C-c g" . consult-ripgrep)
    ("C-c f" . consult-find)
-   ("C-c C-j" . consult-mark))
+   ;; ("C-c C-j" . consult-mark)
+   )
   :preface
   (defun my-consult-line (&optional at-point)
     "Consult-line uses things-at-point if set C-u prefix."
@@ -3836,8 +3837,11 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
           (org-narrow-to-subtree))
         (goto-char (point-max)))
 
-      (setq org-capture-templates
-            `(("i" "inbox" entry
+      (setq org-daily-tasks-file (expand-file-name "daily.org" gtd/org-agenda-directory)
+            org-capture-templates
+            `(("d" "Weekdays TODO" entry
+               (file org-daily-tasks-file) "%[~/org/templates/weekdays-todo.org]" :prepend t)
+              ("i" "inbox" entry
                (file ,(concat gtd/org-agenda-directory "inbox.org"))
                "* TODO %?")
               ("j" "Journal entry" plain (function org-journal-find-location)
@@ -4178,10 +4182,10 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
        :target (file+head "lit/${slug}.org"
                           "#+title: ${title}\n#+date: %U\n#+filetags: Literature")
        :unnarrowed t)
-      ("m" "Meeting" plain "%?"
-       :target (file+head "work/${slug}.org"
-                          "#+title: ${title}\n#+filetags: Meeting\n#+options: toc:nil")
-       :unnarrowed t)
+      ;; ("m" "Meeting" plain "%?"
+      ;;  :target (file+head "work/${slug}.org"
+      ;;                     "#+title: ${title}\n#+filetags: Meeting\n#+options: toc:nil")
+      ;;  :unnarrowed t)
       ("w" "Working" plain "%?"
        :target (file+head "work/${slug}.org"
                           "#+title: ${title}\n#+filetags: Working\n#+options: toc:nil")
