@@ -1930,6 +1930,14 @@ Only in Neotree Buffer:
   :straight t)
 #+end_src
 
+*** GraphQL mode
+
+#+begin_src emacs-lisp
+(leaf graphql-mode
+  :straight t
+  :mode ("\\.graphql\\'" "\\.gql\\'"))
+#+end_src
+
 ** Productivity
 *** Syntax checking with Flymake
 :PROPERTIES:
