@@ -1275,7 +1275,7 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :hook
   ((meow-insert-exit-hook . (lambda nil
                               (if skk-mode (skk-latin-mode-on))))
-   (eshell-mode-hook . meow-append)
+   ((org-agenda-mode-hook eshell-mode-hook magit-blame-mode-hook magit-diff-mode-hook) . meow-append)
    (after-change-major-mode-hook . (lambda nil
                                      (if (and (featurep 'magit)
                                               (magit-commit-message-buffer))
