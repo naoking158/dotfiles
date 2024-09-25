@@ -737,6 +737,25 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 
 #+end_src
 
+
+** Copy org link to current position
+
+#+begin_src emacs-lisp
+(defun my/copy-org-link-to-current-position ()
+  (interactive)
+  (let* ((file (buffer-file-name))
+         (line (line-number-at-pos))
+         (column (current-column))
+         (pos-str (format "%d:%d" line column))
+         (link (if file
+                   (format "[[file:%s::%s][%s]]"
+                           file pos-str (file-name-nondirectory file))
+                 (error "Buffer is not visiting a file"))))
+    (kill-new link)
+    (message "Org link copied to kill ring: %s" link)))
+#+end_src
+
+
 * Basic UI Configuration
 :PROPERTIES:
 :ID:       55BAFA5B-FF42-4569-98F4-E85A27ACAE9A
