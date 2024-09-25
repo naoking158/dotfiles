@@ -28,6 +28,7 @@ a bunch of resources I've found online.
   - [[#command-log-mode][Command Log Mode]]
   - [[#presentation][Presentation]]
   - [[#bibtex-indent][Bibtex Indent]]
+  - [[#copy-org-link-to-current-position][Copy org link to current position]]
 - [[#basic-ui-configuration][Basic UI Configuration]]
   - [[#user-interface][User Interface]]
   - [[#frame-transparency][Frame Transparency]]
@@ -126,6 +127,7 @@ a bunch of resources I've found online.
   - [[#ellama-for-ollama-communication][Ellama for Ollama communication]]
   - [[#plantuml][PlantUML]]
   - [[#reformatter][Reformatter]]
+  - [[#one-tab-per-project][One-tab-per-project]]
 - [[#footer][Footer]]
 :END:
 
