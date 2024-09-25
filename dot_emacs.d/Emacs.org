@@ -2126,10 +2126,29 @@ Only in Neotree Buffer:
 
 #+begin_src emacs-lisp
 (leaf treesit-auto
+  :disabled t
   :straight t
   :global-minor-mode global-treesit-auto-mode
   :custom ((treesit-auto-install . t)
            (treesit-font-lock-level . 4)))
+
+(leaf treesit-langs
+  :straight (treesit-langs
+             :type git
+             :host github
+             :repo "kiennq/treesit-langs"
+             :files (:defaults "*.el" "queries"))
+  :hook ((prog-mode text-mode conf-mode)
+         . (lambda ()
+             ;; some mode is better be highlighted not using tree-sitter
+             (unless (member major-mode '(sh-mode))
+               (ignore-errors (treesit-hl-toggle 'on)))))
+  :custom ((treesit-font-lock-level . 4)
+           (treesit-langs-git-dir . nil)
+           (treesit-langs-grammar-dir . "~/.emacs.d/etc/tree-sitter"))
+  :config
+  (add-to-list 'treesit-extra-load-path treesit-langs-grammar-dir))
+
 #+end_src
 
 *** Showing Pair of Brackets with Paren
