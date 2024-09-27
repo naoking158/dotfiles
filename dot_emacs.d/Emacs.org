@@ -1039,7 +1039,9 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
     (funcall my-load-theme-func sym-theme))
 
   (defun my/default-theme nil
-    (my/load-theme 'modus-dark))
+    (my/load-theme 'modus-light)
+    ;; (my/load-theme 'modus-dark)
+    )
 
   :config
   (column-number-mode)
@@ -1277,7 +1279,11 @@ modified (✏️)/(**), or read-write (📖)/(RW)"
   :hook
   ((meow-insert-exit-hook . (lambda nil
                               (if skk-mode (skk-latin-mode-on))))
-   ((org-agenda-mode-hook eshell-mode-hook magit-blame-mode-hook magit-diff-mode-hook) . meow-append)
+   ((org-agenda-mode-hook
+     eshell-mode-hook
+     magit-blame-mode-hook
+     magit-diff-mode-hook
+     lsp-bridge-ref-mode-hook) . meow-append)
    (after-change-major-mode-hook . (lambda nil
                                      (if (and (featurep 'magit)
                                               (magit-commit-message-buffer))
