@@ -38,5 +38,10 @@
 [github]
 	user = naoking158
 
+[url "ssh://git@github.com/"]
+    insteadOf = https://github.com/
+
 [includeIf "gitdir:~/src/github.com/400f/"]
   path = ~/.gitconfig_400f
+
+

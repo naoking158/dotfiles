@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -Ceu
+
+
+PROTECTED_BRANCHES="main master"
+MY_GITHUB_USERNAME="naoking158"
+
+REMOTE_URL=$(git config --get remote.origin.url)
+CURRENT_BRANCH=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
+
+if ! echo "$REMOTE_URL" | grep -q "$MY_GITHUB_USERNAME"; then
+    for branch in $PROTECTED_BRANCHES; do
+        if [ "$branch" = "$CURRENT_BRANCH" ]; then
+            echo "エラー: $branch ブランチへの直接プッシュは禁止されています。"
+            echo "プルリクエストを作成してください。"
+            exit 1
+        fi
+    done
+fi
+
+exit 0
