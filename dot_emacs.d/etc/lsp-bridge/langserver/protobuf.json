@@ -1,0 +1,8 @@
+{
+  "name": "protobuf",
+  "languageId": "proto",
+  "command": ["protobuf-language-server"],
+  "settings": {
+    "additional-proto-dirs": [ ]
+  }
+}
