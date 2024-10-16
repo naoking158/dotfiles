@@ -1949,6 +1949,13 @@ Only in Neotree Buffer:
   :mode ("\\.graphql\\'" "\\.gql\\'"))
 #+end_src
 
+*** Protocol buffer
+
+#+begin_src emacs-lisp
+(leaf protobuf-mode
+  :straight t)
+#+end_src
+
 ** Productivity
 *** Syntax checking with Flymake
 :PROPERTIES:
