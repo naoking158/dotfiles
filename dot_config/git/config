@@ -38,7 +38,7 @@
 [github]
 	user = naoking158
 
-[url "ssh://git@github.com/"]
+[url "git@github.com:"]
     insteadOf = https://github.com/
 
 [includeIf "gitdir:~/src/github.com/400f/"]
