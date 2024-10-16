@@ -1604,7 +1604,7 @@ Only in Neotree Buffer:
             (lsp-bridge-python-multi-lsp-server . "pyright_ruff")
             (acm-enable-icon . t)
             (acm-enable-quick-access . t)
-            (acm-enable-copilot . nil)
+            (acm-enable-copilot . t)
             (acm-enable-tabnine . nil)
             (acm-enable-codeium . nil))
   :defun (acm-doc-scroll-up acm-doc-scroll-down)
@@ -1645,11 +1645,14 @@ Only in Neotree Buffer:
   (add-to-list 'lsp-bridge-single-lang-server-mode-list '(svelte-mode . "svelte"))
   (add-to-list 'lsp-bridge-default-mode-hooks 'svelte-mode-hook)
 
-  (add-to-list 'lsp-bridge-default-mode-hooks 'vue-mode-hook)
   (add-to-list 'lsp-bridge-multi-lang-server-mode-list '(vue-mode . "volar_emmet"))
-  
-  (add-to-list 'lsp-bridge-default-mode-hooks 'vue-ts-mode-hook)
+  (add-to-list 'lsp-bridge-default-mode-hooks 'vue-mode-hook)
+
   (add-to-list 'lsp-bridge-multi-lang-server-mode-list '(vue-ts-mode . "volar_emmet"))
+  (add-to-list 'lsp-bridge-default-mode-hooks 'vue-ts-mode-hook)
+
+  (add-to-list 'lsp-bridge-single-lang-server-mode-list '(protobuf-mode . "protobuf"))
+  (add-to-list 'lsp-bridge-default-mode-hooks 'protobuf-mode-hook)
 
   (setq lsp-bridge-get-project-path-by-filepath
         (lambda (filepath)
