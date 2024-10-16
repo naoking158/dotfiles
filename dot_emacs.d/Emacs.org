@@ -3941,7 +3941,8 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                                  (python . t)
                                  (latex . t)
                                  (shell . t)
-                                 (lua . t)))
+                                 (lua . t)
+                                 (js . t)))
 
 (leaf ob-emacs-lisp
   :straight org
@@ -3966,6 +3967,10 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 (leaf ob-lua
   :straight org
   :commands (org-babel-execute:lua))
+
+(leaf ob-js
+  :straight org
+  :commands (org-babel-execute:js))
 #+end_src
 
 ** Org-modern
