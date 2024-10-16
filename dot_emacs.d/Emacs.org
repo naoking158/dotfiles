@@ -1956,6 +1956,13 @@ Only in Neotree Buffer:
   :straight t)
 #+end_src
 
+*** Terraform
+
+#+begin_src emacs-lisp
+(leaf terraform-mode
+  :straight t)
+#+end_src
+
 ** Productivity
 *** Syntax checking with Flymake
 :PROPERTIES:
