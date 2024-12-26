@@ -1452,7 +1452,8 @@ Only in Neotree Buffer:
   :req "emacs-25.1" "async-20200113" "dash-20200524" "git-commit-20200516" "transient-20200601" "with-editor-20200522"
   :url "https://github.com/magit/magit"
   :straight t
-  :bind ("C-c m" . magit-status)
+  :bind (("C-c m" . magit-status)
+         ("C-c b" . magit-blame))
   :custom ((magit-bury-buffer-function quote magit-mode-quit-window)
            (magit-refresh-verbose . t)
            (magit-commit-ask-to-stage quote stage)
