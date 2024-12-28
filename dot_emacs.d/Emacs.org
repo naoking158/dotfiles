@@ -1932,16 +1932,6 @@ Only in Neotree Buffer:
   (add-to-list 'lsp-bridge-single-lang-server-mode-list '(yaml-mode . "ansible-language-server")))
 #+end_src
 
-*** SQL
-:PROPERTIES:
-:ID:       3788BA7F-8D2F-4750-B409-E508AC9CBD71
-:END:
-
-#+begin_src emacs-lisp
-(leaf sql-indent
-  :straight t)
-#+end_src
-
 *** GraphQL mode
 
 #+begin_src emacs-lisp
@@ -1962,6 +1952,17 @@ Only in Neotree Buffer:
 #+begin_src emacs-lisp
 (leaf terraform-mode
   :straight t)
+#+end_src
+
+
+*** Sql format
+
+#+begin_src emacs-lisp
+(leaf sqlformat
+  :straight t
+  :custom ((sqlformat-command . 'sql-formatter)
+           (sqlformat-args . `("--config" ,(expand-file-name "~/.config/sql-formatter/config.json"))))
+  )
 #+end_src
 
 ** Productivity
@@ -2502,6 +2503,18 @@ HTTP encodings, headers, media types, methods, relations and status codes, all s
   :straight t)
 
   #+end_src
+
+*** Copilot chat
+
+#+begin_src emacs-lisp :tangle yes
+(leaf copilot-chat
+  :straight (copilot-chat
+             :host github
+             :repo "chep/copilot-chat.el"
+             :files ("*.el"))
+  :after org
+  :require t)
+#+end_src
 
 * Window Management
 

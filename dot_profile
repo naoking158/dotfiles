@@ -81,3 +81,5 @@ if [[ $SYSTEM == "manjaro" ]]; then
 fi
 
 export PATH="/usr/local/bin:$HOME/.local/bin:$PATH"
+
+export GOPRIVATE=github.com/400f/*
