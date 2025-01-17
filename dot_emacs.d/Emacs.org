@@ -1621,6 +1621,7 @@ Only in Neotree Buffer:
           ("C-c l l" . lsp-bridge-diagnostic-list)
           ("C-c l c" . lsp-bridge-diagnostic-copy)
           ("C-c l r" . lsp-bridge-rename)
+          ("C-c l i" . lsp-bridge-find-impl)
           ("M-p" . lsp-bridge-popup-documentation-scroll-down)
           ("M-n" . lsp-bridge-popup-documentation-scroll-up)
           )
