@@ -45,10 +45,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                          ),
 
   [3] = LAYOUT_universal(
-                         LGUI_T(KC_TAB) , KC_F1   , KC_F2   , KC_F3   , KC_F4    , KC_F5                           ,        KC_F6   , KC_F7   , KC_F8          , KC_F9   , KC_F10  , KC_F11  ,
-                         KC_LCTL        , KC_BRIU , KC_BRID , KC_MCTL , KC_MCTL  , _______                         ,        AML_TO  , KC_MPRV , KC_MPLY        , KC_MNXT , KC_MUTE , KC_F12  ,
-                         KC_LSFT        , _______ , KC_LEFT , KC_DOWN , KC_RIGHT , _______                         ,        KBC_SAVE, _______ , KC_BTN4        , KC_BTN5 , _______ , KC_BTN2 ,
-                         _______        , KC_LGUI , _______ ,  _______ , _______                         ,                  KC_BSPC , RGUI_T(KC_ENT) , _______ , _______ , _______
+                         LGUI_T(KC_TAB) , KC_F1   , KC_F2   , KC_F3   , KC_F4    , KC_F5                           ,        KC_F6    , KC_F7    , KC_F8   , KC_F9   , KC_F10  , KC_F11  ,
+                         KC_LCTL        , KC_BRIU , KC_BRID , KC_MCTL , KC_MCTL  , _______                         ,        CPI_I100 , KC_MPRV  , KC_MPLY , KC_MNXT , KC_MUTE , KC_F12  ,
+                         KC_LSFT        , _______ , KC_LEFT , KC_DOWN , KC_RIGHT , _______                         ,        CPI_D100 , KBC_SAVE , KC_BTN4 , KC_BTN5 , _______ , KC_BTN2 ,
+                         _______        , KC_LGUI , _______ ,  _______ , _______                         ,                  KC_BSPC  , RGUI_T(KC_ENT) , _______ , _______ , _______
                          ),
 };
 // clang-format on
