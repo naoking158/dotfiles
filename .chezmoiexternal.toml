@@ -1,3 +1,7 @@
 [".config/tmux/plugins/tpm"]
-type = "git-repo"
-url = "https://github.com/tmux-plugins/tpm"
+  type = "git-repo"
+  url = "https://github.com/tmux-plugins/tpm"
+[".config/alacritty/themes/"]
+  type = "git-repo"
+  url = "https://github.com/alacritty/alacritty-theme"
+  include = ["themes/*.toml"]
