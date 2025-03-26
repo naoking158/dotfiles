@@ -93,18 +93,9 @@ alias rm='~/src/github.com/naoking158/rm-alternative/rm-alternative.bash'
 alias sudo='sudo '
 alias tgz='f() { env COPYFILE_DISABLE=1 tar zcvf $1 --exclude=".DS_Store" ${@:2}; unset -f f; }; f'
 alias tree='eza --tree --level 3 -a --ignore-glob "node_modules|.git|.cache" --icons'
-alias pull3='ssh vm3 "bash ~/work/VMOperateTool/utils/download.sh" && myrsync -d vm3 ~/work/VMOperateTool/ ~/src/github.com/fixpoint/VMOperateTool/'
-alias push3='ssh vm3 "rm -rf ~/work/VMOperateTool" && myrsync -u vm3 ~/src/github.com/fixpoint/VMOperateTool/ ~/work/VMOperateTool/'
-alias pull4='ssh vm4 "bash ~/work/VMOperateTool/utils/download.sh" && myrsync -d vm4 ~/work/VMOperateTool/ ~/src/github.com/fixpoint/VMOperateTool/'
-alias push4='ssh vm4 "rm -rf ~/work/VMOperateTool" && myrsync -u vm4 ~/src/github.com/fixpoint/VMOperateTool/ ~/work/VMOperateTool/'
-# alias deploy='ssh vm3 "rm -rf ~/work/VMOperateTool" && myrsync -u vm3 ~/src/work/VMOperateTool/ ~/work/VMOperateTool/ && ssh vm3 "bash ~/work/VMOperateTool/utils/upload.sh"'
-# alias push='ssh vm5 "rm -rf ~/work/ToolsOnKE" && myrsync -u vm5 ~/src/github.com/fixpoint/ToolsOnKE/ ~/work/ToolsOnKE/'
-# alias xargs='gxargs'
 
-dev_vm="vm1"
-dev_pkg="MHLW_AlertPortal"
-alias dpull='ssh ${dev_vm} "bash ~/${dev_pkg}/utils/download.sh" && myrsync -d ${dev_vm} ~/${dev_pkg}/ ~/src/github.com/fixpoint/${dev_pkg}/'
-alias dpush='ssh ${dev_vm} "rm -rf ~/${dev_pkg}" && myrsync -u ${dev_vm} ~/src/github.com/fixpoint/${dev_pkg}/ ~/${dev_pkg}/'
+# Keybind - unbind
+bindkey -r '^J'
 
 # Global Aliases
 alias -g G='| grep'
