@@ -93,6 +93,8 @@ alias rm='~/src/github.com/naoking158/rm-alternative/rm-alternative.bash'
 alias sudo='sudo '
 alias tgz='f() { env COPYFILE_DISABLE=1 tar zcvf $1 --exclude=".DS_Store" ${@:2}; unset -f f; }; f'
 alias tree='eza --tree --level 3 -a --ignore-glob "node_modules|.git|.cache" --icons'
+alias d='docker'
+alias dc='docker compose'
 
 # Keybind - unbind
 bindkey -r '^J'
