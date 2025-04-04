@@ -1655,8 +1655,8 @@ Only in Neotree Buffer:
             (acm-enable-copilot . t)
             (acm-enable-tabnine . nil)
             (acm-enable-codeium . nil)
-            (acm-backend-order . '("copilot-candidates"
-                                   "mode-first-part-candidates"
+            (acm-backend-order . '("mode-first-part-candidates"
+                                   "copilot-candidates"
                                    "template-first-part-candidates"
                                    "template-second-part-candidates"
                                    "mode-second-part-candidates")))
@@ -1809,15 +1809,10 @@ Only in Neotree Buffer:
          "\\.mustache\\'"
          "\\.djhtml\\'"
          "\\.ejs\\'"
-         "\\.vue\\'"
          )
-  :config
-  (define-derived-mode vue-mode web-mode "Vue")
-  (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
   )
 
 (leaf vue-ts-mode
-  :disabled t
   :straight (vue-ts-mode
              :type git
              :host github
@@ -5538,6 +5533,15 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
   ;; If you want to advice the commands in `otpp-override-commands`
   ;; to be run in the current's tab (so, current project's) root directory
   (otpp-override-mode 1))
+#+end_src
+
+** prettier-rc
+
+#+begin_src emacs-lisp
+(leaf prettier-rc
+  :straight t
+  :hook ((web-mode-hook vue-mode-hook typescript-mode-hook js-mode-hook) . prettier-rc-mode)
+  )
 #+end_src
 
 * Footer
