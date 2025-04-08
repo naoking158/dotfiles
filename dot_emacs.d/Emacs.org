@@ -128,6 +128,9 @@ a bunch of resources I've found online.
   - [[#plantuml][PlantUML]]
   - [[#reformatter][Reformatter]]
   - [[#one-tab-per-project][One-tab-per-project]]
+  - [[#prettier-rc][prettier-rc]]
+  - [[#lsp-proxy][lsp-proxy]]
+  - [[#copilot][copilot]]
 - [[#footer][Footer]]
 :END:
 
@@ -1631,6 +1634,7 @@ Only in Neotree Buffer:
 
 #+begin_src emacs-lisp
 (leaf lsp-bridge
+  :disabled t
   :straight (lsp-bridge
              :type git
              :host github
@@ -1659,7 +1663,8 @@ Only in Neotree Buffer:
                                    "copilot-candidates"
                                    "template-first-part-candidates"
                                    "template-second-part-candidates"
-                                   "mode-second-part-candidates")))
+                                   "mode-second-part-candidates"))
+            )
   :defun (acm-doc-scroll-up acm-doc-scroll-down)
   :bind ((:lsp-bridge-mode-map
           :package lsp-bridge
@@ -2104,7 +2109,13 @@ Only in Neotree Buffer:
   :straight t
   :bind (("C-c C-n" . flycheck-next-error)
          ("C-c C-p" . flycheck-previous-error))
-  :hook typescript-mode-hook vue-mode-hook vue-ts-mode-hook
+  :hook (
+         typescript-mode-hook
+         vue-mode-hook
+         vue-ts-mode-hook
+         go-mode-hook
+         go-ts-mode-hook
+         )
   :custom ((flycheck-display-errors-delay . 0.8))
   :config
   (flycheck-add-mode 'javascript-eslint 'vue-mode)
@@ -3191,21 +3202,24 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 #+begin_src emacs-lisp
 
 (leaf corfu
-  :disabled t
+  :disabled nil
   :straight t
-  ;; :global-minor-mode global-corfu-mode
+  :global-minor-mode global-corfu-mode corfu-popupinfo-mode
   :custom
   ((corfu-excluded-modes . '(sh-mode
                              shell-mode
                              eshell-mode
                              python-mode
-                             yaml-mode
-                             typescript-mode
-                             js-mode))
+                             ;; yaml-mode
+                             ;; typescript-mode
+                             ;; js-mode
+                             ))
    (corfu-auto . t)
-   (corfu-auto-delay . 0.1)
-   (corfu-auto-prefix . 2)
+   (corfu-auto-delay . 0)
+   (corfu-popupinfo-delay . '(0.1 . 0.1))
+   (corfu-auto-prefix . 1)
    (corfu-preselect-first . nil)
+   (corfu-quit-no-match . 'separator)
 
    ;; Enable indentation+completion using the TAB key.
    ;; `completion-at-point' is often bound to M-TAB.
@@ -3226,33 +3240,10 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 
   (defun my/corfu-remap-tab-command ()
     (global-set-key [remap c-indent-line-or-region] #'indent-for-tab-command))
-
-  ;; https://github.com/minad/corfu/wiki#auto-commit
-  (defun my/corfu-commit-predicate ()
-    "Auto-commit candidates if:
-    1. A `.' is typed, except after a SPACE.
-    2. A selection was made, aside from entering SPACE.
-    3. Just one candidate exists, and we continue to non-symbol info.
-    4. The 1st match is exact."
-    (cond
-     ((seq-contains-p (this-command-keys-vector) ?.)
-      (or (string-empty-p (car corfu--input))
-          (not (string= (substring (car corfu--input) -1) " "))))
-
-     ((/= corfu--index corfu--preselect) ; a selection was made
-      (not (seq-contains-p (this-command-keys-vector) ? )))
-
-     ((eq corfu--total 1) ;just one candidate
-      (seq-intersection (this-command-keys-vector) [?: ?, ?\) ?\] ?\( ? ]))
-
-     ((and corfu--input ; exact 1st match
-           (string-equal (substring (car corfu--input) corfu--base)
-                         (car corfu--candidates)))
-      (seq-intersection (this-command-keys-vector) [?: ?. ?, ?\) ?\] ?\" ?' ? ]))))
-  (setq corfu-commit-predicate #'my/corfu-commit-predicate))
+  )
 
 (leaf cape
-  :disabled t
+  :disabled nil
   :straight t
   :require t dabbrev
   :custom (cape-dabbrev-min-length . 2)
@@ -3265,21 +3256,16 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
          ("C-c p i" . cape-ispell)
          ("C-c p l" . cape-line))
   :hook ((prog-mode-hook . my--set-basic-capf)
-         (text-mode-hook . my--set-basic-capf)
-         (lsp-completion-mode-hook . my--set-lsp-capf))
+         (text-mode-hook . my--set-basic-capf))
   :init
-  (defun my--convert-super-capf (arg-capf)
+  (defun my--convert-capf-super (arg-capf)
     (list (cape-capf-buster
-           (cape-super-capf arg-capf #'cape-dabbrev))
+           (cape-capf-super arg-capf #'cape-dabbrev))
           #'cape-file))
 
   (defun my--set-basic-capf ()
     (setq-local completion-at-point-functions
-                (my--convert-super-capf (car completion-at-point-functions))))
-
-  (defun my--set-lsp-capf ()
-    (setq-local completion-at-point-functions
-                (my--convert-super-capf #'lsp-completion-at-point)))
+                (my--convert-capf-super (car completion-at-point-functions))))
 
   :config
   (add-to-list 'completion-at-point-functions #'cape-file t)
@@ -5541,6 +5527,62 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 (leaf prettier-rc
   :straight t
   :hook ((web-mode-hook vue-mode-hook typescript-mode-hook js-mode-hook) . prettier-rc-mode)
+  )
+#+end_src
+
+** lsp-proxy
+
+#+begin_src emacs-lisp
+(leaf lsp-proxy
+  :straight (lsp-proxy
+             :type git
+             :host github
+             :repo "jadestrong/lsp-proxy"
+             :files ("lsp-proxy.el" "lsp-proxy")
+             :pre-build (("cargo" "build" "--release") ("cp" "./target/release/lsp-proxy" "./")))
+  :require t
+  :hook (go-mode-hook
+         go-ts-mode-hook
+         vue-ts-mode-hook
+         web-mode-hook
+         typescript-mode-hook
+         js-mode-hook)
+  :custom `((lsp-proxy-user-languages-config . ,(expand-file-name "~/.emacs.d/etc/lsp-proxy/languages.toml")))
+  :bind ((:lsp-proxy-mode-map
+          :package lsp-proxy
+          ("M-." . lsp-proxy-find-definition)
+          ("C-c C-d" . lsp-proxy-describe-thing-at-point)
+          ("C-c C-r" . lsp-proxy-find-references)
+          ("C-c l i" . lsp-proxy-find-implementations)
+          ("C-c l r" . lsp-proxy-rename)
+          ("C-c l c" . lsp-proxy-execute-command)
+          ))
+  )
+#+end_src
+
+** copilot
+
+#+begin_src emacs-lisp
+(leaf copilot
+  :straight (copilot
+             :host github
+             :repo "copilot-emacs/copilot.el"
+             :files ("*.el"))
+  :hook (prog-mode-hook . copilot-mode)
+  :bind (:copilot-mode-map
+         ("C-<return>" . copilot-accept-completion)
+         ("C-S-<return>" . copilot-accept-completion-by-line))
+  :hydra (hydra-copilot
+          (global-map "C-c c")
+          "copilot"
+          ("c" copilot-complete "complete")
+          ("n" copilot-next-completion "next")
+          ("p" copilot-previous-completion "previous"))
+  :custom ((copilot-indent-offset-warning-disable . t))
+  :config
+  (add-to-list 'copilot-major-mode-alist '("emacs-lisp" . "elisp"))
+  (add-to-list 'copilot-major-mode-alist '("go" . "go"))
+  (add-to-list 'copilot-major-mode-alist '("go-ts" . "go"))
   )
 #+end_src
 

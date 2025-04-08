@@ -1,0 +1,64 @@
+[language-server.gopls]
+command = "gopls"
+
+[language-server.gopls.config]
+usePlaceholders = true
+completeUnimported = true
+staticcheck = true
+buildFlags = ["-tags=integration"]
+
+[language-server.gopls.config.hints]
+assignVariableTypes = true
+compositeLiteralFields = true
+constantValues = true
+functionTypeParameters = true
+parameterNames = true
+rangeVariableTypes = true
+
+[language-server.golangci-lint-lsp]
+command = "golangci-lint-langserver"
+
+[language-server.golangci-lint-lsp.config]
+command = ["golangci-lint", "run", "--output.json.path=stdout", "--show-stats=false", "--issues-exit-code=1"]
+
+[[language]]
+name = "go"
+file-types = ["go"]
+roots = ["go.work", "go.mod"]
+language-servers = [ "gopls", "golangci-lint-lsp" ]
+
+[[language]]
+name = "elisp"
+file-types = ["el"]
+
+[language-server.typescript-language-server]
+config.plugins = [
+  { name = "@vue/typescript-plugin", location = "/usr/local/lib/node_modules/@vue/language-plugin", languages = ["vue"] }
+]
+
+[language-server.vue-language-server]
+command = "vue-language-server"
+args = ["--stdio"]
+config.typescript = { tsdk = "/usr/local/lib/node_modules/typescript/lib" }
+config.vue = { hybridMode = false }
+
+[[language]]
+name = "vue"
+roots = ["package.json"]
+language-id = "vue"
+file-types = ["vue", "ts"]
+language-servers = ["vue-language-server", "typescript-language-server"]
+
+# Override the build-in config. The built-in configuration uses vtsls, but it seems incompatible with vue-language-server. It could also be that my configuration is incorrect.
+# Others, such as JavaScript and TSX, can be added as needed.
+[[language]]
+name = "typescript"
+language-id = "typescript"
+file-types = ["ts", "mts", "cts"]
+roots = ["package.json"]
+language-servers = [
+  { name = "typescript-language-server", except-features = [
+    "format",
+  ] },
+  { name = "eslint", support-workspace = true, config-files = [".eslintrc.js", ".eslintrc.cjs", ".eslintrc.yaml", ".eslintrc.yml", ".eslintrc", ".eslintrc.json", "eslint.config.js", "eslint.config.mjs", "eslint.config.cjs", "eslint.config.ts", "eslint.config.mts", "eslint.config.cts"] },
+]
