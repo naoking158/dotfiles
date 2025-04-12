@@ -95,6 +95,7 @@ alias tgz='f() { env COPYFILE_DISABLE=1 tar zcvf $1 --exclude=".DS_Store" ${@:2}
 alias tree='eza --tree --level 3 -a --ignore-glob "node_modules|.git|.cache" --icons'
 alias d='docker'
 alias dc='docker compose'
+alias dprune='docker system prune -a'
 
 # Keybind - unbind
 bindkey -r '^J'

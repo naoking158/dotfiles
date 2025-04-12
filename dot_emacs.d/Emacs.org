@@ -5546,17 +5546,19 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
          vue-ts-mode-hook
          web-mode-hook
          typescript-mode-hook
-         js-mode-hook)
+         js-mode-hook
+         emacs-lisp-mode-hook)
   :custom `((lsp-proxy-user-languages-config . ,(expand-file-name "~/.emacs.d/etc/lsp-proxy/languages.toml")))
   :bind ((:lsp-proxy-mode-map
           :package lsp-proxy
           ("M-." . lsp-proxy-find-definition)
+          ("M-," . xref-go-back)
           ("C-c C-d" . lsp-proxy-describe-thing-at-point)
           ("C-c C-r" . lsp-proxy-find-references)
           ("C-c l i" . lsp-proxy-find-implementations)
           ("C-c l r" . lsp-proxy-rename)
           ("C-c l c" . lsp-proxy-execute-command)
-          ))
+          ("C-c l s" . lsp-proxy-signature-activate)))
   )
 #+end_src
 
@@ -5578,7 +5580,8 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
           ("c" copilot-complete "complete")
           ("n" copilot-next-completion "next")
           ("p" copilot-previous-completion "previous"))
-  :custom ((copilot-indent-offset-warning-disable . t))
+  :custom ((copilot-indent-offset-warning-disable . t)
+           (copilot-max-char . -1))
   :config
   (add-to-list 'copilot-major-mode-alist '("emacs-lisp" . "elisp"))
   (add-to-list 'copilot-major-mode-alist '("go" . "go"))
