@@ -3,9 +3,6 @@ live_config_reload = true
 import = [
     "~/.config/alacritty/themes/themes/tokyo_night.toml"
 ]
-# import = [
-#     "~/.config/alacritty/themes/themes/xterm.toml"
-# ]
 
 [env]
 TERM = "xterm-256color"
