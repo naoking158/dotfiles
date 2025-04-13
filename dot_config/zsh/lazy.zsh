@@ -135,12 +135,12 @@ if command -v ngrok &>/dev/null; then
 fi
 
 
-# # set global npm bin path
-# if type npm >/dev/null 2>&1; then
-#     local p
-#     p="$(npm prefix --location=global)/bin"
-#     PATH="${PATH}:${p}"
-# fi
+# set global npm bin path
+if type npm >/dev/null 2>&1; then
+    local p
+    p="$(npm prefix --location=global)/bin"
+    PATH="${PATH}:${p}"
+fi
 
 export PATH
 

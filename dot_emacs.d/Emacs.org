@@ -3046,7 +3046,11 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     ;; use setq because fussy-score-fn is not included in match type 
     ;; (setq acm-candidate-match-function fussy-filter-fn)
     (setopt acm-candidate-match-function 'regexp-quote))
-
+  :hook (corfu-mode-hook . (lambda ()
+                             (setq-local fussy-max-candidate-limit 5000
+                                         fussy-default-regex-fn 'fussy-pattern-first-letter
+                                         fussy-prefer-prefix nil)))
+  :advice (:before corfu--capf-wrapper fussy-wipe-cache)
   :init
   (leaf fuz
     :straight (fuz :type git :host github :repo "rustify-emacs/fuz.el")
