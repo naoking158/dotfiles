@@ -1008,8 +1008,11 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
                                        (agenda-date . (1.3))
                                        (agenda-structure . (variable-pitch 1.5))
                                        (t . (bold variable-pitch 1.1)))
-            standard-dark-palette-overrides '((bg-main "#040D12")
-                                              (bg-dim "#1E201E"))
+            standard-dark-palette-overrides '((bg-main "#091826")
+                                              (bg-dim "#143552")
+                                              (fg-main "#f2f4f7")
+                                              (fg-dim "#d8dee9")
+                                              (bg-region "#515944"))
             )
       ;; Load choiced theme
       (pcase sym-theme
@@ -3039,7 +3042,8 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
            (completion-category-overrides . ((command (styles fussy basic))
                                              (consult-multi (styles fussy basic))))
            (fussy-filter-fn . 'fussy-filter-default)
-           (fussy-score-fn . 'fussy-fuz-score))
+           (fussy-use-cache . t)
+           (fussy-compare-same-score-fn . 'fussy-histlen->strlen<))
   :config
   (push 'fussy completion-styles)
   (with-eval-after-load 'acm
@@ -3053,12 +3057,23 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   :advice (:before corfu--capf-wrapper fussy-wipe-cache)
   :init
   (leaf fuz
+    :disabled t
     :straight (fuz :type git :host github :repo "rustify-emacs/fuz.el")
     :require t
     :config
     (setq fussy-score-fn 'fussy-fuz-score)
     (unless (require 'fuz-core nil t)
-      (fuz-build-and-load-dymod))))
+      (fuz-build-and-load-dymod)))
+
+  (leaf fzf-native
+    :straight (fzf-native
+               :repo "dangduc/fzf-native"
+               :host github
+               :files (:defaults "bin"))
+    :config
+    (fzf-native-load-dyn)
+    (setq fussy-score-fn 'fussy-fzf-native-score))
+  )
 
 ;; (leaf orderless
 ;;   :straight t
