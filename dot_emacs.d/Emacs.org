@@ -3043,17 +3043,16 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
                                              (consult-multi (styles fussy basic))))
            (fussy-filter-fn . 'fussy-filter-default)
            (fussy-use-cache . t)
-           (fussy-compare-same-score-fn . 'fussy-histlen->strlen<))
+           (fussy-compare-same-score-fn . 'fussy-histlen->strlen<)
+           (fussy-score-ALL-fn . 'fussy-fzf-score)
+           )
   :config
-  (push 'fussy completion-styles)
-  (with-eval-after-load 'acm
-    ;; use setq because fussy-score-fn is not included in match type 
-    ;; (setq acm-candidate-match-function fussy-filter-fn)
-    (setopt acm-candidate-match-function 'regexp-quote))
+  (fussy-setup)
   :hook (corfu-mode-hook . (lambda ()
                              (setq-local fussy-max-candidate-limit 5000
                                          fussy-default-regex-fn 'fussy-pattern-first-letter
-                                         fussy-prefer-prefix nil)))
+                                         fussy-prefer-prefix nil
+                                         )))
   :advice (:before corfu--capf-wrapper fussy-wipe-cache)
   :init
   (leaf fuz
