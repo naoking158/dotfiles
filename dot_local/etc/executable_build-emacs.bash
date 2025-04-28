@@ -247,6 +247,8 @@ function build() {
             "--with-xml2"
 	          "--with-xwidgets"
             "--with-tree-sitter"
+            "--with-ns"
+            "--enable-mac-app=yes"
         )
     elif is_manjaro; then
         configureFlags=(

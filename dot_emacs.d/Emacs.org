@@ -1,3 +1,4 @@
+
 #+TITLE: Emacs Configuration
 #+PROPERTY: header-args:emacs-lisp :tangle (file-truename "~/.emacs.d/init.el")
 
@@ -180,7 +181,8 @@ a bunch of resources I've found online.
                             (left-fringe . 10)
                             (right-fringe . 10)
                             (width . 150)
-                            (height . 80)))
+                            (height . 80)
+                            (undecorated . t)))
 
 (setq-default line-spacing 0.3)
 
@@ -1008,10 +1010,10 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
                                        (agenda-date . (1.3))
                                        (agenda-structure . (variable-pitch 1.5))
                                        (t . (bold variable-pitch 1.1)))
-            standard-dark-palette-overrides '((bg-main "#091826")
+            standard-dark-palette-overrides '((bg-main "#06101a")
                                               (bg-dim "#143552")
                                               (fg-main "#f2f4f7")
-                                              (fg-dim "#d8dee9")
+                                              (fg-dim "#979fad")
                                               (bg-region "#515944"))
             )
       ;; Load choiced theme
@@ -1797,7 +1799,7 @@ Only in Neotree Buffer:
              :type git
              :host github
              :repo "codesuki/add-node-modules-path")
-  :hook ((vue-mode-hook js-mode-hook typescript-mode-hook) . add-node-modules-path)
+  :hook ((vue-mode-hook vue-ts-mode-hook js-mode-hook typescript-mode-hook) . add-node-modules-path)
   :custom (add-node-modules-path-command . '("echo \"$(npm root)/.bin\"")))
 
 (leaf web-mode
@@ -1832,7 +1834,14 @@ Only in Neotree Buffer:
   :hook web-mode-hook vue-ts-mode-hook
   :bind (:emmet-mode-keymap
          ("C-j" . skk-kakutei)
-         ("C-c e" . emmet-expand-line)))
+         ([remap emmet-expand-line] . nil)
+         ("C-c e" . emmet-expand-line)
+         )
+  :advice (:after emmet-after-hook (lambda ()
+                                     (if (featurep 'copilot)
+                                         (define-key emmet-mode-keymap
+                                           (kbd "C-<return>") #'copilot-accept-completion))
+                                         )))
 #+end_src
 
 *** JavaScript
@@ -1978,6 +1987,7 @@ Only in Neotree Buffer:
 
 #+begin_src emacs-lisp
 (leaf ansible
+  :disabled t
   :straight t
   :hook ((yaml-mode-hook . (lambda ()
                              (ansible 1)
@@ -3038,14 +3048,14 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 #+begin_src emacs-lisp
 (leaf fussy
   :straight t
+  :require t
   :custom ((completion-category-defaults . nil)
            (completion-category-overrides . ((command (styles fussy basic))
                                              (consult-multi (styles fussy basic))))
            (fussy-filter-fn . 'fussy-filter-default)
            (fussy-use-cache . t)
            (fussy-compare-same-score-fn . 'fussy-histlen->strlen<)
-           (fussy-score-ALL-fn . 'fussy-fzf-score)
-           )
+           (fussy-score-ALL-fn . 'fussy-fzf-score))
   :config
   (fussy-setup)
   :hook (corfu-mode-hook . (lambda ()
@@ -3220,7 +3230,6 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 #+begin_src emacs-lisp
 
 (leaf corfu
-  :disabled nil
   :straight t
   :global-minor-mode global-corfu-mode corfu-popupinfo-mode
   :custom
@@ -5543,6 +5552,7 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 
 #+begin_src emacs-lisp
 (leaf prettier-rc
+  :disabled t
   :straight t
   :hook ((web-mode-hook vue-mode-hook typescript-mode-hook js-mode-hook) . prettier-rc-mode)
   )
@@ -5599,7 +5609,8 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
           ("n" copilot-next-completion "next")
           ("p" copilot-previous-completion "previous"))
   :custom ((copilot-indent-offset-warning-disable . t)
-           (copilot-max-char . -1))
+           (copilot-max-char . -1)
+           (copilot-idle-delay . 2))
   :config
   (add-to-list 'copilot-major-mode-alist '("emacs-lisp" . "elisp"))
   (add-to-list 'copilot-major-mode-alist '("go" . "go"))

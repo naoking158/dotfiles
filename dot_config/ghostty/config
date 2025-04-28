@@ -10,4 +10,7 @@ macos-titlebar-style = transparent
 font-family = "UDEV Gothic NF"
 font-size = 16
 
+# 日本語の文字化け対策
+font-feature = -dlig
+
 keybind = alt+w=text:\x1bw

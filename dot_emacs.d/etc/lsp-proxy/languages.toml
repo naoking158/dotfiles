@@ -62,3 +62,22 @@ language-servers = [
   ] },
   { name = "eslint", support-workspace = true, config-files = [".eslintrc.js", ".eslintrc.cjs", ".eslintrc.yaml", ".eslintrc.yml", ".eslintrc", ".eslintrc.json", "eslint.config.js", "eslint.config.mjs", "eslint.config.cjs", "eslint.config.ts", "eslint.config.mts", "eslint.config.cts"] },
 ]
+
+[language-server.html-server]
+command = "vscode-html-language-server"
+args = ["--stdio"]
+
+[language-server.html-server.config]
+provideFormatter = true
+
+[[language]]
+name = "html"
+language-id = "html"
+file-types = ["html"]
+roots = ["package.json"]
+language-servers = [
+    "html-server",
+    { name = "typescript-language-server", except-features = [
+        "format",
+    ]},
+]
