@@ -129,6 +129,7 @@ if type direnv >/dev/null 2>&1; then
     eval "$(direnv hook zsh)"
 fi
 
+[[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
 
 if command -v ngrok &>/dev/null; then
     eval "$(ngrok completion)"
