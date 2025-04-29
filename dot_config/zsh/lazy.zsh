@@ -66,37 +66,6 @@ if type mise >/dev/null 2>&1; then
     eval "$($(which mise) activate zsh)"
 fi
 
-# Aliases
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
-alias diff='diff --color=auto'
-alias dua='/usr/bin/du -shc * | sort -h'
-alias e='emacsclient'
-alias ed='emacs -nw --daemon'
-alias ekill='emacsclient -e "(kill-emacs)"'
-alias enw='TERM=xterm-direct emacsclient -nw'
-alias eq='emacs -q'
-alias eql='eq -l'
-alias fd='fd --color=auto --full-path --no-ignore --hidden --exclude ".git"'
-alias g='git'
-alias gs='g status'
-alias gas='g add -A && gs'
-alias gc='g commit -m'
-alias grep='grep --color=auto'
-alias la='eza -a'
-alias ll='eza -l -g --icons'
-alias lla='ll -a'
-alias ls='eza'
-alias rg='rg --color=auto --no-ignore --hidden --glob="!.git" --line-number'
-alias rm='go-to-torash'
-alias sudo='sudo '
-alias tgz='f() { env COPYFILE_DISABLE=1 tar zcvf $1 --exclude=".DS_Store" ${@:2}; unset -f f; }; f'
-alias tree='eza --tree --level 3 -a --ignore-glob "node_modules|.git|.cache" --icons'
-alias d='docker'
-alias dc='docker compose'
-alias dprune='docker system prune -a'
-
 # Keybind - unbind
 bindkey -r '^J'
 
@@ -144,6 +113,38 @@ if type npm >/dev/null 2>&1; then
 fi
 
 export PATH
+
+
+# Aliases
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias diff='diff --color=auto'
+alias dua='/usr/bin/du -shc * | sort -h'
+alias e='emacsclient'
+alias ed='emacs -nw --daemon'
+alias ekill='emacsclient -e "(kill-emacs)"'
+alias enw='TERM=xterm-direct emacsclient -nw'
+alias eq='emacs -q'
+alias eql='eq -l'
+alias fd='fd --color=auto --full-path --no-ignore --hidden --exclude ".git"'
+alias g='git'
+alias gs='g status'
+alias gas='g add -A && gs'
+alias gc='g commit -m'
+alias grep='grep --color=auto'
+alias la='eza -a'
+alias ll='eza -l -g --icons'
+alias lla='ll -a'
+alias ls='eza'
+alias rg='rg --color=auto --no-ignore --hidden --glob="!.git" --line-number'
+alias rm='~/go/bin/go-to-trash'
+alias sudo='sudo '
+alias tgz='f() { env COPYFILE_DISABLE=1 tar zcvf $1 --exclude=".DS_Store" ${@:2}; unset -f f; }; f'
+alias tree='eza --tree --level 3 -a --ignore-glob "node_modules|.git|.cache" --icons'
+alias d='docker'
+alias dc='docker compose'
+alias dprune='docker system prune -a'
 
 
 typeset -gU path cdpath fpath manpath
