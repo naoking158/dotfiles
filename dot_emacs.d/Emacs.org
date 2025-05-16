@@ -5573,7 +5573,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
          go-ts-mode-hook
          vue-ts-mode-hook
          web-mode-hook
+         tsx-ts-mode-hook
          typescript-mode-hook
+         typescript-ts-mode-hook
          js-mode-hook
          emacs-lisp-mode-hook)
   :custom `((lsp-proxy-user-languages-config . ,(expand-file-name "~/.emacs.d/etc/lsp-proxy/languages.toml")))
@@ -5616,6 +5618,15 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
   (add-to-list 'copilot-major-mode-alist '("go" . "go"))
   (add-to-list 'copilot-major-mode-alist '("go-ts" . "go"))
   )
+#+end_src
+
+** breadcrumbs
+
+#+begin_src emacs-lisp
+(leaf breadcrumb
+  :straight t
+  :hook (prog-mode-hook . (lambda nil
+                            (breadcrumb-mode +1))))
 #+end_src
 
 * Footer
