@@ -64,6 +64,7 @@ fi
 # mise
 if type mise >/dev/null 2>&1; then
     eval "$($(which mise) activate zsh)"
+    PATH="$HOME/.local/share/mise/shims:$PATH"
 fi
 
 # Keybind - unbind

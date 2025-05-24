@@ -4,7 +4,7 @@ command = "gopls"
 [language-server.gopls.config]
 usePlaceholders = true
 completeUnimported = true
-staticcheck = true
+staticcheck = false
 buildFlags = ["-tags=integration"]
 
 [language-server.gopls.config.hints]
@@ -24,8 +24,9 @@ command = ["golangci-lint", "run", "--output.json.path=stdout", "--show-stats=fa
 [[language]]
 name = "go"
 file-types = ["go"]
-roots = ["go.work", "go.mod"]
-language-servers = [ "gopls", "golangci-lint-lsp" ]
+roots = ["go.mod"]
+language-servers = [ "gopls" ]
+# language-servers = [ "gopls", "golangci-lint-lsp" ]
 
 [[language]]
 name = "elisp"
