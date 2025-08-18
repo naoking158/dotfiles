@@ -27,7 +27,7 @@ ltximg/**
 /auto/
 # cask packages
 .cask/
-dist/
+# dist/
 # Flycheck
 flycheck_*.el
 # projectiles files

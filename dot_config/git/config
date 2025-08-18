@@ -43,5 +43,3 @@
 
 [includeIf "gitdir:~/src/github.com/400f/"]
   path = ~/.gitconfig_400f
-
-
