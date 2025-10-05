@@ -101,9 +101,6 @@ a bunch of resources I've found online.
 - [[#applications][Applications]]
   - [[#competitive-programming-with-oj---online-judge][Competitive Programming with oj - Online Judge]]
   - [[#elfeed][Elfeed]]
-  - [[#mail][Mail]]
-  - [[#notmuch][Notmuch]]
-  - [[#emacs-application-framework][Emacs Application Framework]]
 - [[#server-mode][Server Mode]]
 - [[#trial-packages][Trial Packages]]
   - [[#web-browser-with-emacs-w3m][Web Browser with emacs-w3m]]
@@ -132,6 +129,8 @@ a bunch of resources I've found online.
   - [[#prettier-rc][prettier-rc]]
   - [[#lsp-proxy][lsp-proxy]]
   - [[#copilot][copilot]]
+  - [[#breadcrumbs][breadcrumbs]]
+  - [[#claude-code-ide][claude-code-ide]]
 - [[#footer][Footer]]
 :END:
 
@@ -440,7 +439,8 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
               (save-place-mode . 1)
               (save-interprogram-paste-before-kill . t)
               (indent-tabs-mode . nil)
-              (native-comp-async-report-warnings-errors . nil))
+              (native-comp-async-report-warnings-errors . nil)
+              (max-lisp-eval-depth . 3200))
     :config
     (defalias 'yes-or-no-p 'y-or-n-p)
     (keyboard-translate 8 127)
@@ -2397,7 +2397,7 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 
 (leaf lin
   :straight t
-  :custom ((lin-mode-hooks . '(text-mode-hook prog-mode-hook notmuch-search-mode-hook))
+  :custom ((lin-mode-hooks . '(text-mode-hook prog-mode-hook))
            (lin-face . 'lin-cyan))
   :config
   (global-hl-line-mode)
@@ -2576,17 +2576,6 @@ HTTP encodings, headers, media types, methods, relations and status codes, all s
 
   #+end_src
 
-*** Copilot chat
-
-#+begin_src emacs-lisp :tangle yes
-(leaf copilot-chat
-  :straight (copilot-chat
-             :host github
-             :repo "chep/copilot-chat.el"
-             :files ("*.el"))
-  :after org
-  :require t)
-#+end_src
 
 * Window Management
 
@@ -4655,236 +4644,6 @@ From the search buffer there are a number of ways to interact with entries. Entr
 
 
 
-** Mail
-:PROPERTIES:
-:ID:       708C16FF-B967-4E17-8846-C73B711FC9F5
-:END:
-
-*** General Settings
-:PROPERTIES:
-:ID:       cb56211c-1c97-4c1a-95d4-14f9d61bdd62
-:END:
-
-#+begin_src emacs-lisp
-(leaf mail-general
-  :disabled t
-  :require t
-  :load-path "~/src/github.com/naoking158/envs/config-mail/")
-#+end_src
-
-** Notmuch
-:PROPERTIES:
-:ID:       82ca56e2-cd3d-40f9-9a9c-a8ea873507bb
-:END:
-
-Manual is [[https://notmuchmail.org/emacstips/][here]]
-
-#+begin_src emacs-lisp
-;;; Notmuch (mail indexer and mail user agent (MUA))
-;; I install notmuch from the distro's repos because the CLI program is
-;; not dependent on Emacs.  Though the package also includes notmuch.el
-;; which is what we use here (they are maintained by the same people).
-;; (add-to-list 'load-path "/usr/share/emacs/site-lisp/")
-(leaf notmuch
-  ;; :straight t
-  :commands notmuch notmuch-hello
-  :config
-  (load-file "~/src/github.com/naoking158/envs/config-mail/config-notmuch.el")
-
-;;; General UI
-  (setq notmuch-show-logo nil)
-  (setq notmuch-column-control t)
-  (setq notmuch-hello-auto-refresh t)
-  (setq notmuch-hello-recent-searches-max 50)
-  (setq notmuch-hello-thousands-separator "")
-  (setq notmuch-show-all-tags-list nil)
-
-;;; Search
-  (setq notmuch-search-oldest-first nil)
-  (setq notmuch-search-result-format
-        '(("date" . "%12s  ")
-          ("count" . "%-7s  ")
-          ("authors" . "%-20s  ")
-          ("subject" . "%-80s  ")
-          ("tags" . "(%s)")))
-  (setq notmuch-tree-result-format
-        '(("date" . "%12s  ")
-          ("authors" . "%-20s  ")
-          ((("tree" . "%s")
-            ("subject" . "%s"))
-           . " %-80s  ")
-          ("tags" . "(%s)")))
-  (setq notmuch-search-line-faces
-        '(("unread" . notmuch-search-unread-face)
-          ("flag" . notmuch-search-flagged-face)))
-  (setq notmuch-show-empty-saved-searches t)
-
-;;; Tags
-  (setq notmuch-archive-tags '("-inbox" "-del" "-todo" "+archived"))
-  (setq notmuch-message-replied-tags '("+replied"))
-  (setq notmuch-message-forwarded-tags '("+forwarded"))
-  (setq notmuch-show-mark-read-tags '("-unread"))
-  (setq notmuch-draft-tags '("+draft"))
-  (setq notmuch-draft-folder "drafts")
-  (setq notmuch-draft-save-plaintext 'ask)
-  (setq notmuch-tag-formats
-        '(("unread" (propertize tag 'face 'notmuch-tag-unread))
-          ("flag" (propertize tag 'face 'notmuch-tag-flagged))))
-  (setq notmuch-tag-deleted-formats
-        '(("unread" (notmuch-apply-face bare-tag `notmuch-tag-deleted))
-          (".*" (notmuch-apply-face tag `notmuch-tag-deleted))))
-
-;;; Email composition
-  (setq notmuch-mua-compose-in 'current-window)
-  (setq notmuch-mua-hidden-headers nil) ; TODO 2021-05-12: Review hidden headers
-  ;; (setq notmuch-address-command nil)    ; FIXME 2021-05-13: Make it work with EBDB
-  (setq notmuch-address-use-company nil)
-  (setq notmuch-address-internal-completion '(received nil))
-  (setq notmuch-always-prompt-for-sender t)
-  (setq notmuch-mua-cite-function 'message-cite-original-without-signature)
-  (setq notmuch-mua-reply-insert-header-p-function 'notmuch-show-reply-insert-header-p-never)
-  (setq notmuch-mua-user-agent-function #'notmuch-mua-user-agent-full)
-  (setq notmuch-maildir-use-notmuch-insert t)
-  (setq notmuch-crypto-process-mime t)
-  (setq notmuch-crypto-get-keys-asynchronously t)
-
-;;; Reading messages
-  (setq notmuch-show-relative-dates t)
-  (setq notmuch-show-all-multipart/alternative-parts nil)
-  (setq notmuch-show-indent-messages-width 0)
-  (setq notmuch-show-indent-multipart nil)
-  (setq notmuch-show-part-button-default-action 'notmuch-show-save-part)
-  (setq notmuch-show-text/html-blocked-images ".") ; block everything
-  (setq notmuch-wash-citation-lines-prefix 6)
-  (setq notmuch-wash-citation-lines-suffix 6)
-  (setq notmuch-wash-wrap-lines-length 100)
-  (setq notmuch-unthreaded-show-out nil)
-  (setq notmuch-message-headers '("To" "Cc" "Subject" "Date"))
-  (setq notmuch-message-headers-visible t)
-
-;;; Hooks and key bindings
-  (add-hook 'notmuch-mua-send-hook #'notmuch-mua-attachment-check)
-  (remove-hook 'notmuch-show-hook #'notmuch-show-turn-on-visual-line-mode)
-  (add-hook 'notmuch-show-hook (lambda () (setq-local header-line-format nil)))
-
-  (leaf *notmuch-config
-    :leaf-defer nil
-    :advice
-    (:after notmuch-show-mode meow-insert-mode)
-    (:after notmuch-tree-mode meow-insert-mode)
-    (:after notmuch-hello-mode meow-insert-mode)
-    (:after notmuch-search-mode meow-insert-mode)
-    (:after notmuch-message-mode meow-insert-mode)
-
-    :hook (notmuch-mua-send-hook . notmuch-mua-attachment-check)
-    :bind (:notmuch-search-mode-map
-           :package notmuch
-           ("." . nil)
-           ("." . notmuch-tag-jump))
-    :config
-    ;; (add-to-list 'corfu-excluded-modes 'notmuch-message-mode)
-    ;; (add-to-list 'corfu-excluded-modes 'org-msg-edit-mode)
-
-    (setq mark-complete-tags '("+archived" "-inbox" "-todo" "-unread")
-          mark-delete-tags '("+del" "-inbox" "-archived" "-unread")
-          mark-flag-tags '("+flag" "-unread")
-          mark-spam-tags '("+spam" "+del" "-inbox" "-unread")
-          mark-todo-tags '("+todo" "-unread" "-inbox"))
-
-    (setq notmuch-tagging-keys
-          `((,(kbd "a") notmuch-archive-tags "Archive (remove from inbox)")
-            (,(kbd "c") mark-complete-tags "Complete and archive")
-            (,(kbd "d") mark-delete-tags "Mark for deletion")
-            (,(kbd "f") mark-flag-tags "Flag as important")
-            (,(kbd "s") mark-spam-tags "Mark as spam")
-            (,(kbd "t") mark-todo-tags "To-do")
-            (,(kbd "r") ("-unread") "Mark as read")
-            (,(kbd "u") ("+unread") "Mark as unread")))
-    )
-  )
-#+end_src
-
-*** Notmuch-transient
-:PROPERTIES:
-:ID:       08871979-510f-4ab6-bbe5-d11bedfe7c9e
-:END:
-
-#+begin_src emacs-lisp
-(leaf notmuch-transient
-  :straight t
-  :after notmuch
-  :bind
-  ((:notmuch-search-mode-map :package notmuch
-                             ("=" . nil)
-                             ("=" . notmuch-search-mode-transient))
-   (:notmuch-tree-mode-map :package notmuch
-                           ("=" . nil)
-                           ("=" . notmuch-tree-mode-transient))
-   (:notmuch-hello-mode-map :package notmuch
-                            ("=" . nil)
-                            ("=" . notmuch-hello-mode-transient))
-   (:notmuch-show-mode-map :package notmuch
-                           ("=" . nil)
-                           ("=" . notmuch-show-mode-transient))))
-#+end_src
-
-*** ol-notmuch
-:PROPERTIES:
-:ID:       85a901ef-5f0f-4efa-ae0a-ead7a6731e3b
-:END:
-
-#+begin_src emacs-lisp
-(leaf ol-notmuch
-  :straight t
-  :after notmuch)
-#+end_src
-
-*** Mu4e
-**** Config
-:PROPERTIES:
-:ID:       44f695dc-d668-4345-b105-4ab273f1a501
-:END:
-
-#+begin_src emacs-lisp
-(leaf *config-mu4e
-  :disabled t
-  :config
-  (load-file "~/src/github.com/naoking158/envs/config-mail/config-mu4e.el"))
-#+end_src
-
-** Emacs Application Framework
-:PROPERTIES:
-:ID:       24FB1875-D6A4-4609-9485-FAAB24E07AA6
-:END:
-
-#+begin_src emacs-lisp
-
-(leaf eaf
-  :disabled t
-  :when (memq window-system '(x pgtk))
-  :load-path "~/src/github.com/emacs-eaf/emacs-application-framework/"
-  :require eaf
-  :commands
-  (eaf-search-it eaf-open eaf-open-browser eaf-open-browser-with-history eaf-open-pdf-from-history)
-  :custom
-  ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
-  (;; (eaf-python-command . "/usr/bin/python")
-   (eaf-browser-continue-where-left-off . t)
-   (eaf-browser-enable-adblocker . t)
-   (browse-url-browser-function . 'eaf-open-browser))
-  :config
-  ;; run (M-x eaf-install-and-update) at first time
-  (require 'eaf-browser)
-  (require 'eaf-pdf-viewer)
-  (add-to-list 'eaf-wm-focus-fix-wms "wlroots wm")
-  (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-  (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-  ;; (defalias 'browse-web #'eaf-open-browser)
-  (eaf-bind-key nil "M-q" eaf-browser-keybinding)
-  )
-
-#+end_src
-
 * Server Mode
 :PROPERTIES:
 :ID:       829CCBA5-3D95-42AE-8D68-4AACC53C2DF8
@@ -5611,7 +5370,7 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
           ("n" copilot-next-completion "next")
           ("p" copilot-previous-completion "previous"))
   :custom ((copilot-indent-offset-warning-disable . t)
-           (copilot-max-char . -1)
+           ;; (copilot-max-char . -1)
            (copilot-idle-delay . 2))
   :config
   (add-to-list 'copilot-major-mode-alist '("emacs-lisp" . "elisp"))
@@ -5627,6 +5386,19 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
   :straight t
   :hook (prog-mode-hook . (lambda nil
                             (breadcrumb-mode +1))))
+#+end_src
+
+** claude-code-ide
+
+#+begin_src emacs-lisp
+(leaf claude-code-ide
+  :straight (claude-code-ide
+             :type git
+             :host github
+             :repo "manzaltu/claude-code-ide.el")
+  :bind ("C-c C-'" . claude-code-ide-menu) ; Set your favorite keybinding
+  :config
+  (claude-code-ide-emacs-tools-setup))
 #+end_src
 
 * Footer
