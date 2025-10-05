@@ -743,6 +743,9 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 
 
 ** Copy org link to current position
+:PROPERTIES:
+:ID:       F3004A68-C604-43A0-B9AD-9D25FDB2DABD
+:END:
 
 #+begin_src emacs-lisp
 (defun my/copy-org-link-to-current-position ()
@@ -1999,6 +2002,9 @@ Only in Neotree Buffer:
 #+end_src
 
 *** GraphQL mode
+:PROPERTIES:
+:ID:       B54521DA-AB92-43D6-B26C-C4F33D6A4E57
+:END:
 
 #+begin_src emacs-lisp
 (leaf graphql-mode
@@ -2007,6 +2013,9 @@ Only in Neotree Buffer:
 #+end_src
 
 *** Protocol buffer
+:PROPERTIES:
+:ID:       ED35369B-A29E-4F93-98AF-300DEB3ECC77
+:END:
 
 #+begin_src emacs-lisp
 (leaf protobuf-mode
@@ -2014,6 +2023,9 @@ Only in Neotree Buffer:
 #+end_src
 
 *** Terraform
+:PROPERTIES:
+:ID:       B3565DEE-B6A7-4FDF-8EA5-EBC48705C9C4
+:END:
 
 #+begin_src emacs-lisp
 (leaf terraform-mode
@@ -2022,6 +2034,9 @@ Only in Neotree Buffer:
 
 
 *** Sql format
+:PROPERTIES:
+:ID:       B51427F9-52D9-415A-953E-69F911594D1C
+:END:
 
 #+begin_src emacs-lisp
 (leaf sqlformat
@@ -5289,6 +5304,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** One-tab-per-project
+:PROPERTIES:
+:ID:       8DD8AA7F-86FF-4761-82EE-5BAA15B23D93
+:END:
 
 #+begin_src emacs-lisp
 (leaf otpp
@@ -5308,6 +5326,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** prettier-rc
+:PROPERTIES:
+:ID:       257D7235-613B-4683-B782-1C26D014900F
+:END:
 
 #+begin_src emacs-lisp
 (leaf prettier-rc
@@ -5318,6 +5339,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** lsp-proxy
+:PROPERTIES:
+:ID:       32ABC120-7376-41E5-A0CC-12008E4E2C98
+:END:
 
 #+begin_src emacs-lisp
 (leaf lsp-proxy
@@ -5325,8 +5349,7 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
              :type git
              :host github
              :repo "jadestrong/lsp-proxy"
-             :files ("lsp-proxy.el" "lsp-proxy")
-             :pre-build (("cargo" "build" "--release") ("cp" "./target/release/lsp-proxy" "./")))
+             :files ("*.el"))
   :require t
   :hook (go-mode-hook
          go-ts-mode-hook
@@ -5352,6 +5375,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** copilot
+:PROPERTIES:
+:ID:       20893B6D-9EFE-493F-B1A8-094394DB95D9
+:END:
 
 #+begin_src emacs-lisp
 (leaf copilot
@@ -5380,6 +5406,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** breadcrumbs
+:PROPERTIES:
+:ID:       02BDD7D4-30DF-4DF5-B9A3-D6CE99BAD9BC
+:END:
 
 #+begin_src emacs-lisp
 (leaf breadcrumb
@@ -5389,6 +5418,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+end_src
 
 ** claude-code-ide
+:PROPERTIES:
+:ID:       CD29BAD4-D2C0-4302-A793-DDDC153861E1
+:END:
 
 #+begin_src emacs-lisp
 (leaf claude-code-ide
