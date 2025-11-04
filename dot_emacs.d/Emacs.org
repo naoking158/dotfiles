@@ -476,7 +476,7 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 
   (leaf eldoc
     :doc "Show function arglist or variable docstring in echo area"
-    :tag "builtin"
+    :straight (eldoc :type built-in)
     :custom (eldoc-idle-delay . 0.1)))
 
 #+end_src
@@ -1868,12 +1868,11 @@ Only in Neotree Buffer:
 :END:
 
 #+begin_src emacs-lisp
-(leaf typescript-mode
+(leaf typescript-ts-mode
   :straight t
-  :mode (("\\.ts\\'" . typescript-mode)
-         ("\\.tsx\\'" . typescript-mode))
-  :custom ((typescript-indent-level . 2)
-           (typescript-auto-indent-flag . nil))
+  :mode (("\\.ts\\'" . typescript-ts-mode)
+         ("\\.tsx\\'" . typescript-ts-mode))
+  :custom (typescript-ts-mode-indent-offset . 2)
   ;; :hook (typescript-mode-local-vars-hook . (lambda nil
   ;;                                      (lsp-bridge-mode)))
   )
@@ -5349,18 +5348,21 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
              :type git
              :host github
              :repo "jadestrong/lsp-proxy"
-             :files ("*.el"))
-  :require t
+             :files (:defaults))
   :hook (go-mode-hook
          go-ts-mode-hook
          vue-ts-mode-hook
+         vue-mode-hook
          web-mode-hook
          tsx-ts-mode-hook
          typescript-mode-hook
          typescript-ts-mode-hook
          js-mode-hook
          emacs-lisp-mode-hook)
-  :custom `((lsp-proxy-user-languages-config . ,(expand-file-name "~/.emacs.d/etc/lsp-proxy/languages.toml")))
+  :custom `((lsp-proxy-user-languages-config . ,(expand-file-name "~/.emacs.d/etc/lsp-proxy/languages.toml"))
+            (lsp-proxy-enable-hover-eldoc . t)
+            (lsp-proxy-enable-bytecode . nil)
+            )
   :bind ((:lsp-proxy-mode-map
           :package lsp-proxy
           ("M-." . lsp-proxy-find-definition)

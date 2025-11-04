@@ -34,7 +34,7 @@ file-types = ["el"]
 
 [language-server.typescript-language-server]
 config.plugins = [
-  { name = "@vue/typescript-plugin", location = "/usr/local/lib/node_modules/@vue/language-plugin", languages = ["vue"] }
+  { name = "@vue/typescript-plugin", location = "/usr/local/lib/node_modules/@vue/typescript-plugin", languages = ["vue"], enableForWorkspaceTypeScriptVersions = true, configNamespace = "typescript" }
 ]
 
 [language-server.vue-language-server]
@@ -47,8 +47,11 @@ config.vue = { hybridMode = false }
 name = "vue"
 roots = ["package.json"]
 language-id = "vue"
-file-types = ["vue", "ts"]
-language-servers = ["vue-language-server", "typescript-language-server"]
+file-types = ["vue"]
+language-servers = [
+  { name = "vue-language-server", except-features = ["goto-definition", "goto-implementation", "goto-type-definition", "goto-declaration", "goto-reference"] },
+  "typescript-language-server"
+]
 
 # Override the build-in config. The built-in configuration uses vtsls, but it seems incompatible with vue-language-server. It could also be that my configuration is incorrect.
 # Others, such as JavaScript and TSX, can be added as needed.
