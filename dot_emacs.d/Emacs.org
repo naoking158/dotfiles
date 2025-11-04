@@ -1843,8 +1843,8 @@ Only in Neotree Buffer:
   :advice (:after emmet-after-hook (lambda ()
                                      (if (featurep 'copilot)
                                          (define-key emmet-mode-keymap
-                                           (kbd "C-<return>") #'copilot-accept-completion))
-                                         )))
+                                                     (kbd "C-<return>") #'copilot-accept-completion))
+                                     )))
 #+end_src
 
 *** JavaScript
