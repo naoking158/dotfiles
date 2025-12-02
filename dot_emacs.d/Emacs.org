@@ -131,6 +131,7 @@ a bunch of resources I've found online.
   - [[#copilot][copilot]]
   - [[#breadcrumbs][breadcrumbs]]
   - [[#claude-code-ide][claude-code-ide]]
+  - [[#emmet2-mode][emmet2-mode]]
 - [[#footer][Footer]]
 :END:
 
@@ -451,7 +452,10 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
                 'narrow-to-region
                 'narrow-to-page
                 'narrow-to-defun
-                'list-timers)))
+                'list-timers))
+    (setq make-backup-files t
+          backup-directory-alist `((".*" . ,(expand-file-name "backups/" user-emacs-directory))))
+    )
 
   (leaf exec-path-from-shell
     :doc "Get environment variables such as $PATH from the shell"
@@ -1836,7 +1840,7 @@ Only in Neotree Buffer:
 
 (leaf emmet-mode
   :straight t
-  :hook web-mode-hook vue-ts-mode-hook
+  :hook web-mode-hook vue-ts-mode-hook tsx-ts-mode-hook
   :bind (:emmet-mode-keymap
          ("C-j" . skk-kakutei)
          ([remap emmet-expand-line] . nil)
@@ -1846,7 +1850,10 @@ Only in Neotree Buffer:
                                      (if (featurep 'copilot)
                                          (define-key emmet-mode-keymap
                                                      (kbd "C-<return>") #'copilot-accept-completion))
-                                     )))
+                                     ))
+  :config
+  (add-to-list 'emmet-jsx-major-modes 'tsx-ts-mode)
+  )
 #+end_src
 
 *** JavaScript
@@ -2141,6 +2148,7 @@ Only in Neotree Buffer:
          ("C-c C-p" . flycheck-previous-error))
   :hook (
          typescript-mode-hook
+         tsx-ts-mode-hook
          vue-mode-hook
          vue-ts-mode-hook
          go-mode-hook
@@ -2270,7 +2278,19 @@ Only in Neotree Buffer:
              (json-mode . json-ts-mode)
              (bash-mode . bash-ts-mode)
              (sh-mode . bash-ts-mode)))
-    (add-to-list 'major-mode-remap-alist mapping)))
+    (add-to-list 'major-mode-remap-alist mapping))
+  :config
+  (leaf combobulate
+    :straight (combobulate
+               :type git
+               :host github
+               :repo "mickeynp/combobulate"
+               :file (:defaults "*.el" "build")
+               )
+    :preface (setq combobulate-key-prefix "C-c o")
+    :hook tsx-ts-mode-hook
+    )
+  )
 
 (leaf treesit-langs
   :straight (treesit-langs
