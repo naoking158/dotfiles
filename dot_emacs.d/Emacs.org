@@ -131,7 +131,7 @@ a bunch of resources I've found online.
   - [[#copilot][copilot]]
   - [[#breadcrumbs][breadcrumbs]]
   - [[#claude-code-ide][claude-code-ide]]
-  - [[#emmet2-mode][emmet2-mode]]
+  - [[#mmm-mode][mmm-mode]]
 - [[#footer][Footer]]
 :END:
 
@@ -2010,16 +2010,6 @@ Only in Neotree Buffer:
   (add-to-list 'lsp-bridge-single-lang-server-mode-list '(yaml-mode . "ansible-language-server")))
 #+end_src
 
-*** GraphQL mode
-:PROPERTIES:
-:ID:       B54521DA-AB92-43D6-B26C-C4F33D6A4E57
-:END:
-
-#+begin_src emacs-lisp
-(leaf graphql-mode
-  :straight t
-  :mode ("\\.graphql\\'" "\\.gql\\'"))
-#+end_src
 
 *** Protocol buffer
 :PROPERTIES:
@@ -2027,8 +2017,9 @@ Only in Neotree Buffer:
 :END:
 
 #+begin_src emacs-lisp
-(leaf protobuf-mode
-  :straight t)
+(leaf protobuf-ts-mode
+  :straight t
+  :mode "\\.proto\\'")
 #+end_src
 
 *** Terraform
@@ -2141,83 +2132,23 @@ Only in Neotree Buffer:
 :END:
 
 #+begin_src emacs-lisp
-
 (leaf flycheck
   :straight t
+  :global-minor-mode t
   :bind (("C-c C-n" . flycheck-next-error)
          ("C-c C-p" . flycheck-previous-error))
-  :hook (
-         typescript-mode-hook
-         tsx-ts-mode-hook
-         vue-mode-hook
-         vue-ts-mode-hook
-         go-mode-hook
-         go-ts-mode-hook
-         )
-  :custom ((flycheck-display-errors-delay . 0.8))
+  ;; :hook (
+  ;;        typescript-mode-hook
+  ;;        tsx-ts-mode-hook
+  ;;        vue-mode-hook
+  ;;        vue-ts-mode-hook
+  ;;        go-mode-hook
+  ;;        go-ts-mode-hook
+  ;;        )
+  :custom ((flycheck-display-errors-delay . 0.6))
   :config
-  (flycheck-add-mode 'javascript-eslint 'vue-mode)
-  (leaf flycheck-pos-tip
-    :disabled t
-    :straight t
-    :custom (flycheck-pos-tip-timeout . 10)
-    :config
-    (flycheck-pos-tip-mode))
-
-  (leaf flycheck-inline
-    :disabled t
-    :straight t
-    :hook (flycheck-mode-hook . flycheck-inline-mode)
-    :advice
-    (:override flycheck-inline--error-face my--flycheck-inline--error-face)
-    (:override flycheck-inline--error-message my--flycheck-inline--error-message)
-    :preface
-    (defun my--flycheck-inline--error-face (err)
-      "Return the face used to display ERR."
-      (pcase (flycheck-error-level err)
-        (`info 'flycheck-inline-info)
-        (`warning 'flycheck-inline-warning)
-        (`error 'flycheck-inline-error)
-        (_ 'flycheck-inline-info)))
-
-    (defun my--flycheck-inline--error-message (err)
-      "Return the message to display for ERR."
-      (let ((filename (flycheck-error-filename err))
-            (id (flycheck-error-id err))
-            (prefix (pcase (flycheck-error-level err)
-                      (`info "✏️ ")
-                      (`warning "⚠️ ")
-                      (`error "🚫 ")
-                      (_ "✏️ "))))
-        (concat
-         prefix
-         (when (and filename (not (equal filename (buffer-file-name))))
-           (format "In \"%s\":\n" (file-relative-name filename default-directory)))
-         (flycheck-error-message err)
-         (when (and id flycheck-inline-display-error-id)
-           (format " [%s]" id))))))
-
-  (leaf *flycheck-gui
-    :disabled t
-    :when window-system
-    :config
-    ;; checker for textlint
-    (flycheck-define-checker textlint
-      "A linter for text."
-      :command ("~/.config/textlint/textlint.sh" source)
-      :error-patterns
-      ((warning line-start (file-name) ":" line ":" column ": "
-                (id (one-or-more (not (any " "))))
-                (message (one-or-more not-newline)
-                         (zero-or-more "
-" (any " ") (one-or-more not-newline)))
-                line-end))
-      :modes (latex-mode latex-extra-mode))
-
-    (add-hook 'latex-extra-mode-hook #'(lambda nil
-                                         (setq flycheck-checker 'textlint)
-                                         (flycheck-mode 1))))
-
+  ;; (flycheck-add-mode 'javascript-eslint 'vue-mode)
+  
   (leaf *flycheck-tty
     :when (not window-system)
     :custom (flycheck-indication-mode . 'left-margin)
@@ -2258,6 +2189,7 @@ Only in Neotree Buffer:
 
 #+begin_src emacs-lisp
 (leaf treesit
+  :require t
   :mode (("\\.tsx\\'" . tsx-ts-mode)
          ("\\.js\\'"  . typescript-ts-mode)
          ("\\.mjs\\'" . typescript-ts-mode)
@@ -2267,7 +2199,8 @@ Only in Neotree Buffer:
          ("\\.jsx\\'" . tsx-ts-mode)
          ("\\.json\\'" .  json-ts-mode)
          ("\\.Dockerfile\\'" . dockerfile-ts-mode)
-         ("\\.zsh\\'" . bash-ts-mode))
+         ("\\.zsh\\'" . bash-ts-mode)
+         )
   :preface
   (dolist (mapping
            '((python-mode . python-ts-mode)
@@ -2281,6 +2214,7 @@ Only in Neotree Buffer:
     (add-to-list 'major-mode-remap-alist mapping))
   :config
   (leaf combobulate
+    :disabled t
     :straight (combobulate
                :type git
                :host github
@@ -2293,6 +2227,7 @@ Only in Neotree Buffer:
   )
 
 (leaf treesit-langs
+  :require t
   :straight (treesit-langs
              :type git
              :host github
@@ -2307,7 +2242,13 @@ Only in Neotree Buffer:
            (treesit-langs-git-dir . nil)
            (treesit-langs-grammar-dir . "~/.emacs.d/etc/tree-sitter"))
   :config
-  (add-to-list 'treesit-extra-load-path treesit-langs-grammar-dir))
+  (add-to-list 'treesit-extra-load-path treesit-langs-grammar-dir)
+  )
+
+(leaf graphql-ts-mode
+  :straight t
+  :mode ("\\.graphql\\'" "\\.gql\\'")
+  )
 
 #+end_src
 
@@ -5397,11 +5338,13 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
          typescript-mode-hook
          typescript-ts-mode-hook
          js-mode-hook
-         emacs-lisp-mode-hook)
-  :custom `((lsp-proxy-user-languages-config . ,(expand-file-name "~/.emacs.d/etc/lsp-proxy/languages.toml"))
-            (lsp-proxy-enable-hover-eldoc . t)
-            (lsp-proxy-enable-bytecode . nil)
-            )
+         emacs-lisp-mode-hook
+         graphql-ts-mode-hook
+         protobuf-ts-mode-hook
+         )
+  :custom `(lsp-proxy-user-languages-config . ,(expand-file-name "~/.emacs.d/etc/lsp-proxy/languages.toml"))
+  
+            
   :bind ((:lsp-proxy-mode-map
           :package lsp-proxy
           ("M-." . lsp-proxy-find-definition)
@@ -5472,6 +5415,32 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
   :bind ("C-c C-'" . claude-code-ide-menu) ; Set your favorite keybinding
   :config
   (claude-code-ide-emacs-tools-setup))
+#+end_src
+
+** polymode
+:PROPERTIES:
+:ID:       8A02AB64-5D3D-41BF-880D-C18A871BCD3C
+:END:
+
+#+begin_src emacs-lisp
+(leaf polymode
+  :disabled t
+   :straight t
+   :after tsx-ts-mode graphql-ts-mode
+   :config
+   (define-hostmode poly-tsx-hostmode nil
+     "TSX hostmode."
+     :mode 'tsx-ts-mode)
+   (define-innermode poly-tsx-graphql-innermode nil
+     :mode 'graphql-ts-mode
+     :head-matcher "\\(graphql\\|gql\\)`"
+     :tail-matcher "`"
+     :head-mode 'host
+     :tail-mode 'host)
+   (define-polymode poly-tsx-mode
+     :hostmode 'poly-tsx-hostmode
+     :innermodes '(poly-tsx-graphql-innermode))
+   (add-to-list 'auto-mode-alist '("\\.tsx\\'" . poly-tsx-mode)))
 #+end_src
 
 * Footer

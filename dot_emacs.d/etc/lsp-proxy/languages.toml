@@ -1,3 +1,13 @@
+[language-server.gql-ls]
+command = "graphql-lsp"
+args = ["server", "--method", "stream"]
+
+[[language]]
+name = "graphql"
+file-types = ["gql", "graphql"]
+roots = ["graphql.config.ts", "graphql.config.js", ".graphqlrc", ".graphqlrc.yml", ".graphqlrc.js", ".graphqlrc.ts", ".graphqlrc.yaml", ".graphqlrc.json", ".graphqlrc.toml", "graphql.config.json", "graphql.config.toml"]
+language-servers = ["gql-ls"]
+
 [language-server.gopls]
 command = "gopls"
 
@@ -32,9 +42,22 @@ language-servers = [ "gopls" ]
 name = "elisp"
 file-types = ["el"]
 
-[language-server.vtsls.config.vtsls.tsserver]
+[language-server.vtsls-vue]
+command = "vtsls"
+args = ["--stdio"]
+
+[language-server.vtsls-vue.config.typescript]
+tsserver = { log = "off", maxTsServerMemory = 3072 }
+suggest = { completeFunctionCalls = true }
+format = { enable = false }
+
+[language-server.vtsls-vue.config.javascript]
+suggest = { completeFunctionCalls = true }
+format = { enable = false }
+
+[language-server.vtsls-vue.config.vtsls.tsserver]
 globalPlugins = [
-  { name = "@vue/typescript-plugin", location = "${YOUR-PATH}/node_modules/@vue/typescript-plugin", languages = ["vue"], enableForWorkspaceTypeScriptVersions = true, configNamespace = "typescript" }
+  { name = "@vue/typescript-plugin", location = "/usr/local/lib/node_modules/@vue/typescript-plugin", languages = ["vue"], enableForWorkspaceTypeScriptVersions = true, configNamespace = "typescript" }
 ]
 
 [language-server.vue-language-server]
@@ -50,22 +73,8 @@ language-id = "vue"
 file-types = ["vue"]
 language-servers = [
   { name = "vue-language-server", except-features = ["goto-definition", "goto-implementation", "goto-type-definition", "goto-declaration", "goto-reference"] },
-  "vtsls"
+  "vtsls-vue"
 ]
-
-# Override the build-in config. The built-in configuration uses vtsls, but it seems incompatible with vue-language-server. It could also be that my configuration is incorrect.
-# Others, such as JavaScript and TSX, can be added as needed.
-# [[language]]
-# name = "typescript"
-# language-id = "typescript"
-# file-types = ["ts", "mts", "cts"]
-# roots = ["package.json"]
-# language-servers = [
-#   { name = "typescript-language-server", except-features = [
-#     "format",
-#   ] },
-#   { name = "eslint", support-workspace = true, config-files = [".eslintrc.js", ".eslintrc.cjs", ".eslintrc.yaml", ".eslintrc.yml", ".eslintrc", ".eslintrc.json", "eslint.config.js", "eslint.config.mjs", "eslint.config.cjs", "eslint.config.ts", "eslint.config.mts", "eslint.config.cts"] },
-# ]
 
 [language-server.html-server]
 command = "vscode-html-language-server"
@@ -85,3 +94,41 @@ language-servers = [
         "format",
     ]},
 ]
+
+[language-server.oxlint-ls]
+command = "oxlint"
+args = ["--lsp"]
+
+[language-server.tsgo-ls]
+command = "/Users/naoki.sakamoto/src/github.com/microsoft/typescript-go/built/local/tsgo"
+args = ["--lsp", "--stdio"]
+
+[[language]]
+name = "tsx"
+language-id = "typescriptreact"
+file-types = ["tsx"]
+roots = ["package.json"]
+language-servers = [
+  { name = "tsgo-ls" },
+  # { name = "vtsls", except-features = [
+  #   "format",
+  # ] },
+  { name = "eslint", support-workspace = true, config-files = [
+    ".eslintrc.js", ".eslintrc.cjs", ".eslintrc.yaml", ".eslintrc.yml", ".eslintrc", ".eslintrc.json", "eslint.config.js", "eslint.config.mjs", "eslint.config.cjs", "eslint.config.ts", "eslint.config.mts", "eslint.config.cts"
+  ] },
+  { name = "tailwindcss-ls", support-workspace = true },
+  { name = "oxlint-ls", support-workspace = true, config-files = [
+    ".oxlintrc.json"
+  ] },
+  { name = "gql-ls", support-workspace = true },
+]
+
+[language-server.protobuf-lsp]
+command = "protobuf-language-server"
+args = ["-stdio"]
+
+[[language]]
+name = "proto"
+language-id = "proto"
+file-types = ["proto"]
+language-servers = ["protobuf-lsp"]

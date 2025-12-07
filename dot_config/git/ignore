@@ -311,7 +311,6 @@ develop-eggs/
 downloads/
 eggs/
 .eggs/
-parts/
 sdist/
 var/
 wheels/
