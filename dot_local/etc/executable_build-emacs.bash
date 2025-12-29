@@ -26,8 +26,10 @@ function help () {
 
 set -Ceu
 PATCH_URL=(
-    "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-31/round-undecorated-frame.patch"
-    "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-31/system-appearance.patch"
+    "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-30/round-undecorated-frame.patch"
+    "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-30/system-appearance.patch"
+    # "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-31/round-undecorated-frame.patch"
+    # "https://github.com/d12frosted/homebrew-emacs-plus/raw/master/patches/emacs-31/system-appearance.patch"
 )
 
 function e_error() {

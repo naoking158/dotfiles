@@ -131,7 +131,7 @@ a bunch of resources I've found online.
   - [[#copilot][copilot]]
   - [[#breadcrumbs][breadcrumbs]]
   - [[#claude-code-ide][claude-code-ide]]
-  - [[#mmm-mode][mmm-mode]]
+  - [[#polymode][polymode]]
 - [[#footer][Footer]]
 :END:
 
@@ -2233,23 +2233,167 @@ Only in Neotree Buffer:
              :host github
              :repo "kiennq/treesit-langs"
              :files (:defaults "*.el" "queries"))
-  :hook ((prog-mode text-mode conf-mode)
-         . (lambda ()
-             ;; some mode is better be highlighted not using tree-sitter
-             (unless (member major-mode '(sh-mode))
-               (ignore-errors (treesit-hl-toggle 'on)))))
+  ;; :hook ((prog-mode text-mode conf-mode)
+  ;;        . (lambda ()
+  ;;            ;; some mode is better be highlighted not using tree-sitter
+  ;;            (unless (member major-mode '(sh-mode))
+  ;;              (ignore-errors (treesit-hl-toggle 'on)))))
   :custom ((treesit-font-lock-level . 4)
            (treesit-langs-git-dir . nil)
            (treesit-langs-grammar-dir . "~/.emacs.d/etc/tree-sitter"))
   :config
   (add-to-list 'treesit-extra-load-path treesit-langs-grammar-dir)
+
+  ;; Native tree-sitter language injection for GraphQL in TSX/TypeScript
+  ;; Replaces polymode/mmm-mode approaches with Emacs 30 built-in functionality
+  (leaf *ts-graphql-injection
+    :doc "Enable GraphQL syntax highlighting in TSX/TypeScript gql tagged templates"
+    :after graphql-ts-mode
+    :config
+    (defun my/setup-graphql-injection ()
+      "Enable GraphQL syntax highlighting inside gql` ... ` blocks in TSX/TypeScript."
+      (when (treesit-language-available-p 'graphql)
+        ;; Determine host language from major mode
+        (let ((host-lang (pcase major-mode
+                           ('tsx-ts-mode 'tsx)
+                           ('typescript-ts-mode 'typescript)
+                           (_ 'tsx))))
+
+          ;; 1. Set primary parser (Emacs 30 recommended)
+          (setq-local treesit-primary-parser (treesit-parser-create host-lang))
+
+          ;; 2. Create GraphQL parser for this buffer
+          (treesit-parser-create 'graphql)
+
+          ;; 3. Set up range rules WITH :offset to skip backticks
+          (setq-local treesit-range-settings
+                      (treesit-range-rules
+                       :embed 'graphql
+                       :host host-lang
+                       :local t
+                       :offset '(1 . -1)
+                       '((call_expression
+                          function: (identifier) @fn
+                          arguments: (template_string) @capture
+                          (:match "^gql$\\|^graphql$" @fn)))))
+
+          ;; 4. Define GraphQL font-lock rules WITH :override t
+          (let ((graphql-rules-with-override
+                 (treesit-font-lock-rules
+                  :language 'graphql
+                  :override t
+                  :feature 'comment
+                  '((comment) @font-lock-comment-face)
+
+                  :language 'graphql
+                  :override t
+                  :feature 'keyword
+                  '(["query" "mutation" "subscription" "fragment" "on"
+                     "type" "input" "enum" "scalar" "interface" "union"
+                     "extend" "implements" "directive" "schema" "repeatable"]
+                    @font-lock-keyword-face)
+
+                  :language 'graphql
+                  :feature 'keyword
+                  '((directive "@" @font-lock-builtin-face (name) @font-lock-builtin-face))
+
+                  :language 'graphql
+                  :override t
+                  :feature 'type
+                  '([(type) (named_type)] @font-lock-type-face)
+                  
+                  :language 'graphql
+                  :feature 'variable
+                  '([((variable) @font-lock-variable-name-face)
+                     (field (name) @font-lock-variable-name-face)
+                     (field_definition (name @font-lock-variable-name-face))
+                     (input_value_definition (name) @font-lock-variable-name-face)
+                     (argument (name) @font-lock-variable-name-face)
+                     (object_field (name) @font-lock-variable-name-face)])
+
+                  :language 'graphql
+                  :override t
+                  :feature 'string
+                  '([(string_value) (description)] @font-lock-string-face)
+
+                  :language 'graphql
+                  :override t
+                  :feature 'number
+                  '([(int_value) (float_value)] @font-lock-number-face)
+
+                  :language 'graphql
+                  :override t
+                  :feature 'constant
+                  '([(boolean_value) (null_value) (directive_location)]
+                    @font-lock-constant-face)
+
+                  :language 'graphql
+                  :feature 'definition
+                  '([(operation_definition (name) @font-lock-function-name-face)
+                     (object_type_definition (name) @font-lock-function-name-face)
+                     (enum_type_definition (name) @font-lock-function-name-face)
+                     (input_object_type_definition (name) @font-lock-function-name-face)
+                     (union_type_definition (name) @font-lock-function-name-face)
+                     (interface_type_definition (name) @font-lock-function-name-face)
+                     (scalar_type_definition (name) @font-lock-function-name-face)
+                     (fragment_name (name) @font-lock-function-name-face)
+                     (directive_definition ("@" @font-lock-function-name-face
+                                            (name) @font-lock-function-name-face))])
+                  
+                  :language 'graphql
+                  :override t
+                  :feature 'bracket
+                  '((["(" ")" "{" "}" "[" "]"]) @font-lock-negation-char-face)
+
+                  :language 'graphql
+                  :override t
+                  :feature 'delimiter
+                  '((":" @font-lock-delimiter-face)))))
+
+            (setq-local treesit-font-lock-settings
+                        (append treesit-font-lock-settings
+                                graphql-rules-with-override)))
+          
+          ;; 5. Extend font-lock feature list with GraphQL features
+          (setq-local treesit-font-lock-feature-list
+                      (cl-loop for host-features in treesit-font-lock-feature-list
+                               for graphql-features in '((comment constant definition)
+                                                         (keyword string number type variable)
+                                                         (bracket delimiter)
+                                                         nil)
+                               collect (cl-union host-features graphql-features)))
+
+          ;; 6. Set language-at-point function
+          (setq-local treesit-language-at-point-function
+                      (lambda (pos)
+                        (let ((node (treesit-node-at pos host-lang)))
+                          (if (and node
+                                   (member (treesit-node-type node)
+                                           '("string_fragment" "template_content"))
+                                   (let ((call-expr (treesit-parent-until
+                                                     node
+                                                     (lambda (n) (equal (treesit-node-type n) "call_expression")))))
+                                     (when call-expr
+                                       (let ((func-node (treesit-node-child-by-field-name call-expr "function")))
+                                         (and func-node
+                                              (member (treesit-node-text func-node t)
+                                                      '("gql" "graphql")))))))
+                              'graphql
+                            host-lang))))
+
+          ;; 7. Recompute features and refresh
+          (treesit-font-lock-recompute-features)
+          (treesit-major-mode-setup))))
+
+    (add-hook 'tsx-ts-mode-hook #'my/setup-graphql-injection)
+    (add-hook 'typescript-ts-mode-hook #'my/setup-graphql-injection))
   )
 
 (leaf graphql-ts-mode
   :straight t
+  :require t
   :mode ("\\.graphql\\'" "\\.gql\\'")
   )
-
 #+end_src
 
 *** Showing Pair of Brackets with Paren
@@ -2285,7 +2429,7 @@ Only in Neotree Buffer:
   :hook (prog-mode-hook . puni-mode)
   :bind (puni-mode-map
          ("C-)" . puni-slurp-forward)
-         ("C-}" . puni-barf-forward)
+         ("C-(" . puni-barf-forward)
          ("M-(" . puni-wrap-round)
          ("M-s" . puni-splice)
          ("M-r" . puni-raise)
@@ -5339,12 +5483,11 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
          typescript-ts-mode-hook
          js-mode-hook
          emacs-lisp-mode-hook
+         graphql-mode-hook
          graphql-ts-mode-hook
          protobuf-ts-mode-hook
          )
   :custom `(lsp-proxy-user-languages-config . ,(expand-file-name "~/.emacs.d/etc/lsp-proxy/languages.toml"))
-  
-            
   :bind ((:lsp-proxy-mode-map
           :package lsp-proxy
           ("M-." . lsp-proxy-find-definition)
@@ -5425,22 +5568,47 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 #+begin_src emacs-lisp
 (leaf polymode
   :disabled t
-   :straight t
-   :after tsx-ts-mode graphql-ts-mode
-   :config
-   (define-hostmode poly-tsx-hostmode nil
-     "TSX hostmode."
-     :mode 'tsx-ts-mode)
-   (define-innermode poly-tsx-graphql-innermode nil
-     :mode 'graphql-ts-mode
-     :head-matcher "\\(graphql\\|gql\\)`"
-     :tail-matcher "`"
-     :head-mode 'host
-     :tail-mode 'host)
-   (define-polymode poly-tsx-mode
-     :hostmode 'poly-tsx-hostmode
-     :innermodes '(poly-tsx-graphql-innermode))
-   (add-to-list 'auto-mode-alist '("\\.tsx\\'" . poly-tsx-mode)))
+  :straight t
+  :config
+  (define-hostmode poly-tsx-hostmode nil
+    "TSX hostmode."
+    :mode 'tsx-ts-mode)
+  (define-innermode poly-tsx-graphql-innermode nil
+    :mode 'graphql-ts-mode
+    :head-matcher "\\(graphql\\|gql\\)(?`"
+    :tail-matcher "`"
+    :head-mode 'host
+    :tail-mode 'host)
+  (define-polymode poly-tsx-mode
+    :hostmode 'poly-tsx-hostmode
+    :innermodes '(poly-tsx-graphql-innermode))
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . poly-tsx-mode)))
+
+(leaf mmm-mode
+  :disabled t
+  :straight t
+  :global-minor-mode t
+  :custom (mmm-submode-decoration-level . 0) ;; Turn off background highlight
+  :config
+  ;; Add submodule for graphql blocks
+  (mmm-add-classes
+   '((mmm-graphql-mode
+      :submode graphql-mode
+      :face mmm-declaration-submode-face
+      :front "gr?a?p?h?ql(?`"
+      :back "`")))
+
+  (mmm-add-mode-ext-class 'tsx-ts-mode nil 'mmm-graphql-mode)
+
+  (defun mmm-reapply ()
+    (mmm-mode)
+    (mmm-mode))
+
+  (add-hook 'after-save-hook
+            (lambda ()
+              (when (string-match-p "\\.tsx?" buffer-file-name)
+                (mmm-reapply))))
+  )
 #+end_src
 
 * Footer

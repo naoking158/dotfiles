@@ -12,35 +12,13 @@ language-servers = ["gql-ls"]
 command = "gopls"
 
 [language-server.gopls.config]
-usePlaceholders = true
-completeUnimported = true
-staticcheck = false
 buildFlags = ["-tags=integration"]
-
-[language-server.gopls.config.hints]
-assignVariableTypes = true
-compositeLiteralFields = true
-constantValues = true
-functionTypeParameters = true
-parameterNames = true
-rangeVariableTypes = true
-
-[language-server.golangci-lint-lsp]
-command = "golangci-lint-langserver"
-
-[language-server.golangci-lint-lsp.config]
-command = ["golangci-lint", "run", "--output.json.path=stdout", "--show-stats=false", "--issues-exit-code=1"]
 
 [[language]]
 name = "go"
 file-types = ["go"]
 roots = ["go.mod"]
 language-servers = [ "gopls" ]
-# language-servers = [ "gopls", "golangci-lint-lsp" ]
-
-[[language]]
-name = "elisp"
-file-types = ["el"]
 
 [language-server.vtsls-vue]
 command = "vtsls"
@@ -109,14 +87,13 @@ language-id = "typescriptreact"
 file-types = ["tsx"]
 roots = ["package.json"]
 language-servers = [
-  { name = "tsgo-ls" },
-  # { name = "vtsls", except-features = [
-  #   "format",
-  # ] },
+  { name = "tsgo-ls", support-workspace = ["package.json"] },
   { name = "eslint", support-workspace = true, config-files = [
     ".eslintrc.js", ".eslintrc.cjs", ".eslintrc.yaml", ".eslintrc.yml", ".eslintrc", ".eslintrc.json", "eslint.config.js", "eslint.config.mjs", "eslint.config.cjs", "eslint.config.ts", "eslint.config.mts", "eslint.config.cts"
   ] },
-  { name = "tailwindcss-ls", support-workspace = true },
+  { name = "tailwindcss-ls", support-workspace = true, config-files = [
+    "tailwind.config.js",
+  ] },
   { name = "oxlint-ls", support-workspace = true, config-files = [
     ".oxlintrc.json"
   ] },
