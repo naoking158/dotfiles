@@ -109,3 +109,76 @@ name = "proto"
 language-id = "proto"
 file-types = ["proto"]
 language-servers = ["protobuf-lsp"]
+
+[language-server.ruby-ls]
+command = "ruby-lsp"
+
+[language-server.ruby-ls.config]
+formatter = "auto"
+linters = []
+experimentalFeaturesEnabled = false
+
+[language-server.ruby-ls.config.enabledFeatures]
+codeActions = true
+codeLens = true
+completion = true
+definition = true
+diagnostics = true
+documentHighlights = true
+documentLink = true
+documentSymbols = true
+foldingRanges = true
+formatting = true
+hover = true
+inlayHint = true
+onTypeFormatting = true
+selectionRanges = true
+semanticHighlighting = true
+signatureHelp = true
+typeHierarchy = true
+workspaceSymbol = true
+
+[language-server.ruby-ls.config.featuresConfiguration.inlayHint]
+implicitHashValue = true
+implicitRescue = true
+
+[[language]]
+name = "ruby"
+language-servers = ["ruby-ls"]
+file-types = [
+  "rb",
+  "rake",
+  "irb",
+  "gemspec",
+  "rabl",
+  "jbuilder",
+  "jb",
+  "podspec",
+  "rjs",
+  "rbi",
+  "rbs",
+  { glob = "rakefile" },
+  { glob = "gemfile" },
+  { glob = "Rakefile" },
+  { glob = "Gemfile" },
+  { glob = "Podfile" },
+  { glob = "Vagrantfile" },
+  { glob = "Brewfile" },
+  { glob = "Guardfile" },
+  { glob = "Capfile" },
+  { glob = "Cheffile" },
+  { glob = "Hobofile" },
+  { glob = "Appraisals" },
+  { glob = "Rantfile" },
+  { glob = "Berksfile" },
+  { glob = "Berksfile.lock" },
+  { glob = "Thorfile" },
+  { glob = "Puppetfile" },
+  { glob = "Fastfile" },
+  { glob = "Appfile" },
+  { glob = "Deliverfile" },
+  { glob = "Matchfile" },
+  { glob = "Scanfile" },
+  { glob = "Snapfile" },
+  { glob = "Gymfile" },
+]
