@@ -20,46 +20,29 @@ zstyle ':completion:*' recent-dirs-insert both
 zstyle ':chpwd:*' recent-dirs-default true
 zstyle ':chpwd:*' recent-dirs-max 1000
 
-# move repositories with peco
-function peco-src () {
-  local selected_dir=$(ghq list -p | peco --query "$LBUFFER")
+# move repositories with fzf
+function fzf-src () {
+  local selected_dir=$(ghq list -p | fzf --query "$LBUFFER")
   if [ -n "$selected_dir" ]; then
     BUFFER="cd ${selected_dir}"
     zle accept-line
   fi
   zle clear-screen
 }
-zle -N peco-src
-bindkey '^o' peco-src
+zle -N fzf-src
+bindkey '^o' fzf-src
 
-# search history with peco
-function peco-history-selection() {
-    BUFFER=`history -n 1 | tac | awk '!a[$0]++' | peco`
+# search history with fzf
+function fzf-history-selection() {
+    BUFFER=`history -n -r 1 | fzf --query "$LBUFFER" --reverse`
     CURSOR=$#BUFFER
     zle reset-prompt
 }
 
-zle -N peco-history-selection
-bindkey '^R' peco-history-selection
-
-# cdr with peco
-function peco-cdr () {
-    local selected_dir="$(cdr -l | perl -pe 's/^[0-9]+ +//' | peco --prompt="cdr >" --query "$LBUFFER")"
-    if [ -n "$selected_dir" ]; then
-	    BUFFER="cd ${selected_dir}"
-        CURSOR=$#BUFFER
-        zle reset-prompt
-    fi
-}
-zle -N peco-cdr
-bindkey '^[^R' peco-cdr
+zle -N fzf-history-selection
+bindkey '^R' fzf-history-selection
 
 source $HOME/.dotfiles/bin/my-server-util.bash
-
-# rye
-if [[ -e "$HOME/.rye/env" ]]; then
-    source "$HOME/.rye/env"
-fi
 
 # mise
 if type mise >/dev/null 2>&1; then
