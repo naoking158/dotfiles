@@ -9,9 +9,10 @@
 
 set -euo pipefail
 
-# Bootstrap Step 3 may not have home-manager in PATH yet.
-# Prepend ~/.nix-profile/bin to ensure Nix-managed home-manager is found.
-export PATH="$HOME/.nix-profile/bin:$PATH"
+# Ensure nix and home-manager are in PATH.
+# /nix/var/nix/profiles/default/bin -- nix itself (Determinate Nix installer)
+# ~/.nix-profile/bin               -- home-manager and Nix-managed tools
+export PATH="/nix/var/nix/profiles/default/bin:$HOME/.nix-profile/bin:$PATH"
 
 echo "Nix configuration changed. Running home-manager switch..."
 
@@ -23,7 +24,7 @@ if command -v home-manager &>/dev/null; then
     home-manager switch --flake ~/.config/home-manager#{{ .chezmoi.username }}@macos
 else
     echo "home-manager not found in PATH. Running via nix run (first-time bootstrap)..."
-    nix run home-manager/release-25.11 -- switch --flake ~/.config/home-manager#{{ .chezmoi.username }}@macos
+    nix run home-manager -- switch --flake ~/.config/home-manager#{{ .chezmoi.username }}@macos
 fi
 {{ else -}}
 # First-time bootstrap fallback:
@@ -33,7 +34,7 @@ if command -v home-manager &>/dev/null; then
     home-manager switch --flake ~/.config/home-manager#{{ .chezmoi.username }}@popos
 else
     echo "home-manager not found in PATH. Running via nix run (first-time bootstrap)..."
-    nix run home-manager/release-25.11 -- switch --flake ~/.config/home-manager#{{ .chezmoi.username }}@popos
+    nix run home-manager -- switch --flake ~/.config/home-manager#{{ .chezmoi.username }}@popos
 fi
 {{ end -}}
 

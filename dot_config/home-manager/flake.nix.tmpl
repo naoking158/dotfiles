@@ -2,21 +2,31 @@
   description = "Home Manager configuration";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-claude-code.url = "github:ryoppippi/nix-claude-code";
   };
 
-  outputs = { nixpkgs, home-manager, ... }: {
+  outputs = { nixpkgs, home-manager, nix-claude-code, ... }:
+    let
+      direnvOverlay = final: prev: {
+        direnv = prev.direnv.overrideAttrs (old: { doCheck = false; });
+      };
+      overlays = [ direnvOverlay nix-claude-code.overlays.default ];
+      config.allowUnfreePredicate = pkg:
+        builtins.elem (nixpkgs.lib.getName pkg) [ "claude-code" ];
+      mkPkgs = system: import nixpkgs { inherit system overlays config; };
+    in {
     homeConfigurations = {
       "{{ .chezmoi.username }}@popos" = home-manager.lib.homeManagerConfiguration {
-        pkgs = import nixpkgs { system = "x86_64-linux"; };
+        pkgs = mkPkgs "x86_64-linux";
         modules = [ ./home.nix ./linux.nix ];
       };
       "{{ .chezmoi.username }}@macos" = home-manager.lib.homeManagerConfiguration {
-        pkgs = import nixpkgs { system = "aarch64-darwin"; };
+        pkgs = mkPkgs "aarch64-darwin";
         modules = [ ./home.nix ./darwin.nix ];
       };
     };

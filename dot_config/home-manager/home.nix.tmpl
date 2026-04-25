@@ -20,17 +20,14 @@
     sheldon
     tmux
     direnv
+    nix-direnv
+    claude-code
   ];
 
   programs.home-manager.enable = true;
 
-  # $ZDOTDIR conflict avoidance:
-  # programs.direnv.enable = true normally appends hook to ~/.zshrc, but
-  # in this environment $ZDOTDIR = ~/.config/zsh so ~/.zshrc is not loaded.
-  # Set enableZshIntegration = false and manage hook manually in lazy.zsh.
-  programs.direnv = {
-    enable = true;
-    enableZshIntegration = false;
-    nix-direnv.enable = true;
-  };
+  # nix-direnv integration: provide "use flake" in .envrc
+  home.file.".config/direnv/direnvrc".text = ''
+    source ${pkgs.nix-direnv}/share/nix-direnv/direnvrc
+  '';
 }
