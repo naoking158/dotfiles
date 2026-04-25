@@ -114,8 +114,8 @@ language-servers = ["protobuf-lsp"]
 command = "ruby-lsp"
 
 [language-server.ruby-ls.config]
-formatter = "auto"
-linters = []
+formatter = "standard"
+linters = ["standard"]
 experimentalFeaturesEnabled = false
 
 [language-server.ruby-ls.config.enabledFeatures]
@@ -182,3 +182,8 @@ file-types = [
   { glob = "Snapfile" },
   { glob = "Gymfile" },
 ]
+
+# [language-server.solargraph]
+# command = "solargraph"
+# args = ["stdio"]
+# config = { diagnostics = true }

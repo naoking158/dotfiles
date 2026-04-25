@@ -132,6 +132,7 @@ a bunch of resources I've found online.
   - [[#breadcrumbs][breadcrumbs]]
   - [[#claude-code-ide][claude-code-ide]]
   - [[#polymode][polymode]]
+  - [[#mise][mise]]
 - [[#footer][Footer]]
 :END:
 
@@ -5612,6 +5613,17 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
               (when (string-match-p "\\.tsx?" buffer-file-name)
                 (mmm-reapply))))
   )
+#+end_src
+
+** mise
+:PROPERTIES:
+:ID:       4BB9CD89-ED00-4545-A8F9-75B1B507E2D7
+:END:
+
+#+begin_src emacs-lisp
+(leaf mise
+  :straight t
+  :hook (after-init-hook . global-mise-mode))
 #+end_src
 
 * Footer
