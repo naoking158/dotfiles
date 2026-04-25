@@ -1,0 +1,40 @@
+#!/bin/bash
+# flake.nix hash:  {{ include "dot_config/home-manager/flake.nix.tmpl" | sha256sum }}
+# home.nix hash:   {{ include "dot_config/home-manager/home.nix.tmpl" | sha256sum }}
+{{ if eq .chezmoi.os "darwin" -}}
+# darwin.nix hash: {{ include "dot_config/home-manager/darwin.nix.tmpl" | sha256sum }}
+{{ else -}}
+# linux.nix hash:  {{ include "dot_config/home-manager/linux.nix.tmpl" | sha256sum }}
+{{ end -}}
+
+set -euo pipefail
+
+# Bootstrap Step 3 may not have home-manager in PATH yet.
+# Prepend ~/.nix-profile/bin to ensure Nix-managed home-manager is found.
+export PATH="$HOME/.nix-profile/bin:$PATH"
+
+echo "Nix configuration changed. Running home-manager switch..."
+
+{{ if eq .chezmoi.os "darwin" -}}
+# First-time bootstrap fallback:
+# ~/.nix-profile/bin/home-manager is created by home-manager switch itself,
+# so it won't exist on first run. Use nix run as fallback.
+if command -v home-manager &>/dev/null; then
+    home-manager switch --flake ~/.config/home-manager#{{ .chezmoi.username }}@macos
+else
+    echo "home-manager not found in PATH. Running via nix run (first-time bootstrap)..."
+    nix run home-manager/release-25.11 -- switch --flake ~/.config/home-manager#{{ .chezmoi.username }}@macos
+fi
+{{ else -}}
+# First-time bootstrap fallback:
+# ~/.nix-profile/bin/home-manager is created by home-manager switch itself,
+# so it won't exist on first run. Use nix run as fallback.
+if command -v home-manager &>/dev/null; then
+    home-manager switch --flake ~/.config/home-manager#{{ .chezmoi.username }}@popos
+else
+    echo "home-manager not found in PATH. Running via nix run (first-time bootstrap)..."
+    nix run home-manager/release-25.11 -- switch --flake ~/.config/home-manager#{{ .chezmoi.username }}@popos
+fi
+{{ end -}}
+
+echo "home-manager switch completed successfully."

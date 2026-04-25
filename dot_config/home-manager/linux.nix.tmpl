@@ -1,0 +1,11 @@
+{ pkgs, ... }:
+
+{
+  home.homeDirectory = "{{ .chezmoi.homeDir }}";
+
+  targets.genericLinux.enable = true;
+
+  home.packages = with pkgs; [
+    # Linux-specific packages (if any)
+  ];
+}

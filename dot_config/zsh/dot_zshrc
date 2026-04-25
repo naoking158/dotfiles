@@ -1,6 +1,3 @@
-# Set global environment variables
-[[ -f "${HOME}/.profile" ]] && source "${HOME}/.profile"
-
 # source command override technique
 function source {
   ensure_zcompiled $1

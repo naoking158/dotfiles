@@ -1,12 +1,115 @@
 * Dotfiles
 
-** 🛠️ Installation
+Nix (Home Manager + Flakes) + chezmoi + mise によるクロスプラットフォーム開発環境。
+
+** Architecture
+
+#+begin_example
+chezmoi          -- dotfiles 管理 + Nix 設定の展開・自動適用トリガー
+Nix Home Manager -- CLI ツールの宣言的管理 (git, ripgrep, fzf, etc.)
+mise             -- 言語ランタイム管理 (Node.js, Go, Ruby)
+Homebrew         -- macOS GUI アプリ (cask) のみ
+#+end_example
+
+#+begin_example
+~/.config/
+  home-manager/    ... Nix 設定 (flake.nix, home.nix, linux.nix, darwin.nix)
+  mise/config.toml ... 言語ランタイム設定
+  zsh/
+    .zshenv        ... 環境変数 (XDG, EDITOR, LANG)
+    .zshrc         ... 対話シェル設定 (sheldon, nonlazy, lazy)
+#+end_example
+
+** Bootstrap (新規マシン)
+
+4 ステップで完了する。
+
+*** Step 1: Determinate Nix のインストール
 
 #+begin_src shell
-$ chezmoi init --apply git@github.com:naoking158/dotfiles.git
+curl -fsSL https://install.determinate.systems/nix | sh -s -- install
 #+end_src
 
-See [[https://www.chezmoi.io/quick-start/#set-up-a-new-machine-with-a-single-command][Set up a new machine with a single command]] for more detail.
+インストール後、新しいシェルを開くか =. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh= で PATH を通す。
+
+*** Step 2: chezmoi でリポジトリを取得
+
+#+begin_src shell
+nix shell nixpkgs#chezmoi -c chezmoi init git@github.com:naoking158/dotfiles.git
+#+end_src
+
+*** Step 3: chezmoi apply (dotfiles + Nix パッケージの一括適用)
+
+#+begin_src shell
+nix shell nixpkgs#chezmoi -c chezmoi apply
+#+end_src
+
+これにより以下が実行される:
+- dotfiles の展開 (.zshenv, .zshrc, lazy.zsh, git, tmux, etc.)
+- Nix 設定ファイルの展開 (~/.config/home-manager/)
+- mise 設定の展開 (~/.config/mise/config.toml)
+- =run_onchange_nix-apply.sh= が自動実行され =home-manager switch= で CLI ツールがインストールされる
+
+初回は Nix パッケージのダウンロードに数分かかる。
+
+*** Step 4: 言語ランタイムのインストール
+
+#+begin_src shell
+mise install
+#+end_src
+
+Node.js, Go 等がインストールされる。
+
+** 通常運用
+
+*** 設定の変更を適用
+
+#+begin_src shell
+chezmoi apply
+#+end_src
+
+Nix 設定ファイル (flake.nix, home.nix, linux.nix, darwin.nix) に変更があれば =home-manager switch= が自動実行される。変更がなければスキップされる。
+
+*** パッケージの追加
+
+=~/.local/share/chezmoi/dot_config/home-manager/home.nix.tmpl= の =home.packages= にパッケージを追加し、 =chezmoi apply= を実行する。
+
+*** nixpkgs の更新
+
+#+begin_src shell
+cd ~/.config/home-manager && nix flake update
+#+end_src
+
+その後 =chezmoi apply= でハッシュ変化を検知し =home-manager switch= が再実行される。
+
+** Rollback
+
+*** Home Manager の世代を切り戻し
+
+#+begin_src shell
+home-manager generations
+# 出力される世代パスから activate を実行
+/nix/store/xxx-home-manager-generation/activate
+#+end_src
+
+*** chezmoi の変更を元に戻す
+
+#+begin_src shell
+cd ~/.local/share/chezmoi
+git checkout main
+chezmoi apply
+#+end_src
+
+** OS 固有の設定
+
+| 設定 | macOS | Pop OS (Linux) |
+|------+-----------+----------------|
+| flake entry | =<user>@macos= | =<user>@popos= |
+| homeDirectory | =/Users/<user>= | =/home/<user>= |
+| Homebrew | cask (GUI) のみ | 使用しない |
+| genericLinux | - | =true= |
+
+OS 固有のパッケージは =darwin.nix.tmpl= / =linux.nix.tmpl= に追加する。
 
 ** License
 

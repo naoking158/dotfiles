@@ -1,0 +1,36 @@
+{ pkgs, ... }:
+
+{
+  home.username = "{{ .chezmoi.username }}";
+  home.stateVersion = "25.11";
+
+  home.packages = with pkgs; [
+    # Core tools
+    chezmoi
+    mise
+    git
+    curl
+    jq
+    ripgrep
+    fd
+    fzf
+    bat
+    eza
+    ghq
+    sheldon
+    tmux
+    direnv
+  ];
+
+  programs.home-manager.enable = true;
+
+  # $ZDOTDIR conflict avoidance:
+  # programs.direnv.enable = true normally appends hook to ~/.zshrc, but
+  # in this environment $ZDOTDIR = ~/.config/zsh so ~/.zshrc is not loaded.
+  # Set enableZshIntegration = false and manage hook manually in lazy.zsh.
+  programs.direnv = {
+    enable = true;
+    enableZshIntegration = false;
+    nix-direnv.enable = true;
+  };
+}

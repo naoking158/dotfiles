@@ -1,3 +1,8 @@
+# macOS: Homebrew (GUI apps only, CLI tools are managed by Nix)
+if [[ -e /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
 # github
 export G_USER=$(git config user.name)
 export G_ROOT=$(git config ghq.root)
@@ -42,7 +47,7 @@ function fzf-history-selection() {
 zle -N fzf-history-selection
 bindkey '^R' fzf-history-selection
 
-source $HOME/.dotfiles/bin/my-server-util.bash
+[[ -f "${HOME}/.dotfiles/bin/my-server-util.bash" ]] && source "${HOME}/.dotfiles/bin/my-server-util.bash"
 
 # mise
 if type mise >/dev/null 2>&1; then

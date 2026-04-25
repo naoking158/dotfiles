@@ -1,0 +1,15 @@
+# XDG Base Directory
+export XDG_CONFIG_HOME="${HOME}/.config"
+export XDG_CACHE_HOME="${HOME}/.cache"
+export XDG_DATA_HOME="${HOME}/.local/share"
+export XDG_STATE_HOME="${HOME}/.local/state"
+
+# Locale
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+# Editor
+export EDITOR=emacs
+
+# PATH -- base paths only (tool-specific PATH is delegated to each tool's init)
+export PATH="/usr/local/bin:${HOME}/.local/bin:${PATH}"
