@@ -6,6 +6,9 @@
   targets.genericLinux.enable = true;
 
   home.packages = with pkgs; [
-    # Linux-specific packages (if any)
+    # Linux-specific packages
+    emacs-pgtk             # stable (currently 30.x) + native-comp + Wayland
+    # emacs-unstable-pgtk  # latest tag (e.g. 31 pretest) + pgtk
+    # emacs-git-pgtk       # master HEAD + pgtk
   ];
 }

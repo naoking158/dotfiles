@@ -8,14 +8,22 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-claude-code.url = "github:ryoppippi/nix-claude-code";
+    emacs-overlay = {
+      url = "github:nix-community/emacs-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { nixpkgs, home-manager, nix-claude-code, ... }:
+  outputs = { nixpkgs, home-manager, nix-claude-code, emacs-overlay, ... }:
     let
       direnvOverlay = final: prev: {
         direnv = prev.direnv.overrideAttrs (old: { doCheck = false; });
       };
-      overlays = [ direnvOverlay nix-claude-code.overlays.default ];
+      overlays = [
+        direnvOverlay
+        nix-claude-code.overlays.default
+        emacs-overlay.overlays.default
+      ];
       config.allowUnfreePredicate = pkg:
         builtins.elem (nixpkgs.lib.getName pkg) [ "claude-code" ];
       mkPkgs = system: import nixpkgs { inherit system overlays config; };

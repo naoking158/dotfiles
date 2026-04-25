@@ -48,9 +48,20 @@ nix shell nixpkgs#chezmoi -c chezmoi apply
 - dotfiles の展開 (.zshenv, .zshrc, lazy.zsh, git, tmux, etc.)
 - Nix 設定ファイルの展開 (~/.config/home-manager/)
 - mise 設定の展開 (~/.config/mise/config.toml)
-- =run_onchange_nix-apply.sh= が自動実行され =home-manager switch= で CLI ツールがインストールされる
+- =run_once_after_cachix-use.sh= が自動実行され、 =nix-community= cachix を =/etc/nix/nix.custom.conf= に登録する (対話実行時のみ。 sudo パスワードが要求される)
+- =run_onchange_nix-apply.sh= が自動実行され =home-manager switch= で CLI ツールがインストールされる (emacs-overlay 経由の Emacs はバイナリキャッシュから取得される)
 
 初回は Nix パッケージのダウンロードに数分かかる。
+
+*Note*: cachix のセットアップで sudo を求められるのは初回のみ。以後は =/etc/nix/nix.custom.conf= の存在を見て skip される。
+
+非対話で =chezmoi apply= を実行した場合 (sudo 認証キャッシュなし & tty 無しの場合) は cachix セットアップが skip され警告が出る。その場合は以下を 1 度だけ手動実行:
+
+#+begin_src shell
+sudo /nix/var/nix/profiles/default/bin/nix run nixpkgs#cachix -- use nix-community
+#+end_src
+
+実行後、再度 =chezmoi apply= しても cachix スクリプトは skip されるが、必要なら =chezmoi state delete-bucket --bucket=scriptState= でリセットして再試行できる。cachix を有効化しないと emacs-overlay 経由の Emacs はソースビルド (時間がかかるが正しく動作はする)。
 
 *** Step 4: 言語ランタイムのインストール
 
