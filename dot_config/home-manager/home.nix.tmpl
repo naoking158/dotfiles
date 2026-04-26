@@ -24,7 +24,13 @@
     nix-direnv
     claude-code
     cachix
+
+    # Fonts
+    (iosevka-bin.override { variant = "Aile"; })
+    udev-gothic-nf
   ];
+
+  fonts.fontconfig.enable = true;
 
   programs.home-manager.enable = true;
 
