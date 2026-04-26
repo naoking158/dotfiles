@@ -175,6 +175,9 @@ a bunch of resources I've found online.
       package-enable-at-startup nil
       package-native-compile t)
 
+(when (featurep 'pgtk)
+  (setq pgtk-use-im-context-on-new-connection nil))
+
 ;; GUI
 (setq default-frame-alist '((vertical-scroll-bars)
                             (menu-bar-lines . 0)
@@ -399,7 +402,6 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
 :END:
 
 #+begin_src emacs-lisp
-
 (leaf *general-configrations
   :config
   (leaf cus-start
@@ -483,7 +485,6 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
     :doc "Show function arglist or variable docstring in echo area"
     :straight (eldoc :type built-in)
     :custom (eldoc-idle-delay . 0.1)))
-
 #+end_src
 
 ** Change modifiers
@@ -2214,7 +2215,13 @@ Only in Neotree Buffer:
              (sh-mode . bash-ts-mode)
              (ruby-mode . ruby-ts-mode)))
     (add-to-list 'major-mode-remap-alist mapping))
+  :custom ((treesit-font-lock-level . 4))
   :config
+  ;; Grammars are provided by Nix via `programs.emacs.extraPackages`
+  ;; (`treesit-grammars.with-grammars`). The emacsWithPackages wrapper writes
+  ;; an `(add-to-list 'treesit-extra-load-path ...)` into site-start.el, so no
+  ;; manual setup is required here.
+
   (leaf combobulate
     :disabled t
     :straight (combobulate
@@ -2226,25 +2233,6 @@ Only in Neotree Buffer:
     :preface (setq combobulate-key-prefix "C-c o")
     :hook tsx-ts-mode-hook
     )
-  )
-
-(leaf treesit-langs
-  :require t
-  :straight (treesit-langs
-             :type git
-             :host github
-             :repo "kiennq/treesit-langs"
-             :files (:defaults "*.el" "queries"))
-  ;; :hook ((prog-mode text-mode conf-mode)
-  ;;        . (lambda ()
-  ;;            ;; some mode is better be highlighted not using tree-sitter
-  ;;            (unless (member major-mode '(sh-mode))
-  ;;              (ignore-errors (treesit-hl-toggle 'on)))))
-  :custom ((treesit-font-lock-level . 4)
-           (treesit-langs-git-dir . nil)
-           (treesit-langs-grammar-dir . "~/.emacs.d/etc/tree-sitter"))
-  :config
-  (add-to-list 'treesit-extra-load-path treesit-langs-grammar-dir)
 
   ;; Native tree-sitter language injection for GraphQL in TSX/TypeScript
   ;; Replaces polymode/mmm-mode approaches with Emacs 30 built-in functionality
@@ -5085,6 +5073,9 @@ To enable support for Jupyter based source code blocks, add jupyter to org-babel
 
 
 *** Preparation
+:PROPERTIES:
+:ID:       0b23dd80-d41d-43d6-a631-271cffd4eda6
+:END:
 
 1. Install =jupyterlab= and =ipykernel= to both of base and Virtual env
 

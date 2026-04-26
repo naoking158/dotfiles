@@ -3,11 +3,36 @@
 {
   home.homeDirectory = "{{ .chezmoi.homeDir }}";
 
-  home.packages = with pkgs; [
-    # macOS-specific packages
-    emacs                  # stable (NS/AppKit) + native-comp
-    # emacs-unstable       # latest tag (overlay)
-    # emacs-git            # master HEAD (overlay)
-    # emacs-macport        # Mitsuharu port (nixpkgs)
-  ];
+  programs.emacs = {
+    enable = true;
+    package = pkgs.emacs;            # stable (NS/AppKit) + native-comp
+    # package = pkgs.emacs-unstable; # latest tag (overlay)
+    # package = pkgs.emacs-git;      # master HEAD (overlay)
+    # package = pkgs.emacs-macport;  # Mitsuharu port (nixpkgs)
+    extraPackages = epkgs: [
+      (epkgs.treesit-grammars.with-grammars (p: with p; [
+        tree-sitter-bash
+        tree-sitter-c
+        tree-sitter-cpp
+        tree-sitter-css
+        tree-sitter-dockerfile
+        tree-sitter-go
+        tree-sitter-graphql
+        tree-sitter-html
+        tree-sitter-javascript
+        tree-sitter-json
+        tree-sitter-lua
+        tree-sitter-markdown
+        tree-sitter-markdown-inline
+        tree-sitter-nix
+        tree-sitter-python
+        tree-sitter-ruby
+        tree-sitter-rust
+        tree-sitter-toml
+        tree-sitter-tsx
+        tree-sitter-typescript
+        tree-sitter-yaml
+      ]))
+    ];
+  };
 }

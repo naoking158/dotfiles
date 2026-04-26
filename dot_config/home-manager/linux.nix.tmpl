@@ -10,11 +10,40 @@
   targets.genericLinux.enable = true;
 
   home.packages = [
-    pkgs.emacs-pgtk             # stable (currently 30.x) + native-comp + Wayland
-    # pkgs.emacs-unstable-pgtk  # latest tag (e.g. 31 pretest) + pgtk
-    # pkgs.emacs-git-pgtk       # master HEAD + pgtk
     inputs.lsp-proxy.packages.${pkgs.system}.default
   ];
+
+  programs.emacs = {
+    enable = true;
+    package = pkgs.emacs-pgtk;            # stable (30.x) + native-comp + Wayland
+    # package = pkgs.emacs-unstable-pgtk; # latest tag (e.g. 31 pretest) + pgtk
+    # package = pkgs.emacs-git-pgtk;      # master HEAD + pgtk
+    extraPackages = epkgs: [
+      (epkgs.treesit-grammars.with-grammars (p: with p; [
+        tree-sitter-bash
+        tree-sitter-c
+        tree-sitter-cpp
+        tree-sitter-css
+        tree-sitter-dockerfile
+        tree-sitter-go
+        tree-sitter-graphql
+        tree-sitter-html
+        tree-sitter-javascript
+        tree-sitter-json
+        tree-sitter-lua
+        tree-sitter-markdown
+        tree-sitter-markdown-inline
+        tree-sitter-nix
+        tree-sitter-python
+        tree-sitter-ruby
+        tree-sitter-rust
+        tree-sitter-toml
+        tree-sitter-tsx
+        tree-sitter-typescript
+        tree-sitter-yaml
+      ]))
+    ];
+  };
 
   # The xremap-flake home-manager module is always user-mode (no serviceMode
   # option) and requires the YAML inline via `yamlConfig`; it cannot read an
