@@ -122,6 +122,47 @@ chezmoi apply
 
 OS 固有のパッケージは =darwin.nix.tmpl= / =linux.nix.tmpl= に追加する。
 
+** Linux (Wayland / Cosmic DE) 固有のセットアップ
+
+xremap (キーリマッパー) と =emacs-lsp-proxy= は home-manager 経由で宣言的に管理される。Pop!_OS 上の Cosmic DE (=cosmic-comp=) を前提とし、xremap-flake は =services.xremap.withCosmic = true= で =xremap-cosmic= バリアントを選択する。
+
+*** systemd user 環境変数の確認
+
+Cosmic DE の =cosmic-session= は systemd user セッションへ =WAYLAND_DISPLAY= / =XDG_CURRENT_DESKTOP= を引き渡し =graphical-session.target= を立ち上げる。xremap.service は =WantedBy=graphical-session.target= で待機しているため、ログイン直後に自動起動する想定。
+
+確認コマンド:
+
+#+begin_src shell
+systemctl --user show-environment | grep -E '(WAYLAND_DISPLAY|XDG_CURRENT_DESKTOP)'
+systemctl --user status graphical-session.target
+#+end_src
+
+もし環境変数が立っていない (xremap が起動できない) 場合は、Cosmic 側の autostart で以下を 1 度実行する保険を入れる:
+
+#+begin_src shell
+systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP DISPLAY
+systemctl --user start xremap
+#+end_src
+
+*** 動作確認コマンド
+
+#+begin_src shell
+# xremap.service の状態
+systemctl --user status xremap
+journalctl --user -u xremap
+
+# emacs-lsp-proxy バイナリが PATH に出ているか
+which emacs-lsp-proxy
+
+# uinput / input グループの確認 (run_once_after_uinput-setup.sh が完了済みか)
+getent group input | grep -qw "$USER" && echo "ok: $USER in input group"
+test -f /etc/udev/rules.d/99-input.rules && echo "ok: udev rule exists"
+test -f /etc/modules-load.d/uinput.conf && echo "ok: modules-load.d entry exists"
+lsmod | grep -qw uinput && echo "ok: uinput module loaded"
+#+end_src
+
+=run_once_after_uinput-setup.sh= は input グループ追加・udev ルール作成・=modprobe uinput= を冪等に行う。完了後はセッションへの input グループ反映のため一度ログアウト→再ログインすること。NixOS 上ではテンプレートガードにより no-op となる。
+
 ** License
 
 [[LICENSE][MIT]]

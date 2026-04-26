@@ -1,14 +1,31 @@
-{ pkgs, ... }:
+{ pkgs, inputs, config, ... }:
 
 {
+  imports = [
+    inputs.xremap-flake.homeManagerModules.default
+  ];
+
   home.homeDirectory = "{{ .chezmoi.homeDir }}";
 
   targets.genericLinux.enable = true;
 
-  home.packages = with pkgs; [
-    # Linux-specific packages
-    emacs-pgtk             # stable (currently 30.x) + native-comp + Wayland
-    # emacs-unstable-pgtk  # latest tag (e.g. 31 pretest) + pgtk
-    # emacs-git-pgtk       # master HEAD + pgtk
+  home.packages = [
+    pkgs.emacs-pgtk             # stable (currently 30.x) + native-comp + Wayland
+    # pkgs.emacs-unstable-pgtk  # latest tag (e.g. 31 pretest) + pgtk
+    # pkgs.emacs-git-pgtk       # master HEAD + pgtk
+    inputs.lsp-proxy.packages.${pkgs.system}.default
   ];
+
+  # The xremap-flake home-manager module is always user-mode (no serviceMode
+  # option) and requires the YAML inline via `yamlConfig`; it cannot read an
+  # external path via `extraArgs` (mkExecStart appends the module-generated
+  # configFile last). To keep chezmoi as the single source of truth for the
+  # xremap config we read the deployed file at evaluation time. Chezmoi places
+  # regular dotfiles before run_onchange_nix-apply.sh runs, so this file
+  # always exists when home-manager switches.
+  services.xremap = {
+    enable = true;
+    withCosmic = true;
+    yamlConfig = builtins.readFile "${config.home.homeDirectory}/.config/xremap/config.yml";
+  };
 }

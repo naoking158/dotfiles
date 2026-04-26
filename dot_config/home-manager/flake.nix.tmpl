@@ -12,9 +12,17 @@
       url = "github:nix-community/emacs-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    xremap-flake = {
+      url = "github:xremap/nix-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    lsp-proxy = {
+      url = "github:jadestrong/lsp-proxy";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { nixpkgs, home-manager, nix-claude-code, emacs-overlay, ... }:
+  outputs = { self, nixpkgs, home-manager, nix-claude-code, emacs-overlay, xremap-flake, lsp-proxy, ... }@inputs:
     let
       direnvOverlay = final: prev: {
         direnv = prev.direnv.overrideAttrs (old: { doCheck = false; });
@@ -32,6 +40,7 @@
       "{{ .chezmoi.username }}@popos" = home-manager.lib.homeManagerConfiguration {
         pkgs = mkPkgs "x86_64-linux";
         modules = [ ./home.nix ./linux.nix ];
+        extraSpecialArgs = { inherit inputs; };
       };
       "{{ .chezmoi.username }}@macos" = home-manager.lib.homeManagerConfiguration {
         pkgs = mkPkgs "aarch64-darwin";

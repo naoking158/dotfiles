@@ -5,6 +5,7 @@
 # darwin.nix hash: {{ include "dot_config/home-manager/darwin.nix.tmpl" | sha256sum }}
 {{ else -}}
 # linux.nix hash:  {{ include "dot_config/home-manager/linux.nix.tmpl" | sha256sum }}
+# xremap config hash: {{ include "dot_config/xremap/config.yml" | sha256sum }}
 {{ end -}}
 
 set -euo pipefail
@@ -30,11 +31,16 @@ fi
 # First-time bootstrap fallback:
 # ~/.nix-profile/bin/home-manager is created by home-manager switch itself,
 # so it won't exist on first run. Use nix run as fallback.
+#
+# --impure is required on Linux: linux.nix reads the chezmoi-deployed
+# ~/.config/xremap/config.yml at evaluation time via builtins.readFile so
+# that chezmoi remains the single source of truth for the xremap YAML.
+# Pure flake evaluation forbids absolute path reads.
 if command -v home-manager &>/dev/null; then
-    home-manager switch --flake ~/.config/home-manager#{{ .chezmoi.username }}@popos
+    home-manager switch --impure --flake ~/.config/home-manager#{{ .chezmoi.username }}@popos
 else
     echo "home-manager not found in PATH. Running via nix run (first-time bootstrap)..."
-    nix run home-manager -- switch --flake ~/.config/home-manager#{{ .chezmoi.username }}@popos
+    nix run home-manager -- switch --impure --flake ~/.config/home-manager#{{ .chezmoi.username }}@popos
 fi
 {{ end -}}
 

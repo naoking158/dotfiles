@@ -1,0 +1,66 @@
+{{- if ne .chezmoi.os "nixos" -}}
+#!/usr/bin/env bash
+# Bootstrap uinput permissions for xremap on non-NixOS Linux (e.g. Pop!_OS).
+#
+# Sets up:
+#   - $USER membership in the "input" group
+#   - /etc/udev/rules.d/99-input.rules     (KERNEL=="uinput", GROUP="input", MODE:="0660")
+#   - /etc/modules-load.d/uinput.conf      (load uinput on boot)
+#   - the uinput kernel module loaded right now
+#   - udev rules reloaded and triggered
+#
+# Idempotent: each step is guarded by a pre-check and can be re-run safely.
+# Skipped entirely on NixOS (configured declaratively via nixosModules instead).
+
+set -euo pipefail
+
+UDEV_RULE=/etc/udev/rules.d/99-input.rules
+MODLOAD_FILE=/etc/modules-load.d/uinput.conf
+
+echo "Setting up uinput permissions for xremap..."
+
+# Refresh sudo creds once so subsequent sudo invocations don't re-prompt.
+sudo -v
+
+# Step 1: add $USER to the input group.
+if getent group input | grep -qw "$USER"; then
+    echo "  [skip] $USER is already in the 'input' group."
+else
+    echo "  [run ] adding $USER to the 'input' group..."
+    sudo gpasswd -a "$USER" input
+fi
+
+# Step 2: udev rule for /dev/uinput access via the input group.
+if [ -f "$UDEV_RULE" ]; then
+    echo "  [skip] $UDEV_RULE already exists."
+else
+    echo "  [run ] writing $UDEV_RULE..."
+    echo 'KERNEL=="uinput", GROUP="input", MODE:="0660"' | sudo tee "$UDEV_RULE" > /dev/null
+fi
+
+# Step 3: load uinput on boot.
+if [ -f "$MODLOAD_FILE" ]; then
+    echo "  [skip] $MODLOAD_FILE already exists."
+else
+    echo "  [run ] writing $MODLOAD_FILE..."
+    echo uinput | sudo tee "$MODLOAD_FILE" > /dev/null
+fi
+
+# Step 4: load the module right now (avoids a reboot for first use).
+if lsmod | grep -qw uinput; then
+    echo "  [skip] uinput module already loaded."
+else
+    echo "  [run ] modprobe uinput..."
+    sudo modprobe uinput
+fi
+
+# Step 5: always reload + trigger udev so the new rule takes effect.
+echo "  [run ] reloading udev rules..."
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+
+echo
+echo "uinput setup complete."
+echo "NOTE: log out and back in for the 'input' group membership to take effect"
+echo "      in your session (xremap.service needs it to open /dev/uinput)."
+{{- end }}
