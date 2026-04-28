@@ -4153,9 +4153,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   :straight org
   :commands
   org-babel-execute:sh
-  org-babel-expand-body:sh
-  org-babel-execute:shell
-  org-babel-expand-body:shell)
+  org-babel-execute:shell)
 
 (leaf ob-lua
   :straight org
