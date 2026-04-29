@@ -78,8 +78,8 @@ command = "oxlint"
 args = ["--lsp"]
 
 [language-server.tsgo-ls]
-command = "/Users/naoki.sakamoto/src/github.com/microsoft/typescript-go/built/local/tsgo"
-args = ["--lsp", "--stdio"]
+command = "npx"
+args = ["tsgo", "--lsp", "--stdio"]
 
 [[language]]
 name = "tsx"

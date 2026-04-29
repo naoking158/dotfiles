@@ -13,7 +13,17 @@
     inputs.lsp-proxy.packages.${pkgs.system}.default
     inputs.xremap-flake.packages.${pkgs.system}.xremap-cosmic
     pkgs.cosmic-ext-applet-clipboard-manager
+    # Rootless Docker CLI (compose + buildx included by default in nixpkgs;
+    # override is explicit so upgrades never accidentally drop these features).
+    (pkgs.docker.override { composeSupport = true; buildxSupport = true; })
   ];
+
+  # Rootless Docker socket. The chezmoi run_once_after_docker-rootless-setup.sh
+  # script provisions the user-level dockerd. Resolved at apply time so the
+  # value is baked into the user profile and inherited by every login shell.
+  home.sessionVariables = {
+    DOCKER_HOST = "unix:///run/user/{{ output "id" "-u" | trim }}/docker.sock";
+  };
 
   programs.emacs = {
     enable = true;

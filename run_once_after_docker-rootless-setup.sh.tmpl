@@ -1,0 +1,227 @@
+{{- if ne .chezmoi.os "nixos" -}}
+#!/usr/bin/env bash
+# Bootstrap rootless Docker Engine on Pop!_OS (non-NixOS Linux).
+#
+# Sets up:
+#   - Docker official apt repository (keyring + sources list)
+#   - docker-ce docker-ce-cli containerd.io docker-ce-rootless-extras uidmap
+#     dbus-user-session slirp4netns
+#   - Disables rootful docker.service / docker.socket (systemd system)
+#   - /etc/subuid and /etc/subgid entries for $USER
+#   - loginctl enable-linger for the current user
+#   - dockerd-rootless-setuptool.sh install (~/.config/systemd/user/docker.service)
+#   - systemctl --user enable --now docker
+#
+# Idempotent: every step is guarded by a pre-check; a second chezmoi apply
+# prints only [skip] lines and performs no apt/systemd operations.
+#
+# Exit codes (distinct from 0 / 1 for quick diagnosis):
+#   0 — success (or already done)
+#   1 — run as root (forbidden)
+#   2 — /etc/subuid or /etc/subgid write failed
+#   3 — dockerd-rootless-setuptool.sh not found after package install
+#   4 — systemd --user not reachable; re-login required
+#   5 — rootful Docker socket detected; must be removed first
+#
+# Skipped entirely on NixOS (configured declaratively via virtualisation.docker.rootless.*).
+
+set -euo pipefail
+
+# ---------------------------------------------------------------------------
+# Guards
+# ---------------------------------------------------------------------------
+
+# Refuse to run as root (the rootless setup must run as the target user).
+if [ "$(id -u)" = "0" ]; then
+    echo "ERROR: Do not run this script as root. Run as the target user." >&2
+    exit 1
+fi
+
+# Abort if a rootful Docker socket is present — rootless and rootful Docker
+# conflict; the user must remove rootful Docker before proceeding.
+if [ -S /var/run/docker.sock ]; then
+    echo "ERROR: Rootful Docker socket detected at /var/run/docker.sock." >&2
+    echo "       Remove rootful Docker before setting up rootless Docker." >&2
+    echo "       sudo apt-get purge docker-ce docker-ce-cli containerd.io" >&2
+    exit 5
+fi
+
+echo "Setting up rootless Docker Engine..."
+
+# Cache sudo credentials once so subsequent sudo calls do not re-prompt.
+sudo -v
+
+# ---------------------------------------------------------------------------
+# Step A: Docker official apt repository (keyring + sources list)
+# ---------------------------------------------------------------------------
+
+KEYRING_FILE=/etc/apt/keyrings/docker.asc
+SOURCES_FILE=/etc/apt/sources.list.d/docker.list
+
+if [ -f "$KEYRING_FILE" ] && [ -f "$SOURCES_FILE" ]; then
+    echo "  [skip] Docker apt repository already configured."
+else
+    echo "  [run ] Configuring Docker apt repository..."
+
+    # Ensure the keyrings directory exists with correct permissions.
+    sudo install -m 0755 -d /etc/apt/keyrings
+
+    # Download and install the Docker GPG key.
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+        | sudo tee "$KEYRING_FILE" > /dev/null
+    sudo chmod a+r "$KEYRING_FILE"
+
+    # Derive codename from /etc/os-release; Pop!_OS 22.04 reports "jammy".
+    # shellcheck source=/dev/null
+    . /etc/os-release
+    codename="${VERSION_CODENAME:-jammy}"
+
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=${KEYRING_FILE}] \
+https://download.docker.com/linux/ubuntu ${codename} stable" \
+        | sudo tee "$SOURCES_FILE" > /dev/null
+
+    sudo apt-get update -qq
+fi
+
+# ---------------------------------------------------------------------------
+# Step B: Install required packages (only missing ones)
+# ---------------------------------------------------------------------------
+
+REQUIRED_PACKAGES=(
+    docker-ce
+    docker-ce-cli
+    containerd.io
+    docker-ce-rootless-extras
+    uidmap
+    dbus-user-session
+    slirp4netns
+)
+
+MISSING_PACKAGES=()
+for pkg in "${REQUIRED_PACKAGES[@]}"; do
+    if ! dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null | grep -q "install ok installed"; then
+        MISSING_PACKAGES+=("$pkg")
+    fi
+done
+
+if [ "${#MISSING_PACKAGES[@]}" -eq 0 ]; then
+    echo "  [skip] All required packages already installed."
+else
+    echo "  [run ] Installing: ${MISSING_PACKAGES[*]}"
+    sudo apt-get install -y "${MISSING_PACKAGES[@]}"
+fi
+
+# ---------------------------------------------------------------------------
+# Step C: Disable rootful daemon so it does not start on boot
+# ---------------------------------------------------------------------------
+
+# Errors are suppressed — the units may not exist on a fresh install.
+if sudo systemctl is-enabled --quiet docker.service 2>/dev/null \
+   || sudo systemctl is-enabled --quiet docker.socket 2>/dev/null; then
+    echo "  [run ] Disabling rootful docker.service and docker.socket..."
+    sudo systemctl disable --now docker.service docker.socket 2>/dev/null || true
+else
+    echo "  [skip] Rootful docker.service / docker.socket already disabled."
+fi
+
+# ---------------------------------------------------------------------------
+# Step D: /etc/subuid and /etc/subgid
+# ---------------------------------------------------------------------------
+
+SUBUID_ENTRY="${USER}:100000:65536"
+SUBGID_ENTRY="${USER}:100000:65536"
+
+if grep -q "^${USER}:" /etc/subuid 2>/dev/null; then
+    existing_subuid="$(grep "^${USER}:" /etc/subuid)"
+    if [ "$existing_subuid" != "$SUBUID_ENTRY" ]; then
+        echo "  [warn] /etc/subuid already has a different range for ${USER}: ${existing_subuid}" >&2
+        echo "         Leaving existing entry unchanged. Verify it is compatible with rootless Docker." >&2
+    else
+        echo "  [skip] /etc/subuid already has correct entry for ${USER}."
+    fi
+else
+    echo "  [run ] Adding ${USER} to /etc/subuid..."
+    echo "$SUBUID_ENTRY" | sudo tee -a /etc/subuid > /dev/null || exit 2
+fi
+
+if grep -q "^${USER}:" /etc/subgid 2>/dev/null; then
+    existing_subgid="$(grep "^${USER}:" /etc/subgid)"
+    if [ "$existing_subgid" != "$SUBGID_ENTRY" ]; then
+        echo "  [warn] /etc/subgid already has a different range for ${USER}: ${existing_subgid}" >&2
+        echo "         Leaving existing entry unchanged. Verify it is compatible with rootless Docker." >&2
+    else
+        echo "  [skip] /etc/subgid already has correct entry for ${USER}."
+    fi
+else
+    echo "  [run ] Adding ${USER} to /etc/subgid..."
+    echo "$SUBGID_ENTRY" | sudo tee -a /etc/subgid > /dev/null || exit 2
+fi
+
+# ---------------------------------------------------------------------------
+# Step E: loginctl enable-linger (persist systemd --user across logouts)
+# ---------------------------------------------------------------------------
+
+linger_status="$(loginctl show-user "$USER" --property=Linger --value 2>/dev/null || echo "no")"
+if [ "$linger_status" = "yes" ]; then
+    echo "  [skip] Linger already enabled for ${USER}."
+else
+    echo "  [run ] Enabling linger for ${USER}..."
+    sudo loginctl enable-linger "$USER"
+fi
+
+# ---------------------------------------------------------------------------
+# Step F: Verify systemd --user is reachable
+# ---------------------------------------------------------------------------
+
+if ! systemctl --user is-system-running --quiet 2>/dev/null \
+   && ! systemctl --user status --no-pager >/dev/null 2>&1; then
+    echo "" >&2
+    echo "WARNING: systemd --user is not reachable in this session." >&2
+    echo "         This is expected if linger was just enabled for the first time." >&2
+    echo "" >&2
+    echo "  ACTION REQUIRED: Log out and back in, then re-run chezmoi apply" >&2
+    echo "  so that Step G (dockerd-rootless-setuptool.sh install) can complete." >&2
+    echo "" >&2
+    exit 4
+fi
+
+# ---------------------------------------------------------------------------
+# Step G: dockerd-rootless-setuptool.sh install
+# ---------------------------------------------------------------------------
+
+DOCKER_USER_SERVICE="${HOME}/.config/systemd/user/docker.service"
+
+if ! command -v dockerd-rootless-setuptool.sh &>/dev/null; then
+    echo "ERROR: dockerd-rootless-setuptool.sh not found in PATH." >&2
+    echo "       The docker-ce-rootless-extras package should have installed it." >&2
+    echo "       PATH=${PATH}" >&2
+    exit 3
+fi
+
+if [ -f "$DOCKER_USER_SERVICE" ]; then
+    echo "  [skip] Rootless Docker user service already installed (${DOCKER_USER_SERVICE})."
+else
+    echo "  [run ] Running dockerd-rootless-setuptool.sh install..."
+    dockerd-rootless-setuptool.sh install
+fi
+
+# Enable and start the user service (idempotent with --now if already active).
+if systemctl --user is-active --quiet docker 2>/dev/null; then
+    echo "  [skip] docker user service already active."
+else
+    echo "  [run ] Enabling and starting docker user service..."
+    systemctl --user enable --now docker
+fi
+
+# ---------------------------------------------------------------------------
+# Done
+# ---------------------------------------------------------------------------
+
+echo ""
+echo "Docker rootless setup complete."
+echo ""
+echo "Next steps:"
+echo "  1. Open a new login shell so DOCKER_HOST is exported from your profile."
+echo "  2. Verify with: docker run --rm hello-world"
+echo "  3. Check daemon status: systemctl --user status docker"
+{{- end }}
