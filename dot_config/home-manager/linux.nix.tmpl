@@ -3,6 +3,7 @@
 {
   imports = [
     inputs.xremap-flake.homeManagerModules.default
+    ./nikon-webcam.nix
   ];
 
   home.homeDirectory = "{{ .chezmoi.homeDir }}";

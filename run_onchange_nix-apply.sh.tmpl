@@ -4,8 +4,9 @@
 {{ if eq .chezmoi.os "darwin" -}}
 # darwin.nix hash: {{ include "dot_config/home-manager/darwin.nix.tmpl" | sha256sum }}
 {{ else -}}
-# linux.nix hash:  {{ include "dot_config/home-manager/linux.nix.tmpl" | sha256sum }}
-# xremap config hash: {{ include "dot_config/xremap/config.yml" | sha256sum }}
+# linux.nix hash:        {{ include "dot_config/home-manager/linux.nix.tmpl" | sha256sum }}
+# nikon-webcam.nix hash: {{ include "dot_config/home-manager/nikon-webcam.nix.tmpl" | sha256sum }}
+# xremap config hash:    {{ include "dot_config/xremap/config.yml" | sha256sum }}
 {{ end -}}
 
 set -euo pipefail

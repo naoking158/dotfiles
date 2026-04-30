@@ -1,0 +1,209 @@
+{{- if ne .chezmoi.os "nixos" -}}
+#!/usr/bin/env bash
+# Bootstrap v4l2loopback / libgphoto2 / camera group for the Nikon Z5
+# webcam pipeline on non-NixOS Linux (Pop!_OS 24.04).
+#
+# Sets up:
+#   - apt packages: v4l2loopback-dkms, v4l2loopback-utils, libgphoto2-dev
+#   - /etc/modprobe.d/v4l2loopback.conf
+#       options v4l2loopback devices=1 video_nr=10 card_label="NikonZ5" exclusive_caps=1
+#   - /etc/modules-load.d/v4l2loopback.conf  (loads v4l2loopback at boot)
+#   - $USER membership in the "camera" group
+#   - udev rules reloaded + triggered (libgphoto2's 90-libgphoto2.rules)
+#   - v4l2loopback module loaded right now (avoids reboot for first use)
+#
+# Idempotent: each step is guarded by a pre-check and can be re-run safely.
+# Skipped entirely on NixOS (configured declaratively via boot.extraModulePackages
+# / boot.kernelModules / users.users.<name>.extraGroups instead).
+#
+# Lexically ordered before run_onchange_nix-apply.sh.tmpl, so /dev/video10
+# is present by the time home-manager switch installs the
+# nikon-webcam.service unit.
+#
+# Smoke-test gating note (spec US-002):
+#   This script intentionally installs v4l2loopback (apt + modprobe + /etc)
+#   BEFORE the smoke-test binary is realized into the user profile, because
+#   chezmoi runs run_once_after_* before run_onchange_* (which triggers
+#   home-manager switch). The smoke-test gates the manual
+#   `systemctl --user start nikon-webcam` step, NOT the v4l2loopback module
+#   install. v4l2loopback is cheap and reversible — see plan §6.3 for the
+#   full OS-side rollback path if smoke-test exit 12 is observed.
+#
+# Exit codes (distinct from 0 / 1 for quick diagnosis):
+#   0 — success (or already done)
+#   1 — run as root (forbidden)
+#   2 — /etc write failed
+#   4 — sudo authentication failed
+#   5 — apt or modprobe failed (DKMS may be incompatible with running kernel)
+
+set -euo pipefail
+
+# ---------------------------------------------------------------------------
+# Guards
+# ---------------------------------------------------------------------------
+
+if [ "$(id -u)" = "0" ]; then
+    echo "ERROR: Do not run this script as root. Run as the target user." >&2
+    exit 1
+fi
+
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+
+MODPROBE_CONF=/etc/modprobe.d/v4l2loopback.conf
+MODLOAD_FILE=/etc/modules-load.d/v4l2loopback.conf
+CAMERA_GROUP=camera
+
+# Spec §4.2 — exact options string the modprobe.d file must contain.
+MODPROBE_LINE='options v4l2loopback devices=1 video_nr=10 card_label="NikonZ5" exclusive_caps=1'
+
+echo "Setting up v4l2loopback / libgphoto2 / camera group for Nikon Z5..."
+
+# Refresh sudo creds once so subsequent sudo invocations don't re-prompt.
+if ! sudo -v; then
+    echo "ERROR: sudo authentication failed." >&2
+    exit 4
+fi
+
+# ---------------------------------------------------------------------------
+# Step A: Install apt packages (only the missing ones)
+# ---------------------------------------------------------------------------
+
+REQUIRED_PACKAGES=(
+    v4l2loopback-dkms
+    v4l2loopback-utils
+    libgphoto2-dev
+)
+
+MISSING_PACKAGES=()
+for pkg in "${REQUIRED_PACKAGES[@]}"; do
+    if ! dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null | grep -q "install ok installed"; then
+        MISSING_PACKAGES+=("$pkg")
+    fi
+done
+
+if [ "${#MISSING_PACKAGES[@]}" -eq 0 ]; then
+    echo "  [skip] All required packages already installed."
+else
+    echo "  [run ] Installing: ${MISSING_PACKAGES[*]}"
+    if ! sudo apt-get install -y "${MISSING_PACKAGES[@]}"; then
+        cat <<'EOF' >&2
+
+ERROR: apt failed to install one or more packages.
+
+  If the failure is in the v4l2loopback-dkms post-install hook,
+  the bundled v4l2loopback source (typically v0.13.x) likely does
+  not build against the running kernel. Recovery:
+
+    git clone https://github.com/v4l2loopback/v4l2loopback /tmp/v4l2loopback
+    cd /tmp/v4l2loopback
+    sudo make dkms-install
+
+  See spec §6 ("DKMS build fail on kernel 6.18.7") for the full
+  recovery procedure. Re-run `chezmoi apply` once the module
+  builds and `lsmod | grep v4l2loopback` succeeds.
+
+EOF
+        exit 5
+    fi
+fi
+
+# ---------------------------------------------------------------------------
+# Step B: /etc/modprobe.d/v4l2loopback.conf (options for the loopback module)
+# ---------------------------------------------------------------------------
+
+if [ -f "$MODPROBE_CONF" ] && [ "$(cat "$MODPROBE_CONF")" = "$MODPROBE_LINE" ]; then
+    echo "  [skip] $MODPROBE_CONF already has the expected content."
+else
+    if [ -f "$MODPROBE_CONF" ]; then
+        echo "  [warn] $MODPROBE_CONF exists but content differs; overwriting." >&2
+    fi
+    echo "  [run ] writing $MODPROBE_CONF..."
+    if ! echo "$MODPROBE_LINE" | sudo tee "$MODPROBE_CONF" > /dev/null; then
+        echo "ERROR: failed to write $MODPROBE_CONF." >&2
+        exit 2
+    fi
+fi
+
+# ---------------------------------------------------------------------------
+# Step C: /etc/modules-load.d/v4l2loopback.conf (auto-load on boot)
+# ---------------------------------------------------------------------------
+
+if [ -f "$MODLOAD_FILE" ] && [ "$(cat "$MODLOAD_FILE")" = "v4l2loopback" ]; then
+    echo "  [skip] $MODLOAD_FILE already has the expected content."
+else
+    if [ -f "$MODLOAD_FILE" ]; then
+        echo "  [warn] $MODLOAD_FILE exists but content differs; overwriting." >&2
+    fi
+    echo "  [run ] writing $MODLOAD_FILE..."
+    if ! echo "v4l2loopback" | sudo tee "$MODLOAD_FILE" > /dev/null; then
+        echo "ERROR: failed to write $MODLOAD_FILE." >&2
+        exit 2
+    fi
+fi
+
+# ---------------------------------------------------------------------------
+# Step D: camera group + $USER membership
+# ---------------------------------------------------------------------------
+
+if ! getent group "$CAMERA_GROUP" >/dev/null; then
+    echo "  [run ] creating '$CAMERA_GROUP' group..."
+    sudo groupadd -f "$CAMERA_GROUP"
+fi
+
+if getent group "$CAMERA_GROUP" | grep -qw "$USER"; then
+    echo "  [skip] $USER is already in the '$CAMERA_GROUP' group."
+else
+    echo "  [run ] adding $USER to the '$CAMERA_GROUP' group..."
+    sudo gpasswd -a "$USER" "$CAMERA_GROUP" >/dev/null
+fi
+
+# ---------------------------------------------------------------------------
+# Step E: udev rules reload (libgphoto2-dev installs 90-libgphoto2.rules)
+# ---------------------------------------------------------------------------
+
+echo "  [run ] reloading udev rules..."
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+
+# ---------------------------------------------------------------------------
+# Step F: load v4l2loopback right now (avoids a reboot for first use)
+# ---------------------------------------------------------------------------
+
+if lsmod | grep -qw v4l2loopback; then
+    echo "  [skip] v4l2loopback module already loaded."
+    echo "         Note: changes to $MODPROBE_CONF take effect on the next boot"
+    echo "         (or after \`sudo modprobe -r v4l2loopback && sudo modprobe v4l2loopback\`)."
+else
+    echo "  [run ] modprobe v4l2loopback..."
+    if ! sudo modprobe v4l2loopback; then
+        cat <<'EOF' >&2
+
+ERROR: modprobe v4l2loopback failed.
+
+  Most likely cause: DKMS did not finish building the module against
+  the running kernel. Verify with:
+
+    sudo dkms status v4l2loopback
+    sudo dmesg | tail -50
+
+  If DKMS is broken, see the v4l2loopback-dkms recovery instructions
+  in Step A above.
+
+EOF
+        exit 5
+    fi
+fi
+
+# ---------------------------------------------------------------------------
+# Done
+# ---------------------------------------------------------------------------
+
+echo ""
+echo "v4l2loopback / libgphoto2 / camera group setup complete."
+echo "NOTE: log out and back in for the '$CAMERA_GROUP' group membership"
+echo "      to take effect in your session."
+echo "NOTE: after \`home-manager switch\` (run by run_onchange_nix-apply.sh),"
+echo "      run \`nikon-webcam-smoketest\` before \`systemctl --user start nikon-webcam\`."
+{{- end }}

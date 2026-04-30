@@ -1,0 +1,69 @@
+{{- if false -}}
+{{- /*
+  Approach B (mtplvcap) is disabled by default. Flip the leading `false`
+  to `true` when smoke-test exits 12 and Approach C (HDMI capture dongle)
+  hardware is unavailable (spec §10 decision table row 2).
+
+  Before flipping the guard:
+    1. Pin PINNED_TAG below to a release verified for the current Go
+       toolchain (see spec Q8).
+    2. Add `pkgs.go` to home.packages in dot_config/home-manager/nikon-webcam.nix.tmpl.
+    3. Re-run `chezmoi apply` to trigger the build.
+*/ -}}
+#!/usr/bin/env bash
+# Approach B fallback: build puhitaku/mtplvcap from source when the gphoto2
+# Live View path (Approach A) is non-viable.
+#
+# Triggered as run_onchange_*: chezmoi re-executes this script whenever its
+# rendered content changes. PINNED_TAG is recorded as a literal so bumping
+# the pin is what triggers a rebuild (spec §3.5 / §7.3 supply-chain rule).
+#
+# Exit codes:
+#   0 — built (or already current)
+#   3 — `go` not found on PATH (add pkgs.go to home.packages first)
+#   6 — PINNED_TAG still set to the placeholder
+
+set -euo pipefail
+
+# TODO(spec Q8): replace with the puhitaku/mtplvcap release tag verified
+# against the Go toolchain provided by pkgs.go before flipping the guard.
+PINNED_TAG="vX.Y.Z"
+REPO="github.com/puhitaku/mtplvcap"
+
+if [ "$PINNED_TAG" = "vX.Y.Z" ]; then
+    echo "ERROR: PINNED_TAG is still the placeholder 'vX.Y.Z'." >&2
+    echo "       Set it to a real puhitaku/mtplvcap release tag" >&2
+    echo "       (see spec Q8) before enabling Approach B." >&2
+    exit 6
+fi
+
+if ! command -v go >/dev/null 2>&1; then
+    echo "ERROR: 'go' is not on PATH." >&2
+    echo "       Add 'pkgs.go' to home.packages in nikon-webcam.nix.tmpl" >&2
+    echo "       and re-run \`chezmoi apply\` (which triggers home-manager switch)." >&2
+    exit 3
+fi
+
+# GOBIN under XDG-friendly path; do not write into ~/.nix-profile/bin (read-only).
+GOBIN="${HOME}/.local/bin"
+mkdir -p "$GOBIN"
+export GOBIN
+
+echo "Installing ${REPO}@${PINNED_TAG} into ${GOBIN}..."
+# GOPROXY default (proxy.golang.org) is left in place so sumdb verifies the
+# module checksum. Avoid `@latest` to satisfy the supply-chain pin rule.
+go install "${REPO}@${PINNED_TAG}"
+
+cat <<EOF
+
+mtplvcap installed: ${GOBIN}/mtplvcap (pinned ${PINNED_TAG})
+
+Approach B selected. Next steps:
+  1. Connect the Z5 in MTP/PTP mode.
+  2. Run: ${GOBIN}/mtplvcap -addr localhost:8080
+  3. In OBS Studio, add a Browser Source pointing to http://localhost:8080
+     OR pipe the HTTP MJPEG stream into ffmpeg:
+       ffmpeg -i http://localhost:8080/video -f v4l2 /dev/video10
+  4. Bind only to localhost; never 0.0.0.0 (spec §7.1).
+EOF
+{{- end }}
