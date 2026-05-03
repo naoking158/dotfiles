@@ -487,6 +487,52 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
     :custom (eldoc-idle-delay . 0.1)))
 #+end_src
 
+** Wayland clipboard bridge
+:PROPERTIES:
+:ID:       A3B7C291-5E4F-4D82-B9C3-1F6E8D0A2C47
+:END:
+
+pgtk + Wayland + wl-clipboard が揃った環境でのみ、
+interprogram-cut-function / interprogram-paste-function を
+wl-copy / wl-paste でオーバーライドし、cosmic-comp の
+XWayland → Wayland clipboard 同期不全を回避する。
+
+#+begin_src emacs-lisp
+(leaf *wayland-clipboard-bridge
+  :leaf-defer nil
+  :when (and (featurep 'pgtk)
+             (executable-find "wl-copy")
+             (executable-find "wl-paste"))
+  :preface
+  (defvar my/wl-copy-last nil
+    "Last text sent via `my/wl-copy'. Used to suppress double yank.")
+
+  (defun my/wl-copy (text)
+    "Send TEXT to Wayland CLIPBOARD via wl-copy (async)."
+    (let ((default-directory temporary-file-directory)
+          (process-connection-type nil))
+      (let ((proc (start-process "wl-copy" nil "wl-copy")))
+        (process-send-string proc text)
+        (process-send-eof proc)
+        (setq my/wl-copy-last text)
+        proc)))
+
+  (defun my/wl-paste ()
+    "Read Wayland CLIPBOARD via wl-paste. Return nil if empty or own-copy."
+    (let ((default-directory temporary-file-directory))
+      (let ((text (with-output-to-string
+                    (with-current-buffer standard-output
+                      (process-file "wl-paste" nil '(t nil) nil
+                                    "-n" "--no-newline")))))
+        (cond
+         ((or (null text) (string-empty-p text)) nil)
+         ((and my/wl-copy-last (string= text my/wl-copy-last)) nil)
+         (t text)))))
+  :config
+  (setq interprogram-cut-function   #'my/wl-copy
+        interprogram-paste-function #'my/wl-paste))
+#+end_src
+
 ** Change modifiers
 :PROPERTIES:
 :ID:       1997DC11-746D-435F-856F-6B03B1925032

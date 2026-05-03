@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# clipboard history picker (Wayland + cliphist + fuzzel)
+# Spec: docs/specs/20260502-clipboard-sync.md §3.3
+set -euo pipefail
+
+# Guard: exit 2 if any required command is missing
+for cmd in cliphist fuzzel wl-copy; do
+  command -v "$cmd" >/dev/null 2>&1 || { echo "missing: $cmd" >&2; exit 2; }
+done
+
+# Show picker and capture selection; exit 1 on cancel (fuzzel returns non-zero)
+selected=$(cliphist list | fuzzel --dmenu --prompt 'clipboard> ') || exit 1
+[ -z "$selected" ] && exit 1
+
+# Decode the selected entry and write it to the Wayland clipboard
+printf '%s\n' "$selected" | cliphist decode | wl-copy

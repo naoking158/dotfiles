@@ -1,0 +1,57 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/usr/bin/env bash
+# chezmoi run_onchange: enable cliphist-store-{text,image}.service on deploy/update.
+# Spec: docs/specs/20260502-clipboard-sync.md §3.4
+#
+# Idempotent: systemctl enable --now is a no-op if already enabled/active.
+# Re-runs whenever this script's content changes (chezmoi run_onchange semantics).
+# Also migrates away from the legacy single cliphist-store.service if present.
+# Skipped entirely on non-Linux.
+
+set -euo pipefail
+
+# Skip if systemctl is not available (e.g., container environments)
+command -v systemctl >/dev/null 2>&1 || { echo "[skip] systemctl not found, skipping cliphist-store setup."; exit 0; }
+
+UNIT_DIR="${HOME}/.config/systemd/user"
+NEW_UNITS=("cliphist-store-text.service" "cliphist-store-image.service")
+LEGACY_UNIT="cliphist-store.service"
+
+# --- Migration: disable & remove legacy single-watcher unit if present ---
+if systemctl --user list-unit-files --no-legend "${LEGACY_UNIT}" 2>/dev/null | grep -q "${LEGACY_UNIT}"; then
+    echo "[migrate] Disabling legacy ${LEGACY_UNIT}..."
+    systemctl --user disable --now "${LEGACY_UNIT}" 2>/dev/null || true
+fi
+if [ -f "${UNIT_DIR}/${LEGACY_UNIT}" ]; then
+    echo "[migrate] Removing ${UNIT_DIR}/${LEGACY_UNIT}..."
+    rm -f "${UNIT_DIR}/${LEGACY_UNIT}"
+fi
+
+systemctl --user daemon-reload
+
+for unit in "${NEW_UNITS[@]}"; do
+    SERVICE_FILE="${UNIT_DIR}/${unit}"
+    if [ ! -f "${SERVICE_FILE}" ]; then
+        echo "[skip] ${unit} not found at ${SERVICE_FILE}, skipping." >&2
+        continue
+    fi
+
+    if systemctl --user is-enabled --quiet "${unit}" 2>/dev/null; then
+        echo "  [skip] ${unit} already enabled."
+    else
+        echo "  [run ] Enabling ${unit}..."
+        systemctl --user enable "${unit}"
+    fi
+
+    if systemctl --user is-active --quiet "${unit}" 2>/dev/null; then
+        echo "  [skip] ${unit} already active."
+    elif [ -n "${WAYLAND_DISPLAY:-}" ]; then
+        echo "  [run ] Starting ${unit}..."
+        systemctl --user start "${unit}" || echo "  [warn] Start failed; will start automatically on next graphical login."
+    else
+        echo "  [info] No WAYLAND_DISPLAY — ${unit} will start on next graphical login."
+    fi
+done
+
+echo "cliphist-store setup complete."
+{{- end }}

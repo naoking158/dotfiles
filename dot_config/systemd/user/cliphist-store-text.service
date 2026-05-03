@@ -1,0 +1,11 @@
+[Unit]
+Description=Clipboard history (cliphist) - text watcher
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=%h/.nix-profile/bin/wl-paste --type text --watch %h/.nix-profile/bin/cliphist store
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

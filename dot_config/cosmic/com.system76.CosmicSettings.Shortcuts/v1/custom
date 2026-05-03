@@ -1,0 +1,66 @@
+{
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "w",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+            Shift,
+        ],
+        key: "m",
+    ): Minimize,
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "b",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "t",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+            Shift,
+        ],
+        key: "4",
+    ): System(Screenshot),
+    (
+        modifiers: [],
+        key: "Print",
+    ): Disable,
+    (
+        modifiers: [
+            Ctrl,
+        ],
+        key: "grave",
+        description: Some("open ghostty"),
+    ): Spawn("ghostty"),
+    (
+        modifiers: [
+            Super,
+            Shift,
+        ],
+        key: "Escape",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "Escape",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+            Shift,
+        ],
+        key: "p",
+        description: Some("open clipboard history"),
+    ): Spawn("/home/naoki/.local/bin/clipboard-history"),
+}

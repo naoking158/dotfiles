@@ -14,6 +14,9 @@
     inputs.lsp-proxy.packages.${pkgs.system}.default
     inputs.xremap-flake.packages.${pkgs.system}.xremap-cosmic
     pkgs.cosmic-ext-applet-clipboard-manager
+    pkgs.cliphist
+    pkgs.fuzzel
+    pkgs.wl-clipboard
     # Rootless Docker CLI (compose + buildx included by default in nixpkgs;
     # override is explicit so upgrades never accidentally drop these features).
     (pkgs.docker.override { composeSupport = true; buildxSupport = true; })
