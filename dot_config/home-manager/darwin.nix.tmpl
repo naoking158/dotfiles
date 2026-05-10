@@ -1,43 +1,5 @@
-{ pkgs, ... }:
+{ ... }:
 
 {
   home.homeDirectory = "{{ .chezmoi.homeDir }}";
-
-  programs.emacs = {
-    enable = true;
-    # 30.2 の treesit.c は predicate を `#match` (?なし) で出力するが、
-    # nixpkgs 同梱の tree-sitter v0.26+ は `?`/`!` で終わる述語名しか
-    # 受け付けない。flake.nix の treeSitterOverlay で v0.25.10 に pin
-    # して回避している。Emacs 31 系で treesit.c が `#match?` 化済みに
-    # なるので、その時点で overlay と一緒にこのコメントも消す。
-    package = pkgs.emacs;            # stable (NS/AppKit) + native-comp
-    # package = pkgs.emacs-unstable; # latest tag (overlay)
-    # package = pkgs.emacs-git;      # master HEAD (overlay)
-    # package = pkgs.emacs-macport;  # Mitsuharu port (nixpkgs)
-    extraPackages = epkgs: [
-      (epkgs.treesit-grammars.with-grammars (p: with p; [
-        tree-sitter-bash
-        tree-sitter-c
-        tree-sitter-cpp
-        tree-sitter-css
-        tree-sitter-dockerfile
-        tree-sitter-go
-        tree-sitter-graphql
-        tree-sitter-html
-        tree-sitter-javascript
-        tree-sitter-json
-        tree-sitter-lua
-        tree-sitter-markdown
-        tree-sitter-markdown-inline
-        tree-sitter-nix
-        tree-sitter-python
-        tree-sitter-ruby
-        tree-sitter-rust
-        tree-sitter-toml
-        tree-sitter-tsx
-        tree-sitter-typescript
-        tree-sitter-yaml
-      ]))
-    ];
-  };
 }
