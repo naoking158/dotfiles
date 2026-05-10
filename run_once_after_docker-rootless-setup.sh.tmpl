@@ -1,4 +1,4 @@
-{{- if ne .chezmoi.os "nixos" -}}
+{{- if eq .chezmoi.os "linux" -}}
 #!/usr/bin/env bash
 # Bootstrap rootless Docker Engine on Pop!_OS (non-NixOS Linux).
 #

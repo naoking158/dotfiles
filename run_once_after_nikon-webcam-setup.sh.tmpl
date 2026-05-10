@@ -1,4 +1,4 @@
-{{- if ne .chezmoi.os "nixos" -}}
+{{- if eq .chezmoi.os "linux" -}}
 #!/usr/bin/env bash
 # Bootstrap v4l2loopback / libgphoto2 / camera group for the Nikon Z5
 # webcam pipeline on non-NixOS Linux (Pop!_OS 24.04).
