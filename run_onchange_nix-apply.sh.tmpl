@@ -2,7 +2,10 @@
 # flake.nix hash:  {{ include "dot_config/home-manager/flake.nix.tmpl" | sha256sum }}
 # home.nix hash:   {{ include "dot_config/home-manager/home.nix.tmpl" | sha256sum }}
 {{ if eq .chezmoi.os "darwin" -}}
-# darwin.nix hash: {{ include "dot_config/home-manager/darwin.nix.tmpl" | sha256sum }}
+# darwin.nix hash:                  {{ include "dot_config/home-manager/darwin.nix.tmpl" | sha256sum }}
+# nix-darwin/default.nix hash:      {{ include "dot_config/home-manager/nix-darwin/default.nix" | sha256sum }}
+# nix-darwin/homebrew.nix hash:     {{ include "dot_config/home-manager/nix-darwin/homebrew.nix" | sha256sum }}
+# nix-darwin/system.nix.tmpl hash:  {{ include "dot_config/home-manager/nix-darwin/system.nix.tmpl" | sha256sum }}
 {{ else -}}
 # linux.nix hash:        {{ include "dot_config/home-manager/linux.nix.tmpl" | sha256sum }}
 # nikon-webcam.nix hash: {{ include "dot_config/home-manager/nikon-webcam.nix.tmpl" | sha256sum }}
@@ -28,6 +31,21 @@ else
     echo "home-manager not found in PATH. Running via nix run (first-time bootstrap)..."
     nix run home-manager -- switch --flake ~/.config/home-manager#{{ .chezmoi.username }}@macos
 fi
+
+# nix-darwin handles macOS system settings + Homebrew. Recent nix-darwin
+# requires the activation phase to run as root. When chezmoi is invoked
+# from an interactive terminal, the controlling TTY is inherited down to
+# sudo so the password prompt works inline. -E preserves PATH (so
+# darwin-rebuild finds nix) and $HOME (so the flake path resolves under
+# root).
+echo "Running nix-darwin switch..."
+if command -v darwin-rebuild &>/dev/null; then
+    sudo -E darwin-rebuild switch --flake ~/.config/home-manager#{{ .chezmoi.hostname }}
+else
+    echo "darwin-rebuild not found in PATH. Running via nix run (first-time bootstrap)..."
+    sudo -E "$(command -v nix)" run nix-darwin -- switch --flake ~/.config/home-manager#{{ .chezmoi.hostname }}
+fi
+echo "nix-darwin switch completed successfully."
 {{ else -}}
 # First-time bootstrap fallback:
 # ~/.nix-profile/bin/home-manager is created by home-manager switch itself,

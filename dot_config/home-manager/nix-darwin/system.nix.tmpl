@@ -1,0 +1,116 @@
+{ ... }:
+
+{
+  nix = {
+    optimise.automatic = true;
+    settings = {
+      experimental-features = "nix-command flakes";
+      max-jobs = 8;
+    };
+  };
+
+  system = {
+    stateVersion = 6;
+    primaryUser = "{{ .chezmoi.username }}";
+
+    keyboard = {
+      enableKeyMapping = true;
+      # Map CapsLock to Control
+      remapCapsLockToControl = true;
+    };
+
+    defaults = {
+      CustomUserPreferences = {
+        "com.apple.desktopservices" = {
+          DSDontWriteNetworkStores = true;
+        };
+      };
+      NSGlobalDomain = {
+        InitialKeyRepeat = 12;
+        KeyRepeat = 1;
+      };
+      WindowManager = {
+        # Hide items on the desktop
+        StandardHideDesktopIcons = true;
+      };
+      controlcenter = {
+        # Do not show AirDrop in the menu bar
+        AirDrop = false;
+        # Show battery percentage in the menu bar
+        BatteryShowPercentage = true;
+        # Show Bluetooth in the menu bar
+        Bluetooth = true;
+      };
+      dock = {
+        # Show the application switcher on all displays
+        appswitcher-all-displays = true;
+        # Enable Dock auto-hide
+        autohide = true;
+        # Group windows by application in Mission Control / Expose
+        expose-group-apps = true;
+        # Magnified Dock icon size on hover
+        largesize = 48;
+        # Enable Dock magnification on hover
+        magnification = true;
+        # Place the Dock on the bottom side
+        orientation = "bottom";
+        # Do not show recent applications in the Dock
+        show-recents = false;
+        # Show only open applications in the Dock
+        static-only = true;
+        # Dock icon size
+        tilesize = 32;
+        # Hot corner (bottom-left): Launchpad
+        wvous-bl-corner = 11;
+        # Hot corner (bottom-right): Application Windows
+        wvous-br-corner = 3;
+        # Hot corner (top-left): Notification Center
+        wvous-tl-corner = 12;
+        # Hot corner (top-right): Mission Control
+        wvous-tr-corner = 2;
+      };
+      finder = {
+        # Always show file extensions
+        AppleShowAllExtensions = true;
+        # Always show hidden files
+        AppleShowAllFiles = true;
+        # Do not show Finder icons on the desktop
+        CreateDesktop = false;
+        # No warning when changing a file extension
+        FXEnableExtensionChangeWarning = false;
+        # Use list view by default
+        FXPreferredViewStyle = "Nlsv";
+        # Do not show removable media (CD/DVD) on the desktop
+        ShowRemovableMediaOnDesktop = false;
+        # Show the status bar at the bottom of Finder windows
+        ShowStatusBar = true;
+        # Show the full POSIX path in the Finder title bar
+        _FXShowPosixPathInTitle = true;
+      };
+      magicmouse = {
+        # Enable right-click on Magic Mouse
+        MouseButtonMode = "TwoButton";
+      };
+      menuExtraClock = {
+        # 24-hour clock in the menu bar
+        Show24Hour = true;
+        # Show date when there is space in the menu bar
+        ShowDate = 0;
+        # Show day of month
+        ShowDayOfMonth = true;
+        # Show day of week
+        ShowDayOfWeek = true;
+        # Do not show seconds
+        ShowSeconds = false;
+      };
+      spaces = {
+        # Use a single space across displays
+        spans-displays = false;
+      };
+      universalaccess = {
+        # Cursor size
+        mouseDriverCursorSize = 2.0;
+      };
+    };
+  };
+}

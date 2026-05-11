@@ -1,5 +1,11 @@
-{ ... }:
+{ pkgs, ... }:
 
 {
   home.homeDirectory = "{{ .chezmoi.homeDir }}";
+
+  home.packages = with pkgs; [
+    colima
+    docker
+    docker-compose
+  ];
 }

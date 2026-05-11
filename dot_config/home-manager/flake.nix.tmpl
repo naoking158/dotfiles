@@ -8,6 +8,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-claude-code.url = "github:ryoppippi/nix-claude-code";
+    nix-darwin = {
+      url = "github:LnL7/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -26,7 +30,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, nix-claude-code, emacs-overlay, xremap-flake, lsp-proxy, nixos-cosmic, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, nix-claude-code, nix-darwin, emacs-overlay, xremap-flake, lsp-proxy, nixos-cosmic, ... }@inputs:
     let
       direnvOverlay = final: prev: {
         direnv = prev.direnv.overrideAttrs (old: { doCheck = false; });
@@ -80,7 +84,17 @@
       "{{ .chezmoi.username }}@macos" = home-manager.lib.homeManagerConfiguration {
         pkgs = mkPkgs "aarch64-darwin";
         modules = [ ./home.nix ./darwin.nix ];
+        extraSpecialArgs = { inherit inputs; };
       };
+    };
+
+    # nix-darwin manages macOS system settings (defaults, keyboard remap) and
+    # Homebrew (taps/brews/casks). User-level config still lives in
+    # home-manager via homeConfigurations above. Switch with:
+    #   nix run nix-darwin -- switch --flake ~/.config/home-manager#{{ .chezmoi.hostname }}
+    darwinConfigurations.{{ .chezmoi.hostname }} = nix-darwin.lib.darwinSystem {
+      system = "aarch64-darwin";
+      modules = [ ./nix-darwin ];
     };
   };
 }
