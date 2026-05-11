@@ -11,7 +11,6 @@
   targets.genericLinux.enable = true;
 
   home.packages = [
-    inputs.lsp-proxy.packages.${pkgs.system}.default
     inputs.xremap-flake.packages.${pkgs.system}.xremap-cosmic
     pkgs.cosmic-ext-applet-clipboard-manager
     pkgs.cliphist

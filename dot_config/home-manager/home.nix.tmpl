@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
 {
   home.username = "{{ .chezmoi.username }}";
@@ -29,6 +29,9 @@
     # Fonts
     (iosevka-bin.override { variant = "Aile"; })
     udev-gothic-nf
+
+    # Commons
+    inputs.lsp-proxy.packages.${pkgs.system}.default
   ];
 
   fonts.fontconfig.enable = true;
