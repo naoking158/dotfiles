@@ -1,13 +1,10 @@
 { ... }:
 
 {
-  nix = {
-    optimise.automatic = true;
-    settings = {
-      experimental-features = "nix-command flakes";
-      max-jobs = 8;
-    };
-  };
+  # Determinate Nix manages the Nix installation/daemon itself. Disabling
+  # nix-darwin's Nix management lets the two coexist; nix.* options below
+  # become no-ops. Tune Nix settings via /etc/nix/nix.custom.conf instead.
+  nix.enable = false;
 
   system = {
     stateVersion = 6;
