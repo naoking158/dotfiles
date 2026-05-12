@@ -35,7 +35,13 @@ curl -fsSL https://install.determinate.systems/nix | sh -s -- install
 *** Step 2: chezmoi でリポジトリを取得
 
 #+begin_src shell
-nix shell nixpkgs#chezmoi nixpkgs#git -c chezmoi init git@github.com:naoking158/dotfiles.git
+nix shell nixpkgs#chezmoi nixpkgs#git -c chezmoi init https://github.com/naoking158/dotfiles.git
+#+end_src
+
+*Note*: 初回 bootstrap では HTTPS を使う。SSH 鍵を持たない新規マシンでも認証なしで clone できるため、鶏卵問題を回避できる。SSH へ切り替えたい場合は apply 後に鍵を作成・GitHub 登録してから:
+
+#+begin_src shell
+cd ~/.local/share/chezmoi && git remote set-url origin git@github.com:naoking158/dotfiles.git
 #+end_src
 
 *Note (macOS)*: =git= を一緒に =nix shell= に入れているのは、macOS の system =git= が Xcode Command Line Tools のスタブ経由で起動するため、CLT 未インストール状態だと =xcode-select --install= ダイアログが出て =chezmoi: git: exit status 1= で失敗するため。Nix の =git= を使えば CLT を別途インストールする必要はない。
