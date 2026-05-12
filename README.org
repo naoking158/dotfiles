@@ -35,13 +35,15 @@ curl -fsSL https://install.determinate.systems/nix | sh -s -- install
 *** Step 2: chezmoi でリポジトリを取得
 
 #+begin_src shell
-nix shell nixpkgs#chezmoi -c chezmoi init git@github.com:naoking158/dotfiles.git
+nix shell nixpkgs#chezmoi nixpkgs#git -c chezmoi init git@github.com:naoking158/dotfiles.git
 #+end_src
+
+*Note (macOS)*: =git= を一緒に =nix shell= に入れているのは、macOS の system =git= が Xcode Command Line Tools のスタブ経由で起動するため、CLT 未インストール状態だと =xcode-select --install= ダイアログが出て =chezmoi: git: exit status 1= で失敗するため。Nix の =git= を使えば CLT を別途インストールする必要はない。
 
 *** Step 3: chezmoi apply (dotfiles + Nix パッケージの一括適用)
 
 #+begin_src shell
-nix shell nixpkgs#chezmoi -c chezmoi apply
+nix shell nixpkgs#chezmoi nixpkgs#git -c chezmoi apply
 #+end_src
 
 これにより以下が実行される:
