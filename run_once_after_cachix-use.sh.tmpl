@@ -17,6 +17,12 @@ set -uo pipefail
 NIX_BIN="/nix/var/nix/profiles/default/bin/nix"
 CUSTOM_CONF="/etc/nix/nix.custom.conf"
 
+# sudo -H rewrites $HOME to root's home. Without it, nix inherits the
+# caller's $HOME (e.g. /Users/naoki) and warns that it isn't owned by
+# root before falling back to /var/root. cachix here only writes
+# /etc/nix/nix.custom.conf, so the caller's $HOME is not needed.
+SUDO=(sudo -H)
+
 # Idempotency: skip if already wired up.
 if [ -f "$CUSTOM_CONF" ] && grep -q 'nix-community.cachix.org' "$CUSTOM_CONF"; then
     echo "nix-community cachix already configured. Skipping."
@@ -37,7 +43,7 @@ WARNING: nix-community cachix is not configured.
 
   To enable it, run once:
 
-    sudo $NIX_BIN run nixpkgs#cachix -- use nix-community
+    sudo -H $NIX_BIN run nixpkgs#cachix -- use nix-community
 
 EOF
 }
@@ -49,7 +55,7 @@ if ! sudo -n true 2>/dev/null && [ ! -t 0 ]; then
 fi
 
 echo "Configuring nix-community cachix (sudo password may be required)..."
-if ! sudo "$NIX_BIN" run nixpkgs#cachix -- use nix-community; then
+if ! "${SUDO[@]}" "$NIX_BIN" run nixpkgs#cachix -- use nix-community; then
     print_manual
     exit 0
 fi
