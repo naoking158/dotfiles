@@ -416,9 +416,13 @@ The location is managed by [[https://github.com/emacscollective/no-littering][no
     :preface
     (defun general-init-hook nil
       (menu-bar-mode -1)
-      (when-let* ((gls (executable-find "gls")))
-        (setq insert-directory-program gls dired-use-ls-dired t)
-        (setq dired-listing-switches "-al --group-directories-first")))
+      (if-let* ((gls (executable-find "gls")))
+          (setq insert-directory-program gls
+                dired-use-ls-dired t)
+        ;; macOS BSD ls fallback: --dired and --group-directories-first
+        ;; are unsupported, so disable --dired emission and use safe switches.
+        (setq dired-use-ls-dired nil
+              dired-listing-switches "-alh")))
     :custom '((fill-column . 82)
               (tab-width . 2)
               (indent-tabs-mode . nil)

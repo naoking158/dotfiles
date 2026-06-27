@@ -22,6 +22,22 @@ export PATH="/nix/var/nix/profiles/default/bin:$HOME/.nix-profile/bin:$PATH"
 echo "Nix configuration changed. Running home-manager switch..."
 
 {{ if eq .chezmoi.os "darwin" -}}
+# Pre-authenticate sudo NOW, while the terminal is quiet. Otherwise the
+# sudo prompt for the later `darwin-rebuild switch` fires immediately
+# after `home-manager switch`, whose trailing nix progress / activation
+# diff output clobbers the prompt and eats the user's keystrokes (see
+# docs/analysis/bugs/20260628-nix-darwin-sudo-prompt.md).
+echo "Authenticating sudo up front for nix-darwin switch..."
+sudo -v
+
+# Refresh the sudo timestamp every 60s so it does not expire during a
+# long `home-manager switch` build. The loop uses `sudo -n -v` so that
+# if the timestamp is invalidated externally (e.g. `sudo -k` in another
+# shell) it exits silently instead of re-prompting from the background.
+( while true; do sudo -n -v 2>/dev/null || exit; sleep 60; done ) &
+SUDO_KEEPALIVE_PID=$!
+trap 'kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true' EXIT
+
 # First-time bootstrap fallback:
 # ~/.nix-profile/bin/home-manager is created by home-manager switch itself,
 # so it won't exist on first run. Use nix run as fallback.
@@ -33,17 +49,19 @@ else
 fi
 
 # nix-darwin handles macOS system settings + Homebrew. Recent nix-darwin
-# requires the activation phase to run as root. When chezmoi is invoked
-# from an interactive terminal, the controlling TTY is inherited down to
-# sudo so the password prompt works inline. -E preserves PATH (so
-# darwin-rebuild finds nix) and $HOME (so the flake path resolves under
-# root).
+# requires the activation phase to run as root. The password prompt was
+# already handled up front by the `sudo -v` above, and the keepalive
+# loop keeps the timestamp warm across `home-manager switch`, so this
+# call uses `-n` to fail fast if the timestamp ever expires instead of
+# re-prompting on a TTY still being redrawn by nix output. -E preserves
+# PATH (so darwin-rebuild finds nix) and $HOME (so the flake path
+# resolves under root).
 echo "Running nix-darwin switch..."
 if command -v darwin-rebuild &>/dev/null; then
-    sudo -E darwin-rebuild switch --flake ~/.config/home-manager#{{ .chezmoi.hostname }}
+    sudo -n -E darwin-rebuild switch --flake ~/.config/home-manager#{{ .chezmoi.hostname }}
 else
     echo "darwin-rebuild not found in PATH. Running via nix run (first-time bootstrap)..."
-    sudo -E "$(command -v nix)" run nix-darwin -- switch --flake ~/.config/home-manager#{{ .chezmoi.hostname }}
+    sudo -n -E "$(command -v nix)" run nix-darwin -- switch --flake ~/.config/home-manager#{{ .chezmoi.hostname }}
 fi
 echo "nix-darwin switch completed successfully."
 {{ else -}}
