@@ -2,6 +2,7 @@
 node = "lts"
 go = "latest"
 ruby = "3.4"
+bun = "latest"
 
 [settings]
 experimental = true

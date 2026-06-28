@@ -37,6 +37,7 @@
       "raycast"
       "d12frosted/emacs-plus/emacs-plus-app"
       "mtgto/macskk/macskk"
+      "sequel-ace"
       "vivaldi"
     ];
   };
