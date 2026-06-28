@@ -18,6 +18,7 @@ a bunch of resources I've found online.
 - [[#keep-emacsd-clean][Keep .emacs.d Clean]]
 - [[#general-configuration][General Configuration]]
   - [[#properties-of-builtin][Properties of builtin]]
+  - [[#wayland-clipboard-bridge][Wayland clipboard bridge]]
   - [[#change-modifiers][Change modifiers]]
   - [[#auto-revert-buffer][Auto revert buffer]]
   - [[#auto-saving-changed-files][Auto-Saving Changed Files]]
@@ -1078,7 +1079,9 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
       ;; Load choiced theme
       (pcase sym-theme
         ('standard-dark (load-theme 'standard-dark :no-confirm))
-        ('standard-light (load-theme 'standard-light :no-confirm)))
+        ('standard-light (load-theme 'standard-light :no-confirm))
+        ('standard-light-tinted (load-theme 'standard-light-tinted :no-confirm))
+        )
 
       (let ((color (standard-themes-with-colors (list bg-dim fg-dim))))
         (set-face-attribute 'tab-bar-tab nil
@@ -1128,6 +1131,7 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
                         modus-dark
                         standard-light
                         standard-dark
+                        standard-light-tinted
                         bespoke/dark-theme
                         bespoke/light-theme))
 
@@ -1153,7 +1157,9 @@ For more detail, see https://medium.com/@77belac77/how-to-get-googles-emoji-on-y
   (defun my/default-theme nil
     ;; (my/load-theme 'modus-light)
     ;; (my/load-theme 'modus-dark)
-    (my/load-theme 'standard-dark)
+    ;; (my/load-theme 'standard-dark)
+    ;; (my/load-theme 'standard-light)
+    (my/load-theme 'standard-light-tinted)
     )
 
   :config
