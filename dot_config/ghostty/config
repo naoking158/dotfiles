@@ -1,4 +1,9 @@
-theme = Ultra Dark
+theme = iTerm2 Solarized Light
+# theme = Rose Pine Dawn
+# theme = Catppuccin Latte
+# theme = Violet Light
+foreground = #1e1e1e
+
 window-padding-x = 20
 window-padding-y = 5
 window-padding-balance = true
