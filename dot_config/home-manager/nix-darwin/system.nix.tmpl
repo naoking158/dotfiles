@@ -6,6 +6,16 @@
   # become no-ops. Tune Nix settings via /etc/nix/nix.custom.conf instead.
   nix.enable = false;
 
+  # nixpkgs-unstable removed the `--toc-depth` flag from nixos-render-docs,
+  # but nix-darwin's HTML manual build still passes it, so darwin-manual-html
+  # fails to build. Skip the HTML manual (man pages stay enabled). The
+  # uninstaller must also be dropped because it embeds a default-config
+  # system that builds the manual regardless of the option above; run it on
+  # demand with `nix run nix-darwin#darwin-uninstaller` instead. Re-enable
+  # both once https://github.com/nix-darwin/nix-darwin/pull/1819 is merged.
+  documentation.doc.enable = false;
+  system.tools.darwin-uninstaller.enable = false;
+
   system = {
     stateVersion = 6;
     primaryUser = "{{ .chezmoi.username }}";

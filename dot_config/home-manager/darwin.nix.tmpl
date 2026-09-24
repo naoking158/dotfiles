@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
 {
   home.homeDirectory = "{{ .chezmoi.homeDir }}";
@@ -8,5 +8,6 @@
     coreutils-prefixed
     docker
     docker-compose
+    inputs.arto.packages.${system}.default
   ];
 }

@@ -211,6 +211,7 @@
                 "conditions": [
                   {
                     "bundle_identifiers": [
+                      "*Emacs*",
                       "^org\\.gnu\\.Emacs$",
                       "^org\\.gnu\\.AquamacsEmacs$",
                       "^org\\.gnu\\.Aquamacs$",
@@ -274,6 +275,7 @@
                 "conditions": [
                   {
                     "bundle_identifiers": [
+                      "*Emacs*",
                       "^org\\.gnu\\.Emacs$",
                       "^org\\.gnu\\.AquamacsEmacs$",
                       "^org\\.gnu\\.Aquamacs$",
@@ -337,6 +339,7 @@
                 "conditions": [
                   {
                     "bundle_identifiers": [
+                      "*Emacs*",
                       "^org\\.gnu\\.Emacs$",
                       "^org\\.gnu\\.AquamacsEmacs$",
                       "^org\\.gnu\\.Aquamacs$",
@@ -457,6 +460,7 @@
                 "conditions": [
                   {
                     "bundle_identifiers": [
+                      "*Emacs*",
                       "^org\\.gnu\\.Emacs$",
                       "^org\\.gnu\\.AquamacsEmacs$",
                       "^org\\.gnu\\.Aquamacs$",
@@ -520,6 +524,7 @@
                 "conditions": [
                   {
                     "bundle_identifiers": [
+                      "*Emacs*",
                       "^org\\.gnu\\.Emacs$",
                       "^org\\.gnu\\.AquamacsEmacs$",
                       "^org\\.gnu\\.Aquamacs$",
@@ -583,6 +588,7 @@
                 "conditions": [
                   {
                     "bundle_identifiers": [
+                      "*Emacs*",
                       "^org\\.gnu\\.Emacs$",
                       "^org\\.gnu\\.AquamacsEmacs$",
                       "^org\\.gnu\\.Aquamacs$",
@@ -646,6 +652,7 @@
                 "conditions": [
                   {
                     "bundle_identifiers": [
+                      "*Emacs*",
                       "^org\\.gnu\\.Emacs$",
                       "^org\\.gnu\\.AquamacsEmacs$",
                       "^org\\.gnu\\.Aquamacs$",
@@ -709,6 +716,7 @@
                 "conditions": [
                   {
                     "bundle_identifiers": [
+                      "*Emacs*",
                       "^org\\.gnu\\.Emacs$",
                       "^org\\.gnu\\.AquamacsEmacs$",
                       "^org\\.gnu\\.Aquamacs$",
