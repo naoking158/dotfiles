@@ -73,7 +73,7 @@
         nixos-cosmic.overlays.default
       ];
       config.allowUnfreePredicate = pkg:
-        builtins.elem (nixpkgs.lib.getName pkg) [ "claude-code" ];
+        builtins.elem (nixpkgs.lib.getName pkg) [ "claude" ];
       mkPkgs = system: import nixpkgs { inherit system overlays config; };
     in {
     homeConfigurations = {
