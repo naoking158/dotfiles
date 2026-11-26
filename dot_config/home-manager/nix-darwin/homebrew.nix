@@ -39,6 +39,7 @@
       "mtgto/macskk/macskk"
       "sequel-ace"
       "vivaldi"
+      "stablyai/orca/orca"
     ];
   };
 }

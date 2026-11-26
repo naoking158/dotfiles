@@ -1,6 +1,7 @@
 {
-  "trustedtaps": [
-    "d12frosted/emacs-plus",
-    "mtgto/macskk"
+  "trustedcasks": [
+    "d12frosted/emacs-plus/emacs-plus-app",
+    "mtgto/macskk/macskk",
+    "stablyai/orca/orca"
   ]
 }

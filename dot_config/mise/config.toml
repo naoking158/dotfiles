@@ -5,6 +5,9 @@ ruby = "3.4"
 bun = "latest"
 "github:sorah/mairu" = "latest"
 fnox = "latest"
+pnpm = "latest"
+uv = "latest"
+bats = "1.14.0"
 
 [settings]
 experimental = true
